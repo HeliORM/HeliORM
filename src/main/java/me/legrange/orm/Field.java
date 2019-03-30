@@ -9,4 +9,6 @@ package me.legrange.orm;
  */
 public interface Field<T extends Table<O>, O, C> {
 
+    String getSqlField();
+
 }

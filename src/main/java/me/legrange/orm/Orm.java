@@ -1,6 +1,7 @@
 package me.legrange.orm;
 
 import java.sql.Connection;
+import me.legrange.orm.impl.SelectPart;
 
 /**
  *
@@ -8,20 +9,14 @@ import java.sql.Connection;
  */
 public class Orm implements AutoCloseable {
 
-    public enum Dialect {
-        MYSQL;
-    }
-
     private final Connection con;
-    private final Dialect dialect;
 
-    public static Orm open(Connection con, Dialect dialect) {
-        return new Orm(con, dialect);
+    public static Orm open(Connection con) {
+        return new Orm(con);
     }
 
-    public Orm(Connection con, Dialect dialect) {
+    public Orm(Connection con) {
         this.con = con;
-        this.dialect = dialect;
     }
 
     public <T> T create(T data) throws OrmException {
@@ -33,11 +28,15 @@ public class Orm implements AutoCloseable {
     }
 
     public <T extends Table<O>, O> Select<T, O, T, O> select(T table) {
-        return null;
+        return new SelectPart(null, table, this);
     }
 
     @Override
     public void close() throws OrmException {
+    }
+
+    public Connection getCon() {
+        return con;
     }
 
 }

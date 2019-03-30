@@ -8,6 +8,8 @@ package me.legrange.orm;
  */
 public interface Select<T extends Table<O>, O, RT extends Table<RO>, RO> extends Executable<RT, RO> {
 
+    <RT extends Table<RO>, RO> Join<T, O, RT, RO> join(RT table);
+
     <F extends NumberField<T, O, C>, C extends Number> NumberClause<T, O, C, RT, RO> where(F field);
 
     <F extends StringField<T, O>> StringClause<T, O, RT, RO> where(F field);
@@ -16,6 +18,6 @@ public interface Select<T extends Table<O>, O, RT extends Table<RO>, RO> extends
 
     <F extends EnumField<T, O, C>, C extends Enum> EnumClause<T, O, C, RT, RO> where(F field);
 
-    <RT extends Table<RO>, RO> Join<T, O, RT, RO> join(RT table);
+    <F extends BooleanField<T, O>> BooleanClause<T, O, RT, RO> where(F field);
 
 }
