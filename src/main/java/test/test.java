@@ -19,12 +19,16 @@ public class test {
         try (Orm orm = Orm.open(con, Orm.Dialect.MYSQL)) {
             orm.select(CLIENT)
                     .where(CLIENT.clientNumber).le(5)
-                    .and(CLIENT.lastname).in("Le Grange").list();
+                    .and(CLIENT.lastname).in("Le Grange")
+                    .join(SALE).on(CLIENT.clientNumber).eq(SALE.clientNumber);
 
             List<Sale> list = orm.select(SALE)
                     .where(SALE.status).notEq(Sale.SaleStatus.INACTIVE)
-                    .orderBy(SALE.price)
+                    .and(SALE.price).gt(50.0)
+                    .join(CLIENT).on(SALE.clientNumber).eq(CLIENT.clientNumber)
+                    .orderBy(SALE.saleNumber)
                     .list();
+
         }
     }
 

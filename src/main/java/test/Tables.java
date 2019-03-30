@@ -24,6 +24,7 @@ public class Tables {
     public static class SaleTable implements Table<Sale> {
 
         public final NumberField<SaleTable, Sale, Integer> saleNumber = null;
+        public final NumberField<SaleTable, Sale, Integer> clientNumber = null;
         public final NumberField<SaleTable, Sale, Double> price = null;
         public final EnumField<SaleTable, Sale, Sale.SaleStatus> status = null;
         public final DateField<SaleTable, Sale> created = null;

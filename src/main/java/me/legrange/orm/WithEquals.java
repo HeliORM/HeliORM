@@ -7,10 +7,10 @@ package me.legrange.orm;
  * @param <O> Object type
  * @param <C> Column/field type
  */
-public interface WithEquals<T extends Table<O>, O, C> {
+public interface WithEquals<T extends Table<O>, O, C, RT extends Table<RO>, RO> {
 
-    Continuation<T, O> eq(C value);
+    Continuation<T, O, RT, RO> eq(C value);
 
-    Continuation<T, O> notEq(C value);
+    Continuation<T, O, RT, RO> notEq(C value);
 
 }

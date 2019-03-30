@@ -7,7 +7,7 @@ package me.legrange.orm;
  *
  * @author gideon
  */
-public interface StringClause<T extends Table<O>, O> extends Clause<T, O, String>,
-        WithRange<T, O, String>, WithEquals<T, O, String>, WithIn<T, O, String> {
+public interface StringClause<T extends Table<O>, O, RT extends Table<RO>, RO> extends Clause<T, O, String, RT, RO>,
+        WithRange<T, O, String, RT, RO>, WithEquals<T, O, String, RT, RO>, WithIn<T, O, String, RT, RO> {
 
 }

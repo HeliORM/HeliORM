@@ -9,7 +9,7 @@ import java.util.Date;
  *
  * @author gideon
  */
-public interface DateClause<T extends Table<O>, O> extends Clause<T, O, Date>,
-        WithRange<T, O, Date>, WithEquals<T, O, Date>, WithIn<T, O, Date> {
+public interface DateClause<T extends Table<O>, O, RT extends Table<RO>, RO> extends Clause<T, O, Date, RT, RO>,
+        WithRange<T, O, Date, RT, RO>, WithEquals<T, O, Date, RT, RO>, WithIn<T, O, Date, RT, RO> {
 
 }

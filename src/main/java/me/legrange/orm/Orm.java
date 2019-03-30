@@ -32,7 +32,7 @@ public class Orm implements AutoCloseable {
         return data;
     }
 
-    public <T extends Table<O>, O> Select<T, O> select(T table) {
+    public <T extends Table<O>, O> Select<T, O, T, O> select(T table) {
         return null;
     }
 

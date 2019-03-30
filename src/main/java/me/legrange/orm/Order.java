@@ -6,7 +6,7 @@ package me.legrange.orm;
  * @param <T>
  * @param <O>
  */
-public interface Order<T extends Table<O>, O> extends Executable {
+public interface Order<T extends Table<O>, O> extends Executable<T, O> {
 
     <F extends Field<T, O, C>, C> Order<T, O> thenBy(F field);
 

@@ -8,7 +8,7 @@ package me.legrange.orm;
  *
  * @author gideon
  */
-public interface NumberClause<T extends Table<O>, O, C> extends Clause<T, O, C>,
-        WithRange<T, O, C>, WithEquals<T, O, C>, WithIn<T, O, C> {
+public interface NumberClause<T extends Table<O>, O, C, RT extends Table<RO>, RO> extends Clause<T, O, C, RT, RO>,
+        WithRange<T, O, C, RT, RO>, WithEquals<T, O, C, RT, RO>, WithIn<T, O, C, RT, RO> {
 
 }

@@ -7,14 +7,14 @@ package me.legrange.orm;
  * @param <O> Object type
  * @param <C> Column/field type
  */
-public interface WithRange<T extends Table<O>, O, C> {
+public interface WithRange<T extends Table<O>, O, C, RT extends Table<RO>, RO> {
 
-    Continuation<T, O> lt(C value);
+    Continuation<T, O, RT, RO> lt(C value);
 
-    Continuation<T, O> le(C value);
+    Continuation<T, O, RT, RO> le(C value);
 
-    Continuation<T, O> gt(C value);
+    Continuation<T, O, RT, RO> gt(C value);
 
-    Continuation<T, O> ge(C value);
+    Continuation<T, O, RT, RO> ge(C value);
 
 }
