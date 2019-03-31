@@ -10,6 +10,7 @@ import me.legrange.orm.impl.ClausePart;
 import me.legrange.orm.impl.JoinPart;
 import me.legrange.orm.impl.ListOperatorPart;
 import me.legrange.orm.impl.OnClausePart;
+import me.legrange.orm.impl.OrderedPart;
 import me.legrange.orm.impl.Part;
 import me.legrange.orm.impl.SelectPart;
 import me.legrange.orm.impl.ValueOperatorPart;
@@ -27,14 +28,18 @@ public class MySqlOrm extends Orm {
     @Override
     protected String buildQuery(List<Part> parts) throws OrmException {
         StringBuilder query = new StringBuilder();
+        SelectPart select = (SelectPart) parts.get(0);
         for (Part part : parts) {
             switch (part.getType()) {
-                case SELECT:
+                case SELECT: {
                     if (part.getLeft() == null) {
-                        query.append("SELECT * FROM ");
-                        query.append(((SelectPart) part).getReturnTable().getSqTable());
+                        query.append("SELECT  ");
+                        query.append(select.getReturnTable().getSqTable());
+                        query.append(".* FROM ");
+                        query.append(select.getReturnTable().getSqTable());
                     }
-                    break;
+                }
+                break;
                 case CLAUSE: {
                     ClausePart cp = (ClausePart) part;
                     query.append(" ");
@@ -47,10 +52,16 @@ public class MySqlOrm extends Orm {
                     query.append(" JOIN ");
                     query.append(((JoinPart) part).getTable().getSqTable());
                     break;
-                case ON_CLAUSE:
+                case ON_CLAUSE: {
+                    OnClausePart on = (OnClausePart) part;
                     query.append(" ON ");
-                    query.append(((OnClausePart) part).getField().getSqlField());
-                    break;
+                    query.append(select.getReturnTable().getSqTable());
+                    query.append(".");
+                    query.append(on.getLeftField().getSqlField());
+                    query.append("=");
+                    query.append(on.getRightField().getSqlField());
+                }
+                break;
                 case VALUE_OPERATION: {
                     ValueOperatorPart vop = (ValueOperatorPart) part;
                     query.append(valueOperator(vop.getOp()));
@@ -70,6 +81,19 @@ public class MySqlOrm extends Orm {
                     query.append(sj.toString());
                     query.append(")");
 
+                }
+                break;
+                case ORDER: {
+                    OrderedPart order = (OrderedPart) part;
+                    if (part.getLeft().getType() != Part.Type.ORDER) {
+                        query.append(" ORDER BY ");
+                    } else {
+                        query.append(",");
+                    }
+                    query.append(order.getField().getSqlField());
+                    if (order.getDirection() == OrderedPart.Direction.DESCENDING) {
+                        query.append(" DESCENDING");
+                    }
                 }
                 break;
                 case CONTINUATION:

@@ -14,6 +14,7 @@ import me.legrange.orm.Join;
 import me.legrange.orm.NumberClause;
 import me.legrange.orm.NumberField;
 import me.legrange.orm.Order;
+import me.legrange.orm.Ordered;
 import me.legrange.orm.Orm;
 import me.legrange.orm.OrmException;
 import me.legrange.orm.Select;
@@ -25,7 +26,8 @@ import me.legrange.orm.Table;
  *
  * @author gideon
  */
-public class SelectPart<T extends Table<O>, O, RT extends Table<RO>, RO> extends Part<T, O, RT, RO> implements Select<T, O, RT, RO> {
+public class SelectPart<LT extends Table<LO>, LO, RT extends Table<RO>, RO> extends Part<LT, LO, RT, RO>
+        implements Select<LT, LO, RT, RO>, Order<RT, RO> {
 
     private final Orm orm;
     private final Table table;
@@ -57,32 +59,32 @@ public class SelectPart<T extends Table<O>, O, RT extends Table<RO>, RO> extends
     }
 
     @Override
-    public <RT extends Table<RO>, RO> Join<T, O, RT, RO> join(RT table) {
+    public <RT extends Table<RO>, RO> Join<LT, LO, RT, RO> join(RT table) {
         return new JoinPart(this, table);
     }
 
     @Override
-    public <F extends NumberField<T, O, C>, C extends Number> NumberClause<T, O, C, RT, RO> where(F field) {
+    public <F extends NumberField<RT, RO, C>, C extends Number> NumberClause<LT, LO, C, RT, RO> where(F field) {
         return new NumberClausePart(this, ClausePart.Operator.WHERE, field);
     }
 
     @Override
-    public <F extends StringField<T, O>> StringClause<T, O, RT, RO> where(F field) {
+    public <F extends StringField<RT, RO>> StringClause<LT, LO, RT, RO> where(F field) {
         return new StringClausePart(this, ClausePart.Operator.WHERE, field);
     }
 
     @Override
-    public <F extends DateField<T, O>> DateClause<T, O, RT, RO> where(F field) {
+    public <F extends DateField<RT, RO>> DateClause<LT, LO, RT, RO> where(F field) {
         return new DateClausePart(this, ClausePart.Operator.WHERE, field);
     }
 
     @Override
-    public <F extends EnumField<T, O, C>, C extends Enum> EnumClause<T, O, C, RT, RO> where(F field) {
+    public <F extends EnumField<RT, RO, C>, C extends Enum> EnumClause<LT, LO, C, RT, RO> where(F field) {
         return new EnumClausePart(this, ClausePart.Operator.WHERE, field);
     }
 
     @Override
-    public <F extends BooleanField<T, O>> BooleanClause<T, O, RT, RO> where(F field) {
+    public <F extends BooleanField<RT, RO>> BooleanClause<LT, LO, RT, RO> where(F field) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
@@ -107,13 +109,13 @@ public class SelectPart<T extends Table<O>, O, RT extends Table<RO>, RO> extends
     }
 
     @Override
-    public <F extends Field<RT, RO, C>, C> Order<RT, RO> orderBy(F field) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public <F extends Field<RT, RO, C>, C> Ordered<RT, RO> orderBy(F field) {
+        return new OrderedPart(this, OrderedPart.Direction.ASCENDING, field);
     }
 
     @Override
-    public <F extends Field<RT, RO, C>, C> Order<RT, RO> orderByDesc(F field) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public <F extends Field<RT, RO, C>, C> Ordered<RT, RO> orderByDesc(F field) {
+        return new OrderedPart(this, OrderedPart.Direction.DESCENDING, field);
     }
 
     @Override

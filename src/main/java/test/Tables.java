@@ -21,6 +21,7 @@ public class Tables {
 
         public final NumberField<ClientTable, Client, Integer> clientNumber = () -> "clientNumber";
         public final StringField<ClientTable, Client> lastname = () -> "lastname";
+        public final EnumField<ClientTable, Client, Client.ClientType> type = () -> "type";
 
         @Override
         public Class<Client> getObjectClass() {

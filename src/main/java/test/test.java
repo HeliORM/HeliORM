@@ -24,12 +24,16 @@ public class test {
                     .where(CLIENT.clientNumber).le(5)
                     .or(CLIENT.lastname).in("Smith", "Jones")
                     .list();
-            List<Sale> lists = orm.select(SALE)
+            List<Sale> list1 = orm.select(SALE)
                     .where(SALE.status).notEq(Sale.SaleStatus.INACTIVE)
                     .and(SALE.price).gt(50.0)
-                    .join(CLIENT).on(SALE.clientNumber).eq(CLIENT.clientNumber)
-                    .orderBy(SALE.saleNumber)
+                    .join(CLIENT).on(SALE.clientNumber, CLIENT.clientNumber)
+                    .where(CLIENT.type).eq(Client.ClientType.PRIVATE)
+                    .orderBy(SALE.status).thenByDesc(SALE.price)
                     .list();
+//                    .where(CLIENT.type).eq(Client.ClientType.RESELLER)
+            //                    .orderBy(SALE.saleNumber)
+            //        .list();
 
         }
     }
