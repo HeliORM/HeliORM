@@ -59,6 +59,11 @@ public class SelectPart<LT extends Table<LO>, LO, RT extends Table<RO>, RO> exte
     }
 
     @Override
+    public Table getSelectTable() {
+        return table;
+    }
+
+    @Override
     public <RT extends Table<RO>, RO> Join<LT, LO, RT, RO> join(RT table) {
         return new JoinPart(this, table);
     }

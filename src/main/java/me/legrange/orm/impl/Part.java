@@ -27,8 +27,12 @@ public abstract class Part<T extends Table<O>, O, RT extends Table<RO>, RO> {
 
     public abstract Type getType();
 
-    protected Table getReturnTable() {
+    public Table getReturnTable() {
         return left.getReturnTable();
+    }
+
+    public Table getSelectTable() {
+        return left.getSelectTable();
     }
 
     public Part getLeft() {

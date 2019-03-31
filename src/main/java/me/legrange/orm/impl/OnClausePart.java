@@ -10,7 +10,7 @@ public final class OnClausePart<LT extends Table<LO>, LO, RT extends Table<RO>, 
     private final Field<RT, RO, ?> rightField;
 
     <C> OnClausePart(Part left, Field<LT, LO, C> leftField, Field<RT, RO, C> rightField) {
-        super(left, null);
+        super(left, left.getSelectTable());
         this.leftField = leftField;
         this.rightField = rightField;
     }

@@ -31,9 +31,6 @@ public class test {
                     .where(CLIENT.type).eq(Client.ClientType.PRIVATE)
                     .orderBy(SALE.status).thenByDesc(SALE.price)
                     .list();
-//                    .where(CLIENT.type).eq(Client.ClientType.RESELLER)
-            //                    .orderBy(SALE.saleNumber)
-            //        .list();
 
         }
     }
