@@ -19,8 +19,8 @@ public class Tables {
 
     public static class ClientTable implements Table<Client> {
 
-        public final NumberField<ClientTable, Client, Integer> clientNumber = null;
-        public final StringField<ClientTable, Client> lastname = null;
+        public final NumberField<ClientTable, Client, Integer> clientNumber = () -> "clientNumber";
+        public final StringField<ClientTable, Client> lastname = () -> "lastname";
 
         @Override
         public Class<Client> getObjectClass() {
@@ -40,11 +40,11 @@ public class Tables {
 
     public static class SaleTable implements Table<Sale> {
 
-        public final NumberField<SaleTable, Sale, Integer> saleNumber = null;
-        public final NumberField<SaleTable, Sale, Integer> clientNumber = null;
-        public final NumberField<SaleTable, Sale, Double> price = null;
-        public final EnumField<SaleTable, Sale, Sale.SaleStatus> status = null;
-        public final DateField<SaleTable, Sale> created = null;
+        public final NumberField<SaleTable, Sale, Integer> saleNumber = () -> "saleNumber";
+        public final NumberField<SaleTable, Sale, Integer> clientNumber = () -> "clientNumber";
+        public final NumberField<SaleTable, Sale, Double> price = () -> "price";
+        public final EnumField<SaleTable, Sale, Sale.SaleStatus> status = () -> "status";
+        public final DateField<SaleTable, Sale> created = () -> "created";
 
         @Override
         public String getSqTable() {

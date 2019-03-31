@@ -7,9 +7,9 @@ import me.legrange.orm.Table;
  *
  * @author gideon
  */
-class ListOperatorPart<T extends Table<O>, O, C, RT extends Table<RO>, RO> extends ContinuationPart<T, O, RT, RO> {
+public final class ListOperatorPart<T extends Table<O>, O, C, RT extends Table<RO>, RO> extends ContinuationPart<T, O, RT, RO> {
 
-    enum Operator {
+    public enum Operator {
         IN, NOT_IN;
 
     }
@@ -21,6 +21,19 @@ class ListOperatorPart<T extends Table<O>, O, C, RT extends Table<RO>, RO> exten
         super(left);
         this.op = op;
         this.values = values;
+    }
+
+    @Override
+    public Type getType() {
+        return Type.LIST_OPERATION;
+    }
+
+    public Operator getOp() {
+        return op;
+    }
+
+    public List<C> getValues() {
+        return values;
     }
 
 }

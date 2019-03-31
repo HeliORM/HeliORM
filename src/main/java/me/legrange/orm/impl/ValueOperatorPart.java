@@ -6,10 +6,10 @@ import me.legrange.orm.Table;
  *
  * @author gideon
  */
-class ValueOperatorPart<T extends Table<O>, O, C, RT extends Table<RO>, RO> extends ContinuationPart<T, O, RT, RO> {
+public final class ValueOperatorPart<T extends Table<O>, O, C, RT extends Table<RO>, RO> extends ContinuationPart<T, O, RT, RO> {
 
-    enum Operator {
-        EQ, NOT_EQ, LIKE, NOT_LIKE, LT, GT, LE, GE, IN, NOT_IN;
+    public enum Operator {
+        EQ, NOT_EQ, LIKE, NOT_LIKE, LT, GT, LE, GE;
 
     }
 
@@ -20,6 +20,19 @@ class ValueOperatorPart<T extends Table<O>, O, C, RT extends Table<RO>, RO> exte
         super(left);
         this.op = op;
         this.value = value;
+    }
+
+    @Override
+    public Type getType() {
+        return Type.VALUE_OPERATION;
+    }
+
+    public Operator getOp() {
+        return op;
+    }
+
+    public C getValue() {
+        return value;
     }
 
 }

@@ -1,6 +1,5 @@
 package me.legrange.orm.impl;
 
-import static java.lang.String.format;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -43,16 +42,16 @@ public class SelectPart<T extends Table<O>, O, RT extends Table<RO>, RO> extends
 
     @Override
     protected Orm getOrm() {
-        if (left != null) {
-            return left.getOrm();
+        if (getLeft() != null) {
+            return getLeft().getOrm();
         }
         return orm;
     }
 
     @Override
-    protected Table getReturnTable() {
-        if (left != null) {
-            return left.getReturnTable();
+    public final Table getReturnTable() {
+        if (getLeft() != null) {
+            return getLeft().getReturnTable();
         }
         return table;
     }
@@ -64,22 +63,22 @@ public class SelectPart<T extends Table<O>, O, RT extends Table<RO>, RO> extends
 
     @Override
     public <F extends NumberField<T, O, C>, C extends Number> NumberClause<T, O, C, RT, RO> where(F field) {
-        return new NumberClausePart(this, field);
+        return new NumberClausePart(this, ClausePart.Operator.WHERE, field);
     }
 
     @Override
     public <F extends StringField<T, O>> StringClause<T, O, RT, RO> where(F field) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return new StringClausePart(this, ClausePart.Operator.WHERE, field);
     }
 
     @Override
     public <F extends DateField<T, O>> DateClause<T, O, RT, RO> where(F field) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return new DateClausePart(this, ClausePart.Operator.WHERE, field);
     }
 
     @Override
     public <F extends EnumField<T, O, C>, C extends Enum> EnumClause<T, O, C, RT, RO> where(F field) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return new EnumClausePart(this, ClausePart.Operator.WHERE, field);
     }
 
     @Override
@@ -118,11 +117,8 @@ public class SelectPart<T extends Table<O>, O, RT extends Table<RO>, RO> extends
     }
 
     @Override
-    protected String query() {
-        if (left == null) {
-            return format("select %s", table.getSqTable());
-        }
-        return format(" %s", table.getSqTable());
+    public Type getType() {
+        return Type.SELECT;
     }
 
 }

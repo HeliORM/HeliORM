@@ -20,8 +20,4 @@ public interface Executable<T extends Table<O>, O> {
 
     Optional<O> oneOrNone() throws OrmException;
 
-    <F extends Field<T, O, C>, C> Order<T, O> orderBy(F field);
-
-    <F extends Field<T, O, C>, C> Order<T, O> orderByDesc(F field);
-
 }

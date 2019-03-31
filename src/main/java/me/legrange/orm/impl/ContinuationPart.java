@@ -1,10 +1,5 @@
 package me.legrange.orm.impl;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -31,22 +26,22 @@ abstract class ContinuationPart<T extends Table<O>, O, RT extends Table<RO>, RO>
 
     @Override
     public <F extends NumberField<T, O, C>, C extends Number> NumberClause<T, O, C, RT, RO> and(F field) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return new NumberClausePart(this, ClausePart.Operator.AND, field);
     }
 
     @Override
     public <F extends NumberField<T, O, C>, C extends Number> NumberClause<T, O, C, RT, RO> or(F field) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return new NumberClausePart(this, ClausePart.Operator.OR, field);
     }
 
     @Override
     public <F extends StringField<T, O>> StringClause<T, O, RT, RO> and(F field) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return new StringClausePart(this, ClausePart.Operator.AND, field);
     }
 
     @Override
     public <F extends StringField<T, O>> StringClause<T, O, RT, RO> or(F field) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return new StringClausePart(this, ClausePart.Operator.OR, field);
     }
 
     @Override
@@ -71,34 +66,12 @@ abstract class ContinuationPart<T extends Table<O>, O, RT extends Table<RO>, RO>
 
     @Override
     public <RT extends Table<RO>, RO> Join<T, O, RT, RO> join(RT table) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return new JoinPart(this, table);
     }
 
     @Override
     public List<RO> list() throws OrmException {
-
-        try {
-            String query = query();
-            System.out.println(query);
-            Connection con = getOrm().getCon();
-            List<RO> result = new ArrayList();
-            try (Statement stmt = con.createStatement(); ResultSet rs = stmt.executeQuery(query)) {
-                Table<RO> table = getReturnTable();
-                while (rs.next()) {
-                    try {
-                        RO obj = table.getObjectClass().newInstance();
-                    } catch (InstantiationException | IllegalAccessException ex) {
-                        throw new OrmException(ex.getMessage(), ex);
-                    }
-                    for (Field field : table.getFields()) {
-
-                    }
-                }
-            }
-            return result;
-        } catch (SQLException ex) {
-            throw new OrmException(ex.getMessage(), ex);
-        }
+        return getOrm().list(this);
     }
 
     @Override
@@ -116,19 +89,17 @@ abstract class ContinuationPart<T extends Table<O>, O, RT extends Table<RO>, RO>
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    @Override
     public <F extends Field<RT, RO, C>, C> Order<RT, RO> orderBy(F field) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    @Override
     public <F extends Field<RT, RO, C>, C> Order<RT, RO> orderByDesc(F field) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    protected String query() {
-        return left.query();
+    public Type getType() {
+        return Type.CONTINUATION;
     }
 
 }

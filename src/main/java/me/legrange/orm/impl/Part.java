@@ -7,9 +7,13 @@ import me.legrange.orm.Table;
  *
  * @author gideon
  */
-abstract class Part<T extends Table<O>, O, RT extends Table<RO>, RO> {
+public abstract class Part<T extends Table<O>, O, RT extends Table<RO>, RO> {
 
-    protected final Part left;
+    public enum Type {
+        SELECT, VALUE_OPERATION, LIST_OPERATION, ON_CLAUSE, CLAUSE, JOIN, CONTINUATION, ORDER;
+    }
+
+    private final Part left;
 
     protected Part(Part left) {
         this.left = left;
@@ -19,10 +23,14 @@ abstract class Part<T extends Table<O>, O, RT extends Table<RO>, RO> {
         return left.getOrm();
     }
 
-    protected abstract String query();
+    public abstract Type getType();
 
     protected Table getReturnTable() {
         return left.getReturnTable();
+    }
+
+    public Part getLeft() {
+        return left;
     }
 
 }

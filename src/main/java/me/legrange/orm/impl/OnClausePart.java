@@ -5,7 +5,7 @@ import me.legrange.orm.OnClause;
 import me.legrange.orm.Select;
 import me.legrange.orm.Table;
 
-class OnClausePart<LT extends Table<LO>, LO, RT extends Table<RO>, RO, C> extends Part implements OnClause<LT, LO, RT, RO, C> {
+public final class OnClausePart<LT extends Table<LO>, LO, RT extends Table<RO>, RO, C> extends Part implements OnClause<LT, LO, RT, RO, C> {
 
     private final Field<LT, LO, C> field;
 
@@ -16,12 +16,16 @@ class OnClausePart<LT extends Table<LO>, LO, RT extends Table<RO>, RO, C> extend
 
     @Override
     public <F extends Field<RT, RO, C>, C> Select<RT, RO, LT, LO> eq(F field) {
-        return new SelectPart(left, null);
+        return new SelectPart(getLeft(), null);
     }
 
     @Override
-    protected String query() {
-        return left.query() + String.format(" %s", field.getSqlField());
+    public Type getType() {
+        return Type.ON_CLAUSE;
+    }
+
+    public Field<LT, LO, C> getField() {
+        return field;
     }
 
 }
