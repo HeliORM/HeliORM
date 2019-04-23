@@ -12,6 +12,10 @@ import me.legrange.orm.annotation.PrimaryKey;
 @Pojo
 public class Person extends Obj {
 
+    public enum Sex {
+        MALE, FEMALE, CONFUSED;
+    }
+
     @PrimaryKey
     private Long personNumber;
     @Column
@@ -22,6 +26,7 @@ public class Person extends Obj {
     private String emailAddress;
     @ForeignKey(pojo = Company.class)
     private Long companyNumber;
+    private Sex sex;
 
     public Long getPersonNumber() {
         return personNumber;
@@ -53,6 +58,14 @@ public class Person extends Obj {
 
     public void setEmailAddress(String emailAddress) {
         this.emailAddress = emailAddress;
+    }
+
+    public Sex getSex() {
+        return sex;
+    }
+
+    public void setSex(Sex sex) {
+        this.sex = sex;
     }
 
 }

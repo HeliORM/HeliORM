@@ -3,15 +3,18 @@ package test;
 import java.util.Arrays;
 import java.util.List;
 import me.legrange.orm.DateField;
+import me.legrange.orm.EnumField;
 import me.legrange.orm.Field;
 import me.legrange.orm.NumberField;
 import me.legrange.orm.StringField;
 import me.legrange.orm.Table;
 import me.legrange.orm.impl.DateFieldPart;
+import me.legrange.orm.impl.EnumFieldPart;
 import me.legrange.orm.impl.NumberFieldPart;
 import me.legrange.orm.impl.StringFieldPart;
 import pojos.Company;
 import pojos.Person;
+import pojos.Person.Sex;
 
 public final class Tables {
 
@@ -48,6 +51,7 @@ public final class Tables {
         public final StringField<PersonTable, Person> lastName = new StringFieldPart("lastName", "lastName");
         public final StringField<PersonTable, Person> emailAddress = new StringFieldPart("emailAddress", "emailAddress");
         public final NumberField<PersonTable, Person, Long> companyNumber = new NumberFieldPart(Person.class, "companyNumber", "companyNumber");
+        public final EnumField<PersonTable, Person, Sex> sex = new EnumFieldPart(Sex.class, "sex", "sex");
 
         public List<Field> getFields() {
             return Arrays.asList(created, modified, version, personNumber, firstName, lastName, emailAddress, companyNumber);
