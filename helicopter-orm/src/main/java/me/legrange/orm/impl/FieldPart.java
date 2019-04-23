@@ -1,19 +1,22 @@
-package me.legrange.orm;
+package me.legrange.orm.impl;
+
+import me.legrange.orm.Field;
+import me.legrange.orm.Table;
 
 /**
  *
  * @author gideon
  */
-public class AbstractField<T extends Table<O>, O, C> implements Field<T, O, C> {
+abstract class FieldPart<T extends Table<O>, O, C> implements Field<T, O, C> {
 
+    private final Class<C> typeClass;
     private final String javaName;
     private final String sqlName;
-    private final Class<C> typeClass;
 
-    public AbstractField(Class<C> typeClass, String javaName, String sqlName) {
+    protected FieldPart(Class<C> typeClass, String javaName, String sqlName) {
+        this.typeClass = typeClass;
         this.javaName = javaName;
         this.sqlName = sqlName;
-        this.typeClass = typeClass;
     }
 
     @Override
