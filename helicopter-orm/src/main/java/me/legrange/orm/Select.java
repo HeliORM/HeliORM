@@ -6,7 +6,7 @@ package me.legrange.orm;
  * @param <T>
  * @param <O>
  */
-public interface Select<T extends Table<O>, O, RT extends Table<RO>, RO> extends Executable<RT, RO>, Order<RT, RO> {
+public interface Select<T extends Table<O>, O, RT extends Table<RO>, RO> extends Executable<T, O>, Order<T, O> {
 
     <RT extends Table<RO>, RO> Join<T, O, RT, RO> join(RT table);
 

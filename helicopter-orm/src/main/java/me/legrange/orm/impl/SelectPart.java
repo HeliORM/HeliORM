@@ -13,7 +13,6 @@ import me.legrange.orm.Field;
 import me.legrange.orm.Join;
 import me.legrange.orm.NumberClause;
 import me.legrange.orm.NumberField;
-import me.legrange.orm.Order;
 import me.legrange.orm.Ordered;
 import me.legrange.orm.Orm;
 import me.legrange.orm.OrmException;
@@ -27,7 +26,7 @@ import me.legrange.orm.Table;
  * @author gideon
  */
 public class SelectPart<LT extends Table<LO>, LO, RT extends Table<RO>, RO> extends Part<LT, LO, RT, RO>
-        implements Select<LT, LO, RT, RO>, Order<RT, RO> {
+        implements Select<LT, LO, RT, RO> {
 
     private final Orm orm;
     private final Table table;
@@ -94,32 +93,32 @@ public class SelectPart<LT extends Table<LO>, LO, RT extends Table<RO>, RO> exte
     }
 
     @Override
-    public List<RO> list() throws OrmException {
+    public List<LO> list() throws OrmException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public Stream<RO> stream() throws OrmException {
+    public Stream<LO> stream() throws OrmException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public RO one() throws OrmException {
+    public LO one() throws OrmException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public Optional<RO> oneOrNone() throws OrmException {
+    public Optional<LO> oneOrNone() throws OrmException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public <F extends Field<RT, RO, C>, C> Ordered<RT, RO> orderBy(F field) {
+    public <F extends Field<LT, LO, C>, C> Ordered<LT, LO> orderBy(F field) {
         return new OrderedPart(this, OrderedPart.Direction.ASCENDING, field);
     }
 
     @Override
-    public <F extends Field<RT, RO, C>, C> Ordered<RT, RO> orderByDesc(F field) {
+    public <F extends Field<LT, LO, C>, C> Ordered<LT, LO> orderByDesc(F field) {
         return new OrderedPart(this, OrderedPart.Direction.DESCENDING, field);
     }
 
