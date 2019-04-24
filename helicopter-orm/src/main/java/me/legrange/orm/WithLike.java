@@ -11,6 +11,6 @@ public interface WithLike<T extends Table<O>, O, C> {
 
     ExpressionContinuation<T, O> like(C value);
 
-    ExpressionContinuation<T, O> norLike(C value);
+    ExpressionContinuation<T, O> notLike(C value);
 
 }

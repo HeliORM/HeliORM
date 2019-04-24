@@ -12,8 +12,10 @@ public abstract class Part<T extends Table<O>, O, RT extends Table<RO>, RO> {
     public enum Type {
         SELECT,
         WHERE,
+        FIELD,
+        VALUE_EXPRESSION,
+        LIST_EXPRESSION,
         ON_CLAUSE, JOIN,
-        ON_EQ,
         AND, OR, ORDER;
     }
 

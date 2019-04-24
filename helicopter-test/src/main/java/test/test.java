@@ -15,7 +15,7 @@ import static test.Tables.PERSON;
 public class test {
 
     public static void main(String... args) throws Exception {
-        Orm orm = null;
+        Orm orm = Orm.open(null, Orm.Driver.MYSQL);
 
         List<Person> persons1 = orm.select(PERSON).orderBy(PERSON.emailAddress).list();
         List<Person> list = orm.select(PERSON)
