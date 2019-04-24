@@ -69,6 +69,16 @@ public class StringClausePart<T extends Table<O>, O, RT extends Table<RO>, RO>
     }
 
     @Override
+    public Continuation<T, O, RT, RO> like(String value) {
+        return new ValueOperatorPart(this, ValueOperatorPart.Operator.LIKE, value);
+    }
+
+    @Override
+    public Continuation<T, O, RT, RO> norLike(String value) {
+        return new ValueOperatorPart(this, ValueOperatorPart.Operator.NOT_LIKE, value);
+    }
+
+    @Override
     public Type getType() {
         return Type.CLAUSE;
     }
