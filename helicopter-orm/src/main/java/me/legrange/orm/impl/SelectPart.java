@@ -3,22 +3,14 @@ package me.legrange.orm.impl;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
-import me.legrange.orm.BooleanClause;
-import me.legrange.orm.BooleanField;
-import me.legrange.orm.DateClause;
-import me.legrange.orm.DateField;
-import me.legrange.orm.EnumClause;
-import me.legrange.orm.EnumField;
+import me.legrange.orm.Continuation;
+import me.legrange.orm.ExpressionContinuation;
 import me.legrange.orm.Field;
 import me.legrange.orm.Join;
-import me.legrange.orm.NumberClause;
-import me.legrange.orm.NumberField;
 import me.legrange.orm.Ordered;
 import me.legrange.orm.Orm;
 import me.legrange.orm.OrmException;
 import me.legrange.orm.Select;
-import me.legrange.orm.StringClause;
-import me.legrange.orm.StringField;
 import me.legrange.orm.Table;
 
 /**
@@ -68,28 +60,8 @@ public class SelectPart<LT extends Table<LO>, LO, RT extends Table<RO>, RO> exte
     }
 
     @Override
-    public <F extends NumberField<RT, RO, C>, C extends Number> NumberClause<LT, LO, C, RT, RO> where(F field) {
-        return new NumberClausePart(this, ClausePart.Operator.WHERE, field);
-    }
-
-    @Override
-    public <F extends StringField<RT, RO>> StringClause<LT, LO, RT, RO> where(F field) {
-        return new StringClausePart(this, ClausePart.Operator.WHERE, field);
-    }
-
-    @Override
-    public <F extends DateField<RT, RO>> DateClause<LT, LO, RT, RO> where(F field) {
-        return new DateClausePart(this, ClausePart.Operator.WHERE, field);
-    }
-
-    @Override
-    public <F extends EnumField<RT, RO, C>, C extends Enum> EnumClause<LT, LO, C, RT, RO> where(F field) {
-        return new EnumClausePart(this, ClausePart.Operator.WHERE, field);
-    }
-
-    @Override
-    public <F extends BooleanField<RT, RO>> BooleanClause<LT, LO, RT, RO> where(F field) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public Continuation<LT, LO, RT, RO> where(ExpressionContinuation<RT, RO> cont) {
+        return new ContinuationPart(this, Type.WHERE, cont);
     }
 
     @Override

@@ -7,10 +7,10 @@ package me.legrange.orm;
  * @param <O> Object type
  * @param <C> Column/field type
  */
-public interface WithLike<T extends Table<O>, O, C, RT extends Table<RO>, RO> {
+public interface WithLike<T extends Table<O>, O, C> {
 
-    Continuation<T, O, RT, RO> like(C value);
+    ExpressionContinuation<T, O> like(C value);
 
-    Continuation<T, O, RT, RO> norLike(C value);
+    ExpressionContinuation<T, O> norLike(C value);
 
 }

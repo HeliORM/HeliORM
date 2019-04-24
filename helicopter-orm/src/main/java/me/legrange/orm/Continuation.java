@@ -10,21 +10,9 @@ package me.legrange.orm;
  */
 public interface Continuation<LT extends Table<LO>, LO, RT extends Table<RO>, RO> extends Executable<LT, LO>, Order<LT, LO> {
 
-    <F extends NumberField<LT, LO, C>, C extends Number> NumberClause<LT, LO, C, RT, RO> and(F field);
+    Continuation<LT, LO, RT, RO> and(ExpressionContinuation<RT, RO> cont);
 
-    <F extends NumberField<LT, LO, C>, C extends Number> NumberClause<LT, LO, C, RT, RO> or(F field);
-
-    <F extends StringField<LT, LO>> StringClause<LT, LO, RT, RO> and(F field);
-
-    <F extends StringField<LT, LO>> StringClause<LT, LO, RT, RO> or(F field);
-
-    <F extends EnumField<LT, LO, C>, C extends Enum> EnumClause<LT, LO, C, RT, RO> and(F field);
-
-    <F extends EnumField<LT, LO, C>, C extends Enum> EnumClause<LT, LO, C, RT, RO> or(F field);
-
-    <F extends DateField<LT, LO>> DateClause<LT, LO, RT, RO> and(F field);
-
-    <F extends DateField<LT, LO>> DateClause<LT, LO, RT, RO> or(F field);
+    Continuation<LT, LO, RT, RO> or(ExpressionContinuation<RT, RO> cont);
 
     <RT extends Table<RO>, RO> Join<LT, LO, RT, RO> join(RT table);
 

@@ -4,64 +4,32 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 import me.legrange.orm.Continuation;
-import me.legrange.orm.DateClause;
-import me.legrange.orm.DateField;
-import me.legrange.orm.EnumClause;
-import me.legrange.orm.EnumField;
+import me.legrange.orm.ExpressionContinuation;
 import me.legrange.orm.Field;
 import me.legrange.orm.Join;
-import me.legrange.orm.NumberClause;
-import me.legrange.orm.NumberField;
 import me.legrange.orm.Ordered;
 import me.legrange.orm.OrmException;
-import me.legrange.orm.StringClause;
-import me.legrange.orm.StringField;
 import me.legrange.orm.Table;
 
-abstract class ContinuationPart<LT extends Table<LO>, LO, RT extends Table<RO>, RO> extends Part implements Continuation<LT, LO, RT, RO> {
+public class ContinuationPart<LT extends Table<LO>, LO, RT extends Table<RO>, RO> extends Part implements Continuation<LT, LO, RT, RO> {
 
-    ContinuationPart(Part left) {
+    private final ExpressionContinuation cont;
+    private final Type type;
+
+    ContinuationPart(Part left, Type type, ExpressionContinuation cont) {
         super(left);
+        this.cont = cont;
+        this.type = type;
     }
 
     @Override
-    public <F extends NumberField<LT, LO, C>, C extends Number> NumberClause<LT, LO, C, RT, RO> and(F field) {
-        return new NumberClausePart(this, ClausePart.Operator.AND, field);
+    public Continuation<LT, LO, RT, RO> and(ExpressionContinuation<RT, RO> cont) {
+        return new ContinuationPart(this, Type.AND, cont);
     }
 
     @Override
-    public <F extends NumberField<LT, LO, C>, C extends Number> NumberClause<LT, LO, C, RT, RO> or(F field) {
-        return new NumberClausePart(this, ClausePart.Operator.OR, field);
-    }
-
-    @Override
-    public <F extends StringField<LT, LO>> StringClause<LT, LO, RT, RO> and(F field) {
-        return new StringClausePart(this, ClausePart.Operator.AND, field);
-    }
-
-    @Override
-    public <F extends StringField<LT, LO>> StringClause<LT, LO, RT, RO> or(F field) {
-        return new StringClausePart(this, ClausePart.Operator.OR, field);
-    }
-
-    @Override
-    public <F extends EnumField<LT, LO, C>, C extends Enum> EnumClause<LT, LO, C, RT, RO> and(F field) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public <F extends EnumField<LT, LO, C>, C extends Enum> EnumClause<LT, LO, C, RT, RO> or(F field) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public <F extends DateField<LT, LO>> DateClause<LT, LO, RT, RO> and(F field) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public <F extends DateField<LT, LO>> DateClause<LT, LO, RT, RO> or(F field) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public Continuation<LT, LO, RT, RO> or(ExpressionContinuation<RT, RO> cont) {
+        return new ContinuationPart(this, Type.OR, cont);
     }
 
     @Override
@@ -101,7 +69,8 @@ abstract class ContinuationPart<LT extends Table<LO>, LO, RT extends Table<RO>, 
 
     @Override
     public Type getType() {
-        return Type.CONTINUATION;
+
+        return type;
     }
 
 }

@@ -10,9 +10,11 @@ import me.legrange.orm.Table;
 public abstract class Part<T extends Table<O>, O, RT extends Table<RO>, RO> {
 
     public enum Type {
-        SELECT, VALUE_OPERATION, LIST_OPERATION, ON_CLAUSE, CLAUSE, JOIN,
+        SELECT,
+        WHERE,
+        ON_CLAUSE, JOIN,
         ON_EQ,
-        CONTINUATION, ORDER;
+        AND, OR, ORDER;
     }
 
     private final Part left;

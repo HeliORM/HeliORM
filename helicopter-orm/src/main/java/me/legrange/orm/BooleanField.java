@@ -7,6 +7,6 @@ package me.legrange.orm;
  *
  * @author gideon
  */
-public interface BooleanField<T extends Table<O>, O> extends Field<T, O, Boolean> {
+public interface BooleanField<T extends Table<O>, O> extends Field<T, O, Boolean>, BooleanExpression<T, O> {
 
 }

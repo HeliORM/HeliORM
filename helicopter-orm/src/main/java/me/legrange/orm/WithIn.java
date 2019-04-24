@@ -9,14 +9,14 @@ import java.util.List;
  * @param <O> Object type
  * @param <C> Column/field type
  */
-public interface WithIn<T extends Table<O>, O, C, RT extends Table<RO>, RO> {
+public interface WithIn<T extends Table<O>, O, C> {
 
-    Continuation<T, O, RT, RO> in(List<C> values);
+    ExpressionContinuation<T, O> in(List<C> values);
 
-    Continuation<T, O, RT, RO> notIn(List<C> value);
+    ExpressionContinuation<T, O> notIn(List<C> value);
 
-    Continuation<T, O, RT, RO> in(C... values);
+    ExpressionContinuation<T, O> in(C... values);
 
-    Continuation<T, O, RT, RO> notIn(C... value);
+    ExpressionContinuation<T, O> notIn(C... value);
 
 }

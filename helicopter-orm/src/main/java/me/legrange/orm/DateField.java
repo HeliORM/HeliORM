@@ -9,6 +9,6 @@ import java.util.Date;
  *
  * @author gideon
  */
-public interface DateField<T extends Table<O>, O> extends Field<T, O, Date> {
+public interface DateField<T extends Table<O>, O> extends Field<T, O, Date>, DateExpression<T, O> {
 
 }

@@ -7,6 +7,6 @@ package me.legrange.orm;
  *
  * @author gideon
  */
-public interface StringField<T extends Table<O>, O> extends Field<T, O, String> {
+public interface StringField<T extends Table<O>, O> extends Field<T, O, String>, StringExpression<T, O> {
 
 }

@@ -18,18 +18,21 @@ public class test {
         Orm orm = null;
 
         List<Person> persons1 = orm.select(PERSON).orderBy(PERSON.emailAddress).list();
-        List<Person> persons2 = orm.select(PERSON)
-                .where(PERSON.emailAddress).in("joe@acme.com", "bob@acme.com")
-                .join(COMPANY).on(PERSON.companyNumber, COMPANY.companyNumber)
-                .where(COMPANY.name).eq("ACME")
-                .orderBy(PERSON.emailAddress)
-                .list();
-
+        List<Person> list = orm.select(PERSON)
+                .where(PERSON.lastName.eq("Le Grange").and(PERSON.firstName.notEq("Gideon")))
+                .or(PERSON.lastName.eq("Smith").and(PERSON.firstName.eq("John")))
+                .join(COMPANY).on(PERSON.companyNumber, COMPANY.companyNumber).list();
+        //                .where(PERSON.emailAddress).in("joe@acme.com", "bob@acme.com")
+        //                .join(COMPANY).on(PERSON.companyNumber, COMPANY.companyNumber)
+        //                .where(COMPANY.name).eq("ACME")
+        //                .orderBy(PERSON.emailAddress)
+        //                .list();
+        //
         Ordered<Tables.PersonTable, Person> query1 = orm.select(PERSON)
-                .where(PERSON.emailAddress).in("joe@acme.com", "bob@acme.com")
-                .and(PERSON.sex).notEq(Person.Sex.MALE)
+                .where(PERSON.emailAddress.in("joe@acme.com", "bob@acme.com"))
+                .and(PERSON.sex.notEq(Person.Sex.MALE))
                 .join(COMPANY).on(PERSON.companyNumber, COMPANY.companyNumber)
-                .where(COMPANY.name).eq("ACME")
+                .where(COMPANY.name.eq("ACME"))
                 .orderBy(PERSON.emailAddress);
         Stream<Person> stream1 = query1.stream();
     }
