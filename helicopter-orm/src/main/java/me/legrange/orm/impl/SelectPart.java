@@ -1,15 +1,11 @@
 package me.legrange.orm.impl;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Stream;
 import me.legrange.orm.Continuation;
 import me.legrange.orm.ExpressionContinuation;
 import me.legrange.orm.Field;
 import me.legrange.orm.Join;
 import me.legrange.orm.Ordered;
 import me.legrange.orm.Orm;
-import me.legrange.orm.OrmException;
 import me.legrange.orm.Select;
 import me.legrange.orm.Table;
 
@@ -17,7 +13,7 @@ import me.legrange.orm.Table;
  *
  * @author gideon
  */
-public class SelectPart<LT extends Table<LO>, LO, RT extends Table<RO>, RO> extends Part<LT, LO, RT, RO>
+public class SelectPart<LT extends Table<LO>, LO, RT extends Table<RO>, RO> extends ExecutablePart<LT, LO>
         implements Select<LT, LO, RT, RO> {
 
     private final Orm orm;
@@ -62,26 +58,6 @@ public class SelectPart<LT extends Table<LO>, LO, RT extends Table<RO>, RO> exte
     @Override
     public Continuation<LT, LO, RT, RO> where(ExpressionContinuation<RT, RO> cont) {
         return new ContinuationPart(this, Type.WHERE, cont);
-    }
-
-    @Override
-    public List<LO> list() throws OrmException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public Stream<LO> stream() throws OrmException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public LO one() throws OrmException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public Optional<LO> oneOrNone() throws OrmException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override

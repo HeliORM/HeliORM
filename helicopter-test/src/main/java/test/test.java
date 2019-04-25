@@ -19,15 +19,16 @@ public class test {
 
         List<Person> persons1 = orm.select(PERSON).orderBy(PERSON.emailAddress).list();
         List<Person> list = orm.select(PERSON)
-                .where(PERSON.lastName.eq("Le Grange").and(PERSON.firstName.notEq("Gideon")))
-                .or(PERSON.lastName.eq("Smith").and(PERSON.firstName.eq("John")))
-                .join(COMPANY).on(PERSON.companyNumber, COMPANY.companyNumber).list();
-        //                .where(PERSON.emailAddress).in("joe@acme.com", "bob@acme.com")
-        //                .join(COMPANY).on(PERSON.companyNumber, COMPANY.companyNumber)
-        //                .where(COMPANY.name).eq("ACME")
-        //                .orderBy(PERSON.emailAddress)
-        //                .list();
-        //
+                .where(PERSON.lastName.eq("Le Grange")
+                        .and(PERSON.firstName.notEq("Gideon")))
+                .or(PERSON.lastName.eq("Smith")
+                        .and(PERSON.firstName.eq("John")))
+                .join(COMPANY)
+                .on(PERSON.companyNumber, COMPANY.companyNumber)
+                .where(COMPANY.name.like("ACME%")
+                        .or(COMPANY.name.like("FOOBAR%")))
+                .list();
+
         Ordered<Tables.PersonTable, Person> query1 = orm.select(PERSON)
                 .where(PERSON.emailAddress.in("joe@acme.com", "bob@acme.com"))
                 .and(PERSON.sex.notEq(Person.Sex.MALE))
