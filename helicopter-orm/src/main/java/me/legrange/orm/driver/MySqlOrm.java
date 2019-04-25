@@ -10,6 +10,7 @@ import me.legrange.orm.impl.JoinPart;
 import me.legrange.orm.impl.OnClausePart;
 import me.legrange.orm.impl.OrderedPart;
 import me.legrange.orm.impl.Part;
+import me.legrange.orm.impl.ValueExpressionPart;
 
 /**
  *
@@ -25,76 +26,79 @@ public class MySqlOrm extends Orm {
     protected String buildQuery(List<Part> parts) throws OrmException {
         StringBuilder query = new StringBuilder();
         for (Part part : parts) {
-            switch (part.getType()) {
-                case SELECT: {
-                    if (part.getLeft() == null) {
-                        query.append("SELECT  ");
-                        query.append(part.getReturnTable().getSqlTable());
-                        query.append(".* FROM ");
-                        query.append(part.getReturnTable().getSqlTable());
-                    }
-                }
-                break;
-                case WHERE:
-                    query.append(" WHERE ");
-                    buildExpression((ContinuationPart) part);
-                    break;
-                case JOIN:
-                    query.append(" JOIN ");
-                    query.append(((JoinPart) part).getTable().getSqlTable());
-                    break;
-                case ON_CLAUSE: {
-                    OnClausePart on = (OnClausePart) part;
-                    query.append(" ON ");
-                    query.append(part.getLeft().getSelectTable().getSqlTable());
-                    query.append(".");
-                    query.append(on.getLeftField().getSqlName());
-                    query.append("=");
-                    query.append(part.getSelectTable().getSqlTable());
-                    query.append(".");
-                    query.append(on.getRightField().getSqlName());
-                }
-                break;
-                case ORDER: {
-                    OrderedPart order = (OrderedPart) part;
-                    if (part.getLeft().getType() != Part.Type.ORDER) {
-                        query.append(" ORDER BY ");
-                    } else {
-                        query.append(",");
-                    }
-                    query.append(order.getField().getSqlName());
-                    if (order.getDirection() == OrderedPart.Direction.DESCENDING) {
-                        query.append(" DESCENDING");
-                    }
-                }
-                break;
-                case AND:
-                    query.append(" AND ");
-                    buildExpression((ContinuationPart) part);
-                    break;
-                case OR:
-                    query.append(" OR ");
-                    buildExpression((ContinuationPart) part);
-                    break;
-                default:
-                    throw new OrmException(format("Unsupported part type '%s'. BUG!", part.getType()));
-            }
+            query.append(buildPartQuery(part));
 
         }
         return query.toString();
 
     }
 
-    private void buildExpression(ContinuationPart part) {
+    private String buildPartQuery(Part part) {
+        switch (part.getType()) {
+            case SELECT: {
+                if (part.getLeft() == null) {
+                    return format("SELECT %s.* FROM ",
+                            part.getReturnTable().getSqlTable(),
+                            part.getReturnTable().getSqlTable());
+                }
+            }
+            break;
+            case WHERE:
+                return format(" WHERE %s",
+                        buildExpression((ContinuationPart) part));
+            case JOIN:
+                return format(" JOIN %s ",
+                        ((JoinPart) part).getTable().getSqlTable());
+            case ON_CLAUSE: {
+                OnClausePart on = (OnClausePart) part;
+                return format(" ON %s ")
+                query.append(" ON ");
+                query.append(part.getLeft().getSelectTable().getSqlTable());
+                query.append(".");
+                query.append(on.getLeftField().getSqlName());
+                query.append("=");
+                query.append(part.getSelectTable().getSqlTable());
+                query.append(".");
+                query.append(on.getRightField().getSqlName());
+            }
+            break;
+            case ORDER: {
+                OrderedPart order = (OrderedPart) part;
+                if (part.getLeft().getType() != Part.Type.ORDER) {
+                    query.append(" ORDER BY ");
+                } else {
+                    query.append(",");
+                }
+                query.append(order.getField().getSqlName());
+                if (order.getDirection() == OrderedPart.Direction.DESCENDING) {
+                    query.append(" DESCENDING");
+                }
+            }
+            break;
+            case AND:
+                query.append(" AND ");
+                buildExpression((ContinuationPart) part);
+                break;
+            case OR:
+                query.append(" OR ");
+                buildExpression((ContinuationPart) part);
+                break;
+            default:
+                throw new OrmException(format("Unsupported part type '%s'. BUG!", part.getType()));
+        }
 
-//    case VALUE_OPERATION: {
-//                    ValueOperatorPart vop = (ValueOperatorPart) part;
-//                    query.append(valueOperator(vop.getOp()));
-//                    query.append("'");
-//                    query.append(sqlValue(vop.getValue()));
-//                    query.append("'");
-//                }
-//                break;
+    }
+
+    private String buildExpression(ContinuationPart part) {
+        switch (part.getType()) {
+            case VALUE_EXPRESSION:
+                ValueExpressionPart vop = (ValueExpressionPart) part;
+                query.append(valueOperator(vop.getOp()));
+                query.append("'");
+                query.append(sqlValue(vop.getValue()));
+                query.append("'");
+        }
+        break;
 //                case LIST_OPERATION: {
 //                    ListOperatorPart lop = (ListOperatorPart) part;
 //                    query.append(listOperator(lop.getOp()));
