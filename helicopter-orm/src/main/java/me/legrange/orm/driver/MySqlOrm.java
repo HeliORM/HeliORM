@@ -51,37 +51,34 @@ public class MySqlOrm extends Orm {
                         ((JoinPart) part).getTable().getSqlTable());
             case ON_CLAUSE: {
                 OnClausePart on = (OnClausePart) part;
-                return format(" ON %s ")
-                query.append(" ON ");
-                query.append(part.getLeft().getSelectTable().getSqlTable());
-                query.append(".");
-                query.append(on.getLeftField().getSqlName());
-                query.append("=");
-                query.append(part.getSelectTable().getSqlTable());
-                query.append(".");
-                query.append(on.getRightField().getSqlName());
+                return format(" ON %s.%s=%s.%s",
+                        part.getLeft().getSelectTable().getSqlTable(),
+                        on.getLeftField().getSqlName(),
+                        part.getSelectTable().getSqlTable(),
+                        on.getRightField().getSqlName());
             }
-            break;
             case ORDER: {
                 OrderedPart order = (OrderedPart) part;
+                StringBuilder buf = new StringBuilder();
+
                 if (part.getLeft().getType() != Part.Type.ORDER) {
-                    query.append(" ORDER BY ");
+                    buf.append(" ORDER BY ");
                 } else {
-                    query.append(",");
+                    buf.append(",");
                 }
-                query.append(order.getField().getSqlName());
+                buf.append(order.getField().getSqlName());
                 if (order.getDirection() == OrderedPart.Direction.DESCENDING) {
-                    query.append(" DESCENDING");
+                    buf.append(" DESCENDING");
                 }
+                return buf.toString();
             }
-            break;
             case AND:
-                query.append(" AND ");
-                buildExpression((ContinuationPart) part);
+                return format(" AND %s",
+                        buildExpression((ContinuationPart) part));
                 break;
             case OR:
-                query.append(" OR ");
-                buildExpression((ContinuationPart) part);
+                return format(" OR %s",
+                        buildExpression((ContinuationPart) part));
                 break;
             default:
                 throw new OrmException(format("Unsupported part type '%s'. BUG!", part.getType()));
