@@ -1,7 +1,6 @@
 package test;
 
 import java.util.List;
-import java.util.stream.Stream;
 import me.legrange.orm.Ordered;
 import me.legrange.orm.Orm;
 import pojos.Person;
@@ -35,7 +34,7 @@ public class test {
                 .join(COMPANY).on(PERSON.companyNumber, COMPANY.companyNumber)
                 .where(COMPANY.name.eq("ACME"))
                 .orderBy(PERSON.emailAddress);
-        Stream<Person> stream1 = query1.stream();
+        query1.list();
     }
 
 }

@@ -1,13 +1,15 @@
 package me.legrange.orm.impl;
 
-import me.legrange.orm.ExpressionContinuation;
 import me.legrange.orm.Table;
 
 /**
  *
  * @author gideon
+ * @param <T>
+ * @param <O>
+ * @param <C>
  */
-public class ValueExpressionPart<T extends Table<O>, O, C> extends Part<T, O, T, O> implements ExpressionContinuation<T, O> {
+public class ValueExpressionPart<T extends Table<O>, O, C> extends ExpressionPart<T, O, C> {
 
     private final Operator operator;
     private final C value;
@@ -27,14 +29,12 @@ public class ValueExpressionPart<T extends Table<O>, O, C> extends Part<T, O, T,
         return Type.VALUE_EXPRESSION;
     }
 
-    @Override
-    public ExpressionContinuation<T, O> and(ExpressionContinuation<T, O> expr) {
-        return new ContinuationExpressionPart(this, Type.AND, expr);
+    public Operator getOperator() {
+        return operator;
     }
 
-    @Override
-    public ExpressionContinuation<T, O> or(ExpressionContinuation<T, O> expr) {
-        return new ContinuationExpressionPart(this, Type.OR, expr);
+    public C getValue() {
+        return value;
     }
 
 }

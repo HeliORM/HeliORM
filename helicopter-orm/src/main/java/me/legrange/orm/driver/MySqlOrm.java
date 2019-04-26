@@ -3,10 +3,13 @@ package me.legrange.orm.driver;
 import static java.lang.String.format;
 import java.sql.Connection;
 import java.util.List;
+import java.util.StringJoiner;
 import me.legrange.orm.Orm;
 import me.legrange.orm.OrmException;
 import me.legrange.orm.impl.ContinuationPart;
+import me.legrange.orm.impl.ExpressionPart;
 import me.legrange.orm.impl.JoinPart;
+import me.legrange.orm.impl.ListExpressionPart;
 import me.legrange.orm.impl.OnClausePart;
 import me.legrange.orm.impl.OrderedPart;
 import me.legrange.orm.impl.Part;
@@ -33,7 +36,7 @@ public class MySqlOrm extends Orm {
 
     }
 
-    private String buildPartQuery(Part part) {
+    private String buildPartQuery(Part part) throws OrmException {
         switch (part.getType()) {
             case SELECT: {
                 if (part.getLeft() == null) {
@@ -45,7 +48,7 @@ public class MySqlOrm extends Orm {
             break;
             case WHERE:
                 return format(" WHERE %s",
-                        buildExpression((ContinuationPart) part));
+                        buildExpression(((ContinuationPart) part).getExpression()));
             case JOIN:
                 return format(" JOIN %s ",
                         ((JoinPart) part).getTable().getSqlTable());
@@ -74,93 +77,76 @@ public class MySqlOrm extends Orm {
             }
             case AND:
                 return format(" AND %s",
-                        buildExpression((ContinuationPart) part));
-                break;
+                        buildExpression(((ContinuationPart) part).getExpression()));
             case OR:
                 return format(" OR %s",
-                        buildExpression((ContinuationPart) part));
-                break;
+                        buildExpression(((ContinuationPart) part).getExpression()));
             default:
                 throw new OrmException(format("Unsupported part type '%s'. BUG!", part.getType()));
         }
-
+        return "";
     }
 
-    private String buildExpression(ContinuationPart part) {
+    private String buildExpression(ExpressionPart part) throws OrmException {
         switch (part.getType()) {
             case VALUE_EXPRESSION:
                 ValueExpressionPart vop = (ValueExpressionPart) part;
-                query.append(valueOperator(vop.getOp()));
-                query.append("'");
-                query.append(sqlValue(vop.getValue()));
-                query.append("'");
+                return format("%s '%s'", valueOperator(vop),
+                        sqlValue(vop.getValue()));
+            case LIST_EXPRESSION: {
+                ListExpressionPart lop = (ListExpressionPart) part;
+                StringJoiner sj = new StringJoiner(",");
+                for (Object value : lop.getValues()) {
+                    sj.add(format("'%s'", sqlValue(value)));
+                }
+                return format("%s(%s)", listOperator(lop), sj.toString());
+            }
+
+            default:
+                throw new OrmException(format("Unexpected part type '%s'. BUG!", part.getType()));
+
         }
-        break;
-//                case LIST_OPERATION: {
-//                    ListOperatorPart lop = (ListOperatorPart) part;
-//                    query.append(listOperator(lop.getOp()));
-//                    query.append("(");
-//                    StringJoiner sj = new StringJoiner(",");
-//                    for (Object value : lop.getValues()) {
-//                        sj.add(format("'%s'", sqlValue(value)));
-//                    }
-//                    query.append(sj.toString());
-//                    query.append(")");
-//
-//                }
     }
 
     private String sqlValue(Object object) {
         return object.toString();
     }
-//
-//    private String listOperator(ListOperatorPart.Operator op) throws OrmException {
-//        switch (op) {
-//            case IN:
-//                return " IN";
-//            case NOT_IN:
-//                return " NOT IN";
-//            default:
-//                throw new OrmException(format("Unsupported operator '%s'. BUG!", op));
-//
-//        }
-//
-//    }
-//
-//    private String valueOperator(ValueOperatorPart.Operator op) throws OrmException {
-//        switch (op) {
-//            case EQ:
-//                return "=";
-//            case NOT_EQ:
-//                return "<>";
-//            case GE:
-//                return ">=";
-//            case LE:
-//                return "<=";
-//            case GT:
-//                return ">";
-//            case LT:
-//                return "<";
-//            case LIKE:
-//                return " LIKE";
-//            case NOT_LIKE:
-//                return " NOT LIKE";
-//            default:
-//                throw new OrmException(format("Unsupported operator '%s'. BUG!", op));
-//        }
-//
-//    }
-//
-//    private String clauseOperator(ClausePart.Operator op) throws OrmException {
-//        switch (op) {
-//            case WHERE:
-//                return "WHERE";
-//            case AND:
-//                return "AND";
-//            case OR:
-//                return "AND";
-//            default:
-//                throw new OrmException(format("Unsupported operator '%s'. BUG!", op));
-//        }
-//    }
+
+    private String listOperator(ListExpressionPart part) throws OrmException {
+        switch (part.getOperator()) {
+            case IN:
+                return " IN";
+            case NOT_IN:
+                return " NOT IN";
+            default:
+                throw new OrmException(format("Unsupported operator '%s'. BUG!", part.getOperator()));
+
+        }
+
+    }
+
+    private String valueOperator(ValueExpressionPart part) throws OrmException {
+        switch (part.getOperator()) {
+            case EQ:
+                return "=";
+            case NOT_EQ:
+                return "<>";
+            case GE:
+                return ">=";
+            case LE:
+                return "<=";
+            case GT:
+                return ">";
+            case LT:
+                return "<";
+            case LIKE:
+                return " LIKE";
+            case NOT_LIKE:
+                return " NOT LIKE";
+            default:
+                throw new OrmException(format("Unsupported operator '%s'. BUG!", part.getOperator()));
+        }
+
+    }
+
 }
