@@ -43,10 +43,10 @@ public abstract class Part<T extends Table<O>, O, RT extends Table<RO>, RO> {
         return left;
     }
 
-//    public Part head() {
-//        if (left != null) {
-//            return left.head();
-//        }
-//        return this;
-//    }
+    public Part head() {
+        if (left != null) {
+            return left.head();
+        }
+        return this;
+    }
 }

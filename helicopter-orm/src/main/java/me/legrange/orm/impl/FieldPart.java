@@ -17,6 +17,7 @@ public abstract class FieldPart<T extends Table<O>, O, C> extends Part<T, O, T, 
     private final Class<C> fieldClass;
     private final String javaName;
     private final String sqlName;
+    private Part left;
 
     public FieldPart(Class<C> fieldClass, String javaName, String sqlName) {
         super(null);
@@ -51,6 +52,18 @@ public abstract class FieldPart<T extends Table<O>, O, C> extends Part<T, O, T, 
         } catch (CloneNotSupportedException ex) {
             throw new OrmException(format("Could not make a copy of class %s.BUG!", getClass().getSimpleName()));
         }
+    }
+
+    @Override
+    public Part left() {
+        if (left == null) {
+            return super.left();
+        }
+        return left;
+    }
+
+    void setLeft(Part left) {
+        this.left = left;
     }
 
 }
