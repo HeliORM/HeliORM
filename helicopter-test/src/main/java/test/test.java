@@ -19,13 +19,13 @@ public class test {
         //   List<Person> persons1 = orm.select(PERSON).orderBy(PERSON.emailAddress).list();
         List<Person> list = orm.select(PERSON)
                 .where(PERSON.lastName.eq("Le Grange")
-                        .and(PERSON.firstName.notEq("Gideon")))
+                        .and(PERSON.firstName.eq("Gideon")))
                 .or(PERSON.lastName.eq("Smith")
                         .and(PERSON.firstName.eq("John")))
-                .join(COMPANY)
-                .on(PERSON.companyNumber, COMPANY.companyNumber)
-                .where(COMPANY.name.like("ACME%")
-                        .or(COMPANY.name.like("FOOBAR%")))
+                //                .join(COMPANY)
+                //                .on(PERSON.companyNumber, COMPANY.companyNumber)
+                //                .where(COMPANY.name.like("ACME%")
+                //                        .or(COMPANY.name.like("FOOBAR%")))
                 .list();
 
         Ordered<Tables.PersonTable, Person> query1 = orm.select(PERSON)

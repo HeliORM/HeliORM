@@ -16,10 +16,17 @@ public class ExpressionContinuationPart<T extends Table<O>, O> extends Part<T, O
     private final Type type;
     private final ExpressionContinuation expression;
 
-    public ExpressionContinuationPart(Part left, Type type, ExpressionContinuationPart expr) {
+    public ExpressionContinuationPart(Part left, Type type, ExpressionContinuation expr) {
         super(left);
         this.type = type;
         this.expression = expr;
+        if (expr instanceof Part) {
+            Part part = (Part) expr;
+            Part head = ((Part) expr).head();
+            if ((head.left() == null) && (head instanceof FieldPart)) {
+                ((FieldPart) head).setLeft(this);
+            }
+        }
     }
 
     @Override
