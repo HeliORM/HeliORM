@@ -2,12 +2,14 @@ package me.legrange.orm.driver;
 
 import static java.lang.String.format;
 import java.sql.Connection;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.StringJoiner;
 import me.legrange.orm.Orm;
 import me.legrange.orm.OrmException;
 import me.legrange.orm.impl.ContinuationPart;
 import me.legrange.orm.impl.ExpressionPart;
+import me.legrange.orm.impl.FieldPart;
 import me.legrange.orm.impl.JoinPart;
 import me.legrange.orm.impl.ListExpressionPart;
 import me.legrange.orm.impl.OnClausePart;
@@ -39,7 +41,7 @@ public class MySqlOrm extends Orm {
     private String buildPartQuery(Part part) throws OrmException {
         switch (part.getType()) {
             case SELECT: {
-                if (part.getLeft() == null) {
+                if (part.left() == null) {
                     return format("SELECT %s.* FROM ",
                             part.getReturnTable().getSqlTable(),
                             part.getReturnTable().getSqlTable());
@@ -47,15 +49,15 @@ public class MySqlOrm extends Orm {
             }
             break;
             case WHERE:
-                return format(" WHERE %s",
-                        buildExpression(((ContinuationPart) part).getExpression()));
+                return format(" WHERE %s", buildExpression(((ContinuationPart) part).getExpression()));
+//                        buildExpression(((ContinuationPart) part).getExpression()));
             case JOIN:
                 return format(" JOIN %s ",
                         ((JoinPart) part).getTable().getSqlTable());
             case ON_CLAUSE: {
                 OnClausePart on = (OnClausePart) part;
                 return format(" ON %s.%s=%s.%s",
-                        part.getLeft().getSelectTable().getSqlTable(),
+                        part.left().getSelectTable().getSqlTable(),
                         on.getLeftField().getSqlName(),
                         part.getSelectTable().getSqlTable(),
                         on.getRightField().getSqlName());
@@ -64,7 +66,7 @@ public class MySqlOrm extends Orm {
                 OrderedPart order = (OrderedPart) part;
                 StringBuilder buf = new StringBuilder();
 
-                if (part.getLeft().getType() != Part.Type.ORDER) {
+                if (part.left().getType() != Part.Type.ORDER) {
                     buf.append(" ORDER BY ");
                 } else {
                     buf.append(",");
@@ -81,18 +83,11 @@ public class MySqlOrm extends Orm {
             case OR:
                 return format(" OR %s",
                         buildExpression(((ContinuationPart) part).getExpression()));
-            default:
-                throw new OrmException(format("Unsupported part type '%s'. BUG!", part.getType()));
-        }
-        return "";
-    }
-
-    private String buildExpression(ExpressionPart part) throws OrmException {
-        switch (part.getType()) {
-            case VALUE_EXPRESSION:
+            case VALUE_EXPRESSION: {
                 ValueExpressionPart vop = (ValueExpressionPart) part;
                 return format("%s '%s'", valueOperator(vop),
                         sqlValue(vop.getValue()));
+            }
             case LIST_EXPRESSION: {
                 ListExpressionPart lop = (ListExpressionPart) part;
                 StringJoiner sj = new StringJoiner(",");
@@ -101,11 +96,18 @@ public class MySqlOrm extends Orm {
                 }
                 return format("%s(%s)", listOperator(lop), sj.toString());
             }
-
+            case FIELD: {
+                FieldPart field = (FieldPart) part;
+                return format("%s", field.getSqlName());
+            }
             default:
-                throw new OrmException(format("Unexpected part type '%s'. BUG!", part.getType()));
-
+                throw new OrmException(format("Unsupported part type '%s'. BUG!", part.getType()));
         }
+        return "";
+    }
+
+    private String buildExpression(ExpressionPart part) throws OrmException {
+        return buildQuery(unroll(part));
     }
 
     private String sqlValue(Object object) {
@@ -149,4 +151,12 @@ public class MySqlOrm extends Orm {
 
     }
 
+    private List<Part> unroll(Part part) {
+        List<Part> parts = new ArrayList();
+        while (part != null) {
+            parts.add(0, part);
+            part = part.left();
+        }
+        return parts;
+    }
 }

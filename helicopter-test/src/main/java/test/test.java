@@ -16,7 +16,7 @@ public class test {
     public static void main(String... args) throws Exception {
         Orm orm = Orm.open(null, Orm.Driver.MYSQL);
 
-        List<Person> persons1 = orm.select(PERSON).orderBy(PERSON.emailAddress).list();
+        //   List<Person> persons1 = orm.select(PERSON).orderBy(PERSON.emailAddress).list();
         List<Person> list = orm.select(PERSON)
                 .where(PERSON.lastName.eq("Le Grange")
                         .and(PERSON.firstName.notEq("Gideon")))

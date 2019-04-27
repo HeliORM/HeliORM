@@ -31,16 +31,16 @@ public class SelectPart<LT extends Table<LO>, LO, RT extends Table<RO>, RO> exte
 
     @Override
     protected Orm getOrm() {
-        if (getLeft() != null) {
-            return getLeft().getOrm();
+        if (left() != null) {
+            return left().getOrm();
         }
         return orm;
     }
 
     @Override
     public final Table getReturnTable() {
-        if (getLeft() != null) {
-            return getLeft().getReturnTable();
+        if (left() != null) {
+            return left().getReturnTable();
         }
         return table;
     }

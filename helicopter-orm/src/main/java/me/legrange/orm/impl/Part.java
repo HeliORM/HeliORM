@@ -39,8 +39,14 @@ public abstract class Part<T extends Table<O>, O, RT extends Table<RO>, RO> {
         return left.getSelectTable();
     }
 
-    public Part getLeft() {
+    public Part left() {
         return left;
     }
 
+//    public Part head() {
+//        if (left != null) {
+//            return left.head();
+//        }
+//        return this;
+//    }
 }

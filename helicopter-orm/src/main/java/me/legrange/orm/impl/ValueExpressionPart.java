@@ -18,7 +18,7 @@ public class ValueExpressionPart<T extends Table<O>, O, C> extends ExpressionPar
         EQ, NOT_EQ, LT, LE, GT, GE, LIKE, NOT_LIKE;
     }
 
-    public ValueExpressionPart(Part left, Operator op, C value) {
+    public ValueExpressionPart(FieldPart left, Operator op, C value) {
         super(left);
         this.operator = op;
         this.value = value;

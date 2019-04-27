@@ -9,8 +9,8 @@ package me.legrange.orm;
  */
 public interface WithEquals<T extends Table<O>, O, C> {
 
-    ExpressionContinuation<T, O> eq(C value);
+    ExpressionContinuation<T, O> eq(C value) throws OrmException;
 
-    ExpressionContinuation<T, O> notEq(C value);
+    ExpressionContinuation<T, O> notEq(C value) throws OrmException;
 
 }

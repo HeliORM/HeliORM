@@ -85,7 +85,7 @@ public abstract class Orm implements AutoCloseable {
         List<Part> parts = new ArrayList();
         while (part != null) {
             parts.add(0, part);
-            part = part.getLeft();
+            part = part.left();
         }
         return parts;
     }

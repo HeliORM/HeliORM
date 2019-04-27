@@ -11,12 +11,12 @@ import java.util.List;
  */
 public interface WithIn<T extends Table<O>, O, C> {
 
-    ExpressionContinuation<T, O> in(List<C> values);
+    ExpressionContinuation<T, O> in(List<C> values) throws OrmException;
 
-    ExpressionContinuation<T, O> notIn(List<C> value);
+    ExpressionContinuation<T, O> notIn(List<C> value) throws OrmException;
 
-    ExpressionContinuation<T, O> in(C... values);
+    ExpressionContinuation<T, O> in(C... values) throws OrmException;
 
-    ExpressionContinuation<T, O> notIn(C... value);
+    ExpressionContinuation<T, O> notIn(C... value) throws OrmException;
 
 }
