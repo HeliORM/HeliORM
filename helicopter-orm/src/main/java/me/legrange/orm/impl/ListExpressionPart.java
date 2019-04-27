@@ -1,5 +1,6 @@
 package me.legrange.orm.impl;
 
+import static java.lang.String.format;
 import java.util.List;
 import me.legrange.orm.Table;
 
@@ -35,4 +36,8 @@ public class ListExpressionPart<T extends Table<O>, O, C> extends ExpressionPart
         return values;
     }
 
+    @Override
+    public String toString() {
+        return format("%s (%s)", operator.name(), values);
+    }
 }

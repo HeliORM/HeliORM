@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 import me.legrange.orm.driver.MySqlOrm;
+import me.legrange.orm.impl.Node;
 import me.legrange.orm.impl.Part;
 import me.legrange.orm.impl.SelectPart;
 
@@ -55,9 +56,11 @@ public abstract class Orm implements AutoCloseable {
 
     public <O, P extends Part & Executable> List<O> list(P tail) throws OrmException {
 //        try {
-        List<Part> parts = unroll(tail);
-        String query = buildQuery(parts);
-        Connection sql = getCon();
+
+        // Node.unroll(tail).dump(0);
+//        List<Part> parts = unroll(tail);
+        String query = buildQuery(Node.unroll(tail));
+//        Connection sql = getCon();
         List<O> result = new ArrayList();
         System.out.println(query);
 //            try (Statement stmt = sql.createStatement(); ResultSet rs = stmt.executeQuery(query)) {
@@ -79,15 +82,6 @@ public abstract class Orm implements AutoCloseable {
 //        }
     }
 
-    protected abstract String buildQuery(List<Part> parts) throws OrmException;
-
-    private List<Part> unroll(Part part) {
-        List<Part> parts = new ArrayList();
-        while (part != null) {
-            parts.add(0, part);
-            part = part.left();
-        }
-        return parts;
-    }
+    protected abstract String buildQuery(Node root) throws OrmException;
 
 }

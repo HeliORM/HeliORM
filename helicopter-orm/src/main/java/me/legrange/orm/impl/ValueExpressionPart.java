@@ -1,5 +1,6 @@
 package me.legrange.orm.impl;
 
+import static java.lang.String.format;
 import me.legrange.orm.Table;
 
 /**
@@ -35,6 +36,11 @@ public class ValueExpressionPart<T extends Table<O>, O, C> extends ExpressionPar
 
     public C getValue() {
         return value;
+    }
+
+    @Override
+    public String toString() {
+        return format("%s '%s'", operator.name(), value);
     }
 
 }

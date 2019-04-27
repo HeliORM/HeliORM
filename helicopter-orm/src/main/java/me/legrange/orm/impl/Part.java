@@ -20,9 +20,13 @@ public abstract class Part<T extends Table<O>, O, RT extends Table<RO>, RO> {
     }
 
     private final Part left;
+    private Part right;
 
     protected Part(Part left) {
         this.left = left;
+        if (left != null) {
+            left.setRight(this);
+        }
     }
 
     protected Orm getOrm() {
@@ -43,6 +47,10 @@ public abstract class Part<T extends Table<O>, O, RT extends Table<RO>, RO> {
         return left;
     }
 
+    public Part right() {
+        return right;
+    }
+
     public Part head() {
         if (left != null) {
             return left.head();
@@ -50,4 +58,10 @@ public abstract class Part<T extends Table<O>, O, RT extends Table<RO>, RO> {
         return this;
     }
 
+    protected void setRight(Part right) {
+        this.right = right;
+    }
+
+    @Override
+    public abstract String toString();
 }

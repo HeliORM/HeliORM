@@ -11,12 +11,12 @@ import me.legrange.orm.Table;
 
 public class ContinuationPart<LT extends Table<LO>, LO, RT extends Table<RO>, RO> extends ExecutablePart<LT, LO> implements Continuation<LT, LO, RT, RO> {
 
-    private final ExpressionContinuation expression;
+    private final Part expression;
     private final Type type;
 
     ContinuationPart(Part left, Type type, ExpressionContinuation expr) {
         super(left);
-        this.expression = expr;
+        this.expression = ((Part) expr).head();
         this.type = type;
     }
 
@@ -47,11 +47,10 @@ public class ContinuationPart<LT extends Table<LO>, LO, RT extends Table<RO>, RO
 
     @Override
     public Type getType() {
-
         return type;
     }
 
-    public ExpressionPart getExpression() throws OrmException {
+    public Part getExpression() throws OrmException {
         Part part = (Part) expression;
         switch (part.getType()) {
             case VALUE_EXPRESSION:
@@ -60,9 +59,16 @@ public class ContinuationPart<LT extends Table<LO>, LO, RT extends Table<RO>, RO
             case AND:
             case OR:
                 return ((ExpressionContinuationPart) part).getExpression();
+            case FIELD:
+                return part;
             default:
                 throw new OrmException(format("Unexpected part of type %s as expression. BUG?", part.getType()));
         }
+    }
+
+    @Override
+    public String toString() {
+        return getType().name();
     }
 
 }

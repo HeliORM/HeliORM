@@ -1,7 +1,6 @@
 package test;
 
 import java.util.List;
-import me.legrange.orm.Ordered;
 import me.legrange.orm.Orm;
 import pojos.Person;
 import static test.Tables.COMPANY;
@@ -22,19 +21,19 @@ public class test {
                         .and(PERSON.firstName.eq("Gideon")))
                 .or(PERSON.lastName.eq("Smith")
                         .and(PERSON.firstName.eq("John")))
-                //                .join(COMPANY)
-                //                .on(PERSON.companyNumber, COMPANY.companyNumber)
-                //                .where(COMPANY.name.like("ACME%")
-                //                        .or(COMPANY.name.like("FOOBAR%")))
+                .join(COMPANY)
+                .on(PERSON.companyNumber, COMPANY.companyNumber)
+                .where(COMPANY.name.like("ACME%")
+                        .or(COMPANY.name.like("FOOBAR%")))
                 .list();
 
-        Ordered<Tables.PersonTable, Person> query1 = orm.select(PERSON)
-                .where(PERSON.emailAddress.in("joe@acme.com", "bob@acme.com"))
-                .and(PERSON.sex.notEq(Person.Sex.MALE))
-                .join(COMPANY).on(PERSON.companyNumber, COMPANY.companyNumber)
-                .where(COMPANY.name.eq("ACME"))
-                .orderBy(PERSON.emailAddress);
-        query1.list();
+//        Ordered<Tables.PersonTable, Person> query1 = orm.select(PERSON)
+//                .where(PERSON.emailAddress.in("joe@acme.com", "bob@acme.com"))
+//                .and(PERSON.sex.notEq(Person.Sex.MALE))
+//                .join(COMPANY).on(PERSON.companyNumber, COMPANY.companyNumber)
+//                .where(COMPANY.name.eq("ACME"))
+//                .orderBy(PERSON.emailAddress);
+//        query1.list();
     }
 
 }

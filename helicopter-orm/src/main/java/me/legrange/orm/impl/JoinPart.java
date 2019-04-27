@@ -32,4 +32,8 @@ public class JoinPart<LT extends Table<LO>, LO, RT extends Table<RO>, RO> extend
         return table;
     }
 
+    @Override
+    public String toString() {
+        return getType().name();
+    }
 }

@@ -23,9 +23,9 @@ public class ExpressionContinuationPart<T extends Table<O>, O> extends Part<T, O
         if (expr instanceof Part) {
             Part part = (Part) expr;
             Part head = ((Part) expr).head();
-            if ((head.left() == null) && (head instanceof FieldPart)) {
-                ((FieldPart) head).setLeft(this);
-            }
+//            if ((head.left() == null) && (head instanceof FieldPart)) {
+//                ((FieldPart) head).setLeft(this);
+//            }
         }
     }
 
@@ -44,7 +44,7 @@ public class ExpressionContinuationPart<T extends Table<O>, O> extends Part<T, O
         return new ExpressionContinuationPart(this, Type.OR, expr);
     }
 
-    public ExpressionPart getExpression() throws OrmException {
+    public Part getExpression() throws OrmException {
         Part part = (Part) expression;
         switch (part.getType()) {
             case VALUE_EXPRESSION:
@@ -58,4 +58,8 @@ public class ExpressionContinuationPart<T extends Table<O>, O> extends Part<T, O
         }
     }
 
+    @Override
+    public String toString() {
+        return getType().name();
+    }
 }

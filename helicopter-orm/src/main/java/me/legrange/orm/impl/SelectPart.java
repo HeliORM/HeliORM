@@ -1,5 +1,6 @@
 package me.legrange.orm.impl;
 
+import static java.lang.String.format;
 import me.legrange.orm.Continuation;
 import me.legrange.orm.ExpressionContinuation;
 import me.legrange.orm.Field;
@@ -73,6 +74,11 @@ public class SelectPart<LT extends Table<LO>, LO, RT extends Table<RO>, RO> exte
     @Override
     public Type getType() {
         return Type.SELECT;
+    }
+
+    @Override
+    public String toString() {
+        return format("%s %s", getType().name(), getSelectTable());
     }
 
 }

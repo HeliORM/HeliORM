@@ -2,17 +2,13 @@ package me.legrange.orm.driver;
 
 import static java.lang.String.format;
 import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.StringJoiner;
 import me.legrange.orm.Orm;
 import me.legrange.orm.OrmException;
-import me.legrange.orm.impl.ContinuationPart;
-import me.legrange.orm.impl.ExpressionContinuationPart;
-import me.legrange.orm.impl.ExpressionPart;
 import me.legrange.orm.impl.FieldPart;
 import me.legrange.orm.impl.JoinPart;
 import me.legrange.orm.impl.ListExpressionPart;
+import me.legrange.orm.impl.Node;
 import me.legrange.orm.impl.OnClausePart;
 import me.legrange.orm.impl.OrderedPart;
 import me.legrange.orm.impl.Part;
@@ -29,17 +25,19 @@ public class MySqlOrm extends Orm {
     }
 
     @Override
-    protected String buildQuery(List<Part> parts) throws OrmException {
+    protected String buildQuery(Node root) throws OrmException {
         StringBuilder query = new StringBuilder();
-        for (Part part : parts) {
-            query.append(buildPartQuery(part));
-
+        Node node = root;
+        while (node != null) {
+            query.append(buildPartQuery(node));
+            node = node.getNext();
         }
         return query.toString();
 
     }
 
-    private String buildPartQuery(Part part) throws OrmException {
+    private String buildPartQuery(Node node) throws OrmException {
+        Part part = node.getPart();
         switch (part.getType()) {
             case SELECT: {
                 if (part.left() == null) {
@@ -50,8 +48,7 @@ public class MySqlOrm extends Orm {
             }
             break;
             case WHERE:
-                return format(" WHERE %s", buildExpression(part));
-//                        buildExpression(((ContinuationPart) part).getExpression()));
+                return format(" WHERE %s", buildExpression(node));
             case JOIN:
                 return format(" JOIN %s ",
                         ((JoinPart) part).getTable().getSqlTable());
@@ -80,10 +77,10 @@ public class MySqlOrm extends Orm {
             }
             case AND:
                 return format(" AND %s",
-                        buildExpression(part));
+                        buildExpression(node));
             case OR:
                 return format(" OR %s",
-                        buildExpression(part));
+                        buildExpression(node));
             case VALUE_EXPRESSION: {
                 ValueExpressionPart vop = (ValueExpressionPart) part;
                 return format("%s '%s'", valueOperator(vop),
@@ -107,16 +104,8 @@ public class MySqlOrm extends Orm {
         return "";
     }
 
-    private String buildExpression(Part part) throws OrmException {
-        ExpressionPart expr;
-        if (part instanceof ContinuationPart) {
-            expr = ((ContinuationPart) part).getExpression();
-        } else if (part instanceof ExpressionContinuationPart) {
-            expr = ((ExpressionContinuationPart) part).getExpression();
-        } else {
-            throw new OrmException(format("Cannot extract expression from %s. BUG!", part.getClass().getSimpleName()));
-        }
-        return buildQuery(unrollTo(expr, part));
+    private String buildExpression(Node node) throws OrmException {
+        return buildQuery(node.getTangent());
     }
 
     private String sqlValue(Object object) {
@@ -160,12 +149,4 @@ public class MySqlOrm extends Orm {
 
     }
 
-    private List<Part> unrollTo(Part part, Part head) {
-        List<Part> parts = new ArrayList();
-        while ((part != null) && (part != head)) {
-            parts.add(0, part);
-            part = part.left();
-        }
-        return parts;
-    }
 }

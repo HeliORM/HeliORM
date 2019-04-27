@@ -47,4 +47,9 @@ public class OrderedPart<T extends Table<O>, O> extends ExecutablePart<T, O> imp
         return field;
     }
 
+    @Override
+    public String toString() {
+        return getType().name();
+    }
+
 }
