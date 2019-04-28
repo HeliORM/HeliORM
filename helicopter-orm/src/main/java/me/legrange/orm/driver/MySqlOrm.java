@@ -48,7 +48,7 @@ public class MySqlOrm extends Orm {
             }
             break;
             case WHERE:
-                return format(" WHERE %s", buildExpression(node));
+                return format(" WHERE (%s)", buildExpression(node));
             case JOIN:
                 return format(" JOIN %s ",
                         ((JoinPart) part).getTable().getSqlTable());
@@ -76,9 +76,15 @@ public class MySqlOrm extends Orm {
                 return buf.toString();
             }
             case AND:
-                return format(" AND %s",
+                return format(" AND (%s)",
                         buildExpression(node));
             case OR:
+                return format(" OR (%s)",
+                        buildExpression(node));
+            case NESTED_AND:
+                return format(" AND %s",
+                        buildExpression(node));
+            case NESTED_OR:
                 return format(" OR %s",
                         buildExpression(node));
             case VALUE_EXPRESSION: {
@@ -105,7 +111,7 @@ public class MySqlOrm extends Orm {
     }
 
     private String buildExpression(Node node) throws OrmException {
-        return buildQuery(node.getTangent());
+        return format("%s", buildQuery(node.getTangent()));
     }
 
     private String sqlValue(Object object) {

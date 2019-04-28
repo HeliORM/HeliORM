@@ -12,11 +12,15 @@ public abstract class Part<T extends Table<O>, O, RT extends Table<RO>, RO> {
     public enum Type {
         SELECT,
         WHERE,
+        AND,
+        OR,
+        NESTED_AND,
+        NESTED_OR,
         FIELD,
         VALUE_EXPRESSION,
         LIST_EXPRESSION,
         ON_CLAUSE, JOIN,
-        AND, OR, ORDER;
+        ORDER;
     }
 
     private final Part left;

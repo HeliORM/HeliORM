@@ -36,12 +36,12 @@ public class ExpressionContinuationPart<T extends Table<O>, O> extends Part<T, O
 
     @Override
     public ExpressionContinuation<T, O> and(ExpressionContinuation<T, O> expr) {
-        return new ExpressionContinuationPart(this, Type.AND, expr);
+        return new ExpressionContinuationPart(this, Type.NESTED_AND, expr);
     }
 
     @Override
     public ExpressionContinuation<T, O> or(ExpressionContinuation<T, O> expr) {
-        return new ExpressionContinuationPart(this, Type.OR, expr);
+        return new ExpressionContinuationPart(this, Type.NESTED_OR, expr);
     }
 
     public Part getExpression() throws OrmException {

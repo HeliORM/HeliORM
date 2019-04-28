@@ -11,6 +11,7 @@ public class Node {
     private final Part part;
     private final Node next;
     private final Node tangent;
+    private boolean linear;
 
     public Node(Part part, Node next, Node tangent) {
         this.part = part;
