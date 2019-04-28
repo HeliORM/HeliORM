@@ -1,6 +1,5 @@
 package me.legrange.orm.impl;
 
-import static java.lang.String.format;
 import me.legrange.orm.Continuation;
 import me.legrange.orm.ExpressionContinuation;
 import me.legrange.orm.Field;
@@ -51,19 +50,7 @@ public class ContinuationPart<LT extends Table<LO>, LO, RT extends Table<RO>, RO
     }
 
     public Part getExpression() throws OrmException {
-        Part part = (Part) expression;
-        switch (part.getType()) {
-            case VALUE_EXPRESSION:
-            case LIST_EXPRESSION:
-                return (ExpressionPart) part;
-            case AND:
-            case OR:
-                return ((ExpressionContinuationPart) part).getExpression();
-            case FIELD:
-                return part;
-            default:
-                throw new OrmException(format("Unexpected part of type %s as expression. BUG?", part.getType()));
-        }
+        return expression;
     }
 
     @Override

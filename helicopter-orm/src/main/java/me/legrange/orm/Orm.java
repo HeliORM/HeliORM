@@ -8,6 +8,7 @@ import me.legrange.orm.driver.MySqlOrm;
 import me.legrange.orm.impl.Node;
 import me.legrange.orm.impl.Part;
 import me.legrange.orm.impl.SelectPart;
+import me.legrange.orm.rep.Parser;
 
 /**
  *
@@ -57,12 +58,21 @@ public abstract class Orm implements AutoCloseable {
     public <O, P extends Part & Executable> List<O> list(P tail) throws OrmException {
 //        try {
 
+        List<Part> parts = new ArrayList();
+        Part part = tail.head();
+        while (part != null) {
+            parts.add(part);
+            part = part.right();
+        }
+        Parser parser = new Parser(parts);
+        parser.parse();
+
         // Node.unroll(tail).dump(0);
 //        List<Part> parts = unroll(tail);
-        String query = buildQuery(Node.unroll(tail));
+//        String query = buildQuery(Node.unroll(tail));
 //        Connection sql = getCon();
         List<O> result = new ArrayList();
-        System.out.println(query);
+//        System.out.println(query);
 //            try (Statement stmt = sql.createStatement(); ResultSet rs = stmt.executeQuery(query)) {
 //                Table<O> table = ((SelectPart) parts.get(0)).getReturnTable();
 //                while (rs.next()) {
