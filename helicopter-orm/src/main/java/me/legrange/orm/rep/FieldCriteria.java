@@ -6,13 +6,17 @@ import me.legrange.orm.Field;
  *
  * @author gideon
  */
-abstract class FieldCriteria extends Criteria {
+public abstract class FieldCriteria extends Criteria {
 
     private final Field field;
 
-    public FieldCriteria(Field field) {
-        super(Type.FIELD);
+    public FieldCriteria(Type type, Field field) {
+        super(type);
         this.field = field;
+    }
+
+    public Field getField() {
+        return field;
     }
 
 }

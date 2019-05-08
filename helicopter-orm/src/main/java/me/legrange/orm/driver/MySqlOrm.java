@@ -2,17 +2,17 @@ package me.legrange.orm.driver;
 
 import static java.lang.String.format;
 import java.sql.Connection;
-import java.util.StringJoiner;
+import java.util.Optional;
 import me.legrange.orm.Orm;
 import me.legrange.orm.OrmException;
-import me.legrange.orm.impl.FieldPart;
-import me.legrange.orm.impl.JoinPart;
-import me.legrange.orm.impl.ListExpressionPart;
-import me.legrange.orm.impl.Node;
-import me.legrange.orm.impl.OnClausePart;
-import me.legrange.orm.impl.OrderedPart;
-import me.legrange.orm.impl.Part;
-import me.legrange.orm.impl.ValueExpressionPart;
+import me.legrange.orm.rep.AndCriteria;
+import me.legrange.orm.rep.Criteria;
+import me.legrange.orm.rep.Link;
+import me.legrange.orm.rep.ListCriteria;
+import me.legrange.orm.rep.OrCriteria;
+import me.legrange.orm.rep.Query;
+import me.legrange.orm.rep.TableSpec;
+import me.legrange.orm.rep.ValueCriteria;
 
 /**
  *
@@ -25,100 +25,94 @@ public class MySqlOrm extends Orm {
     }
 
     @Override
-    protected String buildQuery(Node root) throws OrmException {
+    protected String buildQuery(Query root) throws OrmException {
+        StringBuilder tablesQuery = new StringBuilder();
+        tablesQuery.append(format("SELECT %s.* FROM %s", root.getTable().getSqlTable(), root.getTable().getSqlTable()));
+        StringBuilder whereQuery = new StringBuilder();
+        Optional<Criteria> optCrit = root.getCriteria();
+        if (optCrit.isPresent()) {
+            whereQuery.append(expandCriteria(root, optCrit.get()));
+
+        }
+        Optional<Link> optLink = root.getLink();
+        if (optLink.isPresent()) {
+            tablesQuery.append(expandLinkTables(root, optLink.get()));
+            whereQuery.append(expandLinkWheres(optLink.get()));
+        }
+        // finalize the query
         StringBuilder query = new StringBuilder();
-        Node node = root;
-        while (node != null) {
-            query.append(buildPartQuery(node));
-            node = node.getNext();
+        query.append(tablesQuery);
+        if (whereQuery.length() > 0) {
+            query.append(" WHERE ");
+            query.append(whereQuery);
+        }
+        return query.toString();
+    }
+
+    private String expandLinkTables(TableSpec left, Link right) {
+        StringBuilder query = new StringBuilder();
+        query.append(format(" JOIN %s ON %s.%s=%s.%s ", right.getTable().getSqlTable(),
+                left.getTable().getSqlTable(), right.getLeftField().getSqlName(),
+                right.getTable().getSqlTable(), right.getField().getSqlName()));
+        if (right.getLink().isPresent()) {
+            query.append(expandLinkTables(right, right.getLink().get()));
+        }
+        return query.toString();
+    }
+
+    private String expandLinkWheres(Link link) throws OrmException {
+        StringBuilder query = new StringBuilder();
+        Optional<Criteria> optCrit = link.getCriteria();
+        if (optCrit.isPresent()) {
+            query.append(expandCriteria(link, optCrit.get()));
+        }
+        if (link.getLink().isPresent()) {
+            String where = expandLinkWheres(link.getLink().get());
+            query.append(where);
         }
         return query.toString();
 
     }
 
-    private String buildPartQuery(Node node) throws OrmException {
-        Part part = node.getPart();
-        switch (part.getType()) {
-            case SELECT: {
-                if (part.left() == null) {
-                    return format("SELECT %s.* FROM %s",
-                            part.getReturnTable().getSqlTable(),
-                            part.getReturnTable().getSqlTable());
-                }
-            }
-            break;
-            case WHERE:
-                return format(" WHERE (%s)", buildExpression(node));
-            case JOIN:
-                return format(" JOIN %s ",
-                        ((JoinPart) part).getTable().getSqlTable());
-            case ON_CLAUSE: {
-                OnClausePart on = (OnClausePart) part;
-                return format(" ON %s.%s=%s.%s",
-                        part.left().getSelectTable().getSqlTable(),
-                        on.getLeftField().getSqlName(),
-                        part.getSelectTable().getSqlTable(),
-                        on.getRightField().getSqlName());
-            }
-            case ORDER: {
-                OrderedPart order = (OrderedPart) part;
-                StringBuilder buf = new StringBuilder();
-
-                if (part.left().getType() != Part.Type.ORDER) {
-                    buf.append(" ORDER BY ");
-                } else {
-                    buf.append(",");
-                }
-                buf.append(order.getField().getSqlName());
-                if (order.getDirection() == OrderedPart.Direction.DESCENDING) {
-                    buf.append(" DESCENDING");
-                }
-                return buf.toString();
-            }
+    private String expandCriteria(TableSpec table, Criteria crit) throws OrmException {
+        switch (crit.getType()) {
+            case LIST_FIELD:
+                return expandListFieldCriteria(table, (ListCriteria) crit);
+            case VALUE_FIELD:
+                return expandValueFieldCriteria(table, (ValueCriteria) crit);
             case AND:
-                return format(" AND (%s)",
-                        buildExpression(node));
+                AndCriteria and = (AndCriteria) crit;
+                return format("(%s AND %s)", expandCriteria(table, and.getLeft()), expandCriteria(table, and.getRight()));
             case OR:
-                return format(" OR (%s)",
-                        buildExpression(node));
-            case NESTED_AND:
-                return format(" AND %s",
-                        buildExpression(node));
-            case NESTED_OR:
-                return format(" OR %s",
-                        buildExpression(node));
-            case VALUE_EXPRESSION: {
-                ValueExpressionPart vop = (ValueExpressionPart) part;
-                return format("%s '%s'", valueOperator(vop),
-                        sqlValue(vop.getValue()));
-            }
-            case LIST_EXPRESSION: {
-                ListExpressionPart lop = (ListExpressionPart) part;
-                StringJoiner sj = new StringJoiner(",");
-                for (Object value : lop.getValues()) {
-                    sj.add(format("'%s'", sqlValue(value)));
-                }
-                return format("%s(%s)", listOperator(lop), sj.toString());
-            }
-            case FIELD: {
-                FieldPart field = (FieldPart) part;
-                return format("%s", field.getSqlName());
-            }
+                OrCriteria or = (OrCriteria) crit;
+                return format("(%s OR %s)", expandCriteria(table, or.getLeft()), expandCriteria(table, or.getRight()));
             default:
-                throw new OrmException(format("Unsupported part type '%s'. BUG!", part.getType()));
+                throw new OrmException(format("Unexpected criteria type '%s' in switch. BUG!", crit.getType()));
         }
-        return "";
     }
 
-    private String buildExpression(Node node) throws OrmException {
-        return format("%s", buildQuery(node.getTangent()));
+    private String expandListFieldCriteria(TableSpec table, ListCriteria crit) throws OrmException {
+        StringBuilder query = new StringBuilder();
+        query.append(format("%s.%s %s (", table.getTable().getSqlTable(), crit.getField().getSqlName(), listOperator(crit)));
+        for (Object val : crit.getValues()) {
+            query.append(format("'%s'", sqlValue(val)));
+        }
+        query.append("'");
+        return query.toString();
+    }
+
+    private String expandValueFieldCriteria(TableSpec table, ValueCriteria crit) throws OrmException {
+        StringBuilder query = new StringBuilder();
+        query.append(format("%s.%s%s'%s'", table.getTable().getSqlTable(), crit.getField().getSqlName(), valueOperator(crit), sqlValue(crit.getValue())
+        ));
+        return query.toString();
     }
 
     private String sqlValue(Object object) {
         return object.toString();
     }
 
-    private String listOperator(ListExpressionPart part) throws OrmException {
+    private String listOperator(ListCriteria part) throws OrmException {
         switch (part.getOperator()) {
             case IN:
                 return " IN";
@@ -131,7 +125,7 @@ public class MySqlOrm extends Orm {
 
     }
 
-    private String valueOperator(ValueExpressionPart part) throws OrmException {
+    private String valueOperator(ValueCriteria part) throws OrmException {
         switch (part.getOperator()) {
             case EQ:
                 return "=";

@@ -7,15 +7,20 @@ import me.legrange.orm.Table;
  *
  * @author gideon
  */
-public class Query {
+public class Query extends TableSpec {
 
-    private final Table table;
-    private Optional<Criteria> criteria;
-    private Optional<Link> link;
-    private Optional<Order> order;
+    private Optional<Order> order = Optional.empty();
 
     public Query(Table table) {
-        this.table = table;
+        super(table);
+    }
+
+    public Optional<Order> getOrder() {
+        return order;
+    }
+
+    public void setOrder(Optional<Order> order) {
+        this.order = order;
     }
 
 }

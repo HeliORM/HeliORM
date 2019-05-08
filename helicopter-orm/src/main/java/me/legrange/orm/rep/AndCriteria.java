@@ -15,4 +15,12 @@ public class AndCriteria extends Criteria {
         this.right = right;
     }
 
+    public Criteria getLeft() {
+        return left;
+    }
+
+    public Criteria getRight() {
+        return right;
+    }
+
 }

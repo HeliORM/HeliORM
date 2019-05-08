@@ -9,7 +9,9 @@ import me.legrange.orm.OrmException;
 import me.legrange.orm.impl.ContinuationPart;
 import me.legrange.orm.impl.ExpressionContinuationPart;
 import me.legrange.orm.impl.FieldPart;
+import me.legrange.orm.impl.JoinPart;
 import me.legrange.orm.impl.ListExpressionPart;
+import me.legrange.orm.impl.OnClausePart;
 import me.legrange.orm.impl.Part;
 import me.legrange.orm.impl.SelectPart;
 import me.legrange.orm.impl.ValueExpressionPart;
@@ -36,30 +38,66 @@ public class Parser {
         Query query = new Query(((SelectPart) part).getReturnTable());
         while (hasNext()) {
             next();
-            if (part.getType() == Part.Type.WHERE) {
-                where();
-            }
-            if (part.getType() == Part.Type.JOIN) {
-                join();
-            }
-            if (part.getType() == Part.Type.ORDER) {
-                order();
-            }
+            switch (part.getType()) {
+                case WHERE:
+                    query.setCriteria(where());
+                    break;
+                case AND:
+                    query.setCriteria(new AndCriteria(query.getCriteria().get(), and()));
+                    break;
+                case OR:
+                    query.setCriteria(new OrCriteria(query.getCriteria().get(), or()));
+                    break;
+                case JOIN:
+                    query.setLink(join());
+                    break;
+                case ORDER:
+                    order();
+                default:
+                    throw new OrmException(format("Unexpected part of type '%s'. BUG!", part.getType()));
 
+            }
         }
         return query;
     }
 
-    private void where() throws OrmException {
+    private Criteria where() throws OrmException {
         expect(Part.Type.WHERE);
-        Part expr = ((ContinuationPart) part).getExpression();
-        push(unroll(expr));
-        expression();
-        pop();
+        return continuation();
     }
 
-    private void join() {
+    private Criteria and() throws OrmException {
+        expect(Part.Type.AND);
+        return continuation();
+    }
 
+    private Criteria or() throws OrmException {
+        expect(Part.Type.OR);
+        return continuation();
+    }
+
+    private Criteria continuation() throws OrmException {
+        Part expr = ((ContinuationPart) part).getExpression();
+        push(unroll(expr));
+        Criteria crit = expression();
+        pop();
+        return crit;
+    }
+
+    private Link join() throws ParseException, OrmException {
+        expect(Part.Type.JOIN);
+        Part join = ((JoinPart) part);
+        next();
+        expect(Part.Type.ON_CLAUSE);
+        OnClausePart on = (OnClausePart) part;
+        Link link = new Link(join.getSelectTable(), on.getLeftField(), on.getRightField());
+        if (hasNext()) {
+            next();
+            if (part.getType() == Part.Type.WHERE) {
+                link.setCriteria(where());
+            }
+        }
+        return link;
     }
 
     private void order() {
@@ -75,10 +113,14 @@ public class Parser {
 
         switch (part.getType()) {
             case VALUE_EXPRESSION:
-                crit = new ValueCriteria(fieldPart.getThis(), valueExpression());
+                expect(Part.Type.VALUE_EXPRESSION);
+                ValueExpressionPart vep = (ValueExpressionPart) part;
+                crit = new ValueCriteria(fieldPart.getThis(), mapOperator(vep.getOperator()), vep.getValue());
                 break;
             case LIST_EXPRESSION:
-                crit = new ListCriteria(fieldPart.getThis(), listExpression());
+                expect(Part.Type.LIST_EXPRESSION);
+                ListExpressionPart lep = (ListExpressionPart) part;
+                crit = new ListCriteria(fieldPart.getThis(), mapOperator(lep.getOperator()), lep.getValues());
                 break;
             default:
                 throw new ParseException("");
@@ -116,14 +158,12 @@ public class Parser {
         return crit;
     }
 
-    private Object valueExpression() throws ParseException {
-        expect(Part.Type.VALUE_EXPRESSION);
-        return ((ValueExpressionPart) part).getValue();
+    private ListCriteria.Operator mapOperator(ListExpressionPart.Operator op) {
+        return ListCriteria.Operator.valueOf(op.name());
     }
 
-    private List listExpression() throws ParseException {
-        expect(Part.Type.LIST_EXPRESSION);
-        return ((ListExpressionPart) part).getValues();
+    private ValueCriteria.Operator mapOperator(ValueExpressionPart.Operator op) {
+        return ValueCriteria.Operator.valueOf(op.name());
     }
 
     private void push(List<Part> more) {

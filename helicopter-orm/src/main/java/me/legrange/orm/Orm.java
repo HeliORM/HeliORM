@@ -5,10 +5,10 @@ import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 import me.legrange.orm.driver.MySqlOrm;
-import me.legrange.orm.impl.Node;
 import me.legrange.orm.impl.Part;
 import me.legrange.orm.impl.SelectPart;
 import me.legrange.orm.rep.Parser;
+import me.legrange.orm.rep.Query;
 
 /**
  *
@@ -65,8 +65,8 @@ public abstract class Orm implements AutoCloseable {
             part = part.right();
         }
         Parser parser = new Parser(parts);
-        parser.parse();
-
+        String q = buildQuery(parser.parse());
+        System.out.println("Q: " + q);
         // Node.unroll(tail).dump(0);
 //        List<Part> parts = unroll(tail);
 //        String query = buildQuery(Node.unroll(tail));
@@ -92,6 +92,6 @@ public abstract class Orm implements AutoCloseable {
 //        }
     }
 
-    protected abstract String buildQuery(Node root) throws OrmException;
+    protected abstract String buildQuery(Query query) throws OrmException;
 
 }

@@ -3,6 +3,7 @@ package test;
 import java.util.List;
 import me.legrange.orm.Orm;
 import pojos.Person;
+import static test.Tables.COMPANY;
 import static test.Tables.PERSON;
 
 /**
@@ -15,17 +16,22 @@ public class test {
         Orm orm = Orm.open(null, Orm.Driver.MYSQL);
 
 //        List<Person> p = orm.select(PERSON).list();
-        //   List<Person> persons1 = orm.select(PERSON).orderBy(PERSON.emailAddress).list();
+//        List<Person> persons1 = orm.select(PERSON)
+//                .where(PERSON.emailAddress.eq("gideon@legrange.me").and(PERSON.sex.eq(Person.Sex.MALE)))
+//                .or(PERSON.emailAddress.eq("john@acme.com"))
+//                .list();
         List<Person> list = orm.select(PERSON)
                 .where(PERSON.lastName.eq("Le Grange")
                         .and(PERSON.firstName.eq("Gideon"))
-                //                .or(PERSON.lastName.eq("Smith")
-                //                        .and(PERSON.firstName.eq("John")))
-                //                .join(COMPANY)
-                //                .on(PERSON.companyNumber, COMPANY.companyNumber)
-                //                .where(COMPANY.name.like("ACME%")
-                //                        .or(COMPANY.name.like("FOOBAR%")))
-                ).list();
+                        .or(PERSON.lastName.eq("Smith")
+                                .and(PERSON.firstName.eq("John"))))
+                .join(COMPANY)
+                .on(PERSON.companyNumber, COMPANY.companyNumber)
+                .where(COMPANY.name.like("ACME%"))
+                .list();
+//                        .or(COMPANY.name.like("FOOBAR%")))
+//                .orderBy(PERSON.personNumber)
+//                .list();
 //        List<Person> list = orm.select(PERSON)
 //                .where(PERSON.lastName.eq("Le Grange")
 //                        .and(PERSON.firstName.eq("Gideon")))
@@ -36,7 +42,6 @@ public class test {
 //                .where(COMPANY.name.like("ACME%")
 //                        .or(COMPANY.name.like("FOOBAR%")))
 //                .list();
-
 //        Ordered<Tables.PersonTable, Person> query1 = orm.select(PERSON)
 //                .where(PERSON.emailAddress.in("joe@acme.com", "bob@acme.com"))
 //                .and(PERSON.sex.notEq(Person.Sex.MALE))
