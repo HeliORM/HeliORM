@@ -51,7 +51,8 @@ public class MySqlOrm extends Orm {
 
     private String expandLinkTables(TableSpec left, Link right) {
         StringBuilder query = new StringBuilder();
-        query.append(format(" JOIN %s ON %s.%s=%s.%s ", right.getTable().getSqlTable(),
+        query.append(format(" JOIN %s ON %s.%s=%s.%s ",
+                right.getTable().getSqlTable(),
                 left.getTable().getSqlTable(), right.getLeftField().getSqlName(),
                 right.getTable().getSqlTable(), right.getField().getSqlName()));
         if (right.getLink().isPresent()) {

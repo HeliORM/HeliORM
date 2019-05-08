@@ -28,7 +28,8 @@ public class JoinPart<LT extends Table<LO>, LO, RT extends Table<RO>, RO> extend
         return Type.JOIN;
     }
 
-    public RT getTable() {
+    @Override
+    public Table getSelectTable() {
         return table;
     }
 
