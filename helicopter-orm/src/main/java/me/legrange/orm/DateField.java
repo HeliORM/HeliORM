@@ -11,4 +11,8 @@ import java.util.Date;
  */
 public interface DateField<T extends Table<O>, O> extends Field<T, O, Date>, DateExpression<T, O> {
 
+    @Override
+    public default FieldType getFieldType() {
+        return FieldType.DATE;
+    }
 }

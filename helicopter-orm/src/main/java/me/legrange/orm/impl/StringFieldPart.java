@@ -18,4 +18,9 @@ public class StringFieldPart<T extends Table<O>, O> extends FieldPart<T, O, Stri
         super(String.class, javaName, sqlName);
     }
 
+    @Override
+    public FieldType getFieldType() {
+        return FieldType.STRING;
+    }
+
 }

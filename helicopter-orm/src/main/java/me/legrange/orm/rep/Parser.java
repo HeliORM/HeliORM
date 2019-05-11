@@ -29,11 +29,15 @@ public class Parser {
     private final Stack<List<Part>> partsStack = new Stack();
     private final Stack<Integer> idxStack = new Stack();
 
-    public Parser(List<Part> parts) {
+    public static Query parse(List<Part> parts) throws OrmException {
+        return new Parser(parts).parse();
+    }
+
+    private Parser(List<Part> parts) {
         this.parts = new ArrayList(parts);
     }
 
-    public Query parse() throws OrmException {
+    private Query parse() throws OrmException {
         next();
         expect(Part.Type.SELECT);
         Query query = new Query(((SelectPart) part).getReturnTable());
@@ -223,7 +227,6 @@ public class Parser {
             throw new ParseException("Parsed past end of list");
         }
         part = parts.get(idx);
-        System.out.printf("part %s => %s\n", part.getType(), part.toString());
     }
 
     private boolean hasNext() {

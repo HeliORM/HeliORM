@@ -9,6 +9,12 @@ package me.legrange.orm;
  */
 public interface Field<T extends Table<O>, O, C> {
 
+    public enum FieldType {
+        LONG, INTEGER, SHORT, BYTE, DOUBLE, FLOAT, BOOLEAN, ENUM, STRING, DATE;
+    }
+
+    FieldType getFieldType();
+
     Class<C> getJavaType();
 
     String getJavaName();

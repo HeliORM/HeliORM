@@ -10,7 +10,8 @@ import me.legrange.orm.StringField;
 import me.legrange.orm.Table;
 import me.legrange.orm.impl.DateFieldPart;
 import me.legrange.orm.impl.EnumFieldPart;
-import me.legrange.orm.impl.NumberFieldPart;
+import me.legrange.orm.impl.IntegerFieldPart;
+import me.legrange.orm.impl.LongFieldPart;
 import me.legrange.orm.impl.StringFieldPart;
 import pojos.Company;
 import pojos.Person;
@@ -23,8 +24,8 @@ public final class Tables {
         public final DateField<CompanyTable, Company> created = new DateFieldPart("created", "created") {
         };
         public final DateField<CompanyTable, Company> modified = new DateFieldPart("modified", "modified");
-        public final NumberField<CompanyTable, Company, Integer> version = new NumberFieldPart(Integer.class, "version", "version");
-        public final NumberField<CompanyTable, Company, Long> companyNumber = new NumberFieldPart(Long.class, "companyNumber", "companyNumber");
+        public final NumberField<CompanyTable, Company, Integer> version = new IntegerFieldPart("version", "version");
+        public final NumberField<CompanyTable, Company, Long> companyNumber = new LongFieldPart("companyNumber", "companyNumber");
         public final StringField<CompanyTable, Company> name = new StringFieldPart("name", "name");
 
         public List<Field> getFields() {
@@ -45,16 +46,16 @@ public final class Tables {
 
         public final DateField<PersonTable, Person> created = new DateFieldPart("created", "created");
         public final DateField<PersonTable, Person> modified = new DateFieldPart("modified", "modified");
-        public final NumberField<PersonTable, Person, Integer> version = new NumberFieldPart(Person.class, "version", "version");
-        public final NumberField<PersonTable, Person, Long> personNumber = new NumberFieldPart(Person.class, "personNumber", "personNumber");
+        public final NumberField<PersonTable, Person, Integer> version = new IntegerFieldPart("version", "version");
+        public final NumberField<PersonTable, Person, Long> personNumber = new LongFieldPart("personNumber", "personNumber");
         public final StringField<PersonTable, Person> firstName = new StringFieldPart("firstName", "firstName");
         public final StringField<PersonTable, Person> lastName = new StringFieldPart("lastName", "lastName");
         public final StringField<PersonTable, Person> emailAddress = new StringFieldPart("emailAddress", "emailAddress");
-        public final NumberField<PersonTable, Person, Long> companyNumber = new NumberFieldPart(Person.class, "companyNumber", "companyNumber");
+        public final NumberField<PersonTable, Person, Long> companyNumber = new LongFieldPart("companyNumber", "companyNumber");
         public final EnumField<PersonTable, Person, Sex> sex = new EnumFieldPart(Sex.class, "sex", "sex");
 
         public List<Field> getFields() {
-            return Arrays.asList(created, modified, version, personNumber, firstName, lastName, emailAddress, companyNumber);
+            return Arrays.asList(created, modified, version, personNumber, firstName, lastName, emailAddress, companyNumber, sex);
         }
 
         public String getSqlTable() {

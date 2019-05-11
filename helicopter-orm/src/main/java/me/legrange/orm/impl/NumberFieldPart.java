@@ -7,7 +7,7 @@ import me.legrange.orm.Table;
  *
  * @author gideon
  */
-public class NumberFieldPart<T extends Table<O>, O, N extends Number> extends FieldPart<T, O, N> implements
+public abstract class NumberFieldPart<T extends Table<O>, O, N extends Number> extends FieldPart<T, O, N> implements
         NumberField<T, O, N>,
         WithEqualsPart<T, O, N>,
         WithRangePart<T, O, N>,

@@ -68,4 +68,9 @@ public class Person extends Obj {
         this.sex = sex;
     }
 
+    @Override
+    public String toString() {
+        return "Person{" + "personNumber=" + personNumber + ", firstName=" + firstName + ", lastName=" + lastName + ", emailAddress=" + emailAddress + ", companyNumber=" + companyNumber + ", sex=" + sex + '}';
+    }
+
 }
