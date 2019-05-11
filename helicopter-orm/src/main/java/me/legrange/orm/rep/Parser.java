@@ -12,6 +12,7 @@ import me.legrange.orm.impl.FieldPart;
 import me.legrange.orm.impl.JoinPart;
 import me.legrange.orm.impl.ListExpressionPart;
 import me.legrange.orm.impl.OnClausePart;
+import me.legrange.orm.impl.OrderedPart;
 import me.legrange.orm.impl.Part;
 import me.legrange.orm.impl.SelectPart;
 import me.legrange.orm.impl.ValueExpressionPart;
@@ -49,13 +50,13 @@ public class Parser {
                     query.setCriteria(new OrCriteria(query.getCriteria().get(), or()));
                     break;
                 case JOIN:
-                    query.setLink(join());
+                    query.setLink(join(query));
                     break;
                 case ORDER:
-                    order();
+                    query.setOrder(order());
+                    break;
                 default:
                     throw new OrmException(format("Unexpected part of type '%s'. BUG!", part.getType()));
-
             }
         }
         return query;
@@ -84,24 +85,47 @@ public class Parser {
         return crit;
     }
 
-    private Link join() throws ParseException, OrmException {
+    private Link join(Query query) throws ParseException, OrmException {
         expect(Part.Type.JOIN);
         Part join = ((JoinPart) part);
         next();
         expect(Part.Type.ON_CLAUSE);
         OnClausePart on = (OnClausePart) part;
         Link link = new Link(join.getSelectTable(), on.getLeftField(), on.getRightField());
-        if (hasNext()) {
+        while (hasNext()) {
             next();
-            if (part.getType() == Part.Type.WHERE) {
-                link.setCriteria(where());
+            switch (part.getType()) {
+                case WHERE:
+                    link.setCriteria(where());
+                    break;
+                case AND:
+                    link.setCriteria(new AndCriteria(link.getCriteria().get(), and()));
+                    break;
+                case OR:
+                    link.setCriteria(new OrCriteria(link.getCriteria().get(), or()));
+                    break;
+                case JOIN:
+                    link.setLink(join(query));
+                    break;
+                case ORDER:
+                    query.setOrder(order());
+                    break;
+                default:
+                    throw new OrmException(format("Unexpected part of type '%s'. BUG!", part.getType()));
             }
         }
         return link;
     }
 
-    private void order() {
-
+    private Order order() throws ParseException {
+        expect(Part.Type.ORDER);
+        OrderedPart op = (OrderedPart) part;
+        Order order = new Order(op.getField(), mapDirection(op.getDirection()));
+        if (hasNext()) {
+            next();
+            order.setThenBy(order());
+        }
+        return order;
     }
 
     private Criteria expression() throws ParseException, OrmException {
@@ -164,6 +188,10 @@ public class Parser {
 
     private ValueCriteria.Operator mapOperator(ValueExpressionPart.Operator op) {
         return ValueCriteria.Operator.valueOf(op.name());
+    }
+
+    private Order.Direction mapDirection(OrderedPart.Direction dir) {
+        return Order.Direction.valueOf(dir.name());
     }
 
     private void push(List<Part> more) {

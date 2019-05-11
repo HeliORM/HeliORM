@@ -19,8 +19,8 @@ public class Query extends TableSpec {
         return order;
     }
 
-    public void setOrder(Optional<Order> order) {
-        this.order = order;
+    public void setOrder(Order order) {
+        this.order = Optional.ofNullable(order);
     }
 
 }

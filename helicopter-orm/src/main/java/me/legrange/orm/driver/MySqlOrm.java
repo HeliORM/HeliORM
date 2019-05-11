@@ -10,6 +10,7 @@ import me.legrange.orm.rep.Criteria;
 import me.legrange.orm.rep.Link;
 import me.legrange.orm.rep.ListCriteria;
 import me.legrange.orm.rep.OrCriteria;
+import me.legrange.orm.rep.Order;
 import me.legrange.orm.rep.Query;
 import me.legrange.orm.rep.TableSpec;
 import me.legrange.orm.rep.ValueCriteria;
@@ -37,6 +38,9 @@ public class MySqlOrm extends Orm {
         Optional<Link> optLink = root.getLink();
         if (optLink.isPresent()) {
             tablesQuery.append(expandLinkTables(root, optLink.get()));
+            if (whereQuery.length() > 0) {
+                whereQuery.append(" AND ");
+            }
             whereQuery.append(expandLinkWheres(optLink.get()));
         }
         // finalize the query
@@ -45,6 +49,12 @@ public class MySqlOrm extends Orm {
         if (whereQuery.length() > 0) {
             query.append(" WHERE ");
             query.append(whereQuery);
+        }
+        // do ordering
+        Optional<Order> optOrder = root.getOrder();
+        if (optOrder.isPresent()) {
+            query.append(" ORDER BY ");
+            query.append(expandOrder(root, optOrder.get()));
         }
         return query.toString();
     }
@@ -68,8 +78,7 @@ public class MySqlOrm extends Orm {
             query.append(expandCriteria(link, optCrit.get()));
         }
         if (link.getLink().isPresent()) {
-            String where = expandLinkWheres(link.getLink().get());
-            query.append(where);
+            query.append(expandLinkWheres(link.getLink().get()));
         }
         return query.toString();
 
@@ -109,6 +118,20 @@ public class MySqlOrm extends Orm {
         return query.toString();
     }
 
+    private String expandOrder(TableSpec table, Order order) {
+        StringBuilder query = new StringBuilder();
+        query.append(format("%s.%s", table.getTable().getSqlTable(), order.getField().getSqlName()));
+        if (order.getDirection() == Order.Direction.DESCENDING) {
+            query.append(" DESC");
+        }
+        if (order.getThenBy().isPresent()) {
+            query.append(", ");
+            query.append(expandOrder(table, order.getThenBy().get()));
+        }
+        return query.toString();
+
+    }
+
     private String sqlValue(Object object) {
         return object.toString();
     }
@@ -141,9 +164,9 @@ public class MySqlOrm extends Orm {
             case LT:
                 return "<";
             case LIKE:
-                return " LIKE";
+                return " LIKE ";
             case NOT_LIKE:
-                return " NOT LIKE";
+                return " NOT LIKE ";
             default:
                 throw new OrmException(format("Unsupported operator '%s'. BUG!", part.getOperator()));
         }

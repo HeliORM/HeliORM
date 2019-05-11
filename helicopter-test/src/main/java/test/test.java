@@ -28,6 +28,8 @@ public class test {
                 .join(COMPANY)
                 .on(PERSON.companyNumber, COMPANY.companyNumber)
                 .where(COMPANY.name.like("ACME%"))
+                .and(COMPANY.companyNumber.gt(2L))
+                .orderBy(PERSON.companyNumber).thenByDesc(PERSON.personNumber)
                 .list();
 //                        .or(COMPANY.name.like("FOOBAR%")))
 //                .orderBy(PERSON.personNumber)
