@@ -18,13 +18,29 @@ import java.util.StringJoiner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import me.legrange.orm.BooleanField;
+import me.legrange.orm.ByteField;
 import me.legrange.orm.DateField;
+import me.legrange.orm.DoubleField;
 import me.legrange.orm.EnumField;
 import me.legrange.orm.Field;
-import me.legrange.orm.NumberField;
+import me.legrange.orm.FloatField;
+import me.legrange.orm.IntegerField;
+import me.legrange.orm.LongField;
 import me.legrange.orm.OrmMetaDataException;
+import me.legrange.orm.ShortField;
 import me.legrange.orm.StringField;
 import me.legrange.orm.Table;
+import me.legrange.orm.impl.BooleanFieldPart;
+import me.legrange.orm.impl.ByteFieldPart;
+import me.legrange.orm.impl.DateFieldPart;
+import me.legrange.orm.impl.DoubleFieldPart;
+import me.legrange.orm.impl.EnumFieldPart;
+import me.legrange.orm.impl.FieldPart;
+import me.legrange.orm.impl.FloatFieldPart;
+import me.legrange.orm.impl.IntegerFieldPart;
+import me.legrange.orm.impl.LongFieldPart;
+import me.legrange.orm.impl.ShortFieldPart;
+import me.legrange.orm.impl.StringFieldPart;
 import me.legrange.orm.mojo.pojo.AnnotatedPojoGenerator;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.plugin.AbstractMojo;
@@ -139,61 +155,89 @@ public class GenerateModel extends AbstractMojo {
     private void addFieldModel(Table cm, Field fm) throws OrmMetaDataException {
         switch (fm.getFieldType()) {
             case BYTE:
+                addByteField(cm, fm);
+                break;
             case SHORT:
+                addShortField(cm, fm);
+                break;
             case INTEGER:
+                addIntegerField(cm, fm);
+                break;
             case LONG:
+                addLongField(cm, fm);
+                break;
             case FLOAT:
+                addFloatField(cm, fm);
+                break;
             case DOUBLE:
-                addType3Field(cm, fm, NumberField.class);
+                addDoubleField(cm, fm);
                 break;
             case BOOLEAN:
-                addType2Field(cm, fm, BooleanField.class);
+                addBooleanField(cm, fm);
                 break;
             case DATE:
-                addType2Field(cm, fm, DateField.class);
+                addDateField(cm, fm);
                 break;
             case STRING:
-                addType2Field(cm, fm, StringField.class);
+                addStringField(cm, fm);
                 break;
             case ENUM:
                 addEnumField(cm, fm);
                 break;
             default:
-                throw new OrmMetaDataException(format("Unsupported POJO field type %s for field '%s' on class %s", fm.getFieldType(), fm.getJavaName(), getJavaName(cm)));
+                throw new OrmMetaDataException(format("Unsupported Pojo field type %s for field '%s' on class %s", fm.getFieldType(), fm.getJavaName(), getJavaName(cm)));
         }
 
     }
 
-    private void addType3Field(Table cm, Field fm, Class<? extends Field> fieldClass) {
+    private void addType2Field(Class<? extends Field> fieldClass, Class<? extends FieldPart> partClass, Table cm, Field fm) {
         impt(fieldClass);
-        emit("public final %s<%sTable, %s, %s> %s = new %s(%s.class, \"%s\", \"%s\");",
-                fieldClass.getSimpleName(),
-                getJavaName(cm),
-                getJavaName(cm),
-                fm.getJavaType().getSimpleName(),
-                fm.getJavaName(),
-                fieldClass.getSimpleName(),
-                getJavaName(cm),
-                fm.getJavaName(),
-                fm.getSqlName());
-
-    }
-
-    private void addType2Field(Table cm, Field fm, Class<? extends Field> fieldClass) {
-        impt(fieldClass);
-        emit("public final %s<%sTable, %s> %s = new %s(%s.class, \"%s\", \"%s\");",
+        impt(partClass);
+        emit("public final %s<%sTable, %s> %s = new %s(\"%s\", \"%s\");",
                 fieldClass.getSimpleName(),
                 getJavaName(cm), getJavaName(cm), fm.getJavaName(),
-                fieldClass.getSimpleName(),
-                getJavaName(cm), fm.getJavaName(), fm.getSqlName());
+                partClass.getSimpleName(),
+                fm.getJavaName(), fm.getSqlName());
+    }
+
+    private void addLongField(Table cm, Field fm) {
+        addType2Field(LongField.class, LongFieldPart.class, cm, fm);
+    }
+
+    private void addIntegerField(Table cm, Field fm) {
+        addType2Field(IntegerField.class, IntegerFieldPart.class, cm, fm);
+    }
+
+    private void addShortField(Table cm, Field fm) {
+        addType2Field(ShortField.class, ShortFieldPart.class, cm, fm);
+    }
+
+    private void addByteField(Table cm, Field fm) {
+        addType2Field(ByteField.class, ByteFieldPart.class, cm, fm);
+    }
+
+    private void addDoubleField(Table cm, Field fm) {
+        addType2Field(DoubleField.class, DoubleFieldPart.class, cm, fm);
+    }
+
+    private void addFloatField(Table cm, Field fm) {
+        addType2Field(FloatField.class, FloatFieldPart.class, cm, fm);
+    }
+
+    private void addBooleanField(Table cm, Field fm) {
+        addType2Field(BooleanField.class, BooleanFieldPart.class, cm, fm);
     }
 
     private void addEnumField(Table cm, Field fm) {
-        impt(EnumField.class);
-        impt(fm.getJavaType());
-        emit("public final EnumField<%sTable, %s, %s> %s = new EnumField(\"%s\", \"%s\");",
-                getJavaName(cm), getJavaName(cm), fm.getJavaType().getSimpleName(), fm.getJavaName(),
-                getJavaName(cm), fm.getJavaName(), fm.getSqlName());
+        addType2Field(EnumField.class, EnumFieldPart.class, cm, fm);
+    }
+
+    private void addDateField(Table cm, Field fm) {
+        addType2Field(DateField.class, DateFieldPart.class, cm, fm);
+    }
+
+    private void addStringField(Table cm, Field fm) {
+        addType2Field(StringField.class, StringFieldPart.class, cm, fm);
     }
 
     /**
