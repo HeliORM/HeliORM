@@ -19,6 +19,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import me.legrange.orm.BooleanField;
 import me.legrange.orm.DateField;
+import me.legrange.orm.EnumField;
 import me.legrange.orm.Field;
 import me.legrange.orm.NumberField;
 import me.legrange.orm.OrmMetaDataException;
@@ -155,9 +156,10 @@ public class GenerateModel extends AbstractMojo {
                 addType2Field(cm, fm, StringField.class);
                 break;
             case ENUM:
+                addEnumField(cm, fm);
                 break;
             default:
-                throw new OrmMetaDataException(format("Unsupported POJO field type for field on class %s", fm.getJavaName(), getJavaName(cm)));
+                throw new OrmMetaDataException(format("Unsupported POJO field type %s for field '%s' on class %s", fm.getFieldType(), fm.getJavaName(), getJavaName(cm)));
         }
 
     }
@@ -183,6 +185,14 @@ public class GenerateModel extends AbstractMojo {
                 fieldClass.getSimpleName(),
                 getJavaName(cm), getJavaName(cm), fm.getJavaName(),
                 fieldClass.getSimpleName(),
+                getJavaName(cm), fm.getJavaName(), fm.getSqlName());
+    }
+
+    private void addEnumField(Table cm, Field fm) {
+        impt(EnumField.class);
+        impt(fm.getJavaType());
+        emit("public final EnumField<%sTable, %s, %s> %s = new EnumField(\"%s\", \"%s\");",
+                getJavaName(cm), getJavaName(cm), fm.getJavaType().getSimpleName(), fm.getJavaName(),
                 getJavaName(cm), fm.getJavaName(), fm.getSqlName());
     }
 
