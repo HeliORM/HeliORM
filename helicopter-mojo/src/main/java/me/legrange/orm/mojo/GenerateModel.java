@@ -120,7 +120,6 @@ public class GenerateModel extends AbstractMojo {
         emit(format("return Arrays.asList(%s);", fieldNames.toString()));
         pop();
         emit("}");
-        pop();
         // getSqlTable();
         emit("");
         emit("@Override");
@@ -137,6 +136,7 @@ public class GenerateModel extends AbstractMojo {
         emit("return %s.class;", getJavaName(cm));
         pop();
         emit("}");
+        pop();
 
         emit("");
         emit("}");
@@ -200,6 +200,19 @@ public class GenerateModel extends AbstractMojo {
                 fm.getJavaName(), fm.getSqlName());
     }
 
+    private void addType3Field(Class<? extends Field> fieldClass, Class<? extends FieldPart> partClass, Table cm, Field fm) {
+        impt(fieldClass);
+        impt(partClass);
+        impt(fm.getJavaType());
+        emit("public final %s<%sTable, %s, %s> %s = new %s(%s.class, \"%s\", \"%s\");",
+                fieldClass.getSimpleName(),
+                getJavaName(cm), getJavaName(cm), fm.getJavaType().getSimpleName(),
+                fm.getJavaName(),
+                partClass.getSimpleName(),
+                fm.getJavaType().getSimpleName(),
+                fm.getJavaName(), fm.getSqlName());
+    }
+
     private void addLongField(Table cm, Field fm) {
         addType2Field(LongField.class, LongFieldPart.class, cm, fm);
     }
@@ -229,7 +242,7 @@ public class GenerateModel extends AbstractMojo {
     }
 
     private void addEnumField(Table cm, Field fm) {
-        addType2Field(EnumField.class, EnumFieldPart.class, cm, fm);
+        addType3Field(EnumField.class, EnumFieldPart.class, cm, fm);
     }
 
     private void addDateField(Table cm, Field fm) {
@@ -302,7 +315,7 @@ public class GenerateModel extends AbstractMojo {
 
     private void emit(String fmt, Object... args) {
         for (int i = 0; i < depth; ++i) {
-            buf.append("\t");
+            buf.append("    ");
         }
         buf.append(format(fmt, args));
         if (!fmt.endsWith("\n")) {

@@ -6,6 +6,9 @@ import me.legrange.orm.Table;
 /**
  *
  * @author gideon
+ * @param <T>
+ * @param <O>
+ * @param <E>
  */
 public class EnumFieldPart<T extends Table<O>, O, E extends Enum> extends FieldPart<T, O, E> implements
         EnumField<T, O, E>,
