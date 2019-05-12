@@ -3,8 +3,11 @@ package me.legrange.orm.driver;
 import static java.lang.String.format;
 import java.sql.Connection;
 import java.util.Optional;
+import java.util.StringJoiner;
+import me.legrange.orm.Field;
 import me.legrange.orm.Orm;
 import me.legrange.orm.OrmException;
+import me.legrange.orm.Table;
 import me.legrange.orm.rep.AndCriteria;
 import me.legrange.orm.rep.Criteria;
 import me.legrange.orm.rep.Link;
@@ -21,12 +24,29 @@ import me.legrange.orm.rep.ValueCriteria;
  */
 public class MySqlOrm extends Orm {
 
-    public MySqlOrm(Connection con) {
+    public MySqlOrm(Connection con) throws OrmException {
         super(con);
     }
 
     @Override
-    protected String buildQuery(Query root) throws OrmException {
+    protected String buildInsertQuery(Table<?> table) throws OrmException {
+        StringBuilder query = new StringBuilder();
+        query.append(format("INSERT INTO %s(", table.getSqlTable()));
+        StringJoiner fields = new StringJoiner(",");
+        StringJoiner values = new StringJoiner(",");
+        for (Field field : table.getFields()) {
+            fields.add(field.getSqlName());
+            values.add("?");
+        }
+        query.append(fields.toString());
+        query.append(") VALUES(");
+        query.append(values.toString());
+        query.append(")");
+        return query.toString();
+    }
+
+    @Override
+    protected String buildSelectQuery(Query root) throws OrmException {
         StringBuilder tablesQuery = new StringBuilder();
         tablesQuery.append(format("SELECT %s.* FROM %s", root.getTable().getSqlTable(), root.getTable().getSqlTable()));
         StringBuilder whereQuery = new StringBuilder();

@@ -25,17 +25,17 @@ abstract class ExecutablePart<T extends Table<O>, O> extends Part<T, O, T, O>
 
     @Override
     public Stream<O> stream() throws OrmException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return getOrm().stream(this);
     }
 
     @Override
     public O one() throws OrmException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return getOrm().one(this);
     }
 
     @Override
     public Optional<O> oneOrNone() throws OrmException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return getOrm().oneOrNone(this);
     }
 
 }

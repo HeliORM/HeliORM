@@ -57,8 +57,98 @@ class UnsafeFieldOperation implements PojoOperations {
         }
     }
 
+    @Override
+    public Object getValue(Object pojo, Field field) throws OrmException {
+        java.lang.reflect.Field refField = getDeclaredField(pojo.getClass(), field.getJavaName());
+        switch (field.getFieldType()) {
+            case LONG:
+                return getLong(pojo, refField);
+            case INTEGER:
+                return getInteger(pojo, refField);
+            case SHORT:
+                return getShort(pojo, refField);
+            case BYTE:
+                return getByte(pojo, refField);
+            case DOUBLE:
+                return getDouble(pojo, refField);
+            case FLOAT:
+                return getFloat(pojo, refField);
+            case BOOLEAN:
+                return getBoolean(pojo, refField);
+            case ENUM:
+                return getEnum(pojo, refField);
+            case DATE:
+            case STRING:
+                return getObject(pojo, refField);
+            default:
+                throw new OrmException(format("Unsupported field type '%s'. BUG!", field.getFieldType()));
+        }
+    }
+
     UnsafeFieldOperation() throws OrmException {
         unsafe = getUnsafe();
+    }
+
+    private Object getBoolean(Object pojo, java.lang.reflect.Field field) {
+        if (field.getType().isPrimitive()) {
+            return unsafe.getBoolean(pojo, unsafe.objectFieldOffset(field));
+        }
+        return getObject(pojo, field);
+    }
+
+    private Object getLong(Object pojo, java.lang.reflect.Field field) {
+        if (field.getType().isPrimitive()) {
+            return unsafe.getLong(pojo, unsafe.objectFieldOffset(field));
+        }
+        return getObject(pojo, field);
+    }
+
+    private Object getInteger(Object pojo, java.lang.reflect.Field field) {
+        if (field.getType().isPrimitive()) {
+            return unsafe.getInt(pojo, unsafe.objectFieldOffset(field));
+        }
+        return getObject(pojo, field);
+    }
+
+    private Object getShort(Object pojo, java.lang.reflect.Field field) {
+        if (field.getType().isPrimitive()) {
+            return unsafe.getShort(pojo, unsafe.objectFieldOffset(field));
+        }
+        return getObject(pojo, field);
+    }
+
+    private Object getByte(Object pojo, java.lang.reflect.Field field) {
+        if (field.getType().isPrimitive()) {
+            return unsafe.getByte(pojo, unsafe.objectFieldOffset(field));
+        }
+        return getObject(pojo, field);
+    }
+
+    private Object getDouble(Object pojo, java.lang.reflect.Field field) {
+        if (field.getType().isPrimitive()) {
+            return unsafe.getDouble(pojo, unsafe.objectFieldOffset(field));
+        }
+        return getObject(pojo, field);
+    }
+
+    private Object getFloat(Object pojo, java.lang.reflect.Field field) {
+        if (field.getType().isPrimitive()) {
+            return unsafe.getFloat(pojo, unsafe.objectFieldOffset(field));
+        }
+        return getObject(pojo, field);
+    }
+
+    private Object getEnum(Object pojo, java.lang.reflect.Field field) throws OrmException {
+        Object value = getObject(pojo, field);
+        Class<?> valueClass = value.getClass();
+        if (valueClass.isEnum()) {
+            return ((Enum) value).name();
+        }
+        throw new OrmException(format("Cannot read Pojo enum field from data of type %s", valueClass.getSimpleName()));
+    }
+
+    private Object getObject(Object pojo, java.lang.reflect.Field field) {
+        return unsafe.getObject(pojo, unsafe.objectFieldOffset(field));
     }
 
     private void setBoolean(Object pojo, java.lang.reflect.Field field, Object value) {
