@@ -9,12 +9,12 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import me.legrange.orm.Table;
 import me.legrange.orm.annotation.Pojo;
 import me.legrange.orm.mojo.GenerateModel;
 import me.legrange.orm.mojo.Generator;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.plugin.MojoExecutionException;
-import me.legrange.orm.mojo.ClassModel;
 
 /**
  *
@@ -38,15 +38,15 @@ public class AnnotatedPojoGenerator extends Generator {
     }
 
     @Override
-    public List<ClassModel> getPojoModels() throws MojoExecutionException {
-        List<ClassModel> res = new ArrayList();
+    public List<Table> getPojoModels() throws MojoExecutionException {
+        List<Table> res = new ArrayList();
         for (Class<?> pojoClass : getAllPojoClasses()) {
             res.add(makePojoModel(pojoClass));
         }
         return res;
     }
 
-    private ClassModel makePojoModel(Class<?> pojoClass) {
+    private Table makePojoModel(Class<?> pojoClass) {
         return new PojoClassModel(pojoClass);
     }
 

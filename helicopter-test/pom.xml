@@ -27,6 +27,7 @@
                             <packages>
                                 <package>pojos</package>
                             </packages>
+                            <outputDir>${basedir}/target/generated-sources</outputDir>
                         </configuration>
                     </execution>
                 </executions>

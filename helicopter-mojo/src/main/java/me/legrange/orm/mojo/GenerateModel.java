@@ -1,17 +1,22 @@
 package me.legrange.orm.mojo;
 
 import java.io.File;
-import java.io.PrintStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import static java.lang.String.format;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringJoiner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import me.legrange.orm.BooleanField;
 import me.legrange.orm.DateField;
 import me.legrange.orm.Field;
@@ -43,6 +48,8 @@ public class GenerateModel extends AbstractMojo {
     private Generator.PojoStrategy strategy;
     @Parameter(property = "packages", required = true)
     private Set<String> packages;
+    @Parameter(property = "outputDir", required = false)
+    private String outputDir;
     @Component
     private MavenProject project;
 
@@ -62,11 +69,11 @@ public class GenerateModel extends AbstractMojo {
                     throw new MojoExecutionException(format("Unsupported POJO strategy '%s'. BUG?", strategy));
             }
             openMetaModel();
-            for (ClassModel pm : gen.getPojoModels()) {
+            for (Table pm : gen.getPojoModels()) {
                 addClassModel(pm);
             }
             emit("");
-            for (ClassModel cm : gen.getPojoModels()) {
+            for (Table cm : gen.getPojoModels()) {
                 addClassField(cm);
             }
             closeMetaModel();
@@ -76,17 +83,21 @@ public class GenerateModel extends AbstractMojo {
         }
     }
 
-    private void addClassModel(ClassModel cm) throws OrmMetaDataException {
-        emit("public static final class %sTable implements Table<%s> {", cm.getJavaName(), cm.getJavaName());
+    private void addClassModel(Table<?> cm) throws OrmMetaDataException {
+        emit("public static final class %sTable implements Table<%s> {", getJavaName(cm), getJavaName(cm));
         emit("");
         push();
         StringJoiner fieldNames = new StringJoiner(",");
-        for (FieldModel fm : cm.getFields()) {
+        for (Field fm : cm.getFields()) {
             addFieldModel(cm, fm);
             fieldNames.add(fm.getJavaName());
         }
         // getFields();
+        impt(List.class);
+        impt(Field.class);
+        impt(Arrays.class);
         emit("");
+        emit("@Override");
         emit("public List<Field> getFields() {");
         push();
         emit(format("return Arrays.asList(%s);", fieldNames.toString()));
@@ -95,16 +106,18 @@ public class GenerateModel extends AbstractMojo {
         pop();
         // getSqlTable();
         emit("");
+        emit("@Override");
         emit("public String getSqlTable() {");
         push();
-        emit("return \"%s\";", cm.getTableName());
+        emit("return \"%s\";", cm.getSqlTable());
         pop();
         emit("}");
         // getObjectClass();
         emit("");
-        emit("public Class<%s> getObjectClass() {", cm.getJavaName());
+        emit("@Override");
+        emit("public Class<%s> getObjectClass() {", getJavaName(cm));
         push();
-        emit("return %s.class;", cm.getJavaName());
+        emit("return %s.class;", getJavaName(cm));
         pop();
         emit("}");
 
@@ -113,13 +126,17 @@ public class GenerateModel extends AbstractMojo {
         emit("");
     }
 
-    private void addClassField(ClassModel cm) {
-        impt(cm.getClassName());
-        emit("public static final %sTable %s = new %sTable();", cm.getJavaName(), cm.getJavaName().toUpperCase(), cm.getJavaName());
+    private String getJavaName(Table table) {
+        return table.getObjectClass().getSimpleName();
     }
 
-    private void addFieldModel(ClassModel cm, FieldModel fm) throws OrmMetaDataException {
-        switch (fm.getType()) {
+    private void addClassField(Table cm) {
+        impt(cm.getObjectClass());
+        emit("public static final %sTable %s = new %sTable();", getJavaName(cm), getJavaName(cm).toUpperCase(), getJavaName(cm));
+    }
+
+    private void addFieldModel(Table cm, Field fm) throws OrmMetaDataException {
+        switch (fm.getFieldType()) {
             case BYTE:
             case SHORT:
             case INTEGER:
@@ -137,34 +154,36 @@ public class GenerateModel extends AbstractMojo {
             case STRING:
                 addType2Field(cm, fm, StringField.class);
                 break;
-            case UNSUPPORTED:
-                throw new OrmMetaDataException(format("Unsupported POJO field type for field on class %s", fm.getJavaName(), cm.getJavaName()));
+            case ENUM:
+                break;
+            default:
+                throw new OrmMetaDataException(format("Unsupported POJO field type for field on class %s", fm.getJavaName(), getJavaName(cm)));
         }
 
     }
 
-    private void addType3Field(ClassModel cm, FieldModel fm, Class<? extends Field> fieldClass) {
-        impt(fieldClass.getCanonicalName());
+    private void addType3Field(Table cm, Field fm, Class<? extends Field> fieldClass) {
+        impt(fieldClass);
         emit("public final %s<%sTable, %s, %s> %s = new %s(%s.class, \"%s\", \"%s\");",
                 fieldClass.getSimpleName(),
-                cm.getJavaName(),
-                cm.getJavaName(),
-                fm.getType().javaType(),
+                getJavaName(cm),
+                getJavaName(cm),
+                fm.getJavaType().getSimpleName(),
                 fm.getJavaName(),
                 fieldClass.getSimpleName(),
-                cm.getJavaName(),
+                getJavaName(cm),
                 fm.getJavaName(),
                 fm.getSqlName());
 
     }
 
-    private void addType2Field(ClassModel cm, FieldModel fm, Class<? extends Field> fieldClass) {
-        impt(fieldClass.getCanonicalName());
+    private void addType2Field(Table cm, Field fm, Class<? extends Field> fieldClass) {
+        impt(fieldClass);
         emit("public final %s<%sTable, %s> %s = new %s(%s.class, \"%s\", \"%s\");",
                 fieldClass.getSimpleName(),
-                cm.getJavaName(), cm.getJavaName(), fm.getJavaName(),
+                getJavaName(cm), getJavaName(cm), fm.getJavaName(),
                 fieldClass.getSimpleName(),
-                cm.getJavaName(), fm.getJavaName(), fm.getSqlName());
+                getJavaName(cm), fm.getJavaName(), fm.getSqlName());
     }
 
     /**
@@ -241,13 +260,24 @@ public class GenerateModel extends AbstractMojo {
         imports.add(name);
     }
 
+    private void impt(Class clazz) {
+        imports.add(clazz.getCanonicalName());
+    }
+
     private void output() {
-        PrintStream out = System.out;
-        for (String imp : imports) {
-            out.printf("import %s;\n", imp);
+        PrintWriter out = null;
+        try {
+            out = new PrintWriter(new FileWriter(outputDir + "/Tables.java"));
+            for (String imp : imports) {
+                out.printf("import %s;\n", imp);
+            }
+            out.println();
+            out.print(buf.toString());
+        } catch (IOException ex) {
+            Logger.getLogger(GenerateModel.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            out.close();
         }
-        out.println();
-        out.print(buf.toString());
     }
 
 }

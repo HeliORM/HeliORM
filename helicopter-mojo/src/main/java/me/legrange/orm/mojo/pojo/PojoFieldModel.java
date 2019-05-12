@@ -1,20 +1,20 @@
 package me.legrange.orm.mojo.pojo;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
+import java.util.Date;
 import java.util.Optional;
+import me.legrange.orm.Field;
 import me.legrange.orm.annotation.Column;
-import me.legrange.orm.mojo.FieldModel;
 
 /**
  *
  * @author gideon
  */
-public class PojoFieldModel implements FieldModel {
+public class PojoFieldModel implements Field {
 
-    private final Field pojoField;
+    private final java.lang.reflect.Field pojoField;
 
-    public PojoFieldModel(Field pojoField) {
+    public PojoFieldModel(java.lang.reflect.Field pojoField) {
         this.pojoField = pojoField;
     }
 
@@ -36,8 +36,55 @@ public class PojoFieldModel implements FieldModel {
     }
 
     @Override
-    public Type getType() {
-        return Type.typeFor(pojoField.getType());
+    public Class getJavaType() {
+        return pojoField.getType();
+    }
+
+    @Override
+    public FieldType getFieldType() {
+        Class<?> type = pojoField.getType();
+        if (type.isPrimitive()) {
+            switch (type.getSimpleName()) {
+                case "long":
+                    return FieldType.LONG;
+                case "int":
+                    return FieldType.INTEGER;
+                case "short":
+                    return FieldType.SHORT;
+                case "byte":
+                    return FieldType.BYTE;
+                case "double":
+                    return FieldType.DOUBLE;
+                case "float":
+                    return FieldType.FLOAT;
+                case "boolean":
+                    return FieldType.BOOLEAN;
+            }
+        } else if (Number.class.isAssignableFrom(type)) {
+            switch (type.getSimpleName()) {
+                case "Long":
+                    return FieldType.LONG;
+                case "Integer":
+                    return FieldType.INTEGER;
+                case "Short":
+                    return FieldType.SHORT;
+                case "Byte":
+                    return FieldType.BYTE;
+                case "Double":
+                    return FieldType.DOUBLE;
+                case "Float":
+                    return FieldType.FLOAT;
+            }
+        } else if (Boolean.class.isAssignableFrom(type)) {
+            return FieldType.BOOLEAN;
+        } else if (String.class.isAssignableFrom(type)) {
+            return FieldType.STRING;
+        } else if (Date.class.isAssignableFrom(type)) {
+            return FieldType.DATE;
+        } else if (Enum.class.isAssignableFrom(type)) {
+            return FieldType.ENUM;
+        }
+        return null; // FIXME
     }
 
     private <T extends Annotation> Optional<T> getAnnotation(Class<T> annotationClass) {

@@ -6,4 +6,6 @@ package me.legrange.orm.annotation;
  */
 public @interface PrimaryKey {
 
+    boolean autoIncrement() default true;
+
 }

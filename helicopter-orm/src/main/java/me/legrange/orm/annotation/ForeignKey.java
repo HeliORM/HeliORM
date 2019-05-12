@@ -1,6 +1,5 @@
 package me.legrange.orm.annotation;
 
-
 /**
  *
  * @author gideon
