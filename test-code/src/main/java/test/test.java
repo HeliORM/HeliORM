@@ -1,10 +1,10 @@
 package test;
 
+import Tables.COMPANY;
 import java.sql.DriverManager;
 import java.util.Date;
 import me.legrange.orm.Orm;
 import pojos.Company;
-import static test.Tables.COMPANY;
 
 /**
  *
@@ -12,13 +12,6 @@ import static test.Tables.COMPANY;
  */
 public class test {
 
-    /*
-                            .where(PERSON.lastName.eq("Le Grange")
-                                .and(PERSON.firstName.eq("Gideon")))
-                        .or(PERSON.lastName.eq("Smith")
-                                .and(PERSON.firstName.eq("John")))
-
-     */
     public static void main(String... args) throws Exception {
         Orm orm = Orm.open(DriverManager.getConnection("jdbc:mysql://localhost:3306/orm?user=root"), Orm.Driver.MYSQL);
 

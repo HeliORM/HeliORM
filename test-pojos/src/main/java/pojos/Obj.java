@@ -1,12 +1,14 @@
 package pojos;
 
 import java.util.Date;
+import me.legrange.orm.annotation.Pojo;
 
 /**
  *
  * @author gideon
  */
-public class Obj {
+@Pojo
+public abstract class Obj {
 
     private Date created;
     private Date modified;

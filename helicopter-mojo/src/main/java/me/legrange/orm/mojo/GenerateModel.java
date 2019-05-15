@@ -101,6 +101,7 @@ public class GenerateModel extends AbstractMojo {
     }
 
     private void addClassModel(Table<?> cm) throws OrmMetaDataException {
+        emit("package pojos;"); // FIX ME hard coded
         emit("public static final class %sTable implements Table<%s> {", getJavaName(cm), getJavaName(cm));
         emit("");
         push();

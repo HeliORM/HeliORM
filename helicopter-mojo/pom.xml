@@ -40,7 +40,7 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>helicopter-orm</artifactId>
+            <artifactId>core</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>
