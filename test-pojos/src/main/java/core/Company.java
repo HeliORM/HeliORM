@@ -1,7 +1,8 @@
-package pojos;
+package core;
 
 import me.legrange.orm.annotation.Pojo;
 import me.legrange.orm.annotation.PrimaryKey;
+import pojos.Obj;
 
 /**
  *

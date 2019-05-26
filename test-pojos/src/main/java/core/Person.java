@@ -1,9 +1,10 @@
-package pojos;
+package core;
 
 import me.legrange.orm.annotation.Column;
 import me.legrange.orm.annotation.ForeignKey;
 import me.legrange.orm.annotation.Pojo;
 import me.legrange.orm.annotation.PrimaryKey;
+import pojos.Obj;
 
 /**
  *

@@ -28,6 +28,7 @@
                             <strategy>annotated</strategy>
                             <packages>
                                 <package>pojos</package>
+                                <package>core</package>
                             </packages>
                             <outputDir>${basedir}/target/generated-sources</outputDir>
                         </configuration>
