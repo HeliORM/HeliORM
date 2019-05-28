@@ -96,14 +96,8 @@ public class GenerateModel extends AbstractMojo {
     private void addClassModel(Table<?> cm) throws OrmMetaDataException, GeneratorException {
         Output out = getOutputFor(cm.getObjectClass());
         Table<?> supTable = getSuper(cm);
-        if (supTable != null) {
-            out.impt(fullTableName(supTable));
-            out.emit("public static class %s<T extends %s> extends %s<T> implements Table<T> {",
-                    tableName(cm), getJavaName(cm), tableName(supTable));
-        } else {
-            out.emit("public static class %s<T extends %s> implements Table<T> {",
-                    tableName(cm), getJavaName(cm));
-        }
+        out.emit("public static class %s implements Table<%s> {",
+                tableName(cm), getJavaName(cm));
         out.emit("");
         out.push();
         StringJoiner fieldNames = new StringJoiner(",");
@@ -133,17 +127,11 @@ public class GenerateModel extends AbstractMojo {
         // getObjectClass();
         out.emit("");
         out.emit("@Override");
-        out.emit("public Class<T> getObjectClass() {");
+        out.emit("public Class<%s> getObjectClass() {", getJavaName(cm));
         out.push();
-        out.emit("return (Class<T>) %s.class;", getJavaName(cm));
+        out.emit("return %s.class;", getJavaName(cm));
         out.pop();
         out.emit("}");
-//        // getSuper();
-//        out.emit("");
-//        if (supTable != null) {
-//            impt()
-//            emit("")
-//        }
         out.pop();
 
         out.emit("");
@@ -217,12 +205,15 @@ public class GenerateModel extends AbstractMojo {
         Output out = getOutputFor(cm.getObjectClass());
         out.impt(fieldClass);
         out.impt(partClass);
-        out.emit("public final %s<%s<T>, T> %s = new %s(\"%s\", \"%s\");",
+        // public final StringField<PersonTable, Person> name = new StringFieldPart<P
+        out.emit("public final %s<%s, %s> %s = new %s(\"%s\", \"%s\");",
                 fieldClass.getSimpleName(),
                 tableName(cm),
+                cm.getObjectClass().getSimpleName(),
                 fm.getJavaName(),
                 partClass.getSimpleName(),
-                fm.getJavaName(), fm.getSqlName());
+                fm.getJavaName(),
+                fm.getSqlName());
     }
 
     private void addType3Field(Class<? extends Field> fieldClass, Class<? extends FieldPart> partClass, Table cm, Field fm) throws GeneratorException {
@@ -230,9 +221,10 @@ public class GenerateModel extends AbstractMojo {
         out.impt(fieldClass);
         out.impt(partClass);
         out.impt(fm.getJavaType());
-        out.emit("public final %s<%s<T>, T, %s> %s = new %s(%s.class, \"%s\", \"%s\");",
+        out.emit("public final %s<%s, %s, %s> %s = new %s(%s.class, \"%s\", \"%s\");",
                 fieldClass.getSimpleName(),
                 tableName(cm),
+                cm.getObjectClass().getSimpleName(),
                 fm.getJavaType().getSimpleName(),
                 fm.getJavaName(),
                 partClass.getSimpleName(),
