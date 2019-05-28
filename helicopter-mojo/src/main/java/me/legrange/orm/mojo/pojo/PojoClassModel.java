@@ -18,10 +18,16 @@ import me.legrange.orm.annotation.Pojo;
 public class PojoClassModel implements Table {
 
     private final Class<?> pojoClass;
+    private final Table<?> superTable;
     private List<Field> fieldModels;
 
     public PojoClassModel(Class<?> pojoClass) {
+        this(pojoClass, null);
+    }
+
+    public PojoClassModel(Class<?> pojoClass, Table<?> superTable) {
         this.pojoClass = pojoClass;
+        this.superTable = superTable;
     }
 
     private String getJavaName() {
@@ -84,5 +90,10 @@ public class PojoClassModel implements Table {
     public Class getObjectClass() {
         return pojoClass;
     }
+//
+//    @Override
+//    public Table getSuper() {
+//        return superTable;
+//    }
 
 }

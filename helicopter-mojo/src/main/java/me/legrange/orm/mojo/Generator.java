@@ -2,7 +2,6 @@ package me.legrange.orm.mojo;
 
 import java.util.List;
 import me.legrange.orm.Table;
-import org.apache.maven.plugin.MojoExecutionException;
 
 /**
  *
@@ -20,6 +19,8 @@ public abstract class Generator {
         this.generator = generator;
     }
 
-    public abstract List<Table> getPojoModels() throws MojoExecutionException;
+    public abstract List<Table> getPojoModels() throws GeneratorException;
+
+    public abstract Table getPojoModel(Class clazz) throws GeneratorException;
 
 }

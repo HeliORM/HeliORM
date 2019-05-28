@@ -15,4 +15,5 @@ public interface Table<O> {
 
     String getSqlTable();
 
+//    <P> Table<P> getSuper();
 }

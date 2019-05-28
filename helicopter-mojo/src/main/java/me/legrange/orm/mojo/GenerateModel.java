@@ -64,13 +64,13 @@ public class GenerateModel extends AbstractMojo {
     private String outputDir;
     @Component
     private MavenProject project;
+    private Generator gen;
 
     private Map<String, Output> outputs;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
-            Generator gen;
             switch (strategy) {
                 case annotated:
                     gen = new AnnotatedPojoGenerator(this);
@@ -95,7 +95,15 @@ public class GenerateModel extends AbstractMojo {
 
     private void addClassModel(Table<?> cm) throws OrmMetaDataException, GeneratorException {
         Output out = getOutputFor(cm.getObjectClass());
-        out.emit("public static final class %sTable implements Table<%s> {", getJavaName(cm), getJavaName(cm));
+        Table<?> supTable = getSuper(cm);
+        if (supTable != null) {
+            out.impt(fullTableName(supTable));
+            out.emit("public static class %s<T extends %s> extends %s<T> implements Table<T> {",
+                    tableName(cm), getJavaName(cm), tableName(supTable));
+        } else {
+            out.emit("public static class %s<T extends %s> implements Table<T> {",
+                    tableName(cm), getJavaName(cm));
+        }
         out.emit("");
         out.push();
         StringJoiner fieldNames = new StringJoiner(",");
@@ -125,16 +133,36 @@ public class GenerateModel extends AbstractMojo {
         // getObjectClass();
         out.emit("");
         out.emit("@Override");
-        out.emit("public Class<%s> getObjectClass() {", getJavaName(cm));
+        out.emit("public Class<T> getObjectClass() {");
         out.push();
-        out.emit("return %s.class;", getJavaName(cm));
+        out.emit("return (Class<T>) %s.class;", getJavaName(cm));
         out.pop();
         out.emit("}");
+//        // getSuper();
+//        out.emit("");
+//        if (supTable != null) {
+//            impt()
+//            emit("")
+//        }
         out.pop();
 
         out.emit("");
         out.emit("}");
         out.emit("");
+    }
+
+    private Table getSuper(Table table) throws GeneratorException {
+        return gen.getPojoModel(table.getObjectClass().getSuperclass());
+    }
+
+    private String fullTableName(Table table) {
+        String cn = table.getObjectClass().getCanonicalName();
+        Output out = outputs.get(cn);
+        return out.getPackageName() + ".Tables." + tableName(table);
+    }
+
+    private String tableName(Table table) {
+        return table.getObjectClass().getSimpleName() + "Table";
     }
 
     private String getJavaName(Table table) {
@@ -189,9 +217,10 @@ public class GenerateModel extends AbstractMojo {
         Output out = getOutputFor(cm.getObjectClass());
         out.impt(fieldClass);
         out.impt(partClass);
-        out.emit("public final %s<%sTable, %s> %s = new %s(\"%s\", \"%s\");",
+        out.emit("public final %s<%s<T>, T> %s = new %s(\"%s\", \"%s\");",
                 fieldClass.getSimpleName(),
-                getJavaName(cm), getJavaName(cm), fm.getJavaName(),
+                tableName(cm),
+                fm.getJavaName(),
                 partClass.getSimpleName(),
                 fm.getJavaName(), fm.getSqlName());
     }
@@ -201,9 +230,10 @@ public class GenerateModel extends AbstractMojo {
         out.impt(fieldClass);
         out.impt(partClass);
         out.impt(fm.getJavaType());
-        out.emit("public final %s<%sTable, %s, %s> %s = new %s(%s.class, \"%s\", \"%s\");",
+        out.emit("public final %s<%s<T>, T, %s> %s = new %s(%s.class, \"%s\", \"%s\");",
                 fieldClass.getSimpleName(),
-                getJavaName(cm), getJavaName(cm), fm.getJavaType().getSimpleName(),
+                tableName(cm),
+                fm.getJavaType().getSimpleName(),
                 fm.getJavaName(),
                 partClass.getSimpleName(),
                 fm.getJavaType().getSimpleName(),
@@ -239,6 +269,8 @@ public class GenerateModel extends AbstractMojo {
     }
 
     private void addEnumField(Table cm, Field fm) throws GeneratorException {
+        Output out = getOutputFor(cm.getObjectClass());
+        out.impt(fm.getJavaType());
         addType3Field(EnumField.class, EnumFieldPart.class, cm, fm);
     }
 
@@ -256,14 +288,14 @@ public class GenerateModel extends AbstractMojo {
      * @return The class loader
      * @throws MojoExecutionException
      */
-    public ClassLoader getCompiledClassesLoader() throws MojoExecutionException, DependencyResolutionRequiredException {
+    public ClassLoader getCompiledClassesLoader() throws GeneratorException, DependencyResolutionRequiredException {
         List<String> classpathElements = project.getCompileClasspathElements();
         List<URL> projectClasspathList = new ArrayList<>();
         for (String element : classpathElements) {
             try {
                 projectClasspathList.add(new File(element).toURI().toURL());
             } catch (MalformedURLException e) {
-                throw new MojoExecutionException(element + " is an invalid classpath element", e);
+                throw new GeneratorException(element + " is an invalid classpath element", e);
             }
         }
         return new URLClassLoader(projectClasspathList.toArray(new URL[]{}), Thread.currentThread().getContextClassLoader());

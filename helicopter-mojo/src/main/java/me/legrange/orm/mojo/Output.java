@@ -49,12 +49,14 @@ class Output {
         }
     }
 
-    private void impt(String name) {
+    void impt(String name) {
         imports.add(name);
     }
 
     void impt(Class clazz) {
-        imports.add(clazz.getCanonicalName());
+        if (!clazz.getPackageName().equals(packageName) || clazz.isEnum()) {
+            imports.add(clazz.getCanonicalName());
+        }
     }
 
     void output(String directory) throws GeneratorException {
