@@ -25,7 +25,7 @@ import org.apache.maven.artifact.DependencyResolutionRequiredException;
 public class AnnotatedPojoGenerator extends Generator {
 
     private ScanResult scan;
-    private Map<String, Table> map;
+    private Map<String, PojoClassModel> map;
 
     public AnnotatedPojoGenerator(GenerateModel generator) throws GeneratorException {
         super(generator);
@@ -74,8 +74,10 @@ public class AnnotatedPojoGenerator extends Generator {
             Class<?> sup = pojoClass.getSuperclass();
             if (map.containsKey(sup.getCanonicalName())) {
                 populateForPojo(sup);
-                Table supTable = map.get(sup.getCanonicalName());
-                map.put(pojoClass.getCanonicalName(), new PojoClassModel(pojoClass, supTable));
+                PojoClassModel pm = new PojoClassModel(pojoClass);
+                map.put(pojoClass.getCanonicalName(), pm);
+                PojoClassModel supTable = map.get(sup.getCanonicalName());
+                supTable.addSub(pm);
             } else {
                 map.put(pojoClass.getCanonicalName(), new PojoClassModel(pojoClass));
             }

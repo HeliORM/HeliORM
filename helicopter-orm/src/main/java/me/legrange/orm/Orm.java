@@ -100,8 +100,8 @@ public abstract class Orm implements AutoCloseable {
         String query = buildSelectQuery(Parser.parse(tailToList(tail)));
         Connection sql = getConnection();
         List<O> result = new ArrayList();
+        Table<O> table = tail.getReturnTable();
         try (Statement stmt = sql.createStatement(); ResultSet rs = stmt.executeQuery(query)) {
-            Table<O> table = tail.getReturnTable();
             while (rs.next()) {
                 result.add(makePojoFromResultSet(rs, table));
             }
@@ -109,6 +109,7 @@ public abstract class Orm implements AutoCloseable {
         } catch (SQLException ex) {
             throw new OrmException(ex.getMessage(), ex);
         }
+
     }
 
     /**

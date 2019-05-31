@@ -6,36 +6,13 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.StringJoiner;
 import java.util.stream.Collectors;
-import me.legrange.orm.BooleanField;
-import me.legrange.orm.ByteField;
-import me.legrange.orm.DateField;
-import me.legrange.orm.DoubleField;
-import me.legrange.orm.EnumField;
-import me.legrange.orm.Field;
-import me.legrange.orm.FloatField;
-import me.legrange.orm.IntegerField;
-import me.legrange.orm.LongField;
 import me.legrange.orm.OrmMetaDataException;
-import me.legrange.orm.ShortField;
-import me.legrange.orm.StringField;
 import me.legrange.orm.Table;
-import me.legrange.orm.impl.BooleanFieldPart;
-import me.legrange.orm.impl.ByteFieldPart;
-import me.legrange.orm.impl.DateFieldPart;
-import me.legrange.orm.impl.DoubleFieldPart;
-import me.legrange.orm.impl.EnumFieldPart;
-import me.legrange.orm.impl.FieldPart;
-import me.legrange.orm.impl.FloatFieldPart;
-import me.legrange.orm.impl.IntegerFieldPart;
-import me.legrange.orm.impl.LongFieldPart;
-import me.legrange.orm.impl.ShortFieldPart;
-import me.legrange.orm.impl.StringFieldPart;
 import me.legrange.orm.mojo.pojo.AnnotatedPojoGenerator;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.plugin.AbstractMojo;
@@ -65,7 +42,6 @@ public class GenerateModel extends AbstractMojo {
     @Component
     private MavenProject project;
     private Generator gen;
-
     private Map<String, Output> outputs;
 
     @Override
@@ -78,207 +54,25 @@ public class GenerateModel extends AbstractMojo {
                 default:
                     throw new MojoExecutionException(format("Unsupported POJO strategy '%s'. BUG?", strategy));
             }
-            outputs = PackageOrganizer.organize(gen.getPojoModels().stream().map(pm -> pm.getObjectClass()).collect(Collectors.toList()));
+            outputs = PackageOrganizer.organize(this, gen.getPojoModels().stream().map(pm -> pm.getObjectClass()).collect(Collectors.toList()));
             for (Table pm : gen.getPojoModels()) {
-                addClassModel(pm);
+                getOutputFor(pm).addTable(pm);
             }
-            for (Table cm : gen.getPojoModels()) {
-                addClassField(cm);
-            }
-            for (Output out : outputs.values()) {
+            Set<Output> uniqueOuts = new HashSet(outputs.values());
+            for (Output out : uniqueOuts) {
                 out.output(outputDir);
             }
-        } catch (OrmMetaDataException | GeneratorException ex) {
+        } catch (GeneratorException | OrmMetaDataException ex) {
             throw new MojoExecutionException(ex.getMessage(), ex);
         }
-    }
-
-    private void addClassModel(Table<?> cm) throws OrmMetaDataException, GeneratorException {
-        Output out = getOutputFor(cm.getObjectClass());
-        Table<?> supTable = getSuper(cm);
-        out.emit("public static class %s implements Table<%s> {",
-                tableName(cm), getJavaName(cm));
-        out.emit("");
-        out.push();
-        StringJoiner fieldNames = new StringJoiner(",");
-        for (Field fm : cm.getFields()) {
-            addFieldModel(cm, fm);
-            fieldNames.add(fm.getJavaName());
-        }
-        // getFields();
-        out.impt(List.class);
-        out.impt(Field.class);
-        out.impt(Arrays.class);
-        out.emit("");
-        out.emit("@Override");
-        out.emit("public List<Field> getFields() {");
-        out.push();
-        out.emit(format("return Arrays.asList(%s);", fieldNames.toString()));
-        out.pop();
-        out.emit("}");
-        // getSqlTable();
-        out.emit("");
-        out.emit("@Override");
-        out.emit("public String getSqlTable() {");
-        out.push();
-        out.emit("return \"%s\";", cm.getSqlTable());
-        out.pop();
-        out.emit("}");
-        // getObjectClass();
-        out.emit("");
-        out.emit("@Override");
-        out.emit("public Class<%s> getObjectClass() {", getJavaName(cm));
-        out.push();
-        out.emit("return %s.class;", getJavaName(cm));
-        out.pop();
-        out.emit("}");
-        out.pop();
-
-        out.emit("");
-        out.emit("}");
-        out.emit("");
-    }
-
-    private Table getSuper(Table table) throws GeneratorException {
-        return gen.getPojoModel(table.getObjectClass().getSuperclass());
-    }
-
-    private String fullTableName(Table table) {
-        String cn = table.getObjectClass().getCanonicalName();
-        Output out = outputs.get(cn);
-        return out.getPackageName() + ".Tables." + tableName(table);
-    }
-
-    private String tableName(Table table) {
-        return table.getObjectClass().getSimpleName() + "Table";
-    }
-
-    private String getJavaName(Table table) {
-        return table.getObjectClass().getSimpleName();
-    }
-
-    private void addClassField(Table cm) throws GeneratorException {
-        Output out = getOutputFor(cm.getObjectClass());
-        out.impt(cm.getObjectClass());
-        out.emit("public static final %sTable %s = new %sTable();", getJavaName(cm), getJavaName(cm).toUpperCase(), getJavaName(cm));
-    }
-
-    private void addFieldModel(Table cm, Field fm) throws OrmMetaDataException, GeneratorException {
-        switch (fm.getFieldType()) {
-            case BYTE:
-                addByteField(cm, fm);
-                break;
-            case SHORT:
-                addShortField(cm, fm);
-                break;
-            case INTEGER:
-                addIntegerField(cm, fm);
-                break;
-            case LONG:
-                addLongField(cm, fm);
-                break;
-            case FLOAT:
-                addFloatField(cm, fm);
-                break;
-            case DOUBLE:
-                addDoubleField(cm, fm);
-                break;
-            case BOOLEAN:
-                addBooleanField(cm, fm);
-                break;
-            case DATE:
-                addDateField(cm, fm);
-                break;
-            case STRING:
-                addStringField(cm, fm);
-                break;
-            case ENUM:
-                addEnumField(cm, fm);
-                break;
-            default:
-                throw new OrmMetaDataException(format("Unsupported Pojo field type %s for field '%s' on class %s", fm.getFieldType(), fm.getJavaName(), getJavaName(cm)));
-        }
-
-    }
-
-    private void addType2Field(Class<? extends Field> fieldClass, Class<? extends FieldPart> partClass, Table cm, Field fm) throws GeneratorException {
-        Output out = getOutputFor(cm.getObjectClass());
-        out.impt(fieldClass);
-        out.impt(partClass);
-        // public final StringField<PersonTable, Person> name = new StringFieldPart<P
-        out.emit("public final %s<%s, %s> %s = new %s(\"%s\", \"%s\");",
-                fieldClass.getSimpleName(),
-                tableName(cm),
-                cm.getObjectClass().getSimpleName(),
-                fm.getJavaName(),
-                partClass.getSimpleName(),
-                fm.getJavaName(),
-                fm.getSqlName());
-    }
-
-    private void addType3Field(Class<? extends Field> fieldClass, Class<? extends FieldPart> partClass, Table cm, Field fm) throws GeneratorException {
-        Output out = getOutputFor(cm.getObjectClass());
-        out.impt(fieldClass);
-        out.impt(partClass);
-        out.impt(fm.getJavaType());
-        out.emit("public final %s<%s, %s, %s> %s = new %s(%s.class, \"%s\", \"%s\");",
-                fieldClass.getSimpleName(),
-                tableName(cm),
-                cm.getObjectClass().getSimpleName(),
-                fm.getJavaType().getSimpleName(),
-                fm.getJavaName(),
-                partClass.getSimpleName(),
-                fm.getJavaType().getSimpleName(),
-                fm.getJavaName(), fm.getSqlName());
-    }
-
-    private void addLongField(Table cm, Field fm) throws GeneratorException {
-        addType2Field(LongField.class, LongFieldPart.class, cm, fm);
-    }
-
-    private void addIntegerField(Table cm, Field fm) throws GeneratorException {
-        addType2Field(IntegerField.class, IntegerFieldPart.class, cm, fm);
-    }
-
-    private void addShortField(Table cm, Field fm) throws GeneratorException {
-        addType2Field(ShortField.class, ShortFieldPart.class, cm, fm);
-    }
-
-    private void addByteField(Table cm, Field fm) throws GeneratorException {
-        addType2Field(ByteField.class, ByteFieldPart.class, cm, fm);
-    }
-
-    private void addDoubleField(Table cm, Field fm) throws GeneratorException {
-        addType2Field(DoubleField.class, DoubleFieldPart.class, cm, fm);
-    }
-
-    private void addFloatField(Table cm, Field fm) throws GeneratorException {
-        addType2Field(FloatField.class, FloatFieldPart.class, cm, fm);
-    }
-
-    private void addBooleanField(Table cm, Field fm) throws GeneratorException {
-        addType2Field(BooleanField.class, BooleanFieldPart.class, cm, fm);
-    }
-
-    private void addEnumField(Table cm, Field fm) throws GeneratorException {
-        Output out = getOutputFor(cm.getObjectClass());
-        out.impt(fm.getJavaType());
-        addType3Field(EnumField.class, EnumFieldPart.class, cm, fm);
-    }
-
-    private void addDateField(Table cm, Field fm) throws GeneratorException {
-        addType2Field(DateField.class, DateFieldPart.class, cm, fm);
-    }
-
-    private void addStringField(Table cm, Field fm) throws GeneratorException {
-        addType2Field(StringField.class, StringFieldPart.class, cm, fm);
     }
 
     /**
      * Get a class loader that will load classes compiled during the build
      *
      * @return The class loader
-     * @throws MojoExecutionException
+     * @throws me.legrange.orm.mojo.GeneratorException
+     * @throws org.apache.maven.artifact.DependencyResolutionRequiredException
      */
     public ClassLoader getCompiledClassesLoader() throws GeneratorException, DependencyResolutionRequiredException {
         List<String> classpathElements = project.getCompileClasspathElements();
@@ -298,12 +92,17 @@ public class GenerateModel extends AbstractMojo {
         return packages;
     }
 
-    private Output getOutputFor(Class clazz) throws GeneratorException {
-        Output out = outputs.get(clazz.getCanonicalName());
+    Output getOutputFor(Table table) throws GeneratorException {
+        Class<?> clazz = table.getObjectClass();
+        Output out = getOutputFor(clazz);
         if (out == null) {
             throw new GeneratorException(format("Cannot found output table for class '%s'. BUG!", clazz.getCanonicalName()));
         }
         return out;
+    }
+
+    private Output getOutputFor(Class<?> clazz) throws GeneratorException {
+        return outputs.get(clazz.getCanonicalName());
     }
 
 }

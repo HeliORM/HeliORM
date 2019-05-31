@@ -10,18 +10,18 @@ import java.util.Map;
  */
 class PackageOrganizer {
 
-    static Map<String, Output> organize(List<Class> classes) {
+    static Map<String, Output> organize(GenerateModel gen, List<Class> classes) {
         Map<String, Output> map = new HashMap();
         for (Class clazz : classes) {
-            Output out = new Output(clazz.getPackageName());
+            Output out = new Output(gen, clazz.getPackageName());
             map.put(clazz.getCanonicalName(), out);
         }
-        reduce(map);
+        reduce(gen, map);
         System.out.println(map);
         return map;
     }
 
-    static private void reduce(Map<String, Output> map) {
+    static private void reduce(GenerateModel gen, Map<String, Output> map) {
         boolean changed = false;
         for (String c1 : map.keySet()) {
             Output o1 = map.get(c1);
@@ -30,7 +30,7 @@ class PackageOrganizer {
                     continue;
                 }
                 Output o2 = map.get(c2);
-                Output com = common(o1, o2);
+                Output com = common(gen, o1, o2);
                 if (com != null) {
                     map.put(c1, com);
                     map.put(c2, com);
@@ -39,7 +39,7 @@ class PackageOrganizer {
         }
     }
 
-    static private Output common(Output o1, Output o2) {
+    static private Output common(GenerateModel gen, Output o1, Output o2) {
         if (o1.getPackageName().equals(o2.getPackageName())) {
             return o1;
         }
@@ -55,7 +55,7 @@ class PackageOrganizer {
         while (idx > 0) {
             val1 = val1.substring(0, idx);
             if (val2.startsWith(val1)) {
-                return new Output(val1);
+                return new Output(gen, val1);
             }
             idx = val1.lastIndexOf('.');
         }

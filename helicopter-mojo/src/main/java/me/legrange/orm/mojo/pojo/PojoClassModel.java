@@ -4,9 +4,11 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import me.legrange.orm.Field;
 import me.legrange.orm.Table;
 import me.legrange.orm.annotation.Pojo;
@@ -18,16 +20,11 @@ import me.legrange.orm.annotation.Pojo;
 public class PojoClassModel implements Table {
 
     private final Class<?> pojoClass;
-    private final Table<?> superTable;
     private List<Field> fieldModels;
+    private final Set<PojoClassModel> subs = new HashSet();
 
     public PojoClassModel(Class<?> pojoClass) {
-        this(pojoClass, null);
-    }
-
-    public PojoClassModel(Class<?> pojoClass, Table<?> superTable) {
         this.pojoClass = pojoClass;
-        this.superTable = superTable;
     }
 
     private String getJavaName() {
@@ -57,6 +54,10 @@ public class PojoClassModel implements Table {
             }
         }
         return fieldModels;
+    }
+
+    void addSub(PojoClassModel sub) {
+        subs.add(sub);
     }
 
     private boolean isDataField(java.lang.reflect.Field field) {
@@ -90,10 +91,10 @@ public class PojoClassModel implements Table {
     public Class getObjectClass() {
         return pojoClass;
     }
-//
-//    @Override
-//    public Table getSuper() {
-//        return superTable;
-//    }
+
+    @Override
+    public Set<Table> getSubTables() {
+        return new HashSet(subs);
+    }
 
 }

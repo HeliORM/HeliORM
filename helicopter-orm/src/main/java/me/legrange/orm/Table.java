@@ -1,6 +1,7 @@
 package me.legrange.orm;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -15,5 +16,5 @@ public interface Table<O> {
 
     String getSqlTable();
 
-//    <P> Table<P> getSuper();
+    Set<Table> getSubTables();
 }
