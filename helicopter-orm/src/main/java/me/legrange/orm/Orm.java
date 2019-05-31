@@ -109,7 +109,7 @@ public abstract class Orm implements AutoCloseable {
         } catch (SQLException ex) {
             throw new OrmException(ex.getMessage(), ex);
         }
-
+        //return ((Stream<O>) stream(tail)).collect(Collectors.toList());
     }
 
     /**
