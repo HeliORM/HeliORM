@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Spliterator;
 import java.util.Spliterators;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import me.legrange.orm.driver.MySqlOrm;
@@ -101,19 +102,7 @@ public abstract class Orm implements AutoCloseable {
      * go wrong did go wrong.
      */
     public <O, P extends Part & Executable> List<O> list(P tail) throws OrmException {
-        String query = buildSelectQuery(Parser.parse(tailToList(tail)));
-        Connection sql = getConnection();
-        List<O> result = new ArrayList();
-        Table<O> table = tail.getReturnTable();
-        try (Statement stmt = sql.createStatement(); ResultSet rs = stmt.executeQuery(query)) {
-            while (rs.next()) {
-                result.add(makePojoFromResultSet(rs, table));
-            }
-            return result;
-        } catch (SQLException ex) {
-            throw new OrmException(ex.getMessage(), ex);
-        }
-        //return ((Stream<O>) stream(tail)).collect(Collectors.toList());
+        return ((Stream<O>) stream(tail)).collect(Collectors.toList());
     }
 
     /**
@@ -135,7 +124,7 @@ public abstract class Orm implements AutoCloseable {
             Statement stmt = sql.createStatement();
             ResultSet rs = stmt.executeQuery(query);
             Table<O> table = tail.getReturnTable();
-            return StreamSupport.stream(
+            Stream<O> stream = StreamSupport.stream(
                     Spliterators.spliteratorUnknownSize(new Iterator<O>() {
                         @Override
                         public boolean hasNext() {
@@ -156,7 +145,15 @@ public abstract class Orm implements AutoCloseable {
                         }
                     },
                             Spliterator.ORDERED), false);
-        } catch (SQLException ex) {
+            stream.onClose(() -> {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    throw new UncaughtOrmException(ex.getMessage(), ex);
+                }
+            });
+            return stream;
+        } catch (SQLException | UncaughtOrmException ex) {
             throw new OrmException(ex.getMessage(), ex);
         }
     }
@@ -175,15 +172,17 @@ public abstract class Orm implements AutoCloseable {
      */
     public <O, P extends Part & Executable> Optional<O> oneOrNone(P tail) throws OrmException {
         Stream<O> stream = stream(tail);
-        Optional<O> first = stream.findFirst();
-        if (first.isEmpty()) {
-            return first;
+        O first = null;
+        Iterator<O> iterator = stream.iterator();
+        if (iterator.hasNext()) {
+            first = iterator.next();
+        } else {
+            return Optional.empty();
         }
-        stream.skip(1);
-        if (stream.findFirst().isPresent()) {
+        if (iterator.hasNext()) {
             throw new OrmException(format("Required one or none %s but found more than one", tail.getReturnTable().getObjectClass().getSimpleName()));
         }
-        return first;
+        return Optional.of(first);
     }
 
     /**
