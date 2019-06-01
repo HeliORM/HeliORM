@@ -8,10 +8,14 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 import me.legrange.orm.driver.MySqlOrm;
 import me.legrange.orm.impl.Part;
 import me.legrange.orm.impl.SelectPart;
@@ -131,29 +135,27 @@ public abstract class Orm implements AutoCloseable {
             Statement stmt = sql.createStatement();
             ResultSet rs = stmt.executeQuery(query);
             Table<O> table = tail.getReturnTable();
-            if (!rs.next()) {
-                return Stream.empty();
-            }
-            O pojo = makePojoFromResultSet(rs, table);
-            return Stream.iterate(pojo, p -> {
-                try {
-                    boolean more = rs.next();
-                    if (!more) {
-                        rs.close();
-                        stmt.close();
-                    }
-                    return more;
-                } catch (SQLException ex) {
-                    throw new UncaughtOrmException(ex.getMessage(), ex);
-                }
-            }, p -> {
-                try {
-                    return makePojoFromResultSet(rs, table);
-                } catch (OrmException ex) {
-                    throw new UncaughtOrmException(ex.getMessage(), ex);
-                }
-            }
-            );
+            return StreamSupport.stream(
+                    Spliterators.spliteratorUnknownSize(new Iterator<O>() {
+                        @Override
+                        public boolean hasNext() {
+                            try {
+                                return rs.next();
+                            } catch (SQLException ex) {
+                                throw new UncaughtOrmException(ex.getMessage(), ex);
+                            }
+                        }
+
+                        @Override
+                        public O next() {
+                            try {
+                                return makePojoFromResultSet(rs, table);
+                            } catch (OrmException ex) {
+                                throw new UncaughtOrmException(ex.getMessage(), ex);
+                            }
+                        }
+                    },
+                            Spliterator.ORDERED), false);
         } catch (SQLException ex) {
             throw new OrmException(ex.getMessage(), ex);
         }
