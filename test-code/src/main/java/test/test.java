@@ -15,7 +15,7 @@ public class test {
     public static void main(String... args) throws Exception {
         Orm orm = Orm.open(DriverManager.getConnection("jdbc:mysql://localhost:3306/orm?user=root"), Orm.Driver.MYSQL);
         test t = new test();
-        t.test4(orm);
+        t.test5(orm);
 //        t.test2(orm);
     }
 
@@ -39,6 +39,10 @@ public class test {
     }
 
     private void test5(Orm orm) throws OrmException {
-        orm.select(PERSON).join(PET).on(PERSON.personNumber, PET.personNumber).where(PET.age.eq(3)).list().forEach(System.out::println);
+        orm.select(PERSON)
+                .join(PET).on(PERSON.personNumber, PET.personNumber)
+                .where(PET.age.eq(3))
+                .orderByDesc(PERSON.modified)
+                .list().forEach(System.out::println);
     }
 }

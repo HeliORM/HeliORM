@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -21,6 +22,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import me.legrange.orm.driver.MySqlOrm;
 import me.legrange.orm.impl.JoinPart;
+import me.legrange.orm.impl.OrderedPart;
 import me.legrange.orm.impl.Part;
 import me.legrange.orm.impl.SelectPart;
 import me.legrange.orm.rep.Parser;
@@ -132,6 +134,9 @@ public abstract class Orm implements AutoCloseable {
             } else {
                 res = Stream.concat(res, stream);
             }
+        }
+        if ((queries.size() > 1) && (tail.getType() == Part.Type.ORDER)) {
+            res = res.sorted(makeComparatorForTail(tail));
         }
         return res;
     }
@@ -378,12 +383,58 @@ public abstract class Orm implements AutoCloseable {
         return parts;
     }
 
+    /**
+     * Create a comparator based on the tail of the query that will compare
+     * Pojos on their fields.
+     *
+     * @param <O>
+     * @param <P>
+     * @param tail
+     * @return
+     */
+    private <O, P extends Part> Comparator<O> makeComparatorForTail(P tail) {
+        List<OrderedPart> order = new LinkedList();
+        while (tail.getType() == Part.Type.ORDER) {
+            order.add((OrderedPart) tail);
+            tail = (P) tail.left();
+        }
+        List<Comparator<O>> comps = new LinkedList();
+        for (OrderedPart op : order) {
+            comps.add((Comparator) (Object o1, Object o2) -> {
+                try {
+                    if (op.getDirection() == OrderedPart.Direction.ASCENDING) {
+                        return pops.compareTo(o1, o2, op.getField());
+                    } else {
+                        return -pops.compareTo(o1, o2, op.getField());
+                    }
+                } catch (OrmException ex) {
+                    throw new UncaughtOrmException(ex.getMessage(), ex);
+                }
+            });
+        }
+        return new CompoundComparator(comps);
+    }
+
+    /* Expand the query parts in the list so that the query branches into
+     * multiple table queries when a select or join with a table which has
+     * sub-tables is encountered.
+     * @param parts the query parts
+     * @return The expanded query parts lists.
+     */
     private List<List<Part>> explodeAbstractions(List<Part> parts) {
         return explode(parts, 0);
     }
 
+    /**
+     * Expand the query parts in the list so that the query branches into
+     * multiple table queries when a select or join with a table which has
+     * sub-tables is encountered.
+     *
+     * @param parts the query parts
+     * @param idx the index of the part being examined
+     * @return The expanded query parts lists.
+     */
     private List<List<Part>> explode(List<Part> parts, int idx) {
-        System.out.printf("parts = %s, idx = %s\n", parts, idx);
         Part part = parts.get(idx);
         List<List<Part>> res = new LinkedList();
         if ((part.getType() == Part.Type.SELECT) || (part.getType() == Part.Type.JOIN)) {

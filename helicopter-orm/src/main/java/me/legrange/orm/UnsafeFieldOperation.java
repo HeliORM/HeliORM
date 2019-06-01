@@ -85,6 +85,32 @@ class UnsafeFieldOperation implements PojoOperations {
         }
     }
 
+    @Override
+    public int compareTo(Object pojo1, Object pojo2, Field field) throws OrmException {
+        switch (field.getFieldType()) {
+            case LONG:
+            case INTEGER:
+            case SHORT:
+            case BYTE:
+            case DOUBLE:
+            case FLOAT:
+            case BOOLEAN:
+            case ENUM:
+            case DATE:
+            case STRING:
+                Object val1 = getValue(pojo1, field);
+                Object val2 = getValue(pojo2, field);
+                if (val1 instanceof Comparable) {
+                    return ((Comparable) val1).compareTo((Comparable) val2);
+                } else {
+                    throw new OrmException(format("Non-comparable type %s for field %s", field.getJavaType(), field.getJavaName()));
+                }
+            default:
+                throw new OrmException(format("Unsupported field type '%s'. BUG!", field.getFieldType()));
+        }
+
+    }
+
     UnsafeFieldOperation() throws OrmException {
         unsafe = getUnsafe();
     }
