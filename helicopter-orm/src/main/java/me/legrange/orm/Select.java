@@ -5,6 +5,8 @@ package me.legrange.orm;
  * @author gideon
  * @param <T>
  * @param <O>
+ * @param <RT>
+ * @param <RO>
  */
 public interface Select<T extends Table<O>, O, RT extends Table<RO>, RO> extends Executable<T, O>, Order<T, O> {
 

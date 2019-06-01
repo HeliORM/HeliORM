@@ -4,6 +4,7 @@ import static core.Tables.PERSON;
 import java.sql.DriverManager;
 import me.legrange.orm.Orm;
 import me.legrange.orm.OrmException;
+import static pojos.Tables.OBJ;
 
 /**
  *
@@ -15,7 +16,6 @@ public class test {
         Orm orm = Orm.open(DriverManager.getConnection("jdbc:mysql://localhost:3306/orm?user=root"), Orm.Driver.MYSQL);
         test t = new test();
         t.test4(orm);
-//        t.test1(orm);
 //        t.test2(orm);
     }
 
@@ -35,7 +35,7 @@ public class test {
     }
 
     private void test4(Orm orm) throws OrmException {
-        System.out.println("-- Fail: one all person ---");
-        System.out.println(orm.select(PERSON).where(PERSON.personNumber.eq(1L)).one());
+        System.out.println("-- Simple abstract all obj ---");
+        orm.select(OBJ).list().forEach(System.out::println);
     }
 }

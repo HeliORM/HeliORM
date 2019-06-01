@@ -9,15 +9,18 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import me.legrange.orm.driver.MySqlOrm;
+import me.legrange.orm.impl.JoinPart;
 import me.legrange.orm.impl.Part;
 import me.legrange.orm.impl.SelectPart;
 import me.legrange.orm.rep.Parser;
@@ -117,13 +120,25 @@ public abstract class Orm implements AutoCloseable {
      * go wrong did go wrong.
      */
     public <O, P extends Part & Executable> Stream<O> stream(P tail) throws OrmException {
-        String query = buildSelectQuery(Parser.parse(tailToList(tail)));
+        List<List<Part>> queries = explodeAbstractions(tailToList(tail));
+        Stream<O> res = null;
+        for (List<Part> parts : queries) {
+            Stream<O> stream = streamSingle(parts.get(0).getReturnTable(), buildSelectQuery(Parser.parse(parts)));
+            if (res == null) {
+                res = stream;
+            } else {
+                res = Stream.concat(res, stream);
+            }
+        }
+        return res;
+    }
+
+    private <O, P extends Part & Executable> Stream<O> streamSingle(Table<O> table, String query) throws OrmException {
         Connection sql = getConnection();
         List<O> result = new ArrayList();
         try {
             Statement stmt = sql.createStatement();
             ResultSet rs = stmt.executeQuery(query);
-            Table<O> table = tail.getReturnTable();
             Stream<O> stream = StreamSupport.stream(
                     Spliterators.spliteratorUnknownSize(new Iterator<O>() {
                         @Override
@@ -172,17 +187,17 @@ public abstract class Orm implements AutoCloseable {
      */
     public <O, P extends Part & Executable> Optional<O> oneOrNone(P tail) throws OrmException {
         Stream<O> stream = stream(tail);
-        O first = null;
+        O one;
         Iterator<O> iterator = stream.iterator();
         if (iterator.hasNext()) {
-            first = iterator.next();
+            one = iterator.next();
         } else {
             return Optional.empty();
         }
         if (iterator.hasNext()) {
             throw new OrmException(format("Required one or none %s but found more than one", tail.getReturnTable().getObjectClass().getSimpleName()));
         }
-        return Optional.of(first);
+        return Optional.of(one);
     }
 
     /**
@@ -358,6 +373,43 @@ public abstract class Orm implements AutoCloseable {
             part = part.right();
         }
         return parts;
+    }
+
+    private List<List<Part>> explodeAbstractions(List<Part> parts) {
+        return explode(parts, 0);
+    }
+
+    private List<List<Part>> explode(List<Part> parts, int idx) {
+        List<List<Part>> res = new LinkedList();
+        Part part = parts.get(idx);
+        if ((part.getType() == Part.Type.SELECT) || (part.getType() == Part.Type.JOIN)) {
+            Table<?> table = part.getReturnTable();
+            Set<Table> subTables = table.getSubTables();
+            if (!subTables.isEmpty()) {
+                for (Table<?> subTable : subTables) {
+                    List<Part> copy = new ArrayList(parts);
+                    Part old = copy.remove(idx);
+                    Part left = null;
+                    if (idx > 0) {
+                        left = old.left();
+                    }
+                    Part newPart;
+                    if (part.getType() == Part.Type.SELECT) {
+                        copy.add(idx, new SelectPart(left, subTable));
+                    } else {
+                        copy.add(idx, new JoinPart(left, subTable));
+                    }
+                    if (idx < parts.size() - 1) {
+                        res.addAll(explode(copy, idx++));
+                    } else {
+                        res.add(copy);
+                    }
+                }
+            } else {
+                res.add(parts);
+            }
+        }
+        return res;
     }
 
 }

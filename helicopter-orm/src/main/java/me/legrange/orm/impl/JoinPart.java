@@ -13,7 +13,7 @@ public class JoinPart<LT extends Table<LO>, LO, RT extends Table<RO>, RO> extend
 
     private final RT table;
 
-    JoinPart(Part left, RT table) {
+    public JoinPart(Part left, RT table) {
         super(left);
         this.table = table;
     }
