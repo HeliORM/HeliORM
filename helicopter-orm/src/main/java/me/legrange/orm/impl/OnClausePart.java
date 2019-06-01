@@ -1,5 +1,6 @@
 package me.legrange.orm.impl;
 
+import static java.lang.String.format;
 import me.legrange.orm.Field;
 import me.legrange.orm.OnClause;
 import me.legrange.orm.Table;
@@ -26,6 +27,11 @@ public final class OnClausePart<LT extends Table<LO>, LO, RT extends Table<RO>, 
 
     public Field<RT, RO, ?> getRightField() {
         return rightField;
+    }
+
+    @Override
+    public String toString() {
+        return format("ON %s = %s", leftField.getSqlName(), rightField.getSqlName());
     }
 
 }

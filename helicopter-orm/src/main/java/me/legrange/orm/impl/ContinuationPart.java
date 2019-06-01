@@ -1,5 +1,6 @@
 package me.legrange.orm.impl;
 
+import static java.lang.String.format;
 import me.legrange.orm.Continuation;
 import me.legrange.orm.ExpressionContinuation;
 import me.legrange.orm.Field;
@@ -55,7 +56,7 @@ public class ContinuationPart<LT extends Table<LO>, LO, RT extends Table<RO>, RO
 
     @Override
     public String toString() {
-        return getType().name();
+        return format("%s %s", getType().name(), expression);
     }
 
 }

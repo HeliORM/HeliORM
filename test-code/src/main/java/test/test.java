@@ -1,10 +1,10 @@
 package test;
 
 import static core.Tables.PERSON;
+import static core.Tables.PET;
 import java.sql.DriverManager;
 import me.legrange.orm.Orm;
 import me.legrange.orm.OrmException;
-import static pojos.Tables.OBJ;
 
 /**
  *
@@ -35,7 +35,10 @@ public class test {
     }
 
     private void test4(Orm orm) throws OrmException {
-        System.out.println("-- Simple abstract all obj ---");
-        orm.select(OBJ).list().forEach(System.out::println);
+        orm.select(PET).join(PERSON).on(PET.personNumber, PERSON.personNumber).where(PERSON.firstName.eq("John")).list().forEach(System.out::println);
+    }
+
+    private void test5(Orm orm) throws OrmException {
+        orm.select(PERSON).join(PET).on(PERSON.personNumber, PET.personNumber).where(PET.age.eq(3)).list().forEach(System.out::println);
     }
 }

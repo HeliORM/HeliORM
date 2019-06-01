@@ -78,7 +78,7 @@ public class SelectPart<LT extends Table<LO>, LO, RT extends Table<RO>, RO> exte
 
     @Override
     public String toString() {
-        return format("%s %s", getType().name(), getSelectTable());
+        return format("%s %s", getType().name(), table.getSqlTable());
     }
 
 }

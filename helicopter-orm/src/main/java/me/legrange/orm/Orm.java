@@ -121,6 +121,9 @@ public abstract class Orm implements AutoCloseable {
      */
     public <O, P extends Part & Executable> Stream<O> stream(P tail) throws OrmException {
         List<List<Part>> queries = explodeAbstractions(tailToList(tail));
+        if (queries.isEmpty()) {
+            throw new OrmException("Could not build query from parts. BUG!");
+        }
         Stream<O> res = null;
         for (List<Part> parts : queries) {
             Stream<O> stream = streamSingle(parts.get(0).getReturnTable(), buildSelectQuery(Parser.parse(parts)));
@@ -380,10 +383,11 @@ public abstract class Orm implements AutoCloseable {
     }
 
     private List<List<Part>> explode(List<Part> parts, int idx) {
-        List<List<Part>> res = new LinkedList();
+        System.out.printf("parts = %s, idx = %s\n", parts, idx);
         Part part = parts.get(idx);
+        List<List<Part>> res = new LinkedList();
         if ((part.getType() == Part.Type.SELECT) || (part.getType() == Part.Type.JOIN)) {
-            Table<?> table = part.getReturnTable();
+            Table<?> table = part.getSelectTable();
             Set<Table> subTables = table.getSubTables();
             if (!subTables.isEmpty()) {
                 for (Table<?> subTable : subTables) {
@@ -400,16 +404,20 @@ public abstract class Orm implements AutoCloseable {
                         copy.add(idx, new JoinPart(left, subTable));
                     }
                     if (idx < parts.size() - 1) {
-                        res.addAll(explode(copy, idx++));
+                        res.addAll(explode(copy, idx + 1));
                     } else {
                         res.add(copy);
                     }
                 }
-            } else {
-                res.add(parts);
+                return res;
             }
         }
+        if (idx < parts.size() - 1) {
+            res.addAll(explode(parts, idx + 1));
+        } else {
+            res.add(parts);
+        }
         return res;
-    }
 
+    }
 }

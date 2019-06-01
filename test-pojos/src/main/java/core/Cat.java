@@ -8,7 +8,7 @@ import me.legrange.orm.annotation.PrimaryKey;
  * @author gideon
  */
 @Pojo
-public class Cat {
+public class Cat extends Pet {
 
     @PrimaryKey
     private Long catNumber;

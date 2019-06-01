@@ -59,9 +59,7 @@ class Output {
     }
 
     void addTable(Table table) {
-        if (!tables.containsKey(table)) {
-            tables.put(table, table.getSubTables());
-        }
+        tables.put(table, table.getSubTables());
     }
 
     String getPackageName() {

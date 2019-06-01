@@ -1,5 +1,6 @@
 package me.legrange.orm.impl;
 
+import static java.lang.String.format;
 import me.legrange.orm.Field;
 import me.legrange.orm.Join;
 import me.legrange.orm.OnClause;
@@ -35,6 +36,6 @@ public class JoinPart<LT extends Table<LO>, LO, RT extends Table<RO>, RO> extend
 
     @Override
     public String toString() {
-        return getType().name();
+        return format("JOIN (%s)", table.getSqlTable());
     }
 }
