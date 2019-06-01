@@ -199,15 +199,17 @@ public abstract class Orm implements AutoCloseable {
      */
     public <O, P extends Part & Executable> O one(P tail) throws OrmException {
         Stream<O> stream = stream(tail);
-        Optional<O> first = stream.findFirst();
-        if (first.isEmpty()) {
+        Iterator<O> iterator = stream.iterator();
+        O one;
+        if (iterator.hasNext()) {
+            one = iterator.next();
+        } else {
             throw new OrmException(format("Required exactly one %s but found none", tail.getReturnTable().getObjectClass().getSimpleName()));
         }
-        stream.skip(1);
-        if (stream.findFirst().isPresent()) {
+        if (iterator.hasNext()) {
             throw new OrmException(format("Required exactly one %s but found more than one", tail.getReturnTable().getObjectClass().getSimpleName()));
         }
-        return first.get();
+        return one;
     }
 
     /**

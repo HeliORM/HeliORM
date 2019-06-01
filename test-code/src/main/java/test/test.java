@@ -14,7 +14,7 @@ public class test {
     public static void main(String... args) throws Exception {
         Orm orm = Orm.open(DriverManager.getConnection("jdbc:mysql://localhost:3306/orm?user=root"), Orm.Driver.MYSQL);
         test t = new test();
-        t.test3(orm);
+        t.test4(orm);
 //        t.test1(orm);
 //        t.test2(orm);
     }
@@ -30,8 +30,12 @@ public class test {
     }
 
     private void test3(Orm orm) throws OrmException {
-        System.out.println("-- oneOrNone all person ---");
+        System.out.println("-- oneOrNone person ---");
         orm.select(PERSON).where(PERSON.personNumber.eq(1L)).oneOrNone().ifPresent(System.out::println);
     }
 
+    private void test4(Orm orm) throws OrmException {
+        System.out.println("-- Fail: one all person ---");
+        System.out.println(orm.select(PERSON).where(PERSON.personNumber.eq(1L)).one());
+    }
 }
