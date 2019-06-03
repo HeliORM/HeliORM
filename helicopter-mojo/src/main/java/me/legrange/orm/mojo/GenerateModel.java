@@ -96,7 +96,7 @@ public class GenerateModel extends AbstractMojo {
         Class<?> clazz = table.getObjectClass();
         Output out = getOutputFor(clazz);
         if (out == null) {
-            throw new GeneratorException(format("Cannot found output table for class '%s'. BUG!", clazz.getCanonicalName()));
+            throw new GeneratorException(format("Cannot find output table for class '%s'. BUG!", clazz.getCanonicalName()));
         }
         return out;
     }
