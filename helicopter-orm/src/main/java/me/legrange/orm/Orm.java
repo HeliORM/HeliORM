@@ -29,7 +29,9 @@ import me.legrange.orm.rep.Parser;
 import me.legrange.orm.rep.Query;
 
 /**
- *
+ * @todo primary key/forieng key in meta data
+ * @todo make sure create and update and delete are complete
+ * @todo refractor to abstract out SQL vs MySql driver
  * @author gideon
  */
 public abstract class Orm implements AutoCloseable {
