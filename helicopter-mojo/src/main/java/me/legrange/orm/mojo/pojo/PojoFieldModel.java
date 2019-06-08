@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.Optional;
 import me.legrange.orm.Field;
 import me.legrange.orm.annotation.Column;
+import me.legrange.orm.annotation.PrimaryKey;
 
 /**
  *
@@ -85,6 +86,11 @@ public class PojoFieldModel implements Field {
             return FieldType.ENUM;
         }
         return null; // FIXME
+    }
+
+    @Override
+    public boolean isPrimaryKey() {
+        return getAnnotation(PrimaryKey.class).isPresent();
     }
 
     private <T extends Annotation> Optional<T> getAnnotation(Class<T> annotationClass) {

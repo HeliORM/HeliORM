@@ -21,4 +21,6 @@ public interface Field<T extends Table<O>, O, C> {
 
     String getSqlName();
 
+    boolean isPrimaryKey();
+
 }

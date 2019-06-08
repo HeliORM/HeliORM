@@ -56,6 +56,11 @@ public class PojoClassModel implements Table {
         return fieldModels;
     }
 
+    @Override
+    public Optional<Field> getPrimaryKey() {
+        return getFields().stream().filter(field -> field.isPrimaryKey()).findAny();
+    }
+
     void addSub(PojoClassModel sub) {
         subs.add(sub);
     }

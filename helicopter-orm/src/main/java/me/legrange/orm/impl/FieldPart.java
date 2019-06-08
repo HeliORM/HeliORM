@@ -17,13 +17,19 @@ public abstract class FieldPart<T extends Table<O>, O, C> extends Part<T, O, T, 
     private final Class<C> fieldClass;
     private final String javaName;
     private final String sqlName;
+    private final boolean primaryKey;
     private Part left;
 
     public FieldPart(Class<C> fieldClass, String javaName, String sqlName) {
+        this(fieldClass, javaName, sqlName, false);
+    }
+
+    public FieldPart(Class<C> fieldClass, String javaName, String sqlName, boolean primaryKey) {
         super(null);
         this.fieldClass = fieldClass;
         this.javaName = javaName;
         this.sqlName = sqlName;
+        this.primaryKey = primaryKey;
     }
 
     @Override
@@ -44,6 +50,11 @@ public abstract class FieldPart<T extends Table<O>, O, C> extends Part<T, O, T, 
     @Override
     public Type getType() {
         return Type.FIELD;
+    }
+
+    @Override
+    public boolean isPrimaryKey() {
+        return primaryKey;
     }
 
     public final FieldPart<T, O, C> getThis() throws OrmException {

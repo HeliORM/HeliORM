@@ -43,6 +43,8 @@ public abstract class Orm implements AutoCloseable {
     private final Connection connection;
     private final PojoOperations pops;
     private final Map<Table, PreparedStatement> inserts = new HashMap();
+    private final Map<Table, PreparedStatement> updates = new HashMap();
+    private final Map<Table, PreparedStatement> deletes = new HashMap();
 
     public static Orm open(Connection con, Driver driver) throws OrmException {
         switch (driver) {
@@ -71,10 +73,13 @@ public abstract class Orm implements AutoCloseable {
                 par++;
             }
             stmt.executeUpdate();
-            ResultSet rs = stmt.getGeneratedKeys();
-            if (rs.next()) {
-                // TODO: get the auto-generated key from the result set and apply it to the Pojo.
-                // this requires me to know the key field
+            Optional<Field> opt = table.getPrimaryKey();
+            if (opt.isPresent()) {
+                try (ResultSet rs = stmt.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        pops.setValue(pojo, opt.get(), getKeyValueFromResultSet(rs, opt.get()));
+                    }
+                }
             }
             return pojo;
         } catch (SQLException ex) {
@@ -83,7 +88,39 @@ public abstract class Orm implements AutoCloseable {
     }
 
     public <T extends Table<O>, O> O update(T table, O pojo) throws OrmException {
-        return pojo;
+        try {
+            PreparedStatement stmt = updates.get(table);
+            if (stmt == null) {
+                stmt = getConnection().prepareStatement(buildUpdateQuery(table));
+                updates.put(table, stmt);
+            }
+            int par = 1;
+            for (Field field : table.getFields()) {
+                if (!field.isPrimaryKey()) {
+                    setValueInStatement(stmt, pojo, field, par);
+                    par++;
+                }
+            }
+            setValueInStatement(stmt, pojo, table.getPrimaryKey().get(), par);
+            stmt.executeUpdate();
+            return pojo;
+        } catch (SQLException ex) {
+            throw new OrmException(ex.getMessage(), ex);
+        }
+    }
+
+    public <T extends Table<O>, O> void delete(T table, O pojo) throws OrmException {
+        try {
+            PreparedStatement stmt = deletes.get(table);
+            if (stmt == null) {
+                stmt = getConnection().prepareStatement(buildDeleteQuery(table));
+                deletes.put(table, stmt);
+            }
+            setValueInStatement(stmt, pojo, table.getPrimaryKey().get(), 1);
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            throw new OrmException(ex.getMessage(), ex);
+        }
     }
 
     public <T extends Table<O>, O> Select<T, O, T, O> select(T table) {
@@ -238,7 +275,7 @@ public abstract class Orm implements AutoCloseable {
     }
 
     /**
-     * Build a SQL select query based on the supplied query structure.
+     * Build a SQL select query for the given table.
      *
      * @param query The query structure
      * @return The SQL query text
@@ -249,11 +286,29 @@ public abstract class Orm implements AutoCloseable {
     /**
      * Build a SQL insert query based on the supplied query structure.
      *
-     * @param table The
+     * @param table The table we're inserting into
      * @return The SQL query text
      * @throws OrmException Thrown if there is an error building the query.
      */
     protected abstract String buildInsertQuery(Table<?> table) throws OrmException;
+
+    /**
+     * Build a SQL update query for the given table.
+     *
+     * @param table The table we're updating in
+     * @return The SQL query text
+     * @throws OrmException Thrown if there is an error building the query.
+     */
+    protected abstract String buildUpdateQuery(Table<?> table) throws OrmException;
+
+    /**
+     * Build a SQL delete query for the given table.
+     *
+     * @param table The table we're updating in
+     * @return The SQL query text
+     * @throws OrmException Thrown if there is an error building the query.
+     */
+    protected abstract String buildDeleteQuery(Table<?> table) throws OrmException;
 
     /**
      * Creates a Pojo for the given table from the element currently at the
@@ -310,6 +365,41 @@ public abstract class Orm implements AutoCloseable {
                     return rs.getString(column);
                 case DATE:
                     return rs.getDate(column);
+                default:
+                    throw new OrmException(format("Field type '%s' is unsupported. BUG!", field.getFieldType()));
+            }
+        } catch (SQLException ex) {
+            throw new OrmException(ex.getMessage(), ex);
+        }
+    }
+
+    /**
+     * Retrieve the returned key value from a result set (used for updating
+     * auto-increment keys).
+     *
+     * @param rs The result set
+     * @param field The field for which we're reading data
+     * @return The data
+     * @throws OrmException Thrown if we cannot work out how to extract the
+     * data.
+     */
+    private Object getKeyValueFromResultSet(ResultSet rs, Field field) throws OrmException {
+        try {
+            switch (field.getFieldType()) {
+                case LONG:
+                    return rs.getLong(1);
+                case INTEGER:
+                    return rs.getInt(1);
+                case STRING:
+                    return rs.getString(1);
+                case SHORT:
+                case BYTE:
+                case DOUBLE:
+                case FLOAT:
+                case BOOLEAN:
+                case ENUM:
+                case DATE:
+                    throw new OrmException(format("Field type '%s' is not a supported primary key type", field.getFieldType()));
                 default:
                     throw new OrmException(format("Field type '%s' is unsupported. BUG!", field.getFieldType()));
             }

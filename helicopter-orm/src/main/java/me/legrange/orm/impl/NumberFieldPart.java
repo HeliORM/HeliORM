@@ -17,4 +17,8 @@ public abstract class NumberFieldPart<T extends Table<O>, O, N extends Number> e
         super(fieldType, javaName, sqlName);
     }
 
+    public NumberFieldPart(Class<N> fieldClass, String javaName, String sqlName, boolean primaryKey) {
+        super(fieldClass, javaName, sqlName, primaryKey);
+    }
+
 }

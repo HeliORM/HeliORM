@@ -10,9 +10,9 @@ import me.legrange.orm.annotation.Pojo;
 @Pojo
 public abstract class Obj {
 
-    private Date created;
-    private Date modified;
-    private int version;
+    private Date created = new Date();
+    private Date modified = new Date();
+    private int version = 1;
 
     public Date getCreated() {
         return created;

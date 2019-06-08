@@ -1,6 +1,7 @@
 package me.legrange.orm;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -13,6 +14,8 @@ public interface Table<O> {
     Class<O> getObjectClass();
 
     List<Field> getFields();
+
+    Optional<Field> getPrimaryKey();
 
     String getSqlTable();
 

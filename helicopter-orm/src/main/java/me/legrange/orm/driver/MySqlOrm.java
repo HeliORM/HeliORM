@@ -46,6 +46,27 @@ public class MySqlOrm extends Orm {
     }
 
     @Override
+    protected String buildUpdateQuery(Table<?> table) throws OrmException {
+        StringBuilder query = new StringBuilder();
+        query.append(format("UPDATE %s SET ", table.getSqlTable()));
+        StringJoiner fields = new StringJoiner(",");
+        StringJoiner values = new StringJoiner(",");
+        for (Field field : table.getFields()) {
+            if (!field.isPrimaryKey()) {
+                fields.add(format("%s=?", field.getSqlName()));
+            }
+        }
+        query.append(fields.toString());
+        query.append(format(" WHERE %s=?", table.getPrimaryKey().get().getSqlName()));
+        return query.toString();
+    }
+
+    @Override
+    protected String buildDeleteQuery(Table<?> table) throws OrmException {
+        return format("DELETE FROM %s WHERE %s=?", table.getSqlTable(), table.getPrimaryKey().get().getSqlName());
+    }
+
+    @Override
     protected String buildSelectQuery(Query root) throws OrmException {
         StringBuilder tablesQuery = new StringBuilder();
         tablesQuery.append(format("SELECT %s.* FROM %s", root.getTable().getSqlTable(), root.getTable().getSqlTable()));

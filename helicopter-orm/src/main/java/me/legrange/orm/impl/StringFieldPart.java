@@ -18,6 +18,10 @@ public class StringFieldPart<T extends Table<O>, O> extends FieldPart<T, O, Stri
         super(String.class, javaName, sqlName);
     }
 
+    public StringFieldPart(String javaName, String sqlName, boolean primaryKey) {
+        super(String.class, javaName, sqlName, primaryKey);
+    }
+
     @Override
     public FieldType getFieldType() {
         return FieldType.STRING;

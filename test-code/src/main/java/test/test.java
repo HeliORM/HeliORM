@@ -1,5 +1,7 @@
 package test;
 
+import core.Cat;
+import static core.Tables.CAT;
 import static core.Tables.PERSON;
 import static core.Tables.PET;
 import java.sql.DriverManager;
@@ -15,8 +17,32 @@ public class test {
     public static void main(String... args) throws Exception {
         Orm orm = Orm.open(DriverManager.getConnection("jdbc:mysql://localhost:3306/orm?user=root"), Orm.Driver.MYSQL);
         test t = new test();
-        t.test5(orm);
-//        t.test2(orm);
+        t.test8(orm);
+    }
+
+    private void test8(Orm orm) throws OrmException {
+        System.out.println("-- Delete Cat ---");
+        Cat cat = orm.select(CAT).where(CAT.catNumber.eq(4L)).one();
+        orm.delete(CAT, cat);
+        System.out.println("Cat deleted");
+    }
+
+    private void test7(Orm orm) throws OrmException {
+        System.out.println("-- Update Cat ---");
+        Cat cat = orm.select(CAT).where(CAT.catNumber.eq(5L)).one();
+        cat.setName("Chilli");
+        cat = orm.update(CAT, cat);
+        System.out.println("Cat updated with key " + cat.getCatNumber());
+    }
+
+    private void test6(Orm orm) throws OrmException {
+        System.out.println("-- Create Cat ---");
+        Cat cat = new Cat();
+        cat.setName("Marmite");
+        cat.setAge(1);
+        cat.setPersonNumber(1L);
+        cat = orm.create(CAT, cat);
+        System.out.println("Cat created with key " + cat.getCatNumber());
     }
 
     private void test2(Orm orm) throws OrmException {

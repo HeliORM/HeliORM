@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
@@ -158,6 +159,20 @@ class Output {
         emit(format("return Arrays.asList(%s);", fieldNames.toString()));
         pop();
         emit("}");
+        // getPrimaryKey();
+        impt(Optional.class);
+        emit("");
+        emit("@Override");
+        emit("public Optional<Field> getPrimaryKey() {");
+        push();
+        Optional<Field> opt = cm.getPrimaryKey();
+        if (opt.isPresent()) {
+            emit("return Optional.of(%s);", opt.get().getJavaName());
+        } else {
+            emit("return Optional.empty();");
+        }
+        pop();
+        emit("}");
         // getSqlTable();
         emit("");
         emit("@Override");
@@ -255,15 +270,26 @@ class Output {
     private void addType2Field(Class<? extends Field> fieldClass, Class<? extends FieldPart> partClass, Table cm, Field fm) throws GeneratorException {
         impt(fieldClass);
         impt(partClass);
-        // public final StringField<PersonTable, Person> name = new StringFieldPart<P
-        emit("public final %s<%s, %s> %s = new %s(\"%s\", \"%s\");",
-                fieldClass.getSimpleName(),
-                tableName(cm),
-                cm.getObjectClass().getSimpleName(),
-                fm.getJavaName(),
-                partClass.getSimpleName(),
-                fm.getJavaName(),
-                fm.getSqlName());
+        boolean isKey = fm.isPrimaryKey();
+        if (isKey) {
+            emit("public final %s<%s, %s> %s = new %s(\"%s\", \"%s\", true);",
+                    fieldClass.getSimpleName(),
+                    tableName(cm),
+                    cm.getObjectClass().getSimpleName(),
+                    fm.getJavaName(),
+                    partClass.getSimpleName(),
+                    fm.getJavaName(),
+                    fm.getSqlName());
+        } else {
+            emit("public final %s<%s, %s> %s = new %s(\"%s\", \"%s\");",
+                    fieldClass.getSimpleName(),
+                    tableName(cm),
+                    cm.getObjectClass().getSimpleName(),
+                    fm.getJavaName(),
+                    partClass.getSimpleName(),
+                    fm.getJavaName(),
+                    fm.getSqlName());
+        }
     }
 
     private void addType3Field(Class<? extends Field> fieldClass, Class<? extends FieldPart> partClass, Table cm, Field fm) throws GeneratorException {
