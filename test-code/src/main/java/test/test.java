@@ -22,7 +22,7 @@ public class test {
 
     private void test8(Orm orm) throws OrmException {
         System.out.println("-- Delete Cat ---");
-        Cat cat = orm.select(CAT).where(CAT.catNumber.eq(4L)).one();
+        Cat cat = orm.select(CAT).where(CAT.catNumber.eq(4)).one();
         orm.delete(CAT, cat);
         System.out.println("Cat deleted");
     }
