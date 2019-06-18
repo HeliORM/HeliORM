@@ -59,7 +59,11 @@ public abstract class Orm implements AutoCloseable {
         pops = new UnsafeFieldOperation();
     }
 
-    public <T extends Table<O>, O> O create(T table, O pojo) throws OrmException {
+    public <O> O create(O pojo) throws OrmException {
+        return create(tableFor(pojo), pojo);
+    }
+
+    private <T extends Table<O>, O> O create(T table, O pojo) throws OrmException {
         try {
             PreparedStatement stmt = inserts.get(table);
             if (stmt == null) {
@@ -86,7 +90,11 @@ public abstract class Orm implements AutoCloseable {
         }
     }
 
-    public <T extends Table<O>, O> O update(T table, O pojo) throws OrmException {
+    public <O> O update(O pojo) throws OrmException {
+        return update(tableFor(pojo), pojo);
+    }
+
+    private <T extends Table<O>, O> O update(T table, O pojo) throws OrmException {
         try {
             PreparedStatement stmt = updates.get(table);
             if (stmt == null) {
@@ -108,7 +116,11 @@ public abstract class Orm implements AutoCloseable {
         }
     }
 
-    public <T extends Table<O>, O> void delete(T table, O pojo) throws OrmException {
+    public <O> void delete(O pojo) throws OrmException {
+        delete(tableFor(pojo), pojo);
+    }
+
+    private <T extends Table<O>, O> void delete(T table, O pojo) throws OrmException {
         try {
             PreparedStatement stmt = deletes.get(table);
             if (stmt == null) {
