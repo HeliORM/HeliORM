@@ -7,6 +7,7 @@ import static core.Tables.PET;
 import java.sql.DriverManager;
 import me.legrange.orm.Orm;
 import me.legrange.orm.OrmException;
+import me.legrange.orm.Table;
 
 /**
  *
@@ -17,7 +18,16 @@ public class test {
     public static void main(String... args) throws Exception {
         Orm orm = Orm.open(DriverManager.getConnection("jdbc:mysql://localhost:3306/orm?user=root"), Orm.Driver.MYSQL);
         test t = new test();
-        t.test8(orm);
+        t.test9(orm);
+    }
+
+    /**
+     * Test table lookup
+     */
+    private void test9(Orm orm) throws OrmException, ClassNotFoundException {
+        System.out.println("-- See if we have table ---");
+        Table<Cat> tableFor = orm.tableFor(new Cat());
+        System.out.printf("Cat table has %s and %s\n", tableFor.getObjectClass(), tableFor.getFields());
     }
 
     /**

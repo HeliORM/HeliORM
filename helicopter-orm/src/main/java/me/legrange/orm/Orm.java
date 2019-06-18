@@ -14,6 +14,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.Spliterator;
 import java.util.Spliterators;
@@ -39,6 +40,7 @@ public abstract class Orm implements AutoCloseable {
 
     private final Connection connection;
     private final PojoOperations pops;
+    private final Map<Class<?>, Table> tables = new HashMap();
     private final Map<Table, PreparedStatement> inserts = new HashMap();
     private final Map<Table, PreparedStatement> updates = new HashMap();
     private final Map<Table, PreparedStatement> deletes = new HashMap();
@@ -126,6 +128,21 @@ public abstract class Orm implements AutoCloseable {
 
     @Override
     public void close() throws OrmException {
+    }
+
+    public <O> Table<O> tableFor(O pojo) throws OrmException {
+        if (tables.isEmpty()) {
+            ServiceLoader<Table> svl = ServiceLoader.load(Table.class);
+            for (Table table : svl) {
+                System.out.println(table.getObjectClass());
+                tables.put(table.getObjectClass(), table);
+            }
+        }
+        Table<O> table = tables.get(pojo.getClass());
+        if (table == null) {
+            throw new OrmException("Cannot find table for pojo of type " + pojo.getClass().getCanonicalName());
+        }
+        return table;
     }
 
     private Connection getConnection() {

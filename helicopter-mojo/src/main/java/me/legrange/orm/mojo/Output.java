@@ -218,7 +218,7 @@ class Output {
         emit("");
         emit("}");
         emit("");
-
+        gen.addToService(packageName + ".Tables$" + tableName(cm));
     }
 
     private Set<Table> explodeSubs(Set<Table> subs) {

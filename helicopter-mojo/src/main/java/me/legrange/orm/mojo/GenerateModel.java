@@ -1,6 +1,9 @@
 package me.legrange.orm.mojo;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import static java.lang.String.format;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -39,10 +42,13 @@ public class GenerateModel extends AbstractMojo {
     private Set<String> packages;
     @Parameter(property = "outputDir", required = false)
     private String outputDir;
+    @Parameter(property = "resourceDir", required = false)
+    private String resourceDir;
     @Component
     private MavenProject project;
     private Generator gen;
     private Map<String, Output> outputs;
+    private PrintWriter svc;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -55,6 +61,11 @@ public class GenerateModel extends AbstractMojo {
                     throw new MojoExecutionException(format("Unsupported POJO strategy '%s'. BUG?", strategy));
             }
             outputs = PackageOrganizer.organize(this, gen.getPojoModels().stream().map(pm -> pm.getObjectClass()).collect(Collectors.toList()));
+            File dir = new File(resourceDir + "/META-INF/services/");
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
+            svc = new PrintWriter(new FileWriter(resourceDir + "/META-INF/services/" + Table.class.getCanonicalName()));
             for (Table pm : gen.getPojoModels()) {
                 getOutputFor(pm).addTable(pm);
             }
@@ -62,7 +73,8 @@ public class GenerateModel extends AbstractMojo {
             for (Output out : uniqueOuts) {
                 out.output(outputDir);
             }
-        } catch (GeneratorException | OrmMetaDataException ex) {
+            svc.close();
+        } catch (GeneratorException | OrmMetaDataException | IOException ex) {
             throw new MojoExecutionException(ex.getMessage(), ex);
         }
     }
@@ -99,6 +111,10 @@ public class GenerateModel extends AbstractMojo {
             throw new GeneratorException(format("Cannot find output table for class '%s'. BUG!", clazz.getCanonicalName()));
         }
         return out;
+    }
+
+    void addToService(String name) {
+        svc.println(name);
     }
 
     private Output getOutputFor(Class<?> clazz) throws GeneratorException {
