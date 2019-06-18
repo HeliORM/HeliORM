@@ -18,7 +18,8 @@ public class test {
     public static void main(String... args) throws Exception {
         Orm orm = Orm.open(DriverManager.getConnection("jdbc:mysql://localhost:3306/orm?user=root"), Orm.Driver.MYSQL);
         test t = new test();
-        t.test9(orm);
+        t.test6(orm);
+        t.test7(orm);
     }
 
     /**
@@ -36,7 +37,7 @@ public class test {
     private void test8(Orm orm) throws OrmException {
         System.out.println("-- Delete Cat ---");
         Cat cat = orm.select(CAT).where(CAT.catNumber.eq(4)).one();
-        orm.delete(CAT, cat);
+        orm.delete(cat);
         System.out.println("Cat deleted");
     }
 
@@ -46,8 +47,8 @@ public class test {
     private void test7(Orm orm) throws OrmException {
         System.out.println("-- Update Cat ---");
         Cat cat = orm.select(CAT).where(CAT.catNumber.eq(5)).one();
-        cat.setName("Death Cat");
-        cat = orm.update(CAT, cat);
+        cat.setName("Cool Cat");
+        cat = orm.update(cat);
         System.out.println("Cat updated with key " + cat.getCatNumber());
     }
 
@@ -57,10 +58,10 @@ public class test {
     private void test6(Orm orm) throws OrmException {
         System.out.println("-- Create Cat ---");
         Cat cat = new Cat();
-        cat.setName("Kitty Drop Tables");
+        cat.setName("Super Cat");
         cat.setAge(1);
         cat.setPersonNumber(1L);
-        cat = orm.create(CAT, cat);
+        cat = orm.create(cat);
         System.out.println("Cat created with key " + cat.getCatNumber());
     }
 

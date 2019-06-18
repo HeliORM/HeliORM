@@ -146,7 +146,6 @@ public abstract class Orm implements AutoCloseable {
         if (tables.isEmpty()) {
             ServiceLoader<Table> svl = ServiceLoader.load(Table.class);
             for (Table table : svl) {
-                System.out.println(table.getObjectClass());
                 tables.put(table.getObjectClass(), table);
             }
         }
