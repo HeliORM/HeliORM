@@ -13,7 +13,7 @@ class PackageOrganizer {
     static Map<String, Output> organize(GenerateModel gen, List<Class> classes) {
         Map<String, Output> map = new HashMap();
         for (Class clazz : classes) {
-            Output out = new Output(gen, clazz.getPackageName());
+            Output out = new Output(gen, clazz.getPackage().getName());
             map.put(clazz.getCanonicalName(), out);
         }
         reduce(gen, map);

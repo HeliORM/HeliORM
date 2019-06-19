@@ -35,7 +35,7 @@ public class PojoClassModel implements Table {
     public String getSqlTable() {
         Optional<Pojo> pojo = getAnnotation(Pojo.class);
         if (pojo.isPresent()) {
-            if (!pojo.get().tableName().isBlank()) {
+            if (!pojo.get().tableName().isEmpty()) {
                 return pojo.get().tableName();
             }
         }

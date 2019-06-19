@@ -94,7 +94,7 @@ class Output {
     }
 
     void impt(Class clazz) {
-        if (!clazz.getPackageName().equals(packageName) || clazz.isEnum()) {
+        if (!clazz.getPackage().getName().equals(packageName) || clazz.isEnum()) {
             imports.add(clazz.getCanonicalName());
         }
     }
