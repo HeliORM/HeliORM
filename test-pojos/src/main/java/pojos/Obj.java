@@ -1,7 +1,7 @@
 package pojos;
 
 import java.util.Date;
-import me.legrange.orm.annotation.Pojo;
+import net.legrange.orm.annotation.Pojo;
 
 /**
  *

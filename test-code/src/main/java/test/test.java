@@ -5,9 +5,9 @@ import static core.Tables.CAT;
 import static core.Tables.PERSON;
 import static core.Tables.PET;
 import java.sql.DriverManager;
-import me.legrange.orm.Orm;
-import me.legrange.orm.OrmException;
-import me.legrange.orm.Table;
+import net.legrange.orm.Orm;
+import net.legrange.orm.OrmException;
+import net.legrange.orm.Table;
 
 /**
  *

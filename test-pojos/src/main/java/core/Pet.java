@@ -1,7 +1,7 @@
 package core;
 
-import me.legrange.orm.annotation.ForeignKey;
-import me.legrange.orm.annotation.Pojo;
+import net.legrange.orm.annotation.ForeignKey;
+import net.legrange.orm.annotation.Pojo;
 import pojos.Obj;
 
 /**
