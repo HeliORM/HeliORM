@@ -6,7 +6,7 @@ import net.legrange.orm.def.Field;
  *
  * @author gideon
  */
-interface PojoOperations {
+public interface PojoOperations {
 
     Object newPojoInstance(Table table) throws OrmException;
 

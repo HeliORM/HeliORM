@@ -1,4 +1,4 @@
-package net.legrange.orm;
+package net.legrange.orm.driver;
 
 import java.util.Comparator;
 import java.util.List;
