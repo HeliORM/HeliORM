@@ -1,6 +1,6 @@
 package net.legrange.orm.impl;
 
-import net.legrange.orm.DoubleField;
+import net.legrange.orm.def.DoubleField;
 import net.legrange.orm.Table;
 
 /**

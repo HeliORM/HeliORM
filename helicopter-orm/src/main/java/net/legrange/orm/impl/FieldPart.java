@@ -1,7 +1,7 @@
 package net.legrange.orm.impl;
 
 import static java.lang.String.format;
-import net.legrange.orm.Field;
+import net.legrange.orm.def.Field;
 import net.legrange.orm.OrmException;
 import net.legrange.orm.Table;
 

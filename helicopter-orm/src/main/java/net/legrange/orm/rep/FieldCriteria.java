@@ -1,6 +1,6 @@
 package net.legrange.orm.rep;
 
-import net.legrange.orm.Field;
+import net.legrange.orm.def.Field;
 
 /**
  *

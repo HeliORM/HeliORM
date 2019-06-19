@@ -1,6 +1,6 @@
 package net.legrange.orm.impl;
 
-import net.legrange.orm.ExpressionContinuation;
+import net.legrange.orm.def.ExpressionContinuation;
 import net.legrange.orm.Table;
 
 /**

@@ -1,9 +1,9 @@
 package net.legrange.orm.impl;
 
-import net.legrange.orm.ExpressionContinuation;
+import net.legrange.orm.def.ExpressionContinuation;
 import net.legrange.orm.OrmException;
 import net.legrange.orm.Table;
-import net.legrange.orm.WithEquals;
+import net.legrange.orm.def.WithEquals;
 
 /**
  *

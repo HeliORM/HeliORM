@@ -1,6 +1,6 @@
 package net.legrange.orm.impl;
 
-import net.legrange.orm.BooleanField;
+import net.legrange.orm.def.BooleanField;
 import net.legrange.orm.Table;
 
 /**

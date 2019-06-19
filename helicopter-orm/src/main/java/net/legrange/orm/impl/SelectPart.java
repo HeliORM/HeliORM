@@ -1,13 +1,13 @@
 package net.legrange.orm.impl;
 
 import static java.lang.String.format;
-import net.legrange.orm.Continuation;
-import net.legrange.orm.ExpressionContinuation;
-import net.legrange.orm.Field;
-import net.legrange.orm.Join;
-import net.legrange.orm.Ordered;
+import net.legrange.orm.def.Continuation;
+import net.legrange.orm.def.ExpressionContinuation;
+import net.legrange.orm.def.Field;
+import net.legrange.orm.def.Join;
+import net.legrange.orm.def.Ordered;
 import net.legrange.orm.Orm;
-import net.legrange.orm.Select;
+import net.legrange.orm.def.Select;
 import net.legrange.orm.Table;
 
 /**

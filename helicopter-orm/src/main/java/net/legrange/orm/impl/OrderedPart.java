@@ -1,8 +1,8 @@
 package net.legrange.orm.impl;
 
-import net.legrange.orm.Executable;
-import net.legrange.orm.Field;
-import net.legrange.orm.Ordered;
+import net.legrange.orm.def.Executable;
+import net.legrange.orm.def.Field;
+import net.legrange.orm.def.Ordered;
 import net.legrange.orm.Table;
 
 /**

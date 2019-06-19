@@ -1,6 +1,6 @@
 package net.legrange.orm.impl;
 
-import net.legrange.orm.FloatField;
+import net.legrange.orm.def.FloatField;
 import net.legrange.orm.Table;
 
 /**

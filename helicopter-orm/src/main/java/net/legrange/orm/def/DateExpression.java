@@ -1,6 +1,7 @@
-package net.legrange.orm;
+package net.legrange.orm.def;
 
 import java.util.Date;
+import net.legrange.orm.Table;
 
 /**
  *

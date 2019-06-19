@@ -1,7 +1,7 @@
 package net.legrange.orm.rep;
 
 import java.util.Optional;
-import net.legrange.orm.Field;
+import net.legrange.orm.def.Field;
 
 /**
  *

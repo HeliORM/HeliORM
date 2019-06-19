@@ -1,5 +1,7 @@
 package net.legrange.orm;
 
+import net.legrange.orm.def.Field;
+
 /**
  *
  * @author gideon

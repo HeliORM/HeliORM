@@ -1,6 +1,6 @@
 package net.legrange.orm.impl;
 
-import net.legrange.orm.LongField;
+import net.legrange.orm.def.LongField;
 import net.legrange.orm.Table;
 
 /**

@@ -1,6 +1,7 @@
 package net.legrange.orm;
 
 import static java.lang.String.format;
+import net.legrange.orm.def.Field;
 import sun.misc.Unsafe;
 
 /**

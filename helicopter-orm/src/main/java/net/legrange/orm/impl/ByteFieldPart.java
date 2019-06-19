@@ -1,6 +1,6 @@
 package net.legrange.orm.impl;
 
-import net.legrange.orm.ByteField;
+import net.legrange.orm.def.ByteField;
 import net.legrange.orm.Table;
 
 /**

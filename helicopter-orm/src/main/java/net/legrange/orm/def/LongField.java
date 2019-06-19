@@ -1,7 +1,9 @@
-package net.legrange.orm;
+package net.legrange.orm.def;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
+import net.legrange.orm.OrmException;
+import net.legrange.orm.Table;
 
 /**
  *

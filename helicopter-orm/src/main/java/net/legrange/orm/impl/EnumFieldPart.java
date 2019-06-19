@@ -1,6 +1,6 @@
 package net.legrange.orm.impl;
 
-import net.legrange.orm.EnumField;
+import net.legrange.orm.def.EnumField;
 import net.legrange.orm.Table;
 
 /**

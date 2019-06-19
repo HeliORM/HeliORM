@@ -9,7 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import net.legrange.orm.Field;
+import net.legrange.orm.def.Field;
 import net.legrange.orm.Table;
 import net.legrange.orm.annotation.Pojo;
 

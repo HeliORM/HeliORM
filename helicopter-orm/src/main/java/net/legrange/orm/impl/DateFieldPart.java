@@ -1,7 +1,7 @@
 package net.legrange.orm.impl;
 
 import java.util.Date;
-import net.legrange.orm.DateField;
+import net.legrange.orm.def.DateField;
 import net.legrange.orm.Table;
 
 /**

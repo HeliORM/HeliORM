@@ -1,6 +1,6 @@
 package net.legrange.orm.impl;
 
-import net.legrange.orm.ShortField;
+import net.legrange.orm.def.ShortField;
 import net.legrange.orm.Table;
 
 /**

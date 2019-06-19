@@ -1,8 +1,8 @@
 package net.legrange.orm.impl;
 
 import static java.lang.String.format;
-import net.legrange.orm.Field;
-import net.legrange.orm.OnClause;
+import net.legrange.orm.def.Field;
+import net.legrange.orm.def.OnClause;
 import net.legrange.orm.Table;
 
 public final class OnClausePart<LT extends Table<LO>, LO, RT extends Table<RO>, RO> extends SelectPart<LT, LO, RT, RO> implements OnClause<LT, LO, RT, RO> {

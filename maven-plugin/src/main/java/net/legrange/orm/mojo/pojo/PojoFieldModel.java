@@ -3,7 +3,7 @@ package net.legrange.orm.mojo.pojo;
 import java.lang.annotation.Annotation;
 import java.util.Date;
 import java.util.Optional;
-import net.legrange.orm.Field;
+import net.legrange.orm.def.Field;
 import net.legrange.orm.annotation.Column;
 import net.legrange.orm.annotation.PrimaryKey;
 

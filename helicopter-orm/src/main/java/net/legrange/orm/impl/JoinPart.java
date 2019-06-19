@@ -1,9 +1,9 @@
 package net.legrange.orm.impl;
 
 import static java.lang.String.format;
-import net.legrange.orm.Field;
-import net.legrange.orm.Join;
-import net.legrange.orm.OnClause;
+import net.legrange.orm.def.Field;
+import net.legrange.orm.def.Join;
+import net.legrange.orm.def.OnClause;
 import net.legrange.orm.Table;
 
 /**

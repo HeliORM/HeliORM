@@ -1,4 +1,6 @@
-package net.legrange.orm;
+package net.legrange.orm.def;
+
+import net.legrange.orm.Table;
 
 /**
  *

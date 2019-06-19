@@ -1,8 +1,10 @@
-package net.legrange.orm;
+package net.legrange.orm.def;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
+import net.legrange.orm.OrmException;
+import net.legrange.orm.Table;
 
 /**
  *

@@ -1,5 +1,6 @@
 package net.legrange.orm;
 
+import net.legrange.orm.def.Field;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
