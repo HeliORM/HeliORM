@@ -1,11 +1,12 @@
 package net.legrange.orm.mojo.pojo;
 
+import static java.lang.String.format;
 import java.lang.annotation.Annotation;
 import java.util.Date;
 import java.util.Optional;
-import net.legrange.orm.def.Field;
 import net.legrange.orm.annotation.Column;
 import net.legrange.orm.annotation.PrimaryKey;
+import net.legrange.orm.def.Field;
 
 /**
  *
@@ -85,7 +86,8 @@ public class PojoFieldModel implements Field {
         } else if (Enum.class.isAssignableFrom(type)) {
             return FieldType.ENUM;
         }
-        return null; // FIXME
+        throw new UncaughtPojoException(format("Unsuppored field type %s for field '%s' on %s",
+                type.getSimpleName(), pojoField.getName(), pojoField.getDeclaringClass().getCanonicalName()));
     }
 
     @Override
