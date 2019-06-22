@@ -232,7 +232,7 @@ public abstract class SqlDriver implements OrmDriver {
 
     protected String buildSelectQuery(Query root) throws OrmException {
         StringBuilder tablesQuery = new StringBuilder();
-        tablesQuery.append(format("SELECT %s.* FROM %s", root.getTable().getSqlTable(), root.getTable().getSqlTable()));
+        tablesQuery.append(format("SELECT DISTINCT %s.* FROM %s", root.getTable().getSqlTable(), root.getTable().getSqlTable()));
         StringBuilder whereQuery = new StringBuilder();
         Optional<Criteria> optCrit = root.getCriteria();
         if (optCrit.isPresent()) {
