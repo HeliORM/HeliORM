@@ -1,0 +1,70 @@
+package net.legrange.orm.driver;
+
+import java.util.Optional;
+import net.legrange.orm.OrmException;
+import net.legrange.orm.PojoOperations;
+import net.legrange.orm.Table;
+import net.legrange.orm.UncaughtOrmException;
+import net.legrange.orm.def.Field;
+
+/**
+ *
+ * @author gideon
+ */
+class Wrapper<O> implements Comparable<Wrapper<O>> {
+
+    private final PojoOperations pops;
+    private final Table<O> table;
+    private final O pojo;
+
+    public Wrapper(PojoOperations pops, Table<O> table, O pojo) {
+        this.pops = pops;
+        this.table = table;
+        this.pojo = pojo;
+    }
+
+    public O getPojo() {
+        return pojo;
+    }
+
+    @Override
+    public int compareTo(Wrapper<O> w) {
+        Optional<Field> primaryKey = table.getPrimaryKey();
+        if (primaryKey.isPresent()) {
+            try {
+                return pops.compareTo(pojo, w.getPojo(), primaryKey.get());
+            } catch (OrmException ex) {
+                throw new UncaughtOrmException(ex.getMessage(), ex);
+            }
+        }
+        if (pojo instanceof Comparable) {
+            return ((Comparable) pojo).compareTo(w.getPojo());
+        }
+        return 0;
+    }
+
+    @Override
+    public int hashCode() {
+        Optional<Field> primaryKey = table.getPrimaryKey();
+        if (primaryKey.isPresent()) {
+            try {
+                return pops.getValue(pojo, primaryKey.get()).hashCode();
+            } catch (OrmException ex) {
+                throw new UncaughtOrmException(ex.getMessage(), ex);
+            }
+        }
+        return pojo.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (Wrapper.class != obj.getClass()) {
+            return false;
+        }
+        return compareTo((Wrapper<O>) obj) == 0;
+    }
+
+}

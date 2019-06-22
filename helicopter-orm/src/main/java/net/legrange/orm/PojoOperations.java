@@ -15,4 +15,5 @@ public interface PojoOperations {
     Object getValue(Object pojo, Field field) throws OrmException;
 
     int compareTo(Object pojo1, Object pojo2, Field field) throws OrmException;
+
 }

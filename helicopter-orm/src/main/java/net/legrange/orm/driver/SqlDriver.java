@@ -66,19 +66,22 @@ public abstract class SqlDriver implements OrmDriver {
         if (queries.isEmpty()) {
             throw new OrmException("Could not build query from parts. BUG!");
         }
-        Stream<O> res = null;
-        for (List<Part> parts : queries) {
-            Stream<O> stream = streamSingle(parts.get(0).getReturnTable(), buildSelectQuery(Parser.parse(parts)));
-            if (res == null) {
-                res = stream;
+        Stream<Wrapper<O>> res = queries.stream()
+                .flatMap(parts -> {
+                    try {
+                        return streamSingle(parts.get(0).getReturnTable(), buildSelectQuery(Parser.parse(parts)));
+                    } catch (OrmException ex) {
+                        throw new UncaughtOrmException(ex.getMessage(), ex);
+                    }
+                });
+        if (queries.size() > 1) {
+            if (tail.getType() == Part.Type.ORDER) {
+                res = res.sorted(makeComparatorForTail(tail));
             } else {
-                res = Stream.concat(res, stream);
+                res = res.sorted();
             }
         }
-        if ((queries.size() > 1) && (tail.getType() == Part.Type.ORDER)) {
-            res = res.sorted(makeComparatorForTail(tail));
-        }
-        return res;
+        return res.distinct().map(wrapper -> wrapper.getPojo());
     }
 
     /**
@@ -91,14 +94,13 @@ public abstract class SqlDriver implements OrmDriver {
      * @return The stream of results.
      * @throws OrmException
      */
-    private <O, P extends Part & Executable> Stream<O> streamSingle(Table<O> table, String query) throws OrmException {
+    private <O, P extends Part & Executable> Stream<Wrapper<O>> streamSingle(Table<O> table, String query) throws OrmException {
         Connection sql = getConnection();
-        List<O> result = new ArrayList();
         try {
             Statement stmt = sql.createStatement();
             ResultSet rs = stmt.executeQuery(query);
-            Stream<O> stream = StreamSupport.stream(
-                    Spliterators.spliteratorUnknownSize(new Iterator<O>() {
+            Stream<Wrapper<O>> stream = StreamSupport.stream(
+                    Spliterators.spliteratorUnknownSize(new Iterator<Wrapper<O>>() {
                         @Override
                         public boolean hasNext() {
                             try {
@@ -109,9 +111,9 @@ public abstract class SqlDriver implements OrmDriver {
                         }
 
                         @Override
-                        public O next() {
+                        public Wrapper<O> next() {
                             try {
-                                return makePojoFromResultSet(rs, table);
+                                return new Wrapper(pops, table, makePojoFromResultSet(rs, table));
                             } catch (OrmException ex) {
                                 throw new UncaughtOrmException(ex.getMessage(), ex);
                             }
@@ -159,6 +161,7 @@ public abstract class SqlDriver implements OrmDriver {
         }
     }
 
+    @Override
     public <T extends Table<O>, O> O update(T table, O pojo) throws OrmException {
         try {
             PreparedStatement stmt = updates.get(table);
@@ -181,6 +184,7 @@ public abstract class SqlDriver implements OrmDriver {
         }
     }
 
+    @Override
     public <T extends Table<O>, O> void delete(T table, O pojo) throws OrmException {
         try {
             PreparedStatement stmt = deletes.get(table);
@@ -537,23 +541,20 @@ public abstract class SqlDriver implements OrmDriver {
      * @param tail
      * @return
      */
-    private <O, P extends Part> Comparator<O> makeComparatorForTail(P tail) {
+    private <O, P extends Part> Comparator<Wrapper<O>> makeComparatorForTail(P tail) {
         List<OrderedPart> order = new LinkedList();
         while (tail.getType() == Part.Type.ORDER) {
             order.add((OrderedPart) tail);
             tail = (P) tail.left();
         }
-        List<Comparator<O>> comps = new LinkedList();
+        List<Comparator<Wrapper<O>>> comps = new LinkedList();
         for (OrderedPart op : order) {
-            comps.add((Comparator) (Object o1, Object o2) -> {
-                try {
-                    if (op.getDirection() == OrderedPart.Direction.ASCENDING) {
-                        return pops.compareTo(o1, o2, op.getField());
-                    } else {
-                        return -pops.compareTo(o1, o2, op.getField());
-                    }
-                } catch (OrmException ex) {
-                    throw new UncaughtOrmException(ex.getMessage(), ex);
+            comps.add((Comparator<Wrapper<O>>) (Wrapper<O> w1, Wrapper<O> w2) -> {
+                if (op.getDirection() == OrderedPart.Direction.ASCENDING) {
+                    return w1.compareTo(w2);
+                } else {
+                    return w2.compareTo(w1);
+
                 }
             });
         }

@@ -102,8 +102,9 @@ public class test {
     private void test5(Orm orm) throws OrmException {
         orm.select(PERSON)
                 .join(PET).on(PERSON.personNumber, PET.personNumber)
-                .where(PET.age.eq(3))
-                .orderByDesc(PERSON.firstName)
-                .list().forEach(System.out::println);
+                //                .where(PET.age.eq(3))
+                .orderBy(PERSON.personNumber)
+                .stream()
+                .forEach(System.out::println);
     }
 }

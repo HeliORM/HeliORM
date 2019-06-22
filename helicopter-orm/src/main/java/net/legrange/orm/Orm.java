@@ -61,6 +61,14 @@ public final class Orm implements AutoCloseable {
     public void close() throws OrmException {
     }
 
+    /**
+     * Find the table definition for the given POJO.
+     *
+     * @param <O> The type of the POJO
+     * @param pojo The pojo
+     * @return The table
+     * @throws OrmException
+     */
     public <O> Table<O> tableFor(O pojo) throws OrmException {
         if (tables.isEmpty()) {
             ServiceLoader<Table> svl = ServiceLoader.load(Table.class);
