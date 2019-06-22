@@ -21,6 +21,7 @@ import java.util.StringJoiner;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+import net.legrange.orm.OrmDriver;
 import net.legrange.orm.OrmException;
 import net.legrange.orm.PojoOperations;
 import net.legrange.orm.Table;
@@ -41,7 +42,6 @@ import net.legrange.orm.rep.Parser;
 import net.legrange.orm.rep.Query;
 import net.legrange.orm.rep.TableSpec;
 import net.legrange.orm.rep.ValueCriteria;
-import net.legrange.orm.OrmDriver;
 
 /**
  *
@@ -60,6 +60,7 @@ public abstract class SqlDriver implements OrmDriver {
         this.pops = pops;
     }
 
+    @Override
     public <O, P extends Part & Executable> Stream<O> stream(P tail) throws OrmException {
         List<List<Part>> queries = explodeAbstractions(tailToList(tail));
         if (queries.isEmpty()) {
@@ -80,6 +81,16 @@ public abstract class SqlDriver implements OrmDriver {
         return res;
     }
 
+    /**
+     * Create a stream for the given query on the given table and return a
+     * stream referencing the data.
+     *
+     * @param <O> The type of the POJOs returned
+     * @param table The table on which to query
+     * @param query The SQL query
+     * @return The stream of results.
+     * @throws OrmException
+     */
     private <O, P extends Part & Executable> Stream<O> streamSingle(Table<O> table, String query) throws OrmException {
         Connection sql = getConnection();
         List<O> result = new ArrayList();
