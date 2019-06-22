@@ -15,6 +15,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
+import net.legrange.orm.OrmMetaDataException;
+import net.legrange.orm.Table;
 import net.legrange.orm.def.BooleanField;
 import net.legrange.orm.def.ByteField;
 import net.legrange.orm.def.DateField;
@@ -24,10 +26,9 @@ import net.legrange.orm.def.Field;
 import net.legrange.orm.def.FloatField;
 import net.legrange.orm.def.IntegerField;
 import net.legrange.orm.def.LongField;
-import net.legrange.orm.OrmMetaDataException;
 import net.legrange.orm.def.ShortField;
 import net.legrange.orm.def.StringField;
-import net.legrange.orm.Table;
+import net.legrange.orm.def.TimestampField;
 import net.legrange.orm.impl.BooleanFieldPart;
 import net.legrange.orm.impl.ByteFieldPart;
 import net.legrange.orm.impl.DateFieldPart;
@@ -39,6 +40,7 @@ import net.legrange.orm.impl.IntegerFieldPart;
 import net.legrange.orm.impl.LongFieldPart;
 import net.legrange.orm.impl.ShortFieldPart;
 import net.legrange.orm.impl.StringFieldPart;
+import net.legrange.orm.impl.TimestampFieldPart;
 
 /**
  *
@@ -255,6 +257,8 @@ class Output {
             case DATE:
                 addDateField(cm, fm);
                 break;
+            case TIMESTAMP:
+                addTimestampField(cm, fm);
             case STRING:
                 addStringField(cm, fm);
                 break;
@@ -342,6 +346,10 @@ class Output {
 
     private void addDateField(Table cm, Field fm) throws GeneratorException {
         addType2Field(DateField.class, DateFieldPart.class, cm, fm);
+    }
+
+    private void addTimestampField(Table cm, Field fm) throws GeneratorException {
+        addType2Field(TimestampField.class, TimestampFieldPart.class, cm, fm);
     }
 
     private void addStringField(Table cm, Field fm) throws GeneratorException {

@@ -50,6 +50,7 @@ class UnsafeFieldOperation implements PojoOperations {
                 setEnum(pojo, refField, value);
                 break;
             case DATE:
+            case TIMESTAMP:
             case STRING:
                 setObject(pojo, refField, value);
                 break;
@@ -79,6 +80,7 @@ class UnsafeFieldOperation implements PojoOperations {
             case ENUM:
                 return getEnum(pojo, refField);
             case DATE:
+            case TIMESTAMP:
             case STRING:
                 return getObject(pojo, refField);
             default:
@@ -99,6 +101,7 @@ class UnsafeFieldOperation implements PojoOperations {
             case ENUM:
             case DATE:
             case STRING:
+            case TIMESTAMP:
                 Object val1 = getValue(pojo1, field);
                 Object val2 = getValue(pojo2, field);
                 if (val1 instanceof Comparable) {

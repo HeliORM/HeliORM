@@ -12,7 +12,7 @@ import net.legrange.orm.Table;
 public interface Field<T extends Table<O>, O, C> {
 
     public enum FieldType {
-        LONG, INTEGER, SHORT, BYTE, DOUBLE, FLOAT, BOOLEAN, ENUM, STRING, DATE;
+        LONG, INTEGER, SHORT, BYTE, DOUBLE, FLOAT, BOOLEAN, ENUM, STRING, DATE, TIMESTAMP;
     }
 
     FieldType getFieldType();

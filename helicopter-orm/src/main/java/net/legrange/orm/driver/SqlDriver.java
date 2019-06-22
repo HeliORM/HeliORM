@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -379,6 +380,9 @@ public abstract class SqlDriver implements OrmDriver {
                 case DATE:
                     stmt.setDate(par, getDateFromPojo(pojo, field));
                     break;
+                case TIMESTAMP:
+                    stmt.setTimestamp(par, getTimestampFromPojo(pojo, field));
+                    break;
                 default:
                     throw new OrmException(format("Field type '%s' is unsupported. BUG!", field.getFieldType()));
             }
@@ -465,6 +469,8 @@ public abstract class SqlDriver implements OrmDriver {
                     return rs.getString(column);
                 case DATE:
                     return rs.getDate(column);
+                case TIMESTAMP:
+                    return rs.getTimestamp(column);
                 default:
                     throw new OrmException(format("Field type '%s' is unsupported. BUG!", field.getFieldType()));
             }
@@ -499,6 +505,7 @@ public abstract class SqlDriver implements OrmDriver {
                 case BOOLEAN:
                 case ENUM:
                 case DATE:
+                case TIMESTAMP:
                     throw new OrmException(format("Field type '%s' is not a supported primary key type", field.getFieldType()));
                 default:
                     throw new OrmException(format("Field type '%s' is unsupported. BUG!", field.getFieldType()));
@@ -526,6 +533,14 @@ public abstract class SqlDriver implements OrmDriver {
             throw new OrmException(format("Could not read Date value for field '%s' with type '%s'.", field.getJavaName(), field.getFieldType()));
         }
         return new java.sql.Date(((java.util.Date) value).getTime());
+    }
+
+    private java.sql.Timestamp getTimestampFromPojo(Object pojo, Field field) throws OrmException {
+        Object value = getValueFromPojo(pojo, field);
+        if (!(value instanceof Instant)) {
+            throw new OrmException(format("Could not read Instant value for field '%s' with type '%s'.", field.getJavaName(), field.getFieldType()));
+        }
+        return new java.sql.Timestamp(((Instant) value).toEpochMilli());
     }
 
     private Connection getConnection() {

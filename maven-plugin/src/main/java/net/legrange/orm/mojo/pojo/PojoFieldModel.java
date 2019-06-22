@@ -2,6 +2,7 @@ package net.legrange.orm.mojo.pojo;
 
 import static java.lang.String.format;
 import java.lang.annotation.Annotation;
+import java.time.Instant;
 import java.util.Date;
 import java.util.Optional;
 import net.legrange.orm.annotation.Column;
@@ -83,6 +84,8 @@ public class PojoFieldModel implements Field {
             return FieldType.STRING;
         } else if (Date.class.isAssignableFrom(type)) {
             return FieldType.DATE;
+        } else if (Instant.class.isAssignableFrom(type)) {
+            return FieldType.TIMESTAMP;
         } else if (Enum.class.isAssignableFrom(type)) {
             return FieldType.ENUM;
         }
