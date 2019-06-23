@@ -88,7 +88,9 @@ class Output {
     }
 
     private void impts(String name) {
-        imports.add("static " + name);
+        if (!name.startsWith(packageName)) {
+            imports.add("static " + name);
+        }
     }
 
     void impt(String name) {
@@ -141,6 +143,7 @@ class Output {
     }
 
     private void emit(Table<?> cm) throws OrmMetaDataException, GeneratorException {
+        impt(cm.getObjectClass());
         emit("public static class %s implements Table<%s> {",
                 tableName(cm), getJavaName(cm));
         emit("");
@@ -259,6 +262,7 @@ class Output {
                 break;
             case TIMESTAMP:
                 addTimestampField(cm, fm);
+                break;
             case STRING:
                 addStringField(cm, fm);
                 break;
