@@ -1,6 +1,6 @@
 package pojos;
 
-import java.util.Date;
+import java.time.Instant;
 import net.legrange.orm.annotation.Pojo;
 
 /**
@@ -10,23 +10,23 @@ import net.legrange.orm.annotation.Pojo;
 @Pojo
 public abstract class Obj {
 
-    private Date created = new Date();
-    private Date modified = new Date();
+    private Instant created = Instant.now();
+    private Instant modified = Instant.now();
     private int version = 1;
 
-    public Date getCreated() {
+    public Instant getCreated() {
         return created;
     }
 
-    public void setCreated(Date created) {
+    public void setCreated(Instant created) {
         this.created = created;
     }
 
-    public Date getModified() {
+    public Instant getModified() {
         return modified;
     }
 
-    public void setModified(Date modified) {
+    public void setModified(Instant modified) {
         this.modified = modified;
     }
 
