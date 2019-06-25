@@ -521,6 +521,9 @@ public abstract class SqlDriver implements OrmDriver {
 
     private String getStringFromPojo(Object pojo, Field field) throws OrmException {
         Object value = getValueFromPojo(pojo, field);
+        if (value == null) {
+            return null;
+        }
         if (!(value instanceof String)) {
             throw new OrmException(format("Could not read String value for field type '%s'.", field.getFieldType()));
         }
@@ -529,6 +532,10 @@ public abstract class SqlDriver implements OrmDriver {
 
     private java.sql.Date getDateFromPojo(Object pojo, Field field) throws OrmException {
         Object value = getValueFromPojo(pojo, field);
+        if (value == null) {
+            return null;
+        }
+
         if (!(value instanceof java.util.Date)) {
             throw new OrmException(format("Could not read Date value for field '%s' with type '%s'.", field.getJavaName(), field.getFieldType()));
         }
@@ -537,6 +544,9 @@ public abstract class SqlDriver implements OrmDriver {
 
     private java.sql.Timestamp getTimestampFromPojo(Object pojo, Field field) throws OrmException {
         Object value = getValueFromPojo(pojo, field);
+        if (value == null) {
+            return null;
+        }
         if (!(value instanceof Instant)) {
             throw new OrmException(format("Could not read Instant value for field '%s' with type '%s'.", field.getJavaName(), field.getFieldType()));
         }
