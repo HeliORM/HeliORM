@@ -535,7 +535,6 @@ public abstract class SqlDriver implements OrmDriver {
         if (value == null) {
             return null;
         }
-
         if (!(value instanceof java.util.Date)) {
             throw new OrmException(format("Could not read Date value for field '%s' with type '%s'.", field.getJavaName(), field.getFieldType()));
         }
