@@ -1,6 +1,8 @@
 package net.legrange.orm;
 
 import static java.lang.String.format;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import net.legrange.orm.def.Field;
 import sun.misc.Unsafe;
 
@@ -14,10 +16,24 @@ class UnsafeFieldOperation implements PojoOperations {
 
     @Override
     public Object newPojoInstance(Table table) throws OrmException {
+        Class clazz = table.getObjectClass();
         try {
+            for (Constructor cons : clazz.getConstructors()) {
+                if (cons.getParameterCount() == 0) {
+                    return cons.newInstance(new Object[]{});
+                }
+            }
             return unsafe.allocateInstance(table.getObjectClass());
         } catch (InstantiationException ex) {
             throw new OrmException(ex.getMessage(), ex);
+        } catch (SecurityException ex) {
+            throw new OrmException(format("Security error creating instance of %s (%s)", clazz.getCanonicalName(), ex.getMessage()));
+        } catch (IllegalAccessException ex) {
+            throw new OrmException(format("Access error creating instance of %s (%s)", clazz.getCanonicalName(), ex.getMessage()));
+        } catch (IllegalArgumentException ex) {
+            throw new OrmException(format("Argument error creating instance of %s (%s)", clazz.getCanonicalName(), ex.getMessage()));
+        } catch (InvocationTargetException ex) {
+            throw new OrmException(format("Error creating instance of %s (%s)", clazz.getCanonicalName(), ex.getMessage()));
         }
     }
 
