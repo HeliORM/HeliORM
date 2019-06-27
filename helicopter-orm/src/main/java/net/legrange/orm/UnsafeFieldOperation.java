@@ -170,11 +170,14 @@ class UnsafeFieldOperation implements PojoOperations {
 
     private Object getEnum(Object pojo, java.lang.reflect.Field field) throws OrmException {
         Object value = getObject(pojo, field);
-        Class<?> valueClass = value.getClass();
-        if (valueClass.isEnum()) {
-            return ((Enum) value).name();
+        if (value != null) {
+            Class<?> valueClass = value.getClass();
+            if (valueClass.isEnum()) {
+                return ((Enum) value).name();
+            }
+            throw new OrmException(format("Cannot read Pojo enum field from data of type %s", valueClass.getSimpleName()));
         }
-        throw new OrmException(format("Cannot read Pojo enum field from data of type %s", valueClass.getSimpleName()));
+        return null;
     }
 
     private Object getObject(Object pojo, java.lang.reflect.Field field) {

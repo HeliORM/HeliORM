@@ -57,7 +57,7 @@ public class test {
     private void test6(Orm orm) throws OrmException {
         System.out.println("-- Create Cat ---");
         Cat cat = new Cat();
-        cat.setName("Super Cat");
+        cat.setName("Supreme Cat");
         cat.setAge(1);
         cat.setPersonNumber(1L);
         cat = orm.create(cat);
