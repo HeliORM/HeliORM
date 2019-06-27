@@ -464,7 +464,11 @@ public abstract class SqlDriver implements OrmDriver {
                     if (!javaType.isEnum()) {
                         throw new OrmException(format("Field %s is not an enum. BUG!", field.getJavaName()));
                     }
-                    return Enum.valueOf(javaType, rs.getString(column));
+                    String val = rs.getString(column);
+                    if (val != null) {
+                        return Enum.valueOf(javaType, val);
+                    }
+                    return null;
                 case STRING:
                     return rs.getString(column);
                 case DATE:
