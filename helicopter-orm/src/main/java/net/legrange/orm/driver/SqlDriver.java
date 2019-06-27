@@ -130,7 +130,7 @@ public abstract class SqlDriver implements OrmDriver {
             });
             return stream;
         } catch (SQLException | UncaughtOrmException ex) {
-            throw new OrmException(ex.getMessage(), ex);
+            throw new OrmSqlException(ex.getMessage(), ex);
         }
     }
 
@@ -158,7 +158,7 @@ public abstract class SqlDriver implements OrmDriver {
             }
             return pojo;
         } catch (SQLException ex) {
-            throw new OrmException(ex.getMessage(), ex);
+            throw new OrmSqlException(ex.getMessage(), ex);
         }
     }
 
@@ -181,7 +181,7 @@ public abstract class SqlDriver implements OrmDriver {
             stmt.executeUpdate();
             return pojo;
         } catch (SQLException ex) {
-            throw new OrmException(ex.getMessage(), ex);
+            throw new OrmSqlException(ex.getMessage(), ex);
         }
     }
 
@@ -196,7 +196,7 @@ public abstract class SqlDriver implements OrmDriver {
             setValueInStatement(stmt, pojo, table.getPrimaryKey().get(), 1);
             stmt.executeUpdate();
         } catch (SQLException ex) {
-            throw new OrmException(ex.getMessage(), ex);
+            throw new OrmSqlException(ex.getMessage(), ex);
         }
     }
 
@@ -387,7 +387,7 @@ public abstract class SqlDriver implements OrmDriver {
                     throw new OrmException(format("Field type '%s' is unsupported. BUG!", field.getFieldType()));
             }
         } catch (SQLException ex) {
-            throw new OrmException(ex.getMessage(), ex);
+            throw new OrmSqlException(ex.getMessage(), ex);
         }
     }
 
@@ -479,7 +479,7 @@ public abstract class SqlDriver implements OrmDriver {
                     throw new OrmException(format("Field type '%s' is unsupported. BUG!", field.getFieldType()));
             }
         } catch (SQLException ex) {
-            throw new OrmException(ex.getMessage(), ex);
+            throw new OrmSqlException(ex.getMessage(), ex);
         }
     }
 
@@ -515,7 +515,7 @@ public abstract class SqlDriver implements OrmDriver {
                     throw new OrmException(format("Field type '%s' is unsupported. BUG!", field.getFieldType()));
             }
         } catch (SQLException ex) {
-            throw new OrmException(ex.getMessage(), ex);
+            throw new OrmSqlException(ex.getMessage(), ex);
         }
     }
 
