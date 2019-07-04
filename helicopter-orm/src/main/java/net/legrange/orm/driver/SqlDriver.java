@@ -327,6 +327,13 @@ public abstract class SqlDriver implements OrmDriver {
         return query.toString();
     }
 
+    /**
+     * Expand the given order part into the fields of a SQL order clause.
+     *
+     * @param table The table spec to which the ordering applies
+     * @param order The order part
+     * @return The partial SQL query string
+     */
     private String expandOrder(TableSpec table, Order order) {
         StringBuilder query = new StringBuilder();
         query.append(format("%s.%s", table.getTable().getSqlTable(), order.getField().getSqlName()));
@@ -359,6 +366,16 @@ public abstract class SqlDriver implements OrmDriver {
         return pojo;
     }
 
+    /**
+     * Set the value in a prepared statement to the value of the given field
+     * from the given POJO
+     *
+     * @param stmt The prepared statement in which to set the value
+     * @param pojo The POJO from which to obtain the value
+     * @param field The field for which to get the value from the POJO
+     * @param par The position in the prepared statement for the value
+     * @throws OrmException
+     */
     private void setValueInStatement(PreparedStatement stmt, Object pojo, Field field, int par) throws OrmException {
         try {
             switch (field.getFieldType()) {
@@ -395,6 +412,13 @@ public abstract class SqlDriver implements OrmDriver {
         return object.toString();
     }
 
+    /**
+     * Return the SQL operator for the given list criteria part's operator.
+     *
+     * @param part The part
+     * @return The operator
+     * @throws OrmException
+     */
     private String listOperator(ListCriteria part) throws OrmException {
         switch (part.getOperator()) {
             case IN:
@@ -408,6 +432,13 @@ public abstract class SqlDriver implements OrmDriver {
 
     }
 
+    /**
+     * Return the SQL operator for the given value criteria part's operator.
+     *
+     * @param part The part
+     * @return The operator
+     * @throws OrmException
+     */
     private String valueOperator(ValueCriteria part) throws OrmException {
         switch (part.getOperator()) {
             case EQ:
@@ -519,10 +550,26 @@ public abstract class SqlDriver implements OrmDriver {
         }
     }
 
+    /**
+     * Get a value from the given POJO for the given field as an object
+     *
+     * @param pojo The POJO from which to read the object.
+     * @param field The field to read.
+     * @return The object value.
+     * @throws OrmException
+     */
     private Object getValueFromPojo(Object pojo, Field field) throws OrmException {
         return pops.getValue(pojo, field);
     }
 
+    /**
+     * Get a string value from the given POJO for the given field.
+     *
+     * @param pojo The POJO from which to read the string.
+     * @param field The field to read.
+     * @return The string value.
+     * @throws OrmException
+     */
     private String getStringFromPojo(Object pojo, Field field) throws OrmException {
         Object value = getValueFromPojo(pojo, field);
         if (value == null) {
@@ -534,6 +581,14 @@ public abstract class SqlDriver implements OrmDriver {
         return (String) value;
     }
 
+    /**
+     * Get a date value from the given POJO for the given field.
+     *
+     * @param pojo The POJO from which to read the date.
+     * @param field The field to read.
+     * @return The date value.
+     * @throws OrmException
+     */
     private java.sql.Date getDateFromPojo(Object pojo, Field field) throws OrmException {
         Object value = getValueFromPojo(pojo, field);
         if (value == null) {
@@ -545,6 +600,14 @@ public abstract class SqlDriver implements OrmDriver {
         return new java.sql.Date(((java.util.Date) value).getTime());
     }
 
+    /**
+     * Get a timestamp value from the given POJO for the given field.
+     *
+     * @param pojo The POJO from which to read the timestamp.
+     * @param field The field to read.
+     * @return The timestamp value.
+     * @throws OrmException
+     */
     private java.sql.Timestamp getTimestampFromPojo(Object pojo, Field field) throws OrmException {
         Object value = getValueFromPojo(pojo, field);
         if (value == null) {
