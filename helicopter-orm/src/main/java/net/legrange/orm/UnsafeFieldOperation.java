@@ -7,6 +7,15 @@ import net.legrange.orm.def.Field;
 import sun.misc.Unsafe;
 
 /**
+ * An implementation of PojoOperations that uses the sun.misc.Unsafe API to
+ * manipulate POJOs without the need for a lot of reflection or adherence to
+ * specific conventions. This allows the user to write their POJOs the way they
+ * want to reflect their application logic without caring about ceremony.
+ * Default constructors and getters and setters are not required.
+ *
+ * This is however using an internal Java API with an unclear future, so users
+ * who worry about this can implement PojoOperations in different and safer
+ * ways.
  *
  * @author gideon
  */
