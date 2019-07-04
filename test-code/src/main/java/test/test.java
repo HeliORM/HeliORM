@@ -16,7 +16,7 @@ import net.legrange.orm.Table;
 public class test {
 
     public static void main(String... args) throws Exception {
-        Orm orm = Orm.open(DriverManager.getConnection("jdbc:mysql://localhost:3306/orm?user=root"), Orm.Driver.MYSQL);
+        Orm orm = Orm.open(DriverManager.getConnection("jdbc:mysql://localhost:3306/orm?user=root"), Orm.Dialect.MYSQL);
         test t = new test();
         t.test6(orm);
     }

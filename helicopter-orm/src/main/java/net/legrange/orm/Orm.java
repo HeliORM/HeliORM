@@ -17,42 +17,94 @@ import net.legrange.orm.impl.Part;
 import net.legrange.orm.impl.SelectPart;
 
 /**
+ * The object relational mapper. This is the class that provides the user
+ * functionality. It provides methods to query the database to return POJOs, as
+ * well as to create update and delete POJOs.
+ *
  * @author gideon
  */
 public final class Orm implements AutoCloseable {
 
-    public enum Driver {
+    public enum Dialect {
         MYSQL;
     }
 
     private final OrmDriver driver;
     private final Map<Class<?>, Table> tables = new HashMap();
 
-    public static Orm open(Connection con, Driver driver) throws OrmException {
-        switch (driver) {
+    /**
+     * Create an ORM mapper using the supplied connection to a SQL database of
+     * the given dialect.
+     *
+     * @param con The SQL connection
+     * @param dialect The SQL dialect to use
+     * @return The newly created ORM
+     * @throws OrmException
+     */
+    public static Orm open(Connection con, Dialect dialect) throws OrmException {
+        switch (dialect) {
             case MYSQL:
                 return new Orm(new MySqlDriver(() -> con, new UnsafeFieldOperation()));
             default:
-                throw new OrmException(format("Unsupported database type %s. BUG!", driver));
+                throw new OrmException(format("Unsupported database type %s. BUG!", dialect));
         }
     }
 
+    /**
+     * Create an ORM mapper using the supplied driver instance. This is meant to
+     * be used with third party drivers.
+     *
+     * @param driver The driver used to access data.
+     * @throws OrmException
+     */
     public Orm(OrmDriver driver) throws OrmException {
         this.driver = driver;
     }
 
+    /**
+     * Persist a new POJO to the database.
+     *
+     * @param <O> The type of the POJO
+     * @param pojo The POJO to persist
+     * @return The updated POJO
+     * @throws OrmException
+     */
     public <O> O create(O pojo) throws OrmException {
         return driver.create(tableFor(pojo), pojo);
     }
 
+    /**
+     * Persist an existing POJO to the database.
+     *
+     * @param <O> The type of the POJO
+     * @param pojo The POJO to persist
+     * @return The updated POJO
+     * @throws OrmException
+     */
     public <O> O update(O pojo) throws OrmException {
         return driver.update(tableFor(pojo), pojo);
     }
 
+    /**
+     * Delete a POJO from the database.
+     *
+     * @param <O> The type of the POJO
+     * @param pojo The POJO to delete
+     * @throws OrmException
+     */
     public <O> void delete(O pojo) throws OrmException {
         driver.delete(tableFor(pojo), pojo);
     }
 
+    /**
+     * Create a query builder pattern to select data from the database.
+     *
+     * @param <T> The type of the table to select on
+     * @param <O> The type of the POJOs selected
+     * @param table The table to use as starting point for building the query.
+     * @return The Select object that can be used to expand the query or to
+     * query data.
+     */
     public <T extends Table<O>, O> Select<T, O, T, O> select(T table) {
         return new SelectPart(null, table, this);
     }
