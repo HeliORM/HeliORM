@@ -25,10 +25,20 @@
                         </goals>
                         <configuration>
                             <strategy>annotated</strategy>
-                            <packages>
-                                <package>pojos</package>
-                                <package>core</package>
-                            </packages>
+                            <databases>
+                                <database> 
+                                    <name>pets</name>
+                                    <packages>
+                                        <package>test.pets</package>
+                                    </packages>
+                                </database>
+                                <database> 
+                                    <name>persons</name>
+                                    <packages>
+                                        <package>test.persons</package>
+                                    </packages>
+                                </database>
+                            </databases>
                             <outputDir>${sourceOutputDir}</outputDir>
                             <resourceDir>${resourceOutputDir}</resourceDir>
                         </configuration>

@@ -1,6 +1,6 @@
 package test;
 
-import core.Cat;
+import test.pets.Cat;
 import static core.Tables.CAT;
 import static core.Tables.PERSON;
 import static core.Tables.PET;

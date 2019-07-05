@@ -1,5 +1,6 @@
-package core;
+package test.persons;
 
+import test.persons.Company;
 import net.legrange.orm.annotation.Column;
 import net.legrange.orm.annotation.ForeignKey;
 import net.legrange.orm.annotation.Pojo;

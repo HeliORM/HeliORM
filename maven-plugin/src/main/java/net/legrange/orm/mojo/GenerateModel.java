@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import net.legrange.orm.Database;
 import net.legrange.orm.Table;
 import net.legrange.orm.mojo.pojo.AnnotatedPojoGenerator;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
@@ -37,8 +38,9 @@ public class GenerateModel extends AbstractMojo {
 
     @Parameter(property = "strategy", required = true)
     private Generator.PojoStrategy strategy;
-    @Parameter(property = "packages", required = true)
-    private Set<String> packages;
+    @Parameter(property = "databases", required = true)
+    private Map<String, List<String>> databases;
+
     @Parameter(property = "outputDir", required = false)
     private String outputDir;
     @Parameter(property = "resourceDir", required = false)
@@ -48,6 +50,7 @@ public class GenerateModel extends AbstractMojo {
     private Generator gen;
     private Map<String, Output> outputs;
     private PrintWriter svc;
+    private Map<String, Database> dbMap;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -100,7 +103,11 @@ public class GenerateModel extends AbstractMojo {
     }
 
     public Set<String> getPackages() {
-        return packages;
+        return databases.values().stream().flatMap(list -> list.stream()).collect(Collectors.toSet());
+    }
+
+    public Database databaseFor(Class<?> pojoClass) throws GeneratorException {
+
     }
 
     Output getOutputFor(Table table) throws GeneratorException {

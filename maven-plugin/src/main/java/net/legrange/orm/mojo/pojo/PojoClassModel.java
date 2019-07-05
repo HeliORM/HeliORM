@@ -9,6 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import net.legrange.orm.Database;
 import net.legrange.orm.Table;
 import net.legrange.orm.annotation.Ignore;
 import net.legrange.orm.annotation.Pojo;
@@ -20,11 +21,13 @@ import net.legrange.orm.def.Field;
  */
 public class PojoClassModel implements Table {
 
+    private final Database database;
     private final Class<?> pojoClass;
     private List<Field> fieldModels;
     private final Set<PojoClassModel> subs = new HashSet();
 
-    public PojoClassModel(Class<?> pojoClass) {
+    public PojoClassModel(Database database, Class<?> pojoClass) {
+        this.database = database;
         this.pojoClass = pojoClass;
     }
 
@@ -60,6 +63,11 @@ public class PojoClassModel implements Table {
     @Override
     public Optional<Field> getPrimaryKey() {
         return getFields().stream().filter(field -> field.isPrimaryKey()).findAny();
+    }
+
+    @Override
+    public Database getDatabase() {
+        return database;
     }
 
     void addSub(PojoClassModel sub) {

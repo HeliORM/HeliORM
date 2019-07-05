@@ -11,6 +11,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import net.legrange.orm.Database;
 import net.legrange.orm.Table;
 import net.legrange.orm.annotation.Pojo;
 import net.legrange.orm.mojo.GenerateModel;
@@ -56,6 +58,14 @@ public class AnnotatedPojoGenerator extends Generator {
         return map.get(clazz.getCanonicalName());
     }
 
+    @Override
+    public List<Database> getDatabaseModels() throws GeneratorException {
+        return getPojoModels().stream()
+                .map(table -> table.getDatabase())
+                .distinct()
+                .collect(Collectors.toList());
+    }
+
     private void populate() throws GeneratorException {
         List<Table> res = new ArrayList();
         map = new HashMap();
@@ -74,12 +84,12 @@ public class AnnotatedPojoGenerator extends Generator {
             Class<?> sup = pojoClass.getSuperclass();
             if (map.containsKey(sup.getCanonicalName())) {
                 populateForPojo(sup);
-                PojoClassModel pm = new PojoClassModel(pojoClass);
+                PojoClassModel pm = new PojoClassModel(databaseFor(pojoClass), pojoClass);
                 map.put(pojoClass.getCanonicalName(), pm);
                 PojoClassModel supTable = map.get(sup.getCanonicalName());
                 supTable.addSub(pm);
             } else {
-                map.put(pojoClass.getCanonicalName(), new PojoClassModel(pojoClass));
+                map.put(pojoClass.getCanonicalName(), new PojoClassModel(databaseFor(pojoClass), pojoClass));
             }
         }
     }
@@ -96,6 +106,10 @@ public class AnnotatedPojoGenerator extends Generator {
             throw new GeneratorException(ex.getMessage(), ex);
         }
 
+    }
+
+    private Database databaseFor(Class<?> pojoClass) {
+        return generator.databaseFor(pojoClass);
     }
 
 }

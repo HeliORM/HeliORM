@@ -1,4 +1,4 @@
-package core;
+package test.pets;
 
 import net.legrange.orm.annotation.Pojo;
 import net.legrange.orm.annotation.PrimaryKey;

@@ -1,5 +1,6 @@
-package core;
+package test.pets;
 
+import test.persons.Person;
 import net.legrange.orm.annotation.ForeignKey;
 import net.legrange.orm.annotation.Pojo;
 import pojos.Obj;
