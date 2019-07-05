@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import net.legrange.orm.OrmMetaDataException;
 import net.legrange.orm.Table;
 import net.legrange.orm.mojo.pojo.AnnotatedPojoGenerator;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;

@@ -15,7 +15,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
-import net.legrange.orm.OrmMetaDataException;
 import net.legrange.orm.Table;
 import net.legrange.orm.def.BooleanField;
 import net.legrange.orm.def.ByteField;

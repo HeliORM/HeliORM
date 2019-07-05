@@ -1,7 +1,9 @@
-package net.legrange.orm;
+package net.legrange.orm.mojo;
+
+import net.legrange.orm.OrmException;
 
 /**
- * Exception thrown when the ORM encounters a SQL error.
+ * Exception thrown when the meta data generator encounters and error. error.
  *
  * @author gideon
  */

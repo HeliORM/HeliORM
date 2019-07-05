@@ -3,9 +3,9 @@ package net.legrange.orm.impl;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
-import net.legrange.orm.def.Executable;
 import net.legrange.orm.OrmException;
 import net.legrange.orm.Table;
+import net.legrange.orm.def.Executable;
 
 /**
  *
