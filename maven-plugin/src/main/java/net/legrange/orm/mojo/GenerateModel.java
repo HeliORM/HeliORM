@@ -50,10 +50,9 @@ public class GenerateModel extends AbstractMojo {
 
     private Generator gen;
     private PrintWriter svc;
-    private final Map<String, Table> classTableMap;
+    private Map<String, String> classPackageMap;
 
     public GenerateModel() {
-        this.classTableMap = new HashMap();
     }
 
     @Override
@@ -71,17 +70,11 @@ public class GenerateModel extends AbstractMojo {
                 dir.mkdirs();
             }
             Set<Class<?>> allPojoClasses = gen.getAllPojoClasses();
-            Map<String, String> classPackageMap = makeDatabaseMap(allPojoClasses);
-            Set<String> uniquePackages = classPackageMap.values().stream()
-                    .distinct()
-                    .collect(Collectors.toSet());
-            Map<String, PackageDatabase> packageDatabases = makeDatabases(uniquePackages);
-            Map<String, Table> classTableMap = new HashMap();
-            for (Class<?> pojoClass : allPojoClasses) {
-                PackageDatabase db = packageDatabases.get(classPackageMap.get(pojoClass.getCanonicalName()));
-                Table table = gen.getPojoModel(pojoClass, db);
-                db.addTable(table);
-            }
+            classPackageMap = makeDatabaseMap(allPojoClasses);
+//            Set<String> uniquePackages = classPackageMap.values().stream()
+//                    .distinct()
+//                    .collect(Collectors.toSet());
+            Map<String, PackageDatabase> packageDatabases = new Modeller(gen).getPackageDatabases();
             svc = new PrintWriter(new FileWriter(resourceDir + "/META-INF/services/" + Table.class.getCanonicalName()));
             Set<Output> outputs = new HashSet();
             for (String pkg : packageDatabases.keySet()) {
@@ -127,8 +120,8 @@ public class GenerateModel extends AbstractMojo {
         return packages;
     }
 
-    String getTableFieldName(Table table) {
-        return "-fokop-";
+    String getTablesPackageFor(Table table) {
+        return format("%s", classPackageMap.get(table.getObjectClass().getCanonicalName()));
 
     }
 

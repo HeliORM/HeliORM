@@ -24,11 +24,12 @@ public class PojoClassModel implements Table {
     private final Database database;
     private final Class<?> pojoClass;
     private List<Field> fieldModels;
-    private final Set<PojoClassModel> subs = new HashSet();
+    private final Set<PojoClassModel> subs;
 
-    public PojoClassModel(Database database, Class<?> pojoClass) {
+    public PojoClassModel(Database database, Class<?> pojoClass, Set<PojoClassModel> subTables) {
         this.database = database;
         this.pojoClass = pojoClass;
+        this.subs = subTables;
     }
 
     private String getJavaName() {
@@ -68,10 +69,6 @@ public class PojoClassModel implements Table {
     @Override
     public Database getDatabase() {
         return database;
-    }
-
-    void addSub(PojoClassModel sub) {
-        subs.add(sub);
     }
 
     private boolean isDataField(java.lang.reflect.Field field) {

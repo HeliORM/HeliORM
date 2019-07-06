@@ -411,7 +411,7 @@ class Output {
     }
 
     private String fullFieldName(Table table) throws GeneratorException {
-        return gen.getTableFieldName(table);
+        return gen.getTablesPackageFor(table) + ".Tables." + shortFieldName(table);
     }
 
     private String shortDatabaseName() {

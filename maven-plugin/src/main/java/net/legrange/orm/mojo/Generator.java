@@ -8,7 +8,7 @@ import net.legrange.orm.Table;
  *
  * @author gideon
  */
-public interface Generator {
+public interface Generator<T extends Table> {
 
     public enum PojoStrategy {
         annotated;
@@ -16,6 +16,6 @@ public interface Generator {
 
     Set<Class<?>> getAllPojoClasses() throws GeneratorException;
 
-    Table getPojoModel(Class clazz, Database database);
+    T getPojoModel(Class clazz, Database database, Set<T> subTables);
 
 }

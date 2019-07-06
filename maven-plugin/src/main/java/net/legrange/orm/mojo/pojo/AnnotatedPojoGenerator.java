@@ -9,7 +9,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import net.legrange.orm.Database;
-import net.legrange.orm.Table;
 import net.legrange.orm.annotation.Pojo;
 import net.legrange.orm.mojo.GenerateModel;
 import net.legrange.orm.mojo.Generator;
@@ -20,7 +19,7 @@ import org.apache.maven.artifact.DependencyResolutionRequiredException;
  *
  * @author gideon
  */
-public class AnnotatedPojoGenerator implements Generator {
+public class AnnotatedPojoGenerator implements Generator<PojoClassModel> {
 
     private ScanResult scan;
     private Map<String, PojoClassModel> map;
@@ -39,58 +38,6 @@ public class AnnotatedPojoGenerator implements Generator {
         }
     }
 
-//
-//    @Override
-//    public List<Table> getPojoModels() throws GeneratorException {
-//        if (map == null) {
-//            populate();
-//        }
-//        return new ArrayList(map.values());
-//    }
-//
-//    @Override
-//    public Table getPojoModel(Class clazz) throws GeneratorException {
-//        if (map == null) {
-//            populate();
-//        }
-//        return map.get(clazz.getCanonicalName());
-//    }
-//
-//    @Override
-//    public List<Database> getDatabaseModels() throws GeneratorException {
-//        return getPojoModels().stream()
-//                .map(table -> table.getDatabase())
-//                .distinct()
-//                .collect(Collectors.toList());
-//    }
-//
-//    private void populate() throws GeneratorException {
-//        List<Table> res = new ArrayList();
-//        map = new HashMap();
-//        Set<Class<?>> all = getAllPojoClasses();
-//        for (Class<?> pojoClass : all) {
-//            map.put(pojoClass.getCanonicalName(), null);
-//        }
-//        for (Class<?> pojoClass : all) {
-//            populateForPojo(pojoClass);
-//        }
-//    }
-//
-//    private void populateForPojo(Class<?> pojoClass) {
-//        Table table = map.get(pojoClass.getCanonicalName());
-//        if (table == null) {
-//            Class<?> sup = pojoClass.getSuperclass();
-//            if (map.containsKey(sup.getCanonicalName())) {
-//                populateForPojo(sup);
-//                PojoClassModel pm = new PojoClassModel(databaseFor(pojoClass), pojoClass);
-//                map.put(pojoClass.getCanonicalName(), pm);
-//                PojoClassModel supTable = map.get(sup.getCanonicalName());
-//                supTable.addSub(pm);
-//            } else {
-//                map.put(pojoClass.getCanonicalName(), new PojoClassModel(databaseFor(pojoClass), pojoClass));
-//            }
-//        }
-//    }
     @Override
     public Set<Class<?>> getAllPojoClasses() throws GeneratorException {
         try {
@@ -107,8 +54,8 @@ public class AnnotatedPojoGenerator implements Generator {
     }
 
     @Override
-    public Table getPojoModel(Class clazz, Database database) {
-        return new PojoClassModel(database, clazz);
+    public PojoClassModel getPojoModel(Class clazz, Database database, Set<PojoClassModel> subTables) {
+        return new PojoClassModel(database, clazz, subTables);
     }
 
 }
