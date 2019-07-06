@@ -1,6 +1,6 @@
 package net.legrange.orm;
 
-import java.util.Set;
+import java.util.List;
 
 /**
  *
@@ -10,6 +10,6 @@ public interface Database {
 
     String getSqlDatabase();
 
-    Set<Table> getTables();
+    List<Table> getTables();
 
 }

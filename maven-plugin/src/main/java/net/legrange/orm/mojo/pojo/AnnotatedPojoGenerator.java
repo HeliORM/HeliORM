@@ -91,6 +91,7 @@ public class AnnotatedPojoGenerator implements Generator {
 //            }
 //        }
 //    }
+    @Override
     public Set<Class<?>> getAllPojoClasses() throws GeneratorException {
         try {
             HashSet<Class<?>> res = new HashSet();

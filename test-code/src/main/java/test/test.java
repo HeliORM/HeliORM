@@ -16,9 +16,9 @@ import test.pets.Cat;
 public class test {
 
     public static void main(String... args) throws Exception {
-        Orm orm = Orm.open(DriverManager.getConnection("jdbc:mysql://localhost:3306/orm?user=root"), Orm.Dialect.MYSQL);
+        Orm orm = Orm.open(DriverManager.getConnection("jdbc:mysql://localhost:3306/test?user=root"), Orm.Dialect.MYSQL);
         test t = new test();
-        t.test6(orm);
+        t.test4(orm);
     }
 
     /**
@@ -100,7 +100,7 @@ public class test {
      * name
      */
     private void test5(Orm orm) throws OrmException {
-        orm.select(TEST.PERSON)
+        orm.select(PERSON)
                 .join(PET).on(PERSON.personNumber, PET.personNumber)
                 //                .where(PET.age.eq(3))
                 .orderBy(PERSON.personNumber)

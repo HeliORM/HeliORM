@@ -1,7 +1,7 @@
 package net.legrange.orm.mojo;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 import net.legrange.orm.Database;
 import net.legrange.orm.Table;
 
@@ -12,7 +12,7 @@ import net.legrange.orm.Table;
 public class PackageDatabase implements Database {
 
     private final String packageName;
-    private final Set<Table> tables = new HashSet();
+    private final List<Table> tables = new ArrayList();
 
     public PackageDatabase(String packageName) {
         this.packageName = packageName;
@@ -24,7 +24,7 @@ public class PackageDatabase implements Database {
     }
 
     @Override
-    public Set<Table> getTables() {
+    public List<Table> getTables() {
         return tables;
     }
 

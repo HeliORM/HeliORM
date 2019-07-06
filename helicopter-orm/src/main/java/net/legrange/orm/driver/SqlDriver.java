@@ -202,7 +202,7 @@ public abstract class SqlDriver implements OrmDriver {
 
     protected String buildInsertQuery(Table<?> table) throws OrmException {
         StringBuilder query = new StringBuilder();
-        query.append(format("INSERT INTO %s(", table.getSqlTable()));
+        query.append(format("INSERT INTO %s(", tableName(table)));
         StringJoiner fields = new StringJoiner(",");
         StringJoiner values = new StringJoiner(",");
         for (Field field : table.getFields()) {
@@ -218,7 +218,7 @@ public abstract class SqlDriver implements OrmDriver {
 
     protected String buildUpdateQuery(Table<?> table) throws OrmException {
         StringBuilder query = new StringBuilder();
-        query.append(format("UPDATE %s SET ", table.getSqlTable()));
+        query.append(format("UPDATE %s SET ", tableName(table)));
         StringJoiner fields = new StringJoiner(",");
         StringJoiner values = new StringJoiner(",");
         for (Field field : table.getFields()) {
@@ -232,12 +232,12 @@ public abstract class SqlDriver implements OrmDriver {
     }
 
     protected String buildDeleteQuery(Table<?> table) throws OrmException {
-        return format("DELETE FROM %s WHERE %s=?", table.getSqlTable(), table.getPrimaryKey().get().getSqlName());
+        return format("DELETE FROM %s WHERE %s=?", tableName(table), table.getPrimaryKey().get().getSqlName());
     }
 
     protected String buildSelectQuery(Query root) throws OrmException {
         StringBuilder tablesQuery = new StringBuilder();
-        tablesQuery.append(format("SELECT DISTINCT %s.* FROM %s", root.getTable().getSqlTable(), root.getTable().getSqlTable()));
+        tablesQuery.append(format("SELECT DISTINCT %s.* FROM %s", tableName(root.getTable()), tableName(root.getTable())));
         StringBuilder whereQuery = new StringBuilder();
         Optional<Criteria> optCrit = root.getCriteria();
         if (optCrit.isPresent()) {
@@ -271,9 +271,9 @@ public abstract class SqlDriver implements OrmDriver {
     private String expandLinkTables(TableSpec left, Link right) {
         StringBuilder query = new StringBuilder();
         query.append(format(" JOIN %s ON %s.%s=%s.%s ",
-                right.getTable().getSqlTable(),
-                left.getTable().getSqlTable(), right.getLeftField().getSqlName(),
-                right.getTable().getSqlTable(), right.getField().getSqlName()));
+                tableName(right.getTable()),
+                tableName(left.getTable()), right.getLeftField().getSqlName(),
+                tableName(right.getTable()), right.getField().getSqlName()));
         if (right.getLink().isPresent()) {
             query.append(expandLinkTables(right, right.getLink().get()));
         }
@@ -312,7 +312,7 @@ public abstract class SqlDriver implements OrmDriver {
 
     private String expandListFieldCriteria(TableSpec table, ListCriteria crit) throws OrmException {
         StringBuilder query = new StringBuilder();
-        query.append(format("%s.%s %s (", table.getTable().getSqlTable(), crit.getField().getSqlName(), listOperator(crit)));
+        query.append(format("%s.%s %s (", tableName(table.getTable()), crit.getField().getSqlName(), listOperator(crit)));
         for (Object val : crit.getValues()) {
             query.append(format("'%s'", sqlValue(val)));
         }
@@ -322,7 +322,7 @@ public abstract class SqlDriver implements OrmDriver {
 
     private String expandValueFieldCriteria(TableSpec table, ValueCriteria crit) throws OrmException {
         StringBuilder query = new StringBuilder();
-        query.append(format("%s.%s%s'%s'", table.getTable().getSqlTable(), crit.getField().getSqlName(), valueOperator(crit), sqlValue(crit.getValue())
+        query.append(format("%s.%s%s'%s'", tableName(table.getTable()), crit.getField().getSqlName(), valueOperator(crit), sqlValue(crit.getValue())
         ));
         return query.toString();
     }
@@ -336,7 +336,7 @@ public abstract class SqlDriver implements OrmDriver {
      */
     private String expandOrder(TableSpec table, Order order) {
         StringBuilder query = new StringBuilder();
-        query.append(format("%s.%s", table.getTable().getSqlTable(), order.getField().getSqlName()));
+        query.append(format("%s.%s", tableName(table.getTable()), order.getField().getSqlName()));
         if (order.getDirection() == Order.Direction.DESCENDING) {
             query.append(" DESC");
         }
@@ -724,6 +724,15 @@ public abstract class SqlDriver implements OrmDriver {
             res.add(parts);
         }
         return res;
+    }
 
+    /**
+     * Work out the exact table name to use.
+     *
+     * @param table The table we're referencing
+     * @return The QL table name
+     */
+    private String tableName(Table table) {
+        return table.getSqlTable();
     }
 }

@@ -143,8 +143,8 @@ class Output {
             }
 
             out.println("@Override");
-            out.println("public final Set<Table> getTables() {");
-            out.printf("\treturn Set.of(%s);", sj.toString());
+            out.println("public final List<Table> getTables() {");
+            out.printf("\treturn Arrays.asList(%s);", sj.toString());
             out.println("\n}");
             out.println("");
 

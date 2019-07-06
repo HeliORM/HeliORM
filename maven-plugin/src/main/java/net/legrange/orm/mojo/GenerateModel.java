@@ -41,15 +41,20 @@ public class GenerateModel extends AbstractMojo {
     private Generator.PojoStrategy strategy;
     @Parameter(property = "packages", required = true)
     private Set<String> packages;
-
     @Parameter(property = "outputDir", required = false)
     private String outputDir;
     @Parameter(property = "resourceDir", required = false)
     private String resourceDir;
     @Component
     private MavenProject project;
+
     private Generator gen;
     private PrintWriter svc;
+    private final Map<String, Table> classTableMap;
+
+    public GenerateModel() {
+        this.classTableMap = new HashMap();
+    }
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -71,6 +76,7 @@ public class GenerateModel extends AbstractMojo {
                     .distinct()
                     .collect(Collectors.toSet());
             Map<String, PackageDatabase> packageDatabases = makeDatabases(uniquePackages);
+            Map<String, Table> classTableMap = new HashMap();
             for (Class<?> pojoClass : allPojoClasses) {
                 PackageDatabase db = packageDatabases.get(classPackageMap.get(pojoClass.getCanonicalName()));
                 Table table = gen.getPojoModel(pojoClass, db);
