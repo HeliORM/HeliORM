@@ -1,13 +1,13 @@
 package test;
 
-import test.pets.Cat;
-import static core.Tables.CAT;
-import static core.Tables.PERSON;
-import static core.Tables.PET;
 import java.sql.DriverManager;
 import net.legrange.orm.Orm;
 import net.legrange.orm.OrmException;
 import net.legrange.orm.Table;
+import static test.Tables.CAT;
+import static test.Tables.PERSON;
+import static test.Tables.PET;
+import test.pets.Cat;
 
 /**
  *
@@ -100,7 +100,7 @@ public class test {
      * name
      */
     private void test5(Orm orm) throws OrmException {
-        orm.select(PERSON)
+        orm.select(TEST.PERSON)
                 .join(PET).on(PERSON.personNumber, PET.personNumber)
                 //                .where(PET.age.eq(3))
                 .orderBy(PERSON.personNumber)

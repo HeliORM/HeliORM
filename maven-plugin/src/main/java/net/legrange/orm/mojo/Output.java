@@ -15,6 +15,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
+import net.legrange.orm.Database;
 import net.legrange.orm.Table;
 import net.legrange.orm.def.BooleanField;
 import net.legrange.orm.def.ByteField;
@@ -47,16 +48,19 @@ import net.legrange.orm.impl.TimestampFieldPart;
  */
 class Output {
 
+    private final GenerateModel gen;
+    private final Database database;
+    private final String packageName;
+    private final Map<Table, Set<Table>> tables = new HashMap();
+
     private final StringBuilder buf = new StringBuilder();
     private int depth;
     private PrintWriter out;
     private final Set<String> imports = new HashSet();
-    private final String packageName;
-    private final Map<Table, Set<Table>> tables = new HashMap();
-    private final GenerateModel gen;
 
-    Output(GenerateModel gen, String packageName) {
+    Output(GenerateModel gen, Database database, String packageName) {
         this.packageName = packageName;
+        this.database = database;
         this.gen = gen;
     }
 
@@ -117,6 +121,7 @@ class Output {
                 emit("");
             }
             out = new PrintWriter(new FileWriter(fileName));
+            impt(Database.class.getCanonicalName());
             impt(Table.class.getCanonicalName());
             out.printf("package %s;\n", packageName);
             out.println("");
@@ -124,10 +129,32 @@ class Output {
                 out.printf("import %s;\n", imp);
             }
             out.println("");
-            out.println("public final class Tables {");
+            out.println("public final class Tables implements Database {");
+            out.println("");
+            out.println("\tprivate Tables() {");
+            out.println("\t}");
             out.println("");
             out.print(buf.toString());
             out.println("");
+
+            StringJoiner sj = new StringJoiner(", ");
+            for (Table table : tables.keySet()) {
+                sj.add(shortFieldName(table));
+            }
+
+            out.println("@Override");
+            out.println("public final Set<Table> getTables() {");
+            out.printf("\treturn Set.of(%s);", sj.toString());
+            out.println("\n}");
+            out.println("");
+
+            out.println("@Override");
+            out.println("public final String getSqlDatabase() {");
+            out.printf("\treturn \"%s\";", shortDatabaseName().toLowerCase());
+            out.println("\n}");
+            out.println("");
+
+            out.printf("public final static Tables %s = new Tables();\n", shortDatabaseName());
             for (Table table : tables.keySet()) {
                 out.printf("public final static %s %s = new %s();\n", tableName(table), shortFieldName(table), tableName(table));
             }
@@ -147,6 +174,9 @@ class Output {
                 tableName(cm), getJavaName(cm));
         emit("");
         push();
+        emit("private %s() {", tableName(cm));
+        emit("}");
+        emit("");
         StringJoiner fieldNames = new StringJoiner(",");
         for (Field fm : cm.getFields()) {
             addFieldModel(cm, fm);
@@ -218,11 +248,20 @@ class Output {
         pop();
         emit("}");
         pop();
+        // getDatabase()
+        push();
+        emit("");
+        emit("@Override");
+        emit("public Database getDatabase() {");
+        push();
+        emit("return %s;", shortDatabaseName());
+        pop();
+        emit("}");
+        pop();
 
         emit("");
         emit("}");
         emit("");
-        gen.addToService(packageName + ".Tables$" + tableName(cm));
     }
 
     private Set<Table> explodeSubs(Set<Table> subs) {
@@ -372,7 +411,15 @@ class Output {
     }
 
     private String fullFieldName(Table table) throws GeneratorException {
-        return gen.getOutputFor(table).getPackageName() + ".Tables." + shortFieldName(table);
+        return gen.getTableFieldName(table);
+    }
+
+    private String shortDatabaseName() {
+        int idx = packageName.indexOf('.');
+        if (idx < 0) {
+            return packageName.toUpperCase();
+        }
+        return packageName.substring(idx + 1).toUpperCase();
     }
 
     @Override

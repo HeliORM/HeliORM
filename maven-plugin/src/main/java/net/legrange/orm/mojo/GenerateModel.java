@@ -9,6 +9,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -38,8 +39,8 @@ public class GenerateModel extends AbstractMojo {
 
     @Parameter(property = "strategy", required = true)
     private Generator.PojoStrategy strategy;
-    @Parameter(property = "databases", required = true)
-    private Map<String, List<String>> databases;
+    @Parameter(property = "packages", required = true)
+    private Set<String> packages;
 
     @Parameter(property = "outputDir", required = false)
     private String outputDir;
@@ -48,9 +49,7 @@ public class GenerateModel extends AbstractMojo {
     @Component
     private MavenProject project;
     private Generator gen;
-    private Map<String, Output> outputs;
     private PrintWriter svc;
-    private Map<String, Database> dbMap;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -62,20 +61,36 @@ public class GenerateModel extends AbstractMojo {
                 default:
                     throw new MojoExecutionException(format("Unsupported POJO strategy '%s'. BUG?", strategy));
             }
-            outputs = PackageOrganizer.organize(this, gen.getPojoModels().stream().map(pm -> pm.getObjectClass()).collect(Collectors.toList()));
             File dir = new File(resourceDir + "/META-INF/services/");
             if (!dir.exists()) {
                 dir.mkdirs();
             }
-            svc = new PrintWriter(new FileWriter(resourceDir + "/META-INF/services/" + Table.class.getCanonicalName()));
-            for (Table pm : gen.getPojoModels()) {
-                getOutputFor(pm).addTable(pm);
+            Set<Class<?>> allPojoClasses = gen.getAllPojoClasses();
+            Map<String, String> classPackageMap = makeDatabaseMap(allPojoClasses);
+            Set<String> uniquePackages = classPackageMap.values().stream()
+                    .distinct()
+                    .collect(Collectors.toSet());
+            Map<String, PackageDatabase> packageDatabases = makeDatabases(uniquePackages);
+            for (Class<?> pojoClass : allPojoClasses) {
+                PackageDatabase db = packageDatabases.get(classPackageMap.get(pojoClass.getCanonicalName()));
+                Table table = gen.getPojoModel(pojoClass, db);
+                db.addTable(table);
             }
-            Set<Output> uniqueOuts = new HashSet(outputs.values());
-            for (Output out : uniqueOuts) {
-                out.output(outputDir);
+            svc = new PrintWriter(new FileWriter(resourceDir + "/META-INF/services/" + Table.class.getCanonicalName()));
+            Set<Output> outputs = new HashSet();
+            for (String pkg : packageDatabases.keySet()) {
+                Database database = packageDatabases.get(pkg);
+                Output output = new Output(this, database, pkg);
+                for (Table table : database.getTables()) {
+                    output.addTable(table);
+                    svc.println(table.getObjectClass().getCanonicalName());
+                }
+                outputs.add(output);
             }
             svc.close();
+            for (Output out : outputs) {
+                out.output(outputDir);
+            }
         } catch (GeneratorException | OrmMetaDataException | IOException ex) {
             throw new MojoExecutionException(ex.getMessage(), ex);
         }
@@ -103,28 +118,67 @@ public class GenerateModel extends AbstractMojo {
     }
 
     public Set<String> getPackages() {
-        return databases.values().stream().flatMap(list -> list.stream()).collect(Collectors.toSet());
+        return packages;
     }
 
-    public Database databaseFor(Class<?> pojoClass) throws GeneratorException {
+    String getTableFieldName(Table table) {
+        return "-fokop-";
 
     }
 
-    Output getOutputFor(Table table) throws GeneratorException {
-        Class<?> clazz = table.getObjectClass();
-        Output out = getOutputFor(clazz);
-        if (out == null) {
-            throw new GeneratorException(format("Cannot find output table for class '%s'. BUG!", clazz.getCanonicalName()));
+    private Map<String, PackageDatabase> makeDatabases(Set<String> packages) {
+        return packages.stream()
+                .collect(Collectors.toMap(pkg -> pkg, pkg -> new PackageDatabase(pkg)));
+    }
+
+    private Map<String, String> makeDatabaseMap(Set<Class<?>> allPojoClasses) {
+        Map<String, String> map = new HashMap();
+        for (Class<?> clazz : allPojoClasses) {
+            map.put(clazz.getCanonicalName(), clazz.getPackage().getName());
         }
-        return out;
+        reduce(map);
+        return map;
     }
 
-    void addToService(String name) {
-        svc.println(name);
+    private void reduce(Map<String, String> map) {
+        boolean changed = false;
+        for (String c1 : map.keySet()) {
+            String o1 = map.get(c1);
+            for (String c2 : map.keySet()) {
+                if (c1.equals(c2)) {
+                    continue;
+                }
+                String o2 = map.get(c2);
+                String com = common(o1, o2);
+                if (com != null) {
+                    map.put(c1, com);
+                    map.put(c2, com);
+                }
+            }
+        }
+
     }
 
-    private Output getOutputFor(Class<?> clazz) throws GeneratorException {
-        return outputs.get(clazz.getCanonicalName());
+    private String common(String o1, String o2) {
+        if (o1.equals(o2)) {
+            return o1;
+        }
+        if (o1.startsWith(o2)) {
+            return o2;
+        }
+        if (o2.startsWith(o1)) {
+            return o1;
+        }
+        int idx = o1.lastIndexOf('.');
+        while (idx > 0) {
+            o1 = o1.substring(0, idx);
+            if (o2.startsWith(o1)) {
+                return o1;
+            }
+            idx = o1.lastIndexOf('.');
+        }
+        return null;
+
     }
 
 }

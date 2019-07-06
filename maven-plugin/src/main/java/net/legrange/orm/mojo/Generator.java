@@ -1,6 +1,6 @@
 package net.legrange.orm.mojo;
 
-import java.util.List;
+import java.util.Set;
 import net.legrange.orm.Database;
 import net.legrange.orm.Table;
 
@@ -8,22 +8,14 @@ import net.legrange.orm.Table;
  *
  * @author gideon
  */
-public abstract class Generator {
+public interface Generator {
 
     public enum PojoStrategy {
         annotated;
     }
 
-    protected final GenerateModel generator;
+    Set<Class<?>> getAllPojoClasses() throws GeneratorException;
 
-    public Generator(GenerateModel generator) {
-        this.generator = generator;
-    }
-
-    public abstract List<Database> getDatabaseModels() throws GeneratorException;
-
-    public abstract List<Table> getPojoModels() throws GeneratorException;
-
-    public abstract Table getPojoModel(Class clazz) throws GeneratorException;
+    Table getPojoModel(Class clazz, Database database);
 
 }
