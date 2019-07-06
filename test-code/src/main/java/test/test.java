@@ -18,7 +18,7 @@ public class test {
     public static void main(String... args) throws Exception {
         Orm orm = Orm.open(DriverManager.getConnection("jdbc:mysql://localhost:3306/test?user=root"), Orm.Dialect.MYSQL);
         test t = new test();
-        t.test4(orm);
+        t.test5(orm);
     }
 
     /**

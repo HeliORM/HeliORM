@@ -733,6 +733,6 @@ public abstract class SqlDriver implements OrmDriver {
      * @return The QL table name
      */
     private String tableName(Table table) {
-        return table.getSqlTable();
+        return format("%s.%s", table.getDatabase().getSqlDatabase(), table.getSqlTable());
     }
 }
