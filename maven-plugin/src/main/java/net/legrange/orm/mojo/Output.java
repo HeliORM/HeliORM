@@ -415,7 +415,7 @@ class Output {
     }
 
     private String shortDatabaseName() {
-        int idx = packageName.indexOf('.');
+        int idx = packageName.lastIndexOf('.');
         if (idx < 0) {
             return packageName.toUpperCase();
         }
