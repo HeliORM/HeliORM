@@ -12,15 +12,17 @@ import net.legrange.orm.Table;
 public class PackageDatabase implements Database {
 
     private final String packageName;
+    private String sqlDatabase;
     private final List<Table> tables = new ArrayList();
 
     public PackageDatabase(String packageName) {
         this.packageName = packageName;
+        sqlDatabase = "";
     }
 
     @Override
     public String getSqlDatabase() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return sqlDatabase;
     }
 
     @Override
@@ -30,6 +32,10 @@ public class PackageDatabase implements Database {
 
     void addTable(Table table) {
         tables.add(table);
+    }
+
+    void setSqlDatabase(String sqlDatabase) {
+        this.sqlDatabase = sqlDatabase;
     }
 
 }

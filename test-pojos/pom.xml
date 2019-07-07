@@ -29,6 +29,7 @@
                                 <package>test.pets</package>
                                 <package>test.persons</package>
                             </packages>
+                            <database>test</database>
                             <outputDir>${sourceOutputDir}</outputDir>
                             <resourceDir>${resourceOutputDir}</resourceDir>
                         </configuration>
