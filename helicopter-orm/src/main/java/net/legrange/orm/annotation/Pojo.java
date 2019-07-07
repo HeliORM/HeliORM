@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Annotation used to indicate the class is a Pojo.
+ * Annotation used to indicate the class is a POJO.
  *
  * @author gideon
  */

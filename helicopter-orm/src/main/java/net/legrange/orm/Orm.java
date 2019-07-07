@@ -123,9 +123,11 @@ public final class Orm implements AutoCloseable {
      */
     public <O> Table<O> tableFor(O pojo) throws OrmException {
         if (tables.isEmpty()) {
-            ServiceLoader<Table> svl = ServiceLoader.load(Table.class);
-            for (Table table : svl) {
-                tables.put(table.getObjectClass(), table);
+            ServiceLoader<Database> svl = ServiceLoader.load(Database.class);
+            for (Database database : svl) {
+                for (Table table : database.getTables()) {
+                    tables.put(table.getObjectClass(), table);
+                }
             }
         }
         Table<O> table = tables.get(pojo.getClass());

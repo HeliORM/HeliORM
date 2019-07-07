@@ -18,7 +18,7 @@ public interface Database {
     String getSqlDatabase();
 
     /**
-     * Get the tables in this database.
+     * Return the tables associated with this database.
      *
      * @return The tables
      */

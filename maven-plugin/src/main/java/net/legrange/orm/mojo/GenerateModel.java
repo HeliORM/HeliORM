@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import net.legrange.orm.Database;
 import net.legrange.orm.Table;
 import net.legrange.orm.mojo.pojo.AnnotatedPojoGenerator;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
@@ -73,7 +74,7 @@ public class GenerateModel extends AbstractMojo {
             Set<Class<?>> allPojoClasses = gen.getAllPojoClasses();
             classPackageMap = makeDatabaseMap(allPojoClasses);
             Map<String, PackageDatabase> packageDatabases = new Modeller(gen).getPackageDatabases();
-            svc = new PrintWriter(new FileWriter(resourceDir + "/META-INF/services/" + Table.class.getCanonicalName()));
+            svc = new PrintWriter(new FileWriter(resourceDir + "/META-INF/services/" + Database.class.getCanonicalName()));
             Set<Output> outputs = new HashSet();
             for (String pkg : packageDatabases.keySet()) {
                 PackageDatabase database = packageDatabases.get(pkg);
@@ -81,9 +82,10 @@ public class GenerateModel extends AbstractMojo {
                 Output output = new Output(this, database, pkg);
                 for (Table table : database.getTables()) {
                     output.addTable(table);
-                    svc.println(table.getObjectClass().getCanonicalName());
                 }
                 outputs.add(output);
+                svc.println(output.getPackageName() + ".Tables");
+
             }
             svc.close();
             for (Output out : outputs) {

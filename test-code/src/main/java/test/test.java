@@ -3,7 +3,6 @@ package test;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import net.legrange.orm.Orm;
-import net.legrange.orm.OrmBuilder;
 import net.legrange.orm.OrmException;
 import net.legrange.orm.Table;
 import static test.Tables.CAT;
@@ -20,13 +19,25 @@ public class test {
 
     public static void main(String... args) throws Exception {
         Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?user=root");
+<<<<<<< HEAD
 //        Orm orm = Orm.open(con, Orm.Dialect.MYSQL);
         Orm orm = OrmBuilder.create(con)
                 .mapDatabase(TEST, "orm")
                 .setDialect(Orm.Dialect.MYSQL)
                 .build();
+=======
+        Orm orm = Orm.open(con, Orm.Dialect.MYSQL);
+>>>>>>> master
         test t = new test();
-        t.test5(orm);
+        t.test10(orm);
+    }
+
+    /**
+     * Injection test
+     */
+    private void test10(Orm orm) throws OrmException {
+        System.out.println("-- Kitty drop tables ---");
+        orm.select(TEST.CAT).where(TEST.CAT.name.eq("Kitty'; DROP table cat;--")).list();
     }
 
     /**

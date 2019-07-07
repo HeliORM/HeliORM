@@ -613,10 +613,13 @@ public abstract class SqlDriver implements OrmDriver {
         if (value == null) {
             return null;
         }
-        if (!(value instanceof Instant)) {
-            throw new OrmException(format("Could not read Instant value for field '%s' with type '%s'.", field.getJavaName(), field.getFieldType()));
+        if (value instanceof Instant) {
+            return new java.sql.Timestamp(((Instant) value).toEpochMilli());
         }
-        return new java.sql.Timestamp(((Instant) value).toEpochMilli());
+        if (value instanceof java.util.Date) {
+            return new java.sql.Timestamp(((java.util.Date) value).getTime());
+        }
+        throw new OrmException(format("Could not read Instant value for field '%s' with type '%s'.", field.getJavaName(), field.getFieldType()));
     }
 
     private Connection getConnection() {

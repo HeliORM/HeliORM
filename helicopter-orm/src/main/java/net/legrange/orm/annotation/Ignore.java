@@ -6,6 +6,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * This annotation marks a POJO field which we want the ORM to ignore (and not
+ * persist to or read from the database).
  *
  * @author gideon
  */
