@@ -71,9 +71,6 @@ public class GenerateModel extends AbstractMojo {
             }
             Set<Class<?>> allPojoClasses = gen.getAllPojoClasses();
             classPackageMap = makeDatabaseMap(allPojoClasses);
-//            Set<String> uniquePackages = classPackageMap.values().stream()
-//                    .distinct()
-//                    .collect(Collectors.toSet());
             Map<String, PackageDatabase> packageDatabases = new Modeller(gen).getPackageDatabases();
             svc = new PrintWriter(new FileWriter(resourceDir + "/META-INF/services/" + Table.class.getCanonicalName()));
             Set<Output> outputs = new HashSet();
