@@ -8,6 +8,7 @@ import net.legrange.orm.Table;
 import static test.Tables.CAT;
 import static test.Tables.PERSON;
 import static test.Tables.PET;
+import static test.Tables.TEST;
 import test.pets.Cat;
 
 /**
@@ -20,7 +21,15 @@ public class test {
         Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?user=root");
         Orm orm = Orm.open(con, Orm.Dialect.MYSQL);
         test t = new test();
-        t.test7(orm);
+        t.test10(orm);
+    }
+
+    /**
+     * Injection test
+     */
+    private void test10(Orm orm) throws OrmException {
+        System.out.println("-- Kitty drop tables ---");
+        orm.select(TEST.CAT).where(TEST.CAT.name.eq("Kitty'; DROP table cat;--")).list();
     }
 
     /**
