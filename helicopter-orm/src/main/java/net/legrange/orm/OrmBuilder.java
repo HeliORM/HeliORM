@@ -18,18 +18,22 @@ public class OrmBuilder {
         this.con = con;
     }
 
-    public OrmBuilder withDatabase(Database database, String sqlName) {
+    public OrmBuilder mapDatabase(Database database, String sqlName) {
         databases.put(database, sqlName);
         return this;
     }
 
-    public OrmBuilder withDialect(Orm.Dialect dialect) {
+    public OrmBuilder setDialect(Orm.Dialect dialect) {
         this.dialect = dialect;
         return this;
     }
 
     public Orm build() throws OrmException {
-        return Orm.open(con, dialect);
+        Orm orm = Orm.open(con, dialect);
+//        for (Database database : databases) {
+//            orm.mapDatabase(database, databases.get(database));
+//        }
+        return orm;
     }
 
     public static OrmBuilder create(Connection con) {

@@ -22,8 +22,8 @@ public class test {
         Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?user=root");
 //        Orm orm = Orm.open(con, Orm.Dialect.MYSQL);
         Orm orm = OrmBuilder.create(con)
-                .withDatabase(TEST, "orm")
-                .withDialect(Orm.Dialect.MYSQL)
+                .mapDatabase(TEST, "orm")
+                .setDialect(Orm.Dialect.MYSQL)
                 .build();
         test t = new test();
         t.test5(orm);
