@@ -150,7 +150,7 @@ class Output {
 
             out.println("@Override");
             out.println("public final String getSqlDatabase() {");
-            out.printf("\treturn \"%s\";", shortDatabaseName().toLowerCase());
+            out.printf("\treturn \"%s\";", database.getSqlDatabase());
             out.println("\n}");
             out.println("");
 
@@ -415,11 +415,12 @@ class Output {
     }
 
     private String shortDatabaseName() {
-        int idx = packageName.indexOf('.');
-        if (idx < 0) {
-            return packageName.toUpperCase();
-        }
-        return packageName.substring(idx + 1).toUpperCase();
+        return database.getSqlDatabase().toUpperCase();
+//        int idx = packageName.lastIndexOf('.');
+//        if (idx < 0) {
+//            return packageName.toUpperCase();
+//        }
+//        return packageName.substring(idx + 1).toUpperCase();
     }
 
     @Override

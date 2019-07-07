@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import net.legrange.orm.Database;
 import net.legrange.orm.Table;
 import net.legrange.orm.mojo.pojo.AnnotatedPojoGenerator;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
@@ -45,6 +44,8 @@ public class GenerateModel extends AbstractMojo {
     private String outputDir;
     @Parameter(property = "resourceDir", required = false)
     private String resourceDir;
+    @Parameter(property = "database", required = true)
+    private String database;
     @Component
     private MavenProject project;
 
@@ -71,14 +72,12 @@ public class GenerateModel extends AbstractMojo {
             }
             Set<Class<?>> allPojoClasses = gen.getAllPojoClasses();
             classPackageMap = makeDatabaseMap(allPojoClasses);
-//            Set<String> uniquePackages = classPackageMap.values().stream()
-//                    .distinct()
-//                    .collect(Collectors.toSet());
             Map<String, PackageDatabase> packageDatabases = new Modeller(gen).getPackageDatabases();
             svc = new PrintWriter(new FileWriter(resourceDir + "/META-INF/services/" + Table.class.getCanonicalName()));
             Set<Output> outputs = new HashSet();
             for (String pkg : packageDatabases.keySet()) {
-                Database database = packageDatabases.get(pkg);
+                PackageDatabase database = packageDatabases.get(pkg);
+                database.setSqlDatabase(this.database);
                 Output output = new Output(this, database, pkg);
                 for (Table table : database.getTables()) {
                     output.addTable(table);
