@@ -3,13 +3,11 @@ package test;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import net.legrange.orm.Orm;
-import net.legrange.orm.OrmBuilder;
 import net.legrange.orm.OrmException;
 import net.legrange.orm.Table;
 import static test.Tables.CAT;
 import static test.Tables.PERSON;
 import static test.Tables.PET;
-import static test.Tables.TEST;
 import test.pets.Cat;
 
 /**
@@ -20,13 +18,9 @@ public class test {
 
     public static void main(String... args) throws Exception {
         Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?user=root");
-//        Orm orm = Orm.open(con, Orm.Dialect.MYSQL);
-        Orm orm = OrmBuilder.create(con)
-                .withDatabase(TEST, "orm")
-                .withDialect(Orm.Dialect.MYSQL)
-                .build();
+        Orm orm = Orm.open(con, Orm.Dialect.MYSQL);
         test t = new test();
-        t.test5(orm);
+        t.test7(orm);
     }
 
     /**
