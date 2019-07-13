@@ -5,13 +5,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * A builder pattern that allows for very specific ORM configuration.
  *
  * @author gideon
  */
 public class OrmBuilder {
 
     private final Connection con;
-    private Map<Database, String> databases = new HashMap();
+    private final Map<Database, String> databases = new HashMap();
     private Orm.Dialect dialect;
 
     private OrmBuilder(Connection con) {
