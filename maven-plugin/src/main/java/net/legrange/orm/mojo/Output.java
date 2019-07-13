@@ -416,11 +416,6 @@ class Output {
 
     private String shortDatabaseName() {
         return database.getSqlDatabase().toUpperCase();
-//        int idx = packageName.lastIndexOf('.');
-//        if (idx < 0) {
-//            return packageName.toUpperCase();
-//        }
-//        return packageName.substring(idx + 1).toUpperCase();
     }
 
     @Override

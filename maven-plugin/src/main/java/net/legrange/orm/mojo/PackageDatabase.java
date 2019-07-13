@@ -30,6 +30,10 @@ public class PackageDatabase implements Database {
         return tables;
     }
 
+    public String getPackageName() {
+        return packageName;
+    }
+
     void addTable(Table table) {
         tables.add(table);
     }

@@ -27,6 +27,10 @@ class Modeller<T extends Table> {
         return packageDatabases;
     }
 
+    PackageDatabase getPackageDatabase(String className) {
+        return packageDatabases.get(classPackageMap.get(className));
+    }
+
     private void generate() throws GeneratorException {
         Set<Class<?>> allPojoClasses = gen.getAllPojoClasses();
         classPackageMap = makeDatabaseMap(allPojoClasses);

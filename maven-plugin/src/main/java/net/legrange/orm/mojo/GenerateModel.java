@@ -9,12 +9,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 import net.legrange.orm.Database;
 import net.legrange.orm.Table;
 import net.legrange.orm.mojo.annotated.AnnotatedPojoGenerator;
@@ -51,8 +49,9 @@ public class GenerateModel extends AbstractMojo {
     private MavenProject project;
 
     private Generator gen;
+    private Modeller modeller;
     private PrintWriter svc;
-    private Map<String, String> classPackageMap;
+//    private Map<String, String> classPackageMap;
 
     public GenerateModel() {
     }
@@ -72,8 +71,8 @@ public class GenerateModel extends AbstractMojo {
                 dir.mkdirs();
             }
             Set<Class<?>> allPojoClasses = gen.getAllPojoClasses();
-            classPackageMap = makeDatabaseMap(allPojoClasses);
-            Map<String, PackageDatabase> packageDatabases = new Modeller(gen).getPackageDatabases();
+            modeller = new Modeller(gen);
+            Map<String, PackageDatabase> packageDatabases = modeller.getPackageDatabases();
             svc = new PrintWriter(new FileWriter(resourceDir + "/META-INF/services/" + Database.class.getCanonicalName()));
             Set<Output> outputs = new HashSet();
             for (String pkg : packageDatabases.keySet()) {
@@ -122,63 +121,7 @@ public class GenerateModel extends AbstractMojo {
     }
 
     String getTablesPackageFor(Table table) {
-        return format("%s", classPackageMap.get(table.getObjectClass().getCanonicalName()));
-
-    }
-
-    private Map<String, PackageDatabase> makeDatabases(Set<String> packages) {
-        return packages.stream()
-                .collect(Collectors.toMap(pkg -> pkg, pkg -> new PackageDatabase(pkg)));
-    }
-
-    private Map<String, String> makeDatabaseMap(Set<Class<?>> allPojoClasses) {
-        Map<String, String> map = new HashMap();
-        for (Class<?> clazz : allPojoClasses) {
-            map.put(clazz.getCanonicalName(), clazz.getPackage().getName());
-        }
-        reduce(map);
-        return map;
-    }
-
-    private void reduce(Map<String, String> map) {
-        boolean changed = false;
-        for (String c1 : map.keySet()) {
-            String o1 = map.get(c1);
-            for (String c2 : map.keySet()) {
-                if (c1.equals(c2)) {
-                    continue;
-                }
-                String o2 = map.get(c2);
-                String com = common(o1, o2);
-                if (com != null) {
-                    map.put(c1, com);
-                    map.put(c2, com);
-                }
-            }
-        }
-
-    }
-
-    private String common(String o1, String o2) {
-        if (o1.equals(o2)) {
-            return o1;
-        }
-        if (o1.startsWith(o2)) {
-            return o2;
-        }
-        if (o2.startsWith(o1)) {
-            return o1;
-        }
-        int idx = o1.lastIndexOf('.');
-        while (idx > 0) {
-            o1 = o1.substring(0, idx);
-            if (o2.startsWith(o1)) {
-                return o1;
-            }
-            idx = o1.lastIndexOf('.');
-        }
-        return null;
-
+        return modeller.getPackageDatabase(table.getObjectClass().getCanonicalName()).getPackageName();
     }
 
 }
