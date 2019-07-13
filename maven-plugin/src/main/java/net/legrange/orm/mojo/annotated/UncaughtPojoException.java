@@ -1,4 +1,4 @@
-package net.legrange.orm.mojo.pojo;
+package net.legrange.orm.mojo.annotated;
 
 /**
  *

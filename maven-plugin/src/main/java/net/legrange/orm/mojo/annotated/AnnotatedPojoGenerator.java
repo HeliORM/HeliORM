@@ -1,4 +1,4 @@
-package net.legrange.orm.mojo.pojo;
+package net.legrange.orm.mojo.annotated;
 
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfo;

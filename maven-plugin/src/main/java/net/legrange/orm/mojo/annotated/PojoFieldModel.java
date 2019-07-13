@@ -1,4 +1,4 @@
-package net.legrange.orm.mojo.pojo;
+package net.legrange.orm.mojo.annotated;
 
 import static java.lang.String.format;
 import java.lang.annotation.Annotation;

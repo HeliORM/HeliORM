@@ -17,7 +17,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import net.legrange.orm.Database;
 import net.legrange.orm.Table;
-import net.legrange.orm.mojo.pojo.AnnotatedPojoGenerator;
+import net.legrange.orm.mojo.annotated.AnnotatedPojoGenerator;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
