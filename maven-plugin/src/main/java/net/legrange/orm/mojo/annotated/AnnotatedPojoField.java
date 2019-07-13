@@ -13,11 +13,11 @@ import net.legrange.orm.def.Field;
  *
  * @author gideon
  */
-public class PojoFieldModel implements Field {
+public class AnnotatedPojoField implements Field {
 
     private final java.lang.reflect.Field pojoField;
 
-    public PojoFieldModel(java.lang.reflect.Field pojoField) {
+    public AnnotatedPojoField(java.lang.reflect.Field pojoField) {
         this.pojoField = pojoField;
     }
 
@@ -89,7 +89,7 @@ public class PojoFieldModel implements Field {
         } else if (Enum.class.isAssignableFrom(type)) {
             return FieldType.ENUM;
         }
-        throw new UncaughtPojoException(format("Unsuppored field type %s for field '%s' on %s",
+        throw new AnnotatedPojoException(format("Unsuppored field type %s for field '%s' on %s",
                 type.getSimpleName(), pojoField.getName(), pojoField.getDeclaringClass().getCanonicalName()));
     }
 

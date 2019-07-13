@@ -19,10 +19,10 @@ import org.apache.maven.artifact.DependencyResolutionRequiredException;
  *
  * @author gideon
  */
-public class AnnotatedPojoGenerator implements Generator<PojoClassModel> {
+public class AnnotatedPojoGenerator implements Generator<AnnotatedPojoTable> {
 
     private ScanResult scan;
-    private Map<String, PojoClassModel> map;
+    private Map<String, AnnotatedPojoTable> map;
     private final GenerateModel generator;
 
     public AnnotatedPojoGenerator(GenerateModel generator) throws GeneratorException {
@@ -54,8 +54,8 @@ public class AnnotatedPojoGenerator implements Generator<PojoClassModel> {
     }
 
     @Override
-    public PojoClassModel getPojoModel(Class clazz, Database database, Set<PojoClassModel> subTables) {
-        return new PojoClassModel(database, clazz, subTables);
+    public AnnotatedPojoTable getPojoModel(Class clazz, Database database, Set<AnnotatedPojoTable> subTables) {
+        return new AnnotatedPojoTable(database, clazz, subTables);
     }
 
 }
