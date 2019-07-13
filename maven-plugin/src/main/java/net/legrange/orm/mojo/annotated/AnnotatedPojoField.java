@@ -98,6 +98,14 @@ public class AnnotatedPojoField implements Field {
         return getAnnotation(PrimaryKey.class).isPresent();
     }
 
+    /**
+     * Return the annotation of the given type from the POJO field, if it
+     * exists.
+     *
+     * @param <T> The type of annotation
+     * @param annotationClass The annotation class
+     * @return
+     */
     private <T extends Annotation> Optional<T> getAnnotation(Class<T> annotationClass) {
         return Optional.ofNullable(pojoField.getAnnotation(annotationClass));
     }
