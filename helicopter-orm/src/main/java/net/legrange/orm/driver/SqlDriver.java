@@ -2,6 +2,7 @@ package net.legrange.orm.driver;
 
 import static java.lang.String.format;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -22,8 +23,8 @@ import java.util.StringJoiner;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-import net.legrange.orm.OrmDriver;
 import net.legrange.orm.OrmException;
+import net.legrange.orm.OrmMetaDriver;
 import net.legrange.orm.PojoOperations;
 import net.legrange.orm.Table;
 import net.legrange.orm.UncaughtOrmException;
@@ -48,7 +49,7 @@ import net.legrange.orm.rep.ValueCriteria;
  *
  * @author gideon
  */
-public abstract class SqlDriver implements OrmDriver {
+public abstract class SqlDriver implements OrmMetaDriver {
 
     private final Supplier<Connection> connectionSupplier;
     private final Map<Table, PreparedStatement> inserts = new HashMap();
@@ -200,9 +201,21 @@ public abstract class SqlDriver implements OrmDriver {
         }
     }
 
+    @Override
+    public boolean tableExists(Table table) throws OrmException {
+        try {
+            DatabaseMetaData metaData = getConnection().getMetaData();
+            try (ResultSet tables = metaData.getTables(databaseName(table), null, tableName(table), new String[]{"TABLE"})) {
+                return tables.next();
+            }
+        } catch (SQLException ex) {
+            throw new OrmException(ex.getMessage(), ex);
+        }
+    }
+
     protected String buildInsertQuery(Table<?> table) throws OrmException {
         StringBuilder query = new StringBuilder();
-        query.append(format("INSERT INTO %s(", tableName(table)));
+        query.append(format("INSERT INTO %s(", fullTableName(table)));
         StringJoiner fields = new StringJoiner(",");
         StringJoiner values = new StringJoiner(",");
         for (Field field : table.getFields()) {
@@ -218,7 +231,7 @@ public abstract class SqlDriver implements OrmDriver {
 
     protected String buildUpdateQuery(Table<?> table) throws OrmException {
         StringBuilder query = new StringBuilder();
-        query.append(format("UPDATE %s SET ", tableName(table)));
+        query.append(format("UPDATE %s SET ", fullTableName(table)));
         StringJoiner fields = new StringJoiner(",");
         StringJoiner values = new StringJoiner(",");
         for (Field field : table.getFields()) {
@@ -232,12 +245,12 @@ public abstract class SqlDriver implements OrmDriver {
     }
 
     protected String buildDeleteQuery(Table<?> table) throws OrmException {
-        return format("DELETE FROM %s WHERE %s=?", tableName(table), table.getPrimaryKey().get().getSqlName());
+        return format("DELETE FROM %s WHERE %s=?", fullTableName(table), table.getPrimaryKey().get().getSqlName());
     }
 
     protected String buildSelectQuery(Query root) throws OrmException {
         StringBuilder tablesQuery = new StringBuilder();
-        tablesQuery.append(format("SELECT DISTINCT %s.* FROM %s", tableName(root.getTable()), tableName(root.getTable())));
+        tablesQuery.append(format("SELECT DISTINCT %s.* FROM %s", fullTableName(root.getTable()), fullTableName(root.getTable())));
         StringBuilder whereQuery = new StringBuilder();
         Optional<Criteria> optCrit = root.getCriteria();
         if (optCrit.isPresent()) {
@@ -271,9 +284,9 @@ public abstract class SqlDriver implements OrmDriver {
     private String expandLinkTables(TableSpec left, Link right) {
         StringBuilder query = new StringBuilder();
         query.append(format(" JOIN %s ON %s.%s=%s.%s ",
-                tableName(right.getTable()),
-                tableName(left.getTable()), right.getLeftField().getSqlName(),
-                tableName(right.getTable()), right.getField().getSqlName()));
+                fullTableName(right.getTable()),
+                fullTableName(left.getTable()), right.getLeftField().getSqlName(),
+                fullTableName(right.getTable()), right.getField().getSqlName()));
         if (right.getLink().isPresent()) {
             query.append(expandLinkTables(right, right.getLink().get()));
         }
@@ -312,7 +325,7 @@ public abstract class SqlDriver implements OrmDriver {
 
     private String expandListFieldCriteria(TableSpec table, ListCriteria crit) throws OrmException {
         StringBuilder query = new StringBuilder();
-        query.append(format("%s.%s %s (", tableName(table.getTable()), crit.getField().getSqlName(), listOperator(crit)));
+        query.append(format("%s.%s %s (", fullTableName(table.getTable()), crit.getField().getSqlName(), listOperator(crit)));
         for (Object val : crit.getValues()) {
             query.append(format("'%s'", sqlValue(val)));
         }
@@ -322,7 +335,7 @@ public abstract class SqlDriver implements OrmDriver {
 
     private String expandValueFieldCriteria(TableSpec table, ValueCriteria crit) throws OrmException {
         StringBuilder query = new StringBuilder();
-        query.append(format("%s.%s%s'%s'", tableName(table.getTable()), crit.getField().getSqlName(), valueOperator(crit), sqlValue(crit.getValue())
+        query.append(format("%s.%s%s'%s'", fullTableName(table.getTable()), crit.getField().getSqlName(), valueOperator(crit), sqlValue(crit.getValue())
         ));
         return query.toString();
     }
@@ -336,7 +349,7 @@ public abstract class SqlDriver implements OrmDriver {
      */
     private String expandOrder(TableSpec table, Order order) {
         StringBuilder query = new StringBuilder();
-        query.append(format("%s.%s", tableName(table.getTable()), order.getField().getSqlName()));
+        query.append(format("%s.%s", fullTableName(table.getTable()), order.getField().getSqlName()));
         if (order.getDirection() == Order.Direction.DESCENDING) {
             query.append(" DESC");
         }
@@ -733,9 +746,30 @@ public abstract class SqlDriver implements OrmDriver {
      * Work out the exact table name to use.
      *
      * @param table The table we're referencing
-     * @return The QL table name
+     * @return The SQL table name
+     */
+    private String fullTableName(Table table) {
+        return format("%s.%s", databaseName(table), tableName(table));
+    }
+
+    /**
+     * Work out the short table name to use.
+     *
+     * @param table The table we're referencing
+     * @return The SQL table name
      */
     private String tableName(Table table) {
-        return format("%s.%s", table.getDatabase().getSqlDatabase(), table.getSqlTable());
+        return format("%s", table.getSqlTable());
     }
+
+    /**
+     * Work out the database name to use.
+     *
+     * @param table The table we're referencing
+     * @return The SQL table name
+     */
+    private String databaseName(Table table) {
+        return format("%s", table.getDatabase().getSqlDatabase());
+    }
+
 }
