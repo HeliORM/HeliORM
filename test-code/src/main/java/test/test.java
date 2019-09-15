@@ -21,7 +21,7 @@ public class test {
         Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?user=root");
         Orm orm = Orm.open(con, Orm.Dialect.MYSQL);
         test t = new test();
-        t.test10(orm);
+        t.test9(orm);
     }
 
     /**
@@ -38,7 +38,7 @@ public class test {
     private void test9(Orm orm) throws OrmException, ClassNotFoundException {
         System.out.println("-- See if we have table ---");
         Table<Cat> tableFor = orm.tableFor(new Cat());
-        System.out.printf("Cat table has %s and %s\n", tableFor.getObjectClass(), tableFor.getFields());
+        System.out.printf("Cat table has %s with fields %s\n", tableFor.getObjectClass(), tableFor.getFields());
     }
 
     /**

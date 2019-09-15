@@ -4,7 +4,9 @@ import net.legrange.orm.def.Field;
 
 /**
  * This interface defines the operations on POJOs required for the ORM to
- * manipulate them generically to function.
+ * manipulate them generically to function. The idea is that we can support
+ * different methodologies for manipulating POJOs for different use cases. For
+ * example, a BeanPojoOperations class could use bean patterns.
  *
  * @author gideon
  */

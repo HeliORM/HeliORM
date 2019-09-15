@@ -86,6 +86,15 @@ public class AnnotatedPojoTable implements Table {
         return new HashSet(subs);
     }
 
+    /**
+     * Decide if a reflected field is a data field we need to process. A field
+     * is considered a POJO field if it is not native, not transient, not static
+     * and not annotated with the @Ignore annotation.
+     *
+     *
+     * @param field The reflected field to evaluate
+     * @return True if it is considered a data field
+     */
     private boolean isDataField(java.lang.reflect.Field field) {
         int modifiers = field.getModifiers();
         if (Modifier.isNative(modifiers)) {
@@ -100,14 +109,33 @@ public class AnnotatedPojoTable implements Table {
         return !field.isAnnotationPresent(Ignore.class);
     }
 
+    /**
+     * Return the Java name for the POJO class represented by this
+     *
+     * @return The Java name
+     */
     private String getJavaName() {
         return pojoClass.getSimpleName();
     }
 
+    /**
+     * Convenience method to find the optional annotation on the POJO class.
+     *
+     * @param <T> The type of the annotation
+     * @param annotationClass The annotation class
+     * @return Optional annotation found
+     */
     private <T extends Annotation> Optional<T> getAnnotation(Class<T> annotationClass) {
         return Optional.ofNullable(pojoClass.getAnnotation(annotationClass));
     }
 
+    /**
+     * Return reflected fields for all fields declared on a class and it's super
+     * classes but stopping short of java.lang.Object (recursively)
+     *
+     * @param clazz The class to return the fields from
+     * @return The list of fields
+     */
     private List<java.lang.reflect.Field> getAllFields(Class<?> clazz) {
         List<java.lang.reflect.Field> res = new LinkedList();
         if (clazz.getSuperclass() != Object.class) {
