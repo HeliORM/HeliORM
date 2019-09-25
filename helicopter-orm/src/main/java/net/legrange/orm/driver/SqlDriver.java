@@ -20,6 +20,7 @@ import java.util.Set;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.StringJoiner;
+import java.util.UUID;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -145,15 +146,33 @@ public abstract class SqlDriver implements OrmMetaDriver {
             }
             int par = 1;
             for (Field field : table.getFields()) {
-                setValueInStatement(stmt, pojo, field, par);
+                if (field.isPrimaryKey()) {
+                    if (field.isAutoNumber()) {
+                        if (field.getFieldType() == Field.FieldType.STRING) {
+                            pops.setValue(pojo, field, UUID.randomUUID().toString());
+                            setValueInStatement(stmt, pojo, field, par);
+                        } else {
+                            stmt.setObject(par, null);
+                        }
+                    } else {
+                        setValueInStatement(stmt, pojo, field, par);
+                    }
+                } else {
+                    setValueInStatement(stmt, pojo, field, par);
+                }
                 par++;
             }
             stmt.executeUpdate();
             Optional<Field> opt = table.getPrimaryKey();
             if (opt.isPresent()) {
-                try (ResultSet rs = stmt.getGeneratedKeys()) {
-                    if (rs.next()) {
-                        pops.setValue(pojo, opt.get(), getKeyValueFromResultSet(rs, opt.get()));
+                Field keyField = opt.get();
+                if (keyField.isAutoNumber()) {
+                    if (keyField.getFieldType() != Field.FieldType.STRING) {
+                        try ( ResultSet rs = stmt.getGeneratedKeys()) {
+                            if (rs.next()) {
+                                pops.setValue(pojo, keyField, getKeyValueFromResultSet(rs, opt.get()));
+                            }
+                        }
                     }
                 }
             }
@@ -205,7 +224,7 @@ public abstract class SqlDriver implements OrmMetaDriver {
     public boolean tableExists(Table table) throws OrmException {
         try {
             DatabaseMetaData metaData = getConnection().getMetaData();
-            try (ResultSet tables = metaData.getTables(databaseName(table), null, tableName(table), new String[]{"TABLE"})) {
+            try ( ResultSet tables = metaData.getTables(databaseName(table), null, tableName(table), new String[]{"TABLE"})) {
                 return tables.next();
             }
         } catch (SQLException ex) {

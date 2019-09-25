@@ -51,4 +51,11 @@ public interface Field<T extends Table<O>, O, C> {
      */
     boolean isPrimaryKey();
 
+    /**
+     * Return true if this is an auto-number key
+     *
+     * @return True if auto-number
+     */
+    boolean isAutoNumber();
+
 }

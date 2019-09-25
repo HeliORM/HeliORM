@@ -9,7 +9,10 @@ import static test.Tables.CAT;
 import static test.Tables.PERSON;
 import static test.Tables.PET;
 import static test.Tables.TEST;
+import test.pets.Bird;
+import test.pets.Bird.Kind;
 import test.pets.Cat;
+import test.pets.Cat.Type;
 
 /**
  *
@@ -18,10 +21,24 @@ import test.pets.Cat;
 public class test {
 
     public static void main(String... args) throws Exception {
-        Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?user=root");
+        Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/orm?user=root");
         Orm orm = Orm.open(con, Orm.Dialect.MYSQL);
         test t = new test();
-        t.test9(orm);
+        t.test6(orm);
+    }
+
+    /**
+     * Create a bird for person #1
+     */
+    private void test11(Orm orm) throws OrmException {
+        System.out.println("-- Create Bird ---");
+        Bird bird = new Bird();
+        bird.setName("Polly Wants Crack");
+        bird.setAge(3);
+        bird.setKind(Kind.FREERANGE);
+        bird.setPersonNumber(1L);
+        bird = orm.create(bird);
+        System.out.println("Bird created with key " + bird.getBirdId());
     }
 
     /**
@@ -70,6 +87,7 @@ public class test {
         Cat cat = new Cat();
         cat.setName("Supreme Cat");
         cat.setAge(1);
+        cat.setType(Type.INDOOR);
         cat.setPersonNumber(1L);
         cat = orm.create(cat);
         System.out.println("Cat created with key " + cat.getCatNumber());

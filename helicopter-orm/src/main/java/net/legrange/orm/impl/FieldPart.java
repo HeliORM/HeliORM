@@ -1,9 +1,9 @@
 package net.legrange.orm.impl;
 
 import static java.lang.String.format;
-import net.legrange.orm.def.Field;
 import net.legrange.orm.OrmException;
 import net.legrange.orm.Table;
+import net.legrange.orm.def.Field;
 
 /**
  *
@@ -55,6 +55,11 @@ public abstract class FieldPart<T extends Table<O>, O, C> extends Part<T, O, T, 
     @Override
     public boolean isPrimaryKey() {
         return primaryKey;
+    }
+
+    @Override
+    public boolean isAutoNumber() {
+        return false;
     }
 
     public final FieldPart<T, O, C> getThis() throws OrmException {

@@ -98,6 +98,15 @@ public class AnnotatedPojoField implements Field {
         return getAnnotation(PrimaryKey.class).isPresent();
     }
 
+    @Override
+    public boolean isAutoNumber() {
+        Optional<PrimaryKey> pkA = getAnnotation(PrimaryKey.class);
+        if (pkA.isPresent()) {
+            return pkA.get().autoIncrement();
+        }
+        return true;
+    }
+
     /**
      * Return the annotation of the given type from the POJO field, if it
      * exists.
@@ -106,7 +115,7 @@ public class AnnotatedPojoField implements Field {
      * @param annotationClass The annotation class
      * @return
      */
-    private <T extends Annotation> Optional<T> getAnnotation(Class<T> annotationClass) {
+    private final <T extends Annotation> Optional<T> getAnnotation(Class<T> annotationClass) {
         return Optional.ofNullable(pojoField.getAnnotation(annotationClass));
     }
 }

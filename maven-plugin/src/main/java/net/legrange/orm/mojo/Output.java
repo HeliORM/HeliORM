@@ -318,14 +318,26 @@ class Output {
         impt(partClass);
         boolean isKey = fm.isPrimaryKey();
         if (isKey) {
-            emit("public final %s<%s, %s> %s = new %s(\"%s\", \"%s\", true);",
+            emit("public final %s<%s, %s> %s = new %s(\"%s\", \"%s\", %b) {",
                     fieldClass.getSimpleName(),
                     tableName(cm),
                     cm.getObjectClass().getSimpleName(),
                     fm.getJavaName(),
                     partClass.getSimpleName(),
                     fm.getJavaName(),
-                    fm.getSqlName());
+                    fm.getSqlName(),
+                    fm.isPrimaryKey());
+            if (fm.isAutoNumber()) {
+                push();
+                emit("@Override");
+                emit("public boolean isAutoNumber() {");
+                push();
+                emit("return true;");
+                pop();
+                emit("}");
+                pop();
+            }
+            emit("};");
         } else {
             emit("public final %s<%s, %s> %s = new %s(\"%s\", \"%s\");",
                     fieldClass.getSimpleName(),

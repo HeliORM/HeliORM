@@ -26,4 +26,5 @@ hs_err_pid*
 target/
 pom.xml.versionsBackup
 
-
+# Netbeans
+nb-configuration.xml
