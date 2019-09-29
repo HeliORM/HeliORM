@@ -7,9 +7,9 @@
     <packaging>pom</packaging>
     <modules>
         <module>helicopter-orm</module>
+        <module>maven-plugin</module>
         <module>test-pojos</module>
         <module>test-code</module>
-        <module>maven-plugin</module>
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
