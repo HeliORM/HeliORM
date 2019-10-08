@@ -39,9 +39,9 @@ public class GenerateModel extends AbstractMojo {
     private Generator.PojoStrategy strategy;
     @Parameter(property = "packages", required = true)
     private Set<String> packages;
-    @Parameter(property = "outputDir", required = false)
+    @Parameter(property = "outputDir", required = true)
     private String outputDir;
-    @Parameter(property = "resourceDir", required = false)
+    @Parameter(property = "resourceDir", required = true)
     private String resourceDir;
     @Parameter(property = "database", required = true)
     private String database;
@@ -51,7 +51,6 @@ public class GenerateModel extends AbstractMojo {
     private Generator gen;
     private Modeller modeller;
     private PrintWriter svc;
-//    private Map<String, String> classPackageMap;
 
     public GenerateModel() {
     }
