@@ -21,6 +21,7 @@ import net.legrange.orm.def.BooleanField;
 import net.legrange.orm.def.ByteField;
 import net.legrange.orm.def.DateField;
 import net.legrange.orm.def.DoubleField;
+import net.legrange.orm.def.DurationField;
 import net.legrange.orm.def.EnumField;
 import net.legrange.orm.def.Field;
 import net.legrange.orm.def.FloatField;
@@ -33,6 +34,7 @@ import net.legrange.orm.impl.BooleanFieldPart;
 import net.legrange.orm.impl.ByteFieldPart;
 import net.legrange.orm.impl.DateFieldPart;
 import net.legrange.orm.impl.DoubleFieldPart;
+import net.legrange.orm.impl.DurationFieldPart;
 import net.legrange.orm.impl.EnumFieldPart;
 import net.legrange.orm.impl.FieldPart;
 import net.legrange.orm.impl.FloatFieldPart;
@@ -301,6 +303,9 @@ class Output {
             case TIMESTAMP:
                 addTimestampField(cm, fm);
                 break;
+            case DURATION:
+                addDurationField(cm, fm);
+                break;
             case STRING:
                 addStringField(cm, fm);
                 break;
@@ -404,6 +409,10 @@ class Output {
 
     private void addTimestampField(Table cm, Field fm) throws GeneratorException {
         addType2Field(TimestampField.class, TimestampFieldPart.class, cm, fm);
+    }
+
+    private void addDurationField(Table cm, Field fm) throws GeneratorException {
+        addType2Field(DurationField.class, DurationFieldPart.class, cm, fm);
     }
 
     private void addStringField(Table cm, Field fm) throws GeneratorException {

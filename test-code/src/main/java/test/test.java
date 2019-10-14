@@ -2,9 +2,12 @@ package test;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.time.Duration;
+import java.util.List;
 import net.legrange.orm.Orm;
 import net.legrange.orm.OrmException;
 import net.legrange.orm.Table;
+import static test.Tables.BIRD;
 import static test.Tables.CAT;
 import static test.Tables.PERSON;
 import static test.Tables.PET;
@@ -24,7 +27,19 @@ public class test {
         Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/orm?user=root");
         Orm orm = Orm.open(con, Orm.Dialect.MYSQL);
         test t = new test();
-        t.test6(orm);
+        t.test12(orm);
+    }
+
+    /**
+     * Read bird and look at it's sing time (test duration)
+     */
+    private void test12(Orm orm) throws OrmException {
+        System.out.println("-- Load Birds for person 1 ---");
+        List<Bird> birds = orm.select(BIRD).where(BIRD.personNumber.eq(1)).list();
+        for (Bird bird : birds) {
+            double secs = bird.getSingTime().getSeconds();
+            System.out.printf("%s sings for %s seconds (%s minutes)\n", bird.getName(), secs, secs / 60);
+        }
     }
 
     /**
@@ -37,6 +52,7 @@ public class test {
         bird.setAge(3);
         bird.setKind(Kind.FREERANGE);
         bird.setPersonNumber(1L);
+        bird.setSingTime(Duration.ofMinutes(90)); // Annoying AF
         bird = orm.create(bird);
         System.out.println("Bird created with key " + bird.getBirdId());
     }

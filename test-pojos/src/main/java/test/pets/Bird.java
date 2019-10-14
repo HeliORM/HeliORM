@@ -1,5 +1,6 @@
 package test.pets;
 
+import java.time.Duration;
 import net.legrange.orm.annotation.Pojo;
 import net.legrange.orm.annotation.PrimaryKey;
 
@@ -19,6 +20,8 @@ public class Bird extends Pet {
 
     private Kind kind;
 
+    private Duration singTime;
+
     public String getBirdId() {
         return birdId;
     }
@@ -33,6 +36,14 @@ public class Bird extends Pet {
 
     public void setKind(Kind kind) {
         this.kind = kind;
+    }
+
+    public Duration getSingTime() {
+        return singTime;
+    }
+
+    public void setSingTime(Duration singTime) {
+        this.singTime = singTime;
     }
 
 }

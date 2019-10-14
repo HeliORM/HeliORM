@@ -7,7 +7,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.Duration;
 import java.time.Instant;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -168,7 +170,7 @@ public abstract class SqlDriver implements OrmMetaDriver {
                 Field keyField = opt.get();
                 if (keyField.isAutoNumber()) {
                     if (keyField.getFieldType() != Field.FieldType.STRING) {
-                        try ( ResultSet rs = stmt.getGeneratedKeys()) {
+                        try (ResultSet rs = stmt.getGeneratedKeys()) {
                             if (rs.next()) {
                                 pops.setValue(pojo, keyField, getKeyValueFromResultSet(rs, opt.get()));
                             }
@@ -224,7 +226,7 @@ public abstract class SqlDriver implements OrmMetaDriver {
     public boolean tableExists(Table table) throws OrmException {
         try {
             DatabaseMetaData metaData = getConnection().getMetaData();
-            try ( ResultSet tables = metaData.getTables(databaseName(table), null, tableName(table), new String[]{"TABLE"})) {
+            try (ResultSet tables = metaData.getTables(databaseName(table), null, tableName(table), new String[]{"TABLE"})) {
                 return tables.next();
             }
         } catch (SQLException ex) {
@@ -432,6 +434,9 @@ public abstract class SqlDriver implements OrmMetaDriver {
                 case TIMESTAMP:
                     stmt.setTimestamp(par, getTimestampFromPojo(pojo, field));
                     break;
+                case DURATION:
+                    stmt.setString(par, getDurationFromPojo(pojo, field));
+                    break;
                 default:
                     throw new OrmException(format("Field type '%s' is unsupported. BUG!", field.getFieldType()));
             }
@@ -522,7 +527,7 @@ public abstract class SqlDriver implements OrmMetaDriver {
                     return rs.getFloat(column);
                 case BOOLEAN:
                     return rs.getBoolean(column);
-                case ENUM:
+                case ENUM: {
                     Class javaType = field.getJavaType();
                     if (!javaType.isEnum()) {
                         throw new OrmException(format("Field %s is not an enum. BUG!", field.getJavaName()));
@@ -532,12 +537,28 @@ public abstract class SqlDriver implements OrmMetaDriver {
                         return Enum.valueOf(javaType, val);
                     }
                     return null;
+                }
                 case STRING:
                     return rs.getString(column);
                 case DATE:
                     return rs.getDate(column);
                 case TIMESTAMP:
                     return rs.getTimestamp(column);
+                case DURATION: {
+                    Class javaType = field.getJavaType();
+                    if (!Duration.class.isAssignableFrom(javaType)) {
+                        throw new OrmException(format("Field %s is not a duration. BUG!", field.getJavaName()));
+                    }
+                    String val = rs.getString(column);
+                    if (val != null) {
+                        try {
+                            return Duration.parse(val);
+                        } catch (DateTimeParseException ex) {
+                            throw new OrmException(format("Cannot parse text to a duration (%s)", ex.getMessage()), ex);
+                        }
+                    }
+                    return null;
+                }
                 default:
                     throw new OrmException(format("Field type '%s' is unsupported. BUG!", field.getFieldType()));
             }
@@ -573,6 +594,7 @@ public abstract class SqlDriver implements OrmMetaDriver {
                 case ENUM:
                 case DATE:
                 case TIMESTAMP:
+                case DURATION:
                     throw new OrmException(format("Field type '%s' is not a supported primary key type", field.getFieldType()));
                 default:
                     throw new OrmException(format("Field type '%s' is unsupported. BUG!", field.getFieldType()));
@@ -652,6 +674,25 @@ public abstract class SqlDriver implements OrmMetaDriver {
             return new java.sql.Timestamp(((java.util.Date) value).getTime());
         }
         throw new OrmException(format("Could not read Instant value for field '%s' with type '%s'.", field.getJavaName(), field.getFieldType()));
+    }
+
+    /**
+     * Get a duration value from the given POJO for the given field.
+     *
+     * @param pojo The POJO from which to read the timestamp.
+     * @param field The field to read.
+     * @return The duration string value.
+     * @throws OrmException
+     */
+    private String getDurationFromPojo(Object pojo, Field field) throws OrmException {
+        Object value = getValueFromPojo(pojo, field);
+        if (value == null) {
+            return null;
+        }
+        if (value instanceof Duration) {
+            return ((Duration) value).toString();
+        }
+        throw new OrmException(format("Could not read Duration value for field '%s' with type '%s'.", field.getJavaName(), field.getFieldType()));
     }
 
     private Connection getConnection() {

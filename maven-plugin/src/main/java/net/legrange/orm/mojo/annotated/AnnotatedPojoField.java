@@ -2,6 +2,7 @@ package net.legrange.orm.mojo.annotated;
 
 import static java.lang.String.format;
 import java.lang.annotation.Annotation;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
 import java.util.Optional;
@@ -86,6 +87,8 @@ public class AnnotatedPojoField implements Field {
             return FieldType.DATE;
         } else if (Instant.class.isAssignableFrom(type)) {
             return FieldType.TIMESTAMP;
+        } else if (Duration.class.isAssignableFrom(type)) {
+            return FieldType.DURATION;
         } else if (Enum.class.isAssignableFrom(type)) {
             return FieldType.ENUM;
         }
@@ -115,7 +118,7 @@ public class AnnotatedPojoField implements Field {
      * @param annotationClass The annotation class
      * @return
      */
-    private final <T extends Annotation> Optional<T> getAnnotation(Class<T> annotationClass) {
+    private <T extends Annotation> Optional<T> getAnnotation(Class<T> annotationClass) {
         return Optional.ofNullable(pojoField.getAnnotation(annotationClass));
     }
 }
