@@ -2,11 +2,14 @@ package net.legrange.orm.driver;
 
 import static java.lang.String.format;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.Duration;
 import java.time.Instant;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -19,11 +22,12 @@ import java.util.Set;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.StringJoiner;
+import java.util.UUID;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-import net.legrange.orm.OrmDriver;
 import net.legrange.orm.OrmException;
+import net.legrange.orm.OrmMetaDriver;
 import net.legrange.orm.PojoOperations;
 import net.legrange.orm.Table;
 import net.legrange.orm.UncaughtOrmException;
@@ -48,7 +52,7 @@ import net.legrange.orm.rep.ValueCriteria;
  *
  * @author gideon
  */
-public abstract class SqlDriver implements OrmDriver {
+public abstract class SqlDriver implements OrmMetaDriver {
 
     private final Supplier<Connection> connectionSupplier;
     private final Map<Table, PreparedStatement> inserts = new HashMap();
@@ -144,15 +148,33 @@ public abstract class SqlDriver implements OrmDriver {
             }
             int par = 1;
             for (Field field : table.getFields()) {
-                setValueInStatement(stmt, pojo, field, par);
+                if (field.isPrimaryKey()) {
+                    if (field.isAutoNumber()) {
+                        if (field.getFieldType() == Field.FieldType.STRING) {
+                            pops.setValue(pojo, field, UUID.randomUUID().toString());
+                            setValueInStatement(stmt, pojo, field, par);
+                        } else {
+                            stmt.setObject(par, null);
+                        }
+                    } else {
+                        setValueInStatement(stmt, pojo, field, par);
+                    }
+                } else {
+                    setValueInStatement(stmt, pojo, field, par);
+                }
                 par++;
             }
             stmt.executeUpdate();
             Optional<Field> opt = table.getPrimaryKey();
             if (opt.isPresent()) {
-                try (ResultSet rs = stmt.getGeneratedKeys()) {
-                    if (rs.next()) {
-                        pops.setValue(pojo, opt.get(), getKeyValueFromResultSet(rs, opt.get()));
+                Field keyField = opt.get();
+                if (keyField.isAutoNumber()) {
+                    if (keyField.getFieldType() != Field.FieldType.STRING) {
+                        try (ResultSet rs = stmt.getGeneratedKeys()) {
+                            if (rs.next()) {
+                                pops.setValue(pojo, keyField, getKeyValueFromResultSet(rs, opt.get()));
+                            }
+                        }
                     }
                 }
             }
@@ -200,9 +222,21 @@ public abstract class SqlDriver implements OrmDriver {
         }
     }
 
+    @Override
+    public boolean tableExists(Table table) throws OrmException {
+        try {
+            DatabaseMetaData metaData = getConnection().getMetaData();
+            try (ResultSet tables = metaData.getTables(databaseName(table), null, tableName(table), new String[]{"TABLE"})) {
+                return tables.next();
+            }
+        } catch (SQLException ex) {
+            throw new OrmException(ex.getMessage(), ex);
+        }
+    }
+
     protected String buildInsertQuery(Table<?> table) throws OrmException {
         StringBuilder query = new StringBuilder();
-        query.append(format("INSERT INTO %s(", tableName(table)));
+        query.append(format("INSERT INTO %s(", fullTableName(table)));
         StringJoiner fields = new StringJoiner(",");
         StringJoiner values = new StringJoiner(",");
         for (Field field : table.getFields()) {
@@ -218,7 +252,7 @@ public abstract class SqlDriver implements OrmDriver {
 
     protected String buildUpdateQuery(Table<?> table) throws OrmException {
         StringBuilder query = new StringBuilder();
-        query.append(format("UPDATE %s SET ", tableName(table)));
+        query.append(format("UPDATE %s SET ", fullTableName(table)));
         StringJoiner fields = new StringJoiner(",");
         StringJoiner values = new StringJoiner(",");
         for (Field field : table.getFields()) {
@@ -232,12 +266,12 @@ public abstract class SqlDriver implements OrmDriver {
     }
 
     protected String buildDeleteQuery(Table<?> table) throws OrmException {
-        return format("DELETE FROM %s WHERE %s=?", tableName(table), table.getPrimaryKey().get().getSqlName());
+        return format("DELETE FROM %s WHERE %s=?", fullTableName(table), table.getPrimaryKey().get().getSqlName());
     }
 
     protected String buildSelectQuery(Query root) throws OrmException {
         StringBuilder tablesQuery = new StringBuilder();
-        tablesQuery.append(format("SELECT DISTINCT %s.* FROM %s", tableName(root.getTable()), tableName(root.getTable())));
+        tablesQuery.append(format("SELECT DISTINCT %s.* FROM %s", fullTableName(root.getTable()), fullTableName(root.getTable())));
         StringBuilder whereQuery = new StringBuilder();
         Optional<Criteria> optCrit = root.getCriteria();
         if (optCrit.isPresent()) {
@@ -271,9 +305,9 @@ public abstract class SqlDriver implements OrmDriver {
     private String expandLinkTables(TableSpec left, Link right) {
         StringBuilder query = new StringBuilder();
         query.append(format(" JOIN %s ON %s.%s=%s.%s ",
-                tableName(right.getTable()),
-                tableName(left.getTable()), right.getLeftField().getSqlName(),
-                tableName(right.getTable()), right.getField().getSqlName()));
+                fullTableName(right.getTable()),
+                fullTableName(left.getTable()), right.getLeftField().getSqlName(),
+                fullTableName(right.getTable()), right.getField().getSqlName()));
         if (right.getLink().isPresent()) {
             query.append(expandLinkTables(right, right.getLink().get()));
         }
@@ -312,7 +346,7 @@ public abstract class SqlDriver implements OrmDriver {
 
     private String expandListFieldCriteria(TableSpec table, ListCriteria crit) throws OrmException {
         StringBuilder query = new StringBuilder();
-        query.append(format("%s.%s %s (", tableName(table.getTable()), crit.getField().getSqlName(), listOperator(crit)));
+        query.append(format("%s.%s %s (", fullTableName(table.getTable()), crit.getField().getSqlName(), listOperator(crit)));
         for (Object val : crit.getValues()) {
             query.append(format("'%s'", sqlValue(val)));
         }
@@ -322,7 +356,7 @@ public abstract class SqlDriver implements OrmDriver {
 
     private String expandValueFieldCriteria(TableSpec table, ValueCriteria crit) throws OrmException {
         StringBuilder query = new StringBuilder();
-        query.append(format("%s.%s%s'%s'", tableName(table.getTable()), crit.getField().getSqlName(), valueOperator(crit), sqlValue(crit.getValue())
+        query.append(format("%s.%s%s'%s'", fullTableName(table.getTable()), crit.getField().getSqlName(), valueOperator(crit), sqlValue(crit.getValue())
         ));
         return query.toString();
     }
@@ -336,7 +370,7 @@ public abstract class SqlDriver implements OrmDriver {
      */
     private String expandOrder(TableSpec table, Order order) {
         StringBuilder query = new StringBuilder();
-        query.append(format("%s.%s", tableName(table.getTable()), order.getField().getSqlName()));
+        query.append(format("%s.%s", fullTableName(table.getTable()), order.getField().getSqlName()));
         if (order.getDirection() == Order.Direction.DESCENDING) {
             query.append(" DESC");
         }
@@ -399,6 +433,9 @@ public abstract class SqlDriver implements OrmDriver {
                     break;
                 case TIMESTAMP:
                     stmt.setTimestamp(par, getTimestampFromPojo(pojo, field));
+                    break;
+                case DURATION:
+                    stmt.setString(par, getDurationFromPojo(pojo, field));
                     break;
                 default:
                     throw new OrmException(format("Field type '%s' is unsupported. BUG!", field.getFieldType()));
@@ -490,7 +527,7 @@ public abstract class SqlDriver implements OrmDriver {
                     return rs.getFloat(column);
                 case BOOLEAN:
                     return rs.getBoolean(column);
-                case ENUM:
+                case ENUM: {
                     Class javaType = field.getJavaType();
                     if (!javaType.isEnum()) {
                         throw new OrmException(format("Field %s is not an enum. BUG!", field.getJavaName()));
@@ -500,12 +537,28 @@ public abstract class SqlDriver implements OrmDriver {
                         return Enum.valueOf(javaType, val);
                     }
                     return null;
+                }
                 case STRING:
                     return rs.getString(column);
                 case DATE:
                     return rs.getDate(column);
                 case TIMESTAMP:
                     return rs.getTimestamp(column);
+                case DURATION: {
+                    Class javaType = field.getJavaType();
+                    if (!Duration.class.isAssignableFrom(javaType)) {
+                        throw new OrmException(format("Field %s is not a duration. BUG!", field.getJavaName()));
+                    }
+                    String val = rs.getString(column);
+                    if (val != null) {
+                        try {
+                            return Duration.parse(val);
+                        } catch (DateTimeParseException ex) {
+                            throw new OrmException(format("Cannot parse text to a duration (%s)", ex.getMessage()), ex);
+                        }
+                    }
+                    return null;
+                }
                 default:
                     throw new OrmException(format("Field type '%s' is unsupported. BUG!", field.getFieldType()));
             }
@@ -541,6 +594,7 @@ public abstract class SqlDriver implements OrmDriver {
                 case ENUM:
                 case DATE:
                 case TIMESTAMP:
+                case DURATION:
                     throw new OrmException(format("Field type '%s' is not a supported primary key type", field.getFieldType()));
                 default:
                     throw new OrmException(format("Field type '%s' is unsupported. BUG!", field.getFieldType()));
@@ -620,6 +674,25 @@ public abstract class SqlDriver implements OrmDriver {
             return new java.sql.Timestamp(((java.util.Date) value).getTime());
         }
         throw new OrmException(format("Could not read Instant value for field '%s' with type '%s'.", field.getJavaName(), field.getFieldType()));
+    }
+
+    /**
+     * Get a duration value from the given POJO for the given field.
+     *
+     * @param pojo The POJO from which to read the timestamp.
+     * @param field The field to read.
+     * @return The duration string value.
+     * @throws OrmException
+     */
+    private String getDurationFromPojo(Object pojo, Field field) throws OrmException {
+        Object value = getValueFromPojo(pojo, field);
+        if (value == null) {
+            return null;
+        }
+        if (value instanceof Duration) {
+            return ((Duration) value).toString();
+        }
+        throw new OrmException(format("Could not read Duration value for field '%s' with type '%s'.", field.getJavaName(), field.getFieldType()));
     }
 
     private Connection getConnection() {
@@ -733,9 +806,30 @@ public abstract class SqlDriver implements OrmDriver {
      * Work out the exact table name to use.
      *
      * @param table The table we're referencing
-     * @return The QL table name
+     * @return The SQL table name
+     */
+    private String fullTableName(Table table) {
+        return format("%s.%s", databaseName(table), tableName(table));
+    }
+
+    /**
+     * Work out the short table name to use.
+     *
+     * @param table The table we're referencing
+     * @return The SQL table name
      */
     private String tableName(Table table) {
-        return format("%s.%s", table.getDatabase().getSqlDatabase(), table.getSqlTable());
+        return format("%s", table.getSqlTable());
     }
+
+    /**
+     * Work out the database name to use.
+     *
+     * @param table The table we're referencing
+     * @return The SQL table name
+     */
+    private String databaseName(Table table) {
+        return format("%s", table.getDatabase().getSqlDatabase());
+    }
+
 }

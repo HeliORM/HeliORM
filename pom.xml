@@ -3,13 +3,13 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>net.legrange.orm</groupId>
     <artifactId>orm</artifactId>
-    <version>0.21</version>
+    <version>0.27</version>
     <packaging>pom</packaging>
     <modules>
         <module>helicopter-orm</module>
+        <module>maven-plugin</module>
         <module>test-pojos</module>
         <module>test-code</module>
-        <module>maven-plugin</module>
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

@@ -21,6 +21,7 @@ import net.legrange.orm.def.BooleanField;
 import net.legrange.orm.def.ByteField;
 import net.legrange.orm.def.DateField;
 import net.legrange.orm.def.DoubleField;
+import net.legrange.orm.def.DurationField;
 import net.legrange.orm.def.EnumField;
 import net.legrange.orm.def.Field;
 import net.legrange.orm.def.FloatField;
@@ -33,6 +34,7 @@ import net.legrange.orm.impl.BooleanFieldPart;
 import net.legrange.orm.impl.ByteFieldPart;
 import net.legrange.orm.impl.DateFieldPart;
 import net.legrange.orm.impl.DoubleFieldPart;
+import net.legrange.orm.impl.DurationFieldPart;
 import net.legrange.orm.impl.EnumFieldPart;
 import net.legrange.orm.impl.FieldPart;
 import net.legrange.orm.impl.FloatFieldPart;
@@ -301,6 +303,9 @@ class Output {
             case TIMESTAMP:
                 addTimestampField(cm, fm);
                 break;
+            case DURATION:
+                addDurationField(cm, fm);
+                break;
             case STRING:
                 addStringField(cm, fm);
                 break;
@@ -318,14 +323,26 @@ class Output {
         impt(partClass);
         boolean isKey = fm.isPrimaryKey();
         if (isKey) {
-            emit("public final %s<%s, %s> %s = new %s(\"%s\", \"%s\", true);",
+            emit("public final %s<%s, %s> %s = new %s(\"%s\", \"%s\", %b) {",
                     fieldClass.getSimpleName(),
                     tableName(cm),
                     cm.getObjectClass().getSimpleName(),
                     fm.getJavaName(),
                     partClass.getSimpleName(),
                     fm.getJavaName(),
-                    fm.getSqlName());
+                    fm.getSqlName(),
+                    fm.isPrimaryKey());
+            if (fm.isAutoNumber()) {
+                push();
+                emit("@Override");
+                emit("public boolean isAutoNumber() {");
+                push();
+                emit("return true;");
+                pop();
+                emit("}");
+                pop();
+            }
+            emit("};");
         } else {
             emit("public final %s<%s, %s> %s = new %s(\"%s\", \"%s\");",
                     fieldClass.getSimpleName(),
@@ -394,6 +411,10 @@ class Output {
         addType2Field(TimestampField.class, TimestampFieldPart.class, cm, fm);
     }
 
+    private void addDurationField(Table cm, Field fm) throws GeneratorException {
+        addType2Field(DurationField.class, DurationFieldPart.class, cm, fm);
+    }
+
     private void addStringField(Table cm, Field fm) throws GeneratorException {
         addType2Field(StringField.class, StringFieldPart.class, cm, fm);
     }
@@ -416,11 +437,6 @@ class Output {
 
     private String shortDatabaseName() {
         return database.getSqlDatabase().toUpperCase();
-//        int idx = packageName.lastIndexOf('.');
-//        if (idx < 0) {
-//            return packageName.toUpperCase();
-//        }
-//        return packageName.substring(idx + 1).toUpperCase();
     }
 
     @Override

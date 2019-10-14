@@ -6,7 +6,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Annotation used to indicate the class is a POJO.
+ * Annotation used to indicate the class is a POJO and should be processed by
+ * the processor
  *
  * @author gideon
  */
@@ -14,6 +15,12 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 public @interface Pojo {
 
+    /**
+     * Specify the database table name if you want to override the one selected
+     * by the processor.
+     *
+     * @return The table name.
+     */
     String tableName() default "";
 
 }

@@ -76,6 +76,7 @@ class UnsafeFieldOperation implements PojoOperations {
                 break;
             case DATE:
             case TIMESTAMP:
+            case DURATION:
             case STRING:
                 setObject(pojo, refField, value);
                 break;
@@ -106,6 +107,7 @@ class UnsafeFieldOperation implements PojoOperations {
                 return getEnum(pojo, refField);
             case DATE:
             case TIMESTAMP:
+            case DURATION:
             case STRING:
                 return getObject(pojo, refField);
             default:
@@ -124,9 +126,10 @@ class UnsafeFieldOperation implements PojoOperations {
             case FLOAT:
             case BOOLEAN:
             case ENUM:
-            case DATE:
             case STRING:
+            case DATE:
             case TIMESTAMP:
+            case DURATION:
                 Object val1 = getValue(pojo1, field);
                 Object val2 = getValue(pojo2, field);
                 if (val1 instanceof Comparable) {
@@ -144,6 +147,14 @@ class UnsafeFieldOperation implements PojoOperations {
         unsafe = getUnsafe();
     }
 
+    /**
+     * Get the value for the given field from the given object and return either
+     * a boolean or a Boolean object.
+     *
+     * @param pojo The object to get data from
+     * @param field The field for which to get the data
+     * @return The result
+     */
     private Object getBoolean(Object pojo, java.lang.reflect.Field field) {
         if (field.getType().isPrimitive()) {
             return unsafe.getBoolean(pojo, unsafe.objectFieldOffset(field));
@@ -151,6 +162,14 @@ class UnsafeFieldOperation implements PojoOperations {
         return getObject(pojo, field);
     }
 
+    /**
+     * Get the value for the given field from the given object and return either
+     * a long or a Long object.
+     *
+     * @param pojo The object to get data from
+     * @param field The field for which to get the data
+     * @return The result
+     */
     private Object getLong(Object pojo, java.lang.reflect.Field field) {
         if (field.getType().isPrimitive()) {
             return unsafe.getLong(pojo, unsafe.objectFieldOffset(field));
@@ -158,6 +177,14 @@ class UnsafeFieldOperation implements PojoOperations {
         return getObject(pojo, field);
     }
 
+    /**
+     * Get the value for the given field from the given object and return either
+     * an int or an Integer object.
+     *
+     * @param pojo The object to get data from
+     * @param field The field for which to get the data
+     * @return The result
+     */
     private Object getInteger(Object pojo, java.lang.reflect.Field field) {
         if (field.getType().isPrimitive()) {
             return unsafe.getInt(pojo, unsafe.objectFieldOffset(field));
@@ -165,6 +192,14 @@ class UnsafeFieldOperation implements PojoOperations {
         return getObject(pojo, field);
     }
 
+    /**
+     * Get the value for the given field from the given object and return either
+     * a short or a Short object.
+     *
+     * @param pojo The object to get data from
+     * @param field The field for which to get the data
+     * @return The result
+     */
     private Object getShort(Object pojo, java.lang.reflect.Field field) {
         if (field.getType().isPrimitive()) {
             return unsafe.getShort(pojo, unsafe.objectFieldOffset(field));
@@ -172,6 +207,14 @@ class UnsafeFieldOperation implements PojoOperations {
         return getObject(pojo, field);
     }
 
+    /**
+     * Get the value for the given field from the given object and return either
+     * a byte or a Byte object.
+     *
+     * @param pojo The object to get data from
+     * @param field The field for which to get the data
+     * @return The result
+     */
     private Object getByte(Object pojo, java.lang.reflect.Field field) {
         if (field.getType().isPrimitive()) {
             return unsafe.getByte(pojo, unsafe.objectFieldOffset(field));
@@ -179,6 +222,14 @@ class UnsafeFieldOperation implements PojoOperations {
         return getObject(pojo, field);
     }
 
+    /**
+     * Get the value for the given field from the given object and return either
+     * a double or a Double object.
+     *
+     * @param pojo The object to get data from
+     * @param field The field for which to get the data
+     * @return The result
+     */
     private Object getDouble(Object pojo, java.lang.reflect.Field field) {
         if (field.getType().isPrimitive()) {
             return unsafe.getDouble(pojo, unsafe.objectFieldOffset(field));
@@ -186,6 +237,14 @@ class UnsafeFieldOperation implements PojoOperations {
         return getObject(pojo, field);
     }
 
+    /**
+     * Get the value for the given field from the given object and return either
+     * a float or a Float object.
+     *
+     * @param pojo The object to get data from
+     * @param field The field for which to get the data
+     * @return The result
+     */
     private Object getFloat(Object pojo, java.lang.reflect.Field field) {
         if (field.getType().isPrimitive()) {
             return unsafe.getFloat(pojo, unsafe.objectFieldOffset(field));
@@ -193,6 +252,14 @@ class UnsafeFieldOperation implements PojoOperations {
         return getObject(pojo, field);
     }
 
+    /**
+     * Get the value for the given field from the given object and return either
+     * an enum value.
+     *
+     * @param pojo The object to get data from
+     * @param field The field for which to get the data
+     * @return The result
+     */
     private Object getEnum(Object pojo, java.lang.reflect.Field field) throws OrmException {
         Object value = getObject(pojo, field);
         if (value != null) {
@@ -205,10 +272,25 @@ class UnsafeFieldOperation implements PojoOperations {
         return null;
     }
 
+    /**
+     * Convenience method to retrieve the value of a field from an object.
+     *
+     * @param pojo The object to get data from
+     * @param field The field for which to get the data
+     * @return The data
+     */
     private Object getObject(Object pojo, java.lang.reflect.Field field) {
         return unsafe.getObject(pojo, unsafe.objectFieldOffset(field));
     }
 
+    /**
+     * Set the value for the given field on the given object to the supplied
+     * boolean value.
+     *
+     * @param pojo The object on which to set the data
+     * @param field The field for which to set the data
+     * @param value The value to set
+     */
     private void setBoolean(Object pojo, java.lang.reflect.Field field, Object value) {
         if (field.getType().isPrimitive()) {
             unsafe.putBoolean(pojo, unsafe.objectFieldOffset(field), (boolean) value);
@@ -217,6 +299,14 @@ class UnsafeFieldOperation implements PojoOperations {
         }
     }
 
+    /**
+     * Set the value for the given field on the given object to the supplied
+     * long value.
+     *
+     * @param pojo The object on which to set the data
+     * @param field The field for which to set the data
+     * @param value The value to set
+     */
     private void setLong(Object pojo, java.lang.reflect.Field field, Object value) {
         if (field.getType().isPrimitive()) {
             unsafe.putLong(pojo, unsafe.objectFieldOffset(field), (long) value);
@@ -225,6 +315,14 @@ class UnsafeFieldOperation implements PojoOperations {
         }
     }
 
+    /**
+     * Set the value for the given field on the given object to the supplied
+     * integer value.
+     *
+     * @param pojo The object on which to set the data
+     * @param field The field for which to set the data
+     * @param value The value to set
+     */
     private void setInteger(Object pojo, java.lang.reflect.Field field, Object value) {
         if (field.getType().isPrimitive()) {
             unsafe.putInt(pojo, unsafe.objectFieldOffset(field), (int) value);
@@ -233,6 +331,14 @@ class UnsafeFieldOperation implements PojoOperations {
         }
     }
 
+    /**
+     * Set the value for the given field on the given object to the supplied
+     * short value.
+     *
+     * @param pojo The object on which to set the data
+     * @param field The field for which to set the data
+     * @param value The value to set
+     */
     private void setShort(Object pojo, java.lang.reflect.Field field, Object value) {
         if (field.getType().isPrimitive()) {
             unsafe.putShort(pojo, unsafe.objectFieldOffset(field), (short) value);
@@ -241,6 +347,14 @@ class UnsafeFieldOperation implements PojoOperations {
         }
     }
 
+    /**
+     * Set the value for the given field on the given object to the supplied
+     * byte value.
+     *
+     * @param pojo The object on which to set the data
+     * @param field The field for which to set the data
+     * @param value The value to set
+     */
     private void setByte(Object pojo, java.lang.reflect.Field field, Object value) {
         if (field.getType().isPrimitive()) {
             unsafe.putByte(pojo, unsafe.objectFieldOffset(field), (byte) value);
@@ -249,6 +363,14 @@ class UnsafeFieldOperation implements PojoOperations {
         }
     }
 
+    /**
+     * Set the value for the given field on the given object to the supplied
+     * double value.
+     *
+     * @param pojo The object on which to set the data
+     * @param field The field for which to set the data
+     * @param value The value to set
+     */
     private void setDouble(Object pojo, java.lang.reflect.Field field, Object value) {
         if (field.getType().isPrimitive()) {
             unsafe.putDouble(pojo, unsafe.objectFieldOffset(field), (double) value);
@@ -257,6 +379,14 @@ class UnsafeFieldOperation implements PojoOperations {
         }
     }
 
+    /**
+     * Set the value for the given field on the given object to the supplied
+     * float value.
+     *
+     * @param pojo The object on which to set the data
+     * @param field The field for which to set the data
+     * @param value The value to set
+     */
     private void setFloat(Object pojo, java.lang.reflect.Field field, Object value) {
         if (field.getType().isPrimitive()) {
             unsafe.putFloat(pojo, unsafe.objectFieldOffset(field), (float) value);
@@ -265,6 +395,14 @@ class UnsafeFieldOperation implements PojoOperations {
         }
     }
 
+    /**
+     * Set the value for the given field on the given object to the supplied
+     * enum value.
+     *
+     * @param pojo The object on which to set the data
+     * @param field The field for which to set the data
+     * @param value The value to set
+     */
     private void setEnum(Object pojo, java.lang.reflect.Field field, Object value) throws OrmException {
         Class<?> valueClass = value.getClass();
         if (valueClass.isEnum()) {
@@ -281,21 +419,27 @@ class UnsafeFieldOperation implements PojoOperations {
         }
     }
 
+    /**
+     * Convenience method to set the value supplied for the given field on the
+     * given object.
+     *
+     * @param pojo The object on which to set the value
+     * @param field The field for which to set the value
+     * @param value The value
+     */
     private void setObject(Object pojo, java.lang.reflect.Field field, Object value) {
         unsafe.putObject(pojo, unsafe.objectFieldOffset(field), value);
     }
 
-    private Unsafe getUnsafe() throws OrmException {
-        try {
-            java.lang.reflect.Field f = Unsafe.class
-                    .getDeclaredField("theUnsafe");
-            f.setAccessible(true);
-            return (Unsafe) f.get(null);
-        } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException ex) {
-            throw new OrmException(format("Error getting Unsafe (%s)", ex.getMessage()), ex);
-        }
-    }
-
+    /**
+     * Recursively find the reflected field or the given field name on the given
+     * class.
+     *
+     * @param clazz The class
+     * @param fieldName The field name to find
+     * @return The field
+     * @throws OrmException Thrown if the field can't be found or accessed
+     */
     private java.lang.reflect.Field getDeclaredField(Class<?> clazz, String fieldName) throws OrmException {
         try {
             return clazz.getDeclaredField(fieldName);
@@ -315,4 +459,21 @@ class UnsafeFieldOperation implements PojoOperations {
         return null;
     }
 
+    /**
+     * Get hold of the sun.misc.Unsafe object to use for object manipulation.
+     *
+     * @return The Unsafe object
+     * @throws OrmException Thrown if there is an error while getting the Unsafe
+     * object
+     */
+    private static Unsafe getUnsafe() throws OrmException {
+        try {
+            java.lang.reflect.Field f = Unsafe.class
+                    .getDeclaredField("theUnsafe");
+            f.setAccessible(true);
+            return (Unsafe) f.get(null);
+        } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException ex) {
+            throw new OrmException(format("Error getting Unsafe (%s)", ex.getMessage()), ex);
+        }
+    }
 }

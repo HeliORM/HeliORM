@@ -2,14 +2,20 @@ package test;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.time.Duration;
+import java.util.List;
 import net.legrange.orm.Orm;
 import net.legrange.orm.OrmException;
 import net.legrange.orm.Table;
+import static test.Tables.BIRD;
 import static test.Tables.CAT;
 import static test.Tables.PERSON;
 import static test.Tables.PET;
 import static test.Tables.TEST;
+import test.pets.Bird;
+import test.pets.Bird.Kind;
 import test.pets.Cat;
+import test.pets.Cat.Type;
 
 /**
  *
@@ -18,18 +24,37 @@ import test.pets.Cat;
 public class test {
 
     public static void main(String... args) throws Exception {
-        Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?user=root");
-<<<<<<< HEAD
-//        Orm orm = Orm.open(con, Orm.Dialect.MYSQL);
-        Orm orm = OrmBuilder.create(con)
-                .mapDatabase(TEST, "orm")
-                .setDialect(Orm.Dialect.MYSQL)
-                .build();
-=======
+        Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/orm?user=root");
         Orm orm = Orm.open(con, Orm.Dialect.MYSQL);
->>>>>>> master
         test t = new test();
-        t.test10(orm);
+        t.test12(orm);
+    }
+
+    /**
+     * Read bird and look at it's sing time (test duration)
+     */
+    private void test12(Orm orm) throws OrmException {
+        System.out.println("-- Load Birds for person 1 ---");
+        List<Bird> birds = orm.select(BIRD).where(BIRD.personNumber.eq(1)).list();
+        for (Bird bird : birds) {
+            double secs = bird.getSingTime().getSeconds();
+            System.out.printf("%s sings for %s seconds (%s minutes)\n", bird.getName(), secs, secs / 60);
+        }
+    }
+
+    /**
+     * Create a bird for person #1
+     */
+    private void test11(Orm orm) throws OrmException {
+        System.out.println("-- Create Bird ---");
+        Bird bird = new Bird();
+        bird.setName("Polly Wants Crack");
+        bird.setAge(3);
+        bird.setKind(Kind.FREERANGE);
+        bird.setPersonNumber(1L);
+        bird.setSingTime(Duration.ofMinutes(90)); // Annoying AF
+        bird = orm.create(bird);
+        System.out.println("Bird created with key " + bird.getBirdId());
     }
 
     /**
@@ -46,7 +71,7 @@ public class test {
     private void test9(Orm orm) throws OrmException, ClassNotFoundException {
         System.out.println("-- See if we have table ---");
         Table<Cat> tableFor = orm.tableFor(new Cat());
-        System.out.printf("Cat table has %s and %s\n", tableFor.getObjectClass(), tableFor.getFields());
+        System.out.printf("Cat table has %s with fields %s\n", tableFor.getObjectClass(), tableFor.getFields());
     }
 
     /**
@@ -78,6 +103,7 @@ public class test {
         Cat cat = new Cat();
         cat.setName("Supreme Cat");
         cat.setAge(1);
+        cat.setType(Type.INDOOR);
         cat.setPersonNumber(1L);
         cat = orm.create(cat);
         System.out.println("Cat created with key " + cat.getCatNumber());

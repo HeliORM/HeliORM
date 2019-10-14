@@ -1,7 +1,8 @@
-package net.legrange.orm.mojo.pojo;
+package net.legrange.orm.mojo.annotated;
 
 import static java.lang.String.format;
 import java.lang.annotation.Annotation;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
 import java.util.Optional;
@@ -13,11 +14,11 @@ import net.legrange.orm.def.Field;
  *
  * @author gideon
  */
-public class PojoFieldModel implements Field {
+public class AnnotatedPojoField implements Field {
 
     private final java.lang.reflect.Field pojoField;
 
-    public PojoFieldModel(java.lang.reflect.Field pojoField) {
+    public AnnotatedPojoField(java.lang.reflect.Field pojoField) {
         this.pojoField = pojoField;
     }
 
@@ -86,10 +87,12 @@ public class PojoFieldModel implements Field {
             return FieldType.DATE;
         } else if (Instant.class.isAssignableFrom(type)) {
             return FieldType.TIMESTAMP;
+        } else if (Duration.class.isAssignableFrom(type)) {
+            return FieldType.DURATION;
         } else if (Enum.class.isAssignableFrom(type)) {
             return FieldType.ENUM;
         }
-        throw new UncaughtPojoException(format("Unsuppored field type %s for field '%s' on %s",
+        throw new AnnotatedPojoException(format("Unsuppored field type %s for field '%s' on %s",
                 type.getSimpleName(), pojoField.getName(), pojoField.getDeclaringClass().getCanonicalName()));
     }
 
@@ -98,6 +101,23 @@ public class PojoFieldModel implements Field {
         return getAnnotation(PrimaryKey.class).isPresent();
     }
 
+    @Override
+    public boolean isAutoNumber() {
+        Optional<PrimaryKey> pkA = getAnnotation(PrimaryKey.class);
+        if (pkA.isPresent()) {
+            return pkA.get().autoIncrement();
+        }
+        return true;
+    }
+
+    /**
+     * Return the annotation of the given type from the POJO field, if it
+     * exists.
+     *
+     * @param <T> The type of annotation
+     * @param annotationClass The annotation class
+     * @return
+     */
     private <T extends Annotation> Optional<T> getAnnotation(Class<T> annotationClass) {
         return Optional.ofNullable(pojoField.getAnnotation(annotationClass));
     }
