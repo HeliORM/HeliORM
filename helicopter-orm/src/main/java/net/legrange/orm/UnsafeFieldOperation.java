@@ -29,7 +29,7 @@ class UnsafeFieldOperation implements PojoOperations {
         try {
             for (Constructor cons : clazz.getConstructors()) {
                 if (cons.getParameterCount() == 0) {
-                    return cons.newInstance(new Object[]{});
+                    return cons.newInstance();
                 }
             }
             return unsafe.allocateInstance(table.getObjectClass());
@@ -48,6 +48,9 @@ class UnsafeFieldOperation implements PojoOperations {
 
     @Override
     public void setValue(Object pojo, Field field, Object value) throws OrmException {
+        if (field == null) {
+            throw new OrmException("Null field type passed to setValue(). BUG!");
+        }
         java.lang.reflect.Field refField = getDeclaredField(pojo.getClass(), field.getJavaName());
         switch (field.getFieldType()) {
             case LONG:
@@ -87,6 +90,9 @@ class UnsafeFieldOperation implements PojoOperations {
 
     @Override
     public Object getValue(Object pojo, Field field) throws OrmException {
+        if (field == null) {
+            throw new OrmException("Null field type passed to getValue(). BUG!");
+        }
         java.lang.reflect.Field refField = getDeclaredField(pojo.getClass(), field.getJavaName());
         switch (field.getFieldType()) {
             case LONG:
@@ -133,7 +139,7 @@ class UnsafeFieldOperation implements PojoOperations {
                 Object val1 = getValue(pojo1, field);
                 Object val2 = getValue(pojo2, field);
                 if (val1 instanceof Comparable) {
-                    return ((Comparable) val1).compareTo((Comparable) val2);
+                    return ((Comparable) val1).compareTo(val2);
                 } else {
                     throw new OrmException(format("Non-comparable type %s for field %s", field.getJavaType(), field.getJavaName()));
                 }
@@ -440,23 +446,18 @@ class UnsafeFieldOperation implements PojoOperations {
      * @return The field
      * @throws OrmException Thrown if the field can't be found or accessed
      */
-    private java.lang.reflect.Field getDeclaredField(Class<?> clazz, String fieldName) throws OrmException {
+    private java.lang.reflect.Field getDeclaredField(final Class<?> clazz, final String fieldName) throws OrmException {
         try {
             return clazz.getDeclaredField(fieldName);
         } catch (NoSuchFieldException ex) {
             Class<?> superClass = clazz.getSuperclass();
             if ((superClass != null) && (superClass != Object.class)) {
-                java.lang.reflect.Field res = getDeclaredField(superClass, fieldName);
-                if (res
-                        == null) {
-                    throw new OrmException(format("Could not find field '%s' on class '%s'", fieldName, clazz.getName()));
-                }
-                return res;
+                return getDeclaredField(superClass, fieldName);
             }
         } catch (SecurityException ex) {
             throw new OrmException(ex.getMessage(), ex);
         }
-        return null;
+        throw new OrmException(format("Could not find field '%s' on class '%s'", fieldName, clazz.getName()));
     }
 
     /**
