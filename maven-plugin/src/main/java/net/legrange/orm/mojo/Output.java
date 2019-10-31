@@ -228,7 +228,7 @@ class Output {
         // getSubTables();
         emit("");
         emit("@Override");
-        emit("public Set<Table> getSubTables() {", getJavaName(cm));
+        emit("public Set<Table<?>> getSubTables() {", getJavaName(cm));
         push();
         Set<Table> subs = tables.get(cm);
         impt(List.class);

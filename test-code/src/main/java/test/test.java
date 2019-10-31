@@ -5,6 +5,7 @@ import java.sql.DriverManager;
 import java.time.Duration;
 import java.util.List;
 import net.legrange.orm.Orm;
+import net.legrange.orm.OrmBuilder;
 import net.legrange.orm.OrmException;
 import net.legrange.orm.Table;
 import static test.Tables.BIRD;
@@ -25,9 +26,12 @@ public class test {
 
     public static void main(String... args) throws Exception {
         Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/orm?user=root");
-        Orm orm = Orm.open(con, Orm.Dialect.MYSQL);
+//        Orm orm = Orm.open(con, Orm.Dialect.MYSQL);
+        Orm orm = OrmBuilder.create(con)
+                .setDialect(Orm.Dialect.MYSQL)
+                .mapDatabase(TEST, "petz").build();
         test t = new test();
-        t.test12(orm);
+        t.test7(orm);
     }
 
     /**
@@ -90,7 +94,7 @@ public class test {
     private void test7(Orm orm) throws OrmException {
         System.out.println("-- Update Cat ---");
         Cat cat = orm.select(CAT).where(CAT.catNumber.eq(5)).one();
-        cat.setName("Cool Cat");
+        cat.setName("Cooler Cat");
         cat = orm.update(cat);
         System.out.println("Cat updated with key " + cat.getCatNumber());
     }

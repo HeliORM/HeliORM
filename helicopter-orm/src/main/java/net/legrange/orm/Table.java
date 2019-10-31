@@ -48,7 +48,7 @@ public interface Table<O> {
      *
      * @return The sub tables
      */
-    Set<Table> getSubTables();
+    Set<Table<?>> getSubTables();
 
     /**
      * Return the database within which this table exists.
