@@ -11,6 +11,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -26,6 +27,7 @@ import java.util.UUID;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+import net.legrange.orm.Database;
 import net.legrange.orm.OrmException;
 import net.legrange.orm.OrmMetaDriver;
 import net.legrange.orm.PojoOperations;
@@ -59,10 +61,16 @@ public abstract class SqlDriver implements OrmMetaDriver {
     private final Map<Table, PreparedStatement> updates = new HashMap();
     private final Map<Table, PreparedStatement> deletes = new HashMap();
     private final PojoOperations pops;
+    private final Map<Database, Database> aliases;
 
     public SqlDriver(Supplier<Connection> connectionSupplier, PojoOperations pops) {
+        this(connectionSupplier, pops, Collections.EMPTY_MAP);
+    }
+
+    public SqlDriver(Supplier<Connection> connectionSupplier, PojoOperations pops, Map<Database, Database> aliases) {
         this.connectionSupplier = connectionSupplier;
         this.pops = pops;
+        this.aliases = aliases;
     }
 
     @Override
@@ -770,7 +778,7 @@ public abstract class SqlDriver implements OrmMetaDriver {
         List<List<Part>> res = new LinkedList();
         if ((part.getType() == Part.Type.SELECT) || (part.getType() == Part.Type.JOIN)) {
             Table<?> table = part.getSelectTable();
-            Set<Table> subTables = table.getSubTables();
+            Set<Table<?>> subTables = table.getSubTables();
             if (!subTables.isEmpty()) {
                 for (Table<?> subTable : subTables) {
                     List<Part> copy = new ArrayList(parts);
@@ -829,7 +837,12 @@ public abstract class SqlDriver implements OrmMetaDriver {
      * @return The SQL table name
      */
     private String databaseName(Table table) {
-        return format("%s", table.getDatabase().getSqlDatabase());
+        Database database = table.getDatabase();
+        Database alias = aliases.get(database);
+        if (alias == null) {
+            alias = database;
+        }
+        return format("%s", alias.getSqlDatabase());
     }
 
 }
