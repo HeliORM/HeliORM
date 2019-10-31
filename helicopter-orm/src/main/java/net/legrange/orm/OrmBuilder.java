@@ -4,6 +4,7 @@ import static java.lang.String.format;
 import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Supplier;
 import net.legrange.orm.driver.MySqlDriver;
 import net.legrange.orm.impl.AliasDatabase;
 
@@ -14,12 +15,12 @@ import net.legrange.orm.impl.AliasDatabase;
  */
 public class OrmBuilder {
 
-    private final Connection con;
+    private final Supplier<Connection> con;
     private final Map<Database, String> databases = new HashMap();
     private Orm.Dialect dialect;
     private PojoOperations pops;
 
-    private OrmBuilder(Connection con) throws OrmException {
+    private OrmBuilder(Supplier<Connection> con) throws OrmException {
         this.con = con;
         this.dialect = Orm.Dialect.MYSQL;
         this.pops = new UnsafeFieldOperation();
@@ -48,7 +49,7 @@ public class OrmBuilder {
         OrmDriver driver;
         switch (dialect) {
             case MYSQL:
-                driver = new MySqlDriver(() -> con, pops, aliases);
+                driver = new MySqlDriver(con, pops, aliases);
                 break;
             default:
                 throw new OrmException(format("Don't know how to create a driver for dialect %s", dialect));
@@ -56,8 +57,12 @@ public class OrmBuilder {
         return new Orm(driver);
     }
 
-    public static OrmBuilder create(Connection con) throws OrmException {
+    public static OrmBuilder create(Supplier<Connection> con) throws OrmException {
         return new OrmBuilder(con);
+    }
+
+    public static OrmBuilder create(Connection con) throws OrmException {
+        return new OrmBuilder(() -> con);
     }
 
 }
