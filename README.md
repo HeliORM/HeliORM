@@ -1,8 +1,6 @@
 # helicopter-orm
 A pachy attempt at making a type safe Java ORM
 
-[![Build Status](https://dev.azure.com/GideonLeGrange/Helicopter%20ORM/_apis/build/status/GideonLeGrange.helicopter-orm?branchName=master)](https://dev.azure.com/GideonLeGrange/Helicopter%20ORM/_build/latest?definitionId=1&branchName=master)
-
 # Design Decisions
 
 ## Cool features we want 
