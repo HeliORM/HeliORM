@@ -10,8 +10,8 @@ import net.legrange.orm.annotation.Pojo;
 @Pojo
 public abstract class Obj {
 
-    private Instant created;// = Instant.now();
-    private Instant modified;// = Instant.now();
+    private Instant created = Instant.now();
+    private Instant modified = Instant.now();
     private int version = 1;
 
     public Instant getCreated() {
