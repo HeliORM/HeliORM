@@ -109,6 +109,13 @@ public final class Orm implements AutoCloseable {
         return new SelectPart(null, table, this);
     }
 
+    public OrmTransaction openTransaction() throws OrmException {
+        if (!(driver instanceof OrmTransactionDriver)) {
+            throw new OrmTransactionException("The ORM driver does not support transactions");
+        }
+        return ((OrmTransactionDriver) driver).openTransaction();
+    }
+
     @Override
     public void close() throws OrmException {
     }

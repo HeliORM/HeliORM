@@ -19,7 +19,32 @@ public class OrmBuilder {
     private final Map<Database, String> databases = new HashMap();
     private Orm.Dialect dialect;
     private PojoOperations pops;
+    private boolean rollbackOnUncommittedClose = false;
 
+    /**
+     * Create a new OrmBuilder using the given connection supplier. This makes
+     * it easy to use a connection pool, since most pool implementation has a
+     * getConnection() method, so one can just pass () -> pool.getConnection()
+     * to create.
+     *
+     * @param con The connection supplier
+     * @return The ORM builder
+     * @throws OrmException
+     */
+    public static OrmBuilder create(Supplier<Connection> con) throws OrmException {
+        return new OrmBuilder(con);
+    }
+
+    /**
+     * Create a new OrmBuilder using the given connection. T
+     *
+     * @param con The connection to use
+     * @return The ORM builder
+     * @throws OrmException
+     */
+    public static OrmBuilder create(Connection con) throws OrmException {
+        return new OrmBuilder(() -> con);
+    }
     /**
      * Create a new ORM builder.
      *
@@ -67,6 +92,19 @@ public class OrmBuilder {
         return this;
     }
 
+    /** Setup the ORM to rollback transactions if a transaction is auto-closed at the end of a try-with-resources block.
+     * Default is false and this means that by default an exception will be thrown if there is no commit or rollback call
+     * before the block closes.
+     *
+     * @param rollback if rollback is preferred to an exception
+     * @return * @return The ORM builder
+     */
+    public OrmBuilder setRollbackOnUncommittedClose(boolean rollback) {
+        this.rollbackOnUncommittedClose = rollback;
+        return this;
+    }
+
+
     /**
      * Create the ORM based on the setup supplied using the builder pattern.
      *
@@ -86,32 +124,10 @@ public class OrmBuilder {
             default:
                 throw new OrmException(format("Don't know how to create a driver for dialect %s", dialect));
         }
+        if (driver instanceof OrmTransactionDriver) {
+            ((OrmTransactionDriver)driver).setRollbackOnUncommittedClose(rollbackOnUncommittedClose);
+        }
         return new Orm(driver);
-    }
-
-    /**
-     * Create a new OrmBuilder using the given connection supplier. This makes
-     * it easy to use a connection pool, since most pool implementation has a
-     * getConnection() method, so one can just pass () -> pool.getConnection()
-     * to create.
-     *
-     * @param con The connection supplier
-     * @return The ORM builder
-     * @throws OrmException
-     */
-    public static OrmBuilder create(Supplier<Connection> con) throws OrmException {
-        return new OrmBuilder(con);
-    }
-
-    /**
-     * Create a new OrmBuilder using the given connection. T
-     *
-     * @param con The connection to use
-     * @return The ORM builder
-     * @throws OrmException
-     */
-    public static OrmBuilder create(Connection con) throws OrmException {
-        return new OrmBuilder(() -> con);
     }
 
 }

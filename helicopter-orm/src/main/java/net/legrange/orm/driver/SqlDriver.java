@@ -1,6 +1,7 @@
 package net.legrange.orm.driver;
 
 import static java.lang.String.format;
+
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
@@ -27,12 +28,16 @@ import java.util.UUID;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+
 import net.legrange.orm.Database;
 import net.legrange.orm.OrmException;
 import net.legrange.orm.OrmMetaDriver;
+import net.legrange.orm.OrmTransaction;
+import net.legrange.orm.OrmTransactionException;
 import net.legrange.orm.PojoOperations;
 import net.legrange.orm.Table;
 import net.legrange.orm.UncaughtOrmException;
+import net.legrange.orm.OrmTransactionDriver;
 import net.legrange.orm.def.Executable;
 import net.legrange.orm.def.Field;
 import net.legrange.orm.impl.JoinPart;
@@ -51,12 +56,13 @@ import net.legrange.orm.rep.TableSpec;
 import net.legrange.orm.rep.ValueCriteria;
 
 /**
- *
  * @author gideon
  */
-public abstract class SqlDriver implements OrmMetaDriver {
+public abstract class SqlDriver implements OrmMetaDriver, OrmTransactionDriver {
 
     private final Supplier<Connection> connectionSupplier;
+    private SqlTransaction currentTransaction;
+    private boolean rollbackOnUncommittedClose = false;
     private final Map<Table, PreparedStatement> inserts = new HashMap();
     private final Map<Table, PreparedStatement> updates = new HashMap();
     private final Map<Table, PreparedStatement> deletes = new HashMap();
@@ -97,11 +103,32 @@ public abstract class SqlDriver implements OrmMetaDriver {
         return res.distinct().map(wrapper -> wrapper.getPojo());
     }
 
+    @Override
+    public OrmTransaction openTransaction() throws OrmException {
+        if (currentTransaction != null) {
+            if (currentTransaction.isOpen()) {
+                throw new OrmTransactionException(format("A transaction is already open"));
+            }
+        }
+        currentTransaction = new SqlTransaction(this);
+        return currentTransaction;
+    }
+
+
+    @Override
+    public void setRollbackOnUncommittedClose(boolean rollback) {
+         rollbackOnUncommittedClose = rollback;
+    }
+
+    boolean getRollbackOnUncommittedClose() {
+        return rollbackOnUncommittedClose;
+    }
+
     /**
      * Create a stream for the given query on the given table and return a
      * stream referencing the data.
      *
-     * @param <O> The type of the POJOs returned
+     * @param <O>   The type of the POJOs returned
      * @param table The table on which to query
      * @param query The SQL query
      * @return The stream of results.
@@ -114,24 +141,24 @@ public abstract class SqlDriver implements OrmMetaDriver {
             ResultSet rs = stmt.executeQuery(query);
             Stream<Wrapper<O>> stream = StreamSupport.stream(
                     Spliterators.spliteratorUnknownSize(new Iterator<Wrapper<O>>() {
-                        @Override
-                        public boolean hasNext() {
-                            try {
-                                return rs.next();
-                            } catch (SQLException ex) {
-                                throw new UncaughtOrmException(ex.getMessage(), ex);
-                            }
-                        }
+                                                            @Override
+                                                            public boolean hasNext() {
+                                                                try {
+                                                                    return rs.next();
+                                                                } catch (SQLException ex) {
+                                                                    throw new UncaughtOrmException(ex.getMessage(), ex);
+                                                                }
+                                                            }
 
-                        @Override
-                        public Wrapper<O> next() {
-                            try {
-                                return new Wrapper(pops, table, makePojoFromResultSet(rs, table));
-                            } catch (OrmException ex) {
-                                throw new UncaughtOrmException(ex.getMessage(), ex);
-                            }
-                        }
-                    },
+                                                            @Override
+                                                            public Wrapper<O> next() {
+                                                                try {
+                                                                    return new Wrapper(pops, table, makePojoFromResultSet(rs, table));
+                                                                } catch (OrmException ex) {
+                                                                    throw new UncaughtOrmException(ex.getMessage(), ex);
+                                                                }
+                                                            }
+                                                        },
                             Spliterator.ORDERED), false);
             stream.onClose(() -> {
                 try {
@@ -394,8 +421,8 @@ public abstract class SqlDriver implements OrmMetaDriver {
      * Creates a Pojo for the given table from the element currently at the
      * result set cursor.
      *
-     * @param <O> The type of Pojo
-     * @param rs The result set
+     * @param <O>   The type of Pojo
+     * @param rs    The result set
      * @param table The table
      * @return The pojo
      * @throws OrmException Thrown if there is an error building the Pojo.
@@ -412,10 +439,10 @@ public abstract class SqlDriver implements OrmMetaDriver {
      * Set the value in a prepared statement to the value of the given field
      * from the given POJO
      *
-     * @param stmt The prepared statement in which to set the value
-     * @param pojo The POJO from which to obtain the value
+     * @param stmt  The prepared statement in which to set the value
+     * @param pojo  The POJO from which to obtain the value
      * @param field The field for which to get the value from the POJO
-     * @param par The position in the prepared statement for the value
+     * @param par   The position in the prepared statement for the value
      * @throws OrmException
      */
     private void setValueInStatement(PreparedStatement stmt, Object pojo, Field field, int par) throws OrmException {
@@ -511,11 +538,11 @@ public abstract class SqlDriver implements OrmMetaDriver {
     /**
      * Extract the value for the given field from a SQL result set.
      *
-     * @param rs The result set
+     * @param rs    The result set
      * @param field The field for which we're reading data
      * @return The data
      * @throws OrmException Thrown if we cannot work out how to extract the
-     * data.
+     *                      data.
      */
     private Object getValueFromResultSet(ResultSet rs, Field field) throws OrmException {
         try {
@@ -579,11 +606,11 @@ public abstract class SqlDriver implements OrmMetaDriver {
      * Retrieve the returned key value from a result set (used for updating
      * auto-increment keys).
      *
-     * @param rs The result set
+     * @param rs    The result set
      * @param field The field for which we're reading data
      * @return The data
      * @throws OrmException Thrown if we cannot work out how to extract the
-     * data.
+     *                      data.
      */
     private Object getKeyValueFromResultSet(ResultSet rs, Field field) throws OrmException {
         try {
@@ -615,7 +642,7 @@ public abstract class SqlDriver implements OrmMetaDriver {
     /**
      * Get a value from the given POJO for the given field as an object
      *
-     * @param pojo The POJO from which to read the object.
+     * @param pojo  The POJO from which to read the object.
      * @param field The field to read.
      * @return The object value.
      * @throws OrmException
@@ -627,7 +654,7 @@ public abstract class SqlDriver implements OrmMetaDriver {
     /**
      * Get a string value from the given POJO for the given field.
      *
-     * @param pojo The POJO from which to read the string.
+     * @param pojo  The POJO from which to read the string.
      * @param field The field to read.
      * @return The string value.
      * @throws OrmException
@@ -646,7 +673,7 @@ public abstract class SqlDriver implements OrmMetaDriver {
     /**
      * Get a date value from the given POJO for the given field.
      *
-     * @param pojo The POJO from which to read the date.
+     * @param pojo  The POJO from which to read the date.
      * @param field The field to read.
      * @return The date value.
      * @throws OrmException
@@ -665,7 +692,7 @@ public abstract class SqlDriver implements OrmMetaDriver {
     /**
      * Get a timestamp value from the given POJO for the given field.
      *
-     * @param pojo The POJO from which to read the timestamp.
+     * @param pojo  The POJO from which to read the timestamp.
      * @param field The field to read.
      * @return The timestamp value.
      * @throws OrmException
@@ -687,7 +714,7 @@ public abstract class SqlDriver implements OrmMetaDriver {
     /**
      * Get a duration value from the given POJO for the given field.
      *
-     * @param pojo The POJO from which to read the timestamp.
+     * @param pojo  The POJO from which to read the timestamp.
      * @param field The field to read.
      * @return The duration string value.
      * @throws OrmException
@@ -703,7 +730,13 @@ public abstract class SqlDriver implements OrmMetaDriver {
         throw new OrmException(format("Could not read Duration value for field '%s' with type '%s'.", field.getJavaName(), field.getFieldType()));
     }
 
-    private Connection getConnection() {
+    Connection getConnection() {
+        if (currentTransaction != null) {
+            if (currentTransaction.isOpen()) {
+                return currentTransaction.getConnection();
+            }
+            currentTransaction = null;
+        }
         return connectionSupplier.get();
     }
 
@@ -770,7 +803,7 @@ public abstract class SqlDriver implements OrmMetaDriver {
      * sub-tables is encountered.
      *
      * @param parts the query parts
-     * @param idx the index of the part being examined
+     * @param idx   the index of the part being examined
      * @return The expanded query parts lists.
      */
     private List<List<Part>> explode(List<Part> parts, int idx) {
