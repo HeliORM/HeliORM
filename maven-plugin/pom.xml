@@ -4,7 +4,7 @@
     <parent>
         <groupId>net.legrange.orm</groupId>
         <artifactId>orm</artifactId>
-        <version>0.3</version>
+        <version>0.4</version>
     </parent>
     <artifactId>generate-model-plugin</artifactId>
     <packaging>maven-plugin</packaging>
