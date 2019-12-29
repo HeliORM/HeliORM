@@ -7,6 +7,7 @@ import java.util.List;
 import net.legrange.orm.Orm;
 import net.legrange.orm.OrmBuilder;
 import net.legrange.orm.OrmException;
+import net.legrange.orm.OrmTransaction;
 import net.legrange.orm.Table;
 import static test.Tables.BIRD;
 import static test.Tables.CAT;
@@ -29,10 +30,88 @@ public class test {
 //        Orm orm = Orm.open(con, Orm.Dialect.MYSQL);
         Orm orm = OrmBuilder.create(con)
                 .setDialect(Orm.Dialect.MYSQL)
+                .setRollbackOnUncommittedClose(false)
                 .mapDatabase(TEST, "petz").build();
         test t = new test();
-        t.test7(orm);
+        t.test15(orm);
     }
+
+
+    /**
+     * Transaction - test rollback if you forget the commit
+     */
+    private void test15(Orm orm) throws OrmException {
+        System.out.println("-- Create Bird ---");
+        Bird bird = new Bird();
+        bird.setName("Bigger Bird");
+        bird.setAge(2);
+        bird.setKind(Kind.FREERANGE);
+        bird.setPersonNumber(1L);
+        bird.setSingTime(Duration.ofMinutes(12));
+        try (OrmTransaction tx = orm.openTransaction()) {
+            bird = orm.create(bird);
+            tx.commit();
+        }
+        catch (OrmException ex) {
+            System.out.printf("Creating bird failed: %s\n", ex.getMessage());
+        }
+        System.out.println("Bird created with key " + bird.getBirdId());
+
+        bird.setName("Mofo big bird yo");
+        try (OrmTransaction tx = orm.openTransaction()) {
+            bird = orm.create(bird);
+            tx.commit();
+        }
+        catch (OrmException ex) {
+            System.out.printf("Creating bird failed: %s\n", ex.getMessage());
+            ex.printStackTrace();
+        }
+        System.out.println("Bird created with key " + bird.getBirdId());
+
+    }
+
+    /**
+     * Transaction - test rollback
+     */
+    private void test14(Orm orm) throws OrmException {
+        System.out.println("-- Create Bird ---");
+        Bird bird = new Bird();
+        bird.setName("Bigger Bird");
+        bird.setAge(2);
+        bird.setKind(Kind.FREERANGE);
+        bird.setPersonNumber(1L);
+        bird.setSingTime(Duration.ofMinutes(12));
+        try (OrmTransaction tx = orm.openTransaction()) {
+            bird = orm.create(bird);
+            tx.rollback();
+        }
+        catch (OrmException ex) {
+            System.out.printf("Creating bird failed: %s\n", ex.getMessage());
+        }
+        System.out.println("Bird created with key " + bird.getBirdId());
+    }
+
+    /**
+     * Transaction - test commit
+     */
+    private void test13(Orm orm) throws OrmException {
+        System.out.println("-- Create Bird ---");
+        Bird bird = new Bird();
+        bird.setName("Big Bird");
+        bird.setAge(2);
+        bird.setKind(Kind.FREERANGE);
+        bird.setPersonNumber(1L);
+        bird.setSingTime(Duration.ofMinutes(12));
+        try (OrmTransaction tx = orm.openTransaction()) {
+            bird = orm.create(bird);
+            tx.commit();
+        }
+        catch (OrmException ex) {
+            System.out.printf("Creating bird failed: %s\n", ex.getMessage());
+        }
+        System.out.println("Bird created with key " + bird.getBirdId());
+    }
+
 
     /**
      * Read bird and look at it's sing time (test duration)
