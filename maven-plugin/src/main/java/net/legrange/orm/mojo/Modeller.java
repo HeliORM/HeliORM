@@ -70,14 +70,11 @@ class Modeller<T extends Table> {
                     List<Entry> entryIdx = new ArrayList(list);
                     for (Entry entry : entryIdx) {
                         if (list.contains(entry)) {
-                            System.out.printf("%s vs %s\n", root.clazz.getCanonicalName(), entry.clazz.getCanonicalName());
                             if (entry.isChildOf(root)) {
-                                System.out.println("1");
                                 root.add(entry);
                                 list.remove(entry);
                                 changed = true;
                             } else if (root.isChildOf(entry)) {
-                                System.out.println("2");
                                 entry.add(root);
                                 list.remove(root);
                                 changed = true;

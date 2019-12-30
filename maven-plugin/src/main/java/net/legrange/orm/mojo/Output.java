@@ -133,8 +133,6 @@ class Output {
             out.println("");
             out.println("public final class Tables implements Database {");
             out.println("");
-//            out.println("\tprivate Tables() {");
-//            out.println("\t}");
             out.println("");
             out.print(buf.toString());
             out.println("");
