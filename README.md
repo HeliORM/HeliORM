@@ -1,4 +1,4 @@
-[![Board Status](https://dev.azure.com/GideonLeGrange/b9854740-2080-4dd5-897e-a75c8a80fa64/e00c4bb2-cc8b-416e-971b-d59d8c4d97d9/_apis/work/boardbadge/202dde8b-5992-4874-be1e-5479605af8b0)](https://dev.azure.com/GideonLeGrange/b9854740-2080-4dd5-897e-a75c8a80fa64/_boards/board/t/e00c4bb2-cc8b-416e-971b-d59d8c4d97d9/Microsoft.RequirementCategory)
+[![Build Status](https://dev.azure.com/GideonLeGrange/Helicopter%20ORM/_apis/build/status/GideonLeGrange.helicopter-orm?branchName=master)](https://dev.azure.com/GideonLeGrange/Helicopter%20ORM/_build/latest?definitionId=1&branchName=master)
 # helicopter-orm
 A pachy attempt at making a type safe Java ORM
 
