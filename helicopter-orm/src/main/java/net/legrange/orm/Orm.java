@@ -48,7 +48,7 @@ public final class Orm implements AutoCloseable {
                 .setDialect(dialect)
                 .build();
     }
-    
+
     /**
      * Create an ORM mapper using the supplied driver instance. This is meant to
      * be used with third party drivers.
