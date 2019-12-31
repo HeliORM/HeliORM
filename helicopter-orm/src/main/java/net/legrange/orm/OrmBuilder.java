@@ -54,7 +54,7 @@ public class OrmBuilder {
     private OrmBuilder(Supplier<Connection> con) throws OrmException {
         this.con = con;
         this.dialect = Orm.Dialect.MYSQL;
-        this.pops = new UnsafeFieldOperation();
+        this.pops = new UnsafePojoOperations();
     }
 
     /**

@@ -70,6 +70,14 @@ public class Person extends Obj {
         this.sex = sex;
     }
 
+    public Long getCompanyNumber() {
+        return companyNumber;
+    }
+
+    public void setCompanyNumber(Long companyNumber) {
+        this.companyNumber = companyNumber;
+    }
+
     @Override
     public String toString() {
         return "Person{" + "personNumber=" + personNumber + ", firstName=" + firstName + ", lastName=" + lastName + ", emailAddress=" + emailAddress + ", companyNumber=" + companyNumber + ", sex=" + sex + '}';

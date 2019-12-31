@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.time.Duration;
 import java.util.List;
+
+import net.legrange.orm.BeanPojoOperations;
 import net.legrange.orm.Orm;
 import net.legrange.orm.OrmBuilder;
 import net.legrange.orm.OrmException;
@@ -31,9 +33,10 @@ public class test {
         Orm orm = OrmBuilder.create(con)
                 .setDialect(Orm.Dialect.MYSQL)
                 .setRollbackOnUncommittedClose(false)
+                .withPojoOperations(new BeanPojoOperations())
                 .mapDatabase(TEST, "petz").build();
         test t = new test();
-        t.test15(orm);
+        t.test5(orm);
     }
 
 

@@ -8,6 +8,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.format.DateTimeParseException;
@@ -29,6 +31,7 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import com.sun.tools.corba.se.idl.constExpr.Or;
 import net.legrange.orm.Database;
 import net.legrange.orm.OrmDriver;
 import net.legrange.orm.OrmException;
@@ -117,7 +120,7 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
 
     @Override
     public void setRollbackOnUncommittedClose(boolean rollback) {
-         rollbackOnUncommittedClose = rollback;
+        rollbackOnUncommittedClose = rollback;
     }
 
     boolean getRollbackOnUncommittedClose() {
@@ -256,7 +259,7 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
             throw new OrmSqlException(ex.getMessage(), ex);
         }
     }
-    
+
     protected String buildInsertQuery(Table<?> table) throws OrmException {
         StringBuilder query = new StringBuilder();
         query.append(format("INSERT INTO %s(", fullTableName(table)));
@@ -418,9 +421,34 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
     private <O> O makePojoFromResultSet(ResultSet rs, Table<O> table) throws OrmException {
         O pojo = (O) pops.newPojoInstance(table);
         for (Field field : table.getFields()) {
-            pops.setValue(pojo, field, getValueFromResultSet(rs, field));
+            setValueInPojo(pojo, field, rs);
         }
         return pojo;
+    }
+
+    private void setValueInPojo(Object pojo, Field field, ResultSet rs) throws OrmException {
+        switch (field.getFieldType()) {
+            case LONG:
+            case INTEGER:
+            case SHORT:
+            case BYTE:
+            case DOUBLE:
+            case FLOAT:
+            case BOOLEAN:
+            case ENUM:
+            case STRING:
+            case DATE:
+                pops.setValue(pojo, field, getValueFromResultSet(rs, field));
+                break;
+            case TIMESTAMP:
+                pops.setValue(pojo, field, getTimestampFromSql(rs, field));
+                break;
+            case DURATION:
+                pops.setValue(pojo, field, getDurationFromSql(rs, field));
+                break;
+            default:
+                throw new OrmException(format("Field type '%s' is unsupported. BUG!", field.getFieldType()));
+        }
     }
 
     /**
@@ -656,6 +684,47 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
             throw new OrmException(format("Could not read String value for field type '%s'.", field.getFieldType()));
         }
         return (String) value;
+    }
+
+    /** Get a timestamp value from SQL for the given POJO and field
+     *
+     * @param rs The ResultSet
+     * @param field The field
+     * @return The correct value
+     */
+    private Instant getTimestampFromSql(ResultSet rs, Field field) throws OrmException {
+        try {
+            Timestamp value = rs.getTimestamp(field.getSqlName());
+            if (value == null) {
+                return null;
+            }
+            if (!(value instanceof Timestamp)) {
+                throw new OrmException(format("Could not read Timestamp value from SQL for field '%s' with type '%s'.", field.getJavaName(), field.getFieldType()));
+            }
+            return ((Timestamp)value).toInstant();
+        }
+        catch (SQLException ex) {
+            throw new OrmException(format("Could not read timestamp value from SQL (%s)", ex.getMessage()), ex);
+        }
+    }
+
+    /** Get a duration value from SQL for the given POJO and field
+     *
+     * @param rs The ResultSet
+     * @param field The field
+     * @return The correct value
+     */
+    private Duration getDurationFromSql(ResultSet rs, Field field) throws OrmException {
+        try {
+            String value = rs.getString(field.getSqlName());
+            if (value == null) {
+                return null;
+            }
+            return Duration.parse(value);
+        }
+        catch (SQLException ex) {
+            throw new OrmException(format("Could not read duration value from SQL (%s)", ex.getMessage()), ex);
+        }
     }
 
     /**
