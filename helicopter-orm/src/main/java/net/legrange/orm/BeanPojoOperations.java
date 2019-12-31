@@ -12,7 +12,7 @@ import static java.lang.String.format;
 /**
  * An implementation of PojoOperations that uses the general JavaBean convention to
  * manipulate POJOs.
- * 
+ *
  * Default public constructors and public getters and public setters are required.
  *
  * @author gideon

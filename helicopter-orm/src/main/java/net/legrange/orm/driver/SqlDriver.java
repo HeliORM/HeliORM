@@ -31,7 +31,6 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import com.sun.tools.corba.se.idl.constExpr.Or;
 import net.legrange.orm.Database;
 import net.legrange.orm.OrmDriver;
 import net.legrange.orm.OrmException;
