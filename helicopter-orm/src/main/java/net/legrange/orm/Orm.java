@@ -1,6 +1,7 @@
 package net.legrange.orm;
 
 import static java.lang.String.format;
+
 import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -10,6 +11,7 @@ import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 import net.legrange.orm.def.Executable;
 import net.legrange.orm.def.Select;
 import net.legrange.orm.driver.MySqlDriver;
@@ -36,20 +38,17 @@ public final class Orm implements AutoCloseable {
      * Create an ORM mapper using the supplied connection to a SQL database of
      * the given dialect.
      *
-     * @param con The SQL connection
+     * @param con     The SQL connection
      * @param dialect The SQL dialect to use
      * @return The newly created ORM
      * @throws OrmException
      */
     public static Orm open(Connection con, Dialect dialect) throws OrmException {
-        switch (dialect) {
-            case MYSQL:
-                return new Orm(new MySqlDriver(() -> con, new UnsafeFieldOperation()));
-            default:
-                throw new OrmException(format("Unsupported database type %s. BUG!", dialect));
-        }
+        return OrmBuilder.create(con)
+                .setDialect(dialect)
+                .build();
     }
-
+    
     /**
      * Create an ORM mapper using the supplied driver instance. This is meant to
      * be used with third party drivers.
@@ -64,7 +63,7 @@ public final class Orm implements AutoCloseable {
     /**
      * Persist a new POJO to the database.
      *
-     * @param <O> The type of the POJO
+     * @param <O>  The type of the POJO
      * @param pojo The POJO to persist
      * @return The updated POJO
      * @throws OrmException
@@ -76,7 +75,7 @@ public final class Orm implements AutoCloseable {
     /**
      * Persist an existing POJO to the database.
      *
-     * @param <O> The type of the POJO
+     * @param <O>  The type of the POJO
      * @param pojo The POJO to persist
      * @return The updated POJO
      * @throws OrmException
@@ -88,7 +87,7 @@ public final class Orm implements AutoCloseable {
     /**
      * Delete a POJO from the database.
      *
-     * @param <O> The type of the POJO
+     * @param <O>  The type of the POJO
      * @param pojo The POJO to delete
      * @throws OrmException
      */
@@ -99,8 +98,8 @@ public final class Orm implements AutoCloseable {
     /**
      * Create a query builder pattern to select data from the database.
      *
-     * @param <T> The type of the table to select on
-     * @param <O> The type of the POJOs selected
+     * @param <T>   The type of the table to select on
+     * @param <O>   The type of the POJOs selected
      * @param table The table to use as starting point for building the query.
      * @return The Select object that can be used to expand the query or to
      * query data.
@@ -123,7 +122,7 @@ public final class Orm implements AutoCloseable {
     /**
      * Find the table definition for the given POJO.
      *
-     * @param <O> The type of the POJO
+     * @param <O>  The type of the POJO
      * @param pojo The pojo
      * @return The table
      * @throws OrmException
@@ -147,12 +146,12 @@ public final class Orm implements AutoCloseable {
     /**
      * Execute the supplied programmed query and return a list of result pojos.
      *
-     * @param <O> The type of Pojo to return
-     * @param <P> The type of programmed query
+     * @param <O>  The type of Pojo to return
+     * @param <P>  The type of programmed query
      * @param tail The tail of the query
      * @return The list of loaded Pojos
      * @throws OrmException Thrown if any of the large number of things that can
-     * go wrong did go wrong.
+     *                      go wrong did go wrong.
      */
     public <O, P extends Part & Executable> List<O> list(P tail) throws OrmException {
         return ((Stream<O>) stream(tail)).collect(Collectors.toList());
@@ -162,12 +161,12 @@ public final class Orm implements AutoCloseable {
      * Execute the supplied programmed query and return a stream of result
      * pojos.
      *
-     * @param <O> The type of Pojo to return
-     * @param <P> The type of programmed query
+     * @param <O>  The type of Pojo to return
+     * @param <P>  The type of programmed query
      * @param tail The tail of the query
      * @return The stream of loaded Pojos
      * @throws OrmException Thrown if any of the large number of things that can
-     * go wrong did go wrong.
+     *                      go wrong did go wrong.
      */
     public <O, P extends Part & Executable> Stream<O> stream(P tail) throws OrmException {
         return driver.stream(tail);
@@ -178,12 +177,12 @@ public final class Orm implements AutoCloseable {
      * possible result. It is expected that either zero or one results will be
      * found, so more than one result will cause an error.
      *
-     * @param <O> The type of Pojo to return
-     * @param <P> The type of programmed query
+     * @param <O>  The type of Pojo to return
+     * @param <P>  The type of programmed query
      * @param tail The tail of the query
      * @return The optional found Pojo
      * @throws OrmException Thrown if any of the large number of things that can
-     * go wrong did go wrong.
+     *                      go wrong did go wrong.
      */
     public <O, P extends Part & Executable> Optional<O> oneOrNone(P tail) throws OrmException {
         Stream<O> stream = stream(tail);
@@ -205,12 +204,12 @@ public final class Orm implements AutoCloseable {
      * result. It is expected that exactly one result will be found, so no
      * result or more than one result will cause an error.
      *
-     * @param <O> The type of Pojo to return
-     * @param <P> The type of programmed query
+     * @param <O>  The type of Pojo to return
+     * @param <P>  The type of programmed query
      * @param tail The tail of the query
      * @return The found Pojo
      * @throws OrmException Thrown if any of the large number of things that can
-     * go wrong did go wrong.
+     *                      go wrong did go wrong.
      */
     public <O, P extends Part & Executable> O one(P tail) throws OrmException {
         Stream<O> stream = stream(tail);
