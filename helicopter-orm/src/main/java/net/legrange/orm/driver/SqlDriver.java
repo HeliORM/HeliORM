@@ -30,8 +30,8 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import net.legrange.orm.Database;
+import net.legrange.orm.OrmDriver;
 import net.legrange.orm.OrmException;
-import net.legrange.orm.OrmMetaDriver;
 import net.legrange.orm.OrmTransaction;
 import net.legrange.orm.OrmTransactionException;
 import net.legrange.orm.PojoOperations;
@@ -58,7 +58,7 @@ import net.legrange.orm.rep.ValueCriteria;
 /**
  * @author gideon
  */
-public abstract class SqlDriver implements OrmMetaDriver, OrmTransactionDriver {
+public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
 
     private final Supplier<Connection> connectionSupplier;
     private SqlTransaction currentTransaction;
@@ -256,19 +256,7 @@ public abstract class SqlDriver implements OrmMetaDriver, OrmTransactionDriver {
             throw new OrmSqlException(ex.getMessage(), ex);
         }
     }
-
-    @Override
-    public boolean tableExists(Table table) throws OrmException {
-        try {
-            DatabaseMetaData metaData = getConnection().getMetaData();
-            try (ResultSet tables = metaData.getTables(databaseName(table), null, tableName(table), new String[]{"TABLE"})) {
-                return tables.next();
-            }
-        } catch (SQLException ex) {
-            throw new OrmException(ex.getMessage(), ex);
-        }
-    }
-
+    
     protected String buildInsertQuery(Table<?> table) throws OrmException {
         StringBuilder query = new StringBuilder();
         query.append(format("INSERT INTO %s(", fullTableName(table)));
