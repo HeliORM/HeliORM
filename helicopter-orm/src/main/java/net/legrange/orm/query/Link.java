@@ -1,4 +1,4 @@
-package net.legrange.orm.rep;
+package net.legrange.orm.query;
 
 import net.legrange.orm.def.Field;
 import net.legrange.orm.Table;

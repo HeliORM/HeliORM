@@ -1,4 +1,4 @@
-package net.legrange.orm.rep;
+package net.legrange.orm.query;
 
 import java.util.Optional;
 import net.legrange.orm.Table;

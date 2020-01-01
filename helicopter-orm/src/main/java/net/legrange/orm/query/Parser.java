@@ -1,4 +1,4 @@
-package net.legrange.orm.rep;
+package net.legrange.orm.query;
 
 import static java.lang.String.format;
 import java.util.ArrayList;
@@ -18,6 +18,7 @@ import net.legrange.orm.impl.SelectPart;
 import net.legrange.orm.impl.ValueExpressionPart;
 
 /**
+ * A "parser" that takes a list of parts and turns it into a simpler query structure.
  *
  * @author gideon
  */
@@ -33,6 +34,7 @@ public class Parser {
         return new Parser(parts).parse();
     }
 
+    /** Private constructor, only used in here. */
     private Parser(List<Part> parts) {
         this.parts = new ArrayList(parts);
     }

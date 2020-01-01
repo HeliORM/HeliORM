@@ -1,16 +1,16 @@
-package net.legrange.orm.rep;
+package net.legrange.orm.query;
 
 /**
  *
  * @author gideon
  */
-public class OrCriteria extends Criteria {
+public class AndCriteria extends Criteria {
 
     private final Criteria left;
     private final Criteria right;
 
-    public OrCriteria(Criteria left, Criteria right) {
-        super(Type.OR);
+    public AndCriteria(Criteria left, Criteria right) {
+        super(Type.AND);
         this.left = left;
         this.right = right;
     }
@@ -22,4 +22,5 @@ public class OrCriteria extends Criteria {
     public Criteria getRight() {
         return right;
     }
+
 }

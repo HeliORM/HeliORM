@@ -1,8 +1,31 @@
 
 # helicopter-orm
-A pachy attempt at making a type safe Java ORM
+A simple type safe Java Object Relational Mapper (ORM) 
 
-# Design Decisions
+# About
+
+Helicopter ORM provides a type safe, Java centric way of accessing relational data 
+(typically stored in a SQL database). It has a few nifty features, but before we get
+into that, it may be best to start with a few examples. 
+
+
+```java
+Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?user=dbuser&password=dbpass");
+Orm orm = Orm.open(con, Orm.Dialect.MYSQL);
+
+List<Person> persons = orm.select(PERSON)
+    .where(PERSON.name).eq("Bob")
+    .list();
+
+```
+
+```java
+List<Person> persons = orm.select(PERSON)
+  .orderBy(PERSON.name)
+  .list(); 
+```
+
+**Work in progress**
 
 ## Cool features we want 
 

@@ -1,8 +1,5 @@
 package net.legrange.orm;
 
-import net.legrange.orm.OrmException;
-import net.legrange.orm.PojoOperations;
-import net.legrange.orm.Table;
 import net.legrange.orm.def.Field;
 
 import java.lang.reflect.Constructor;

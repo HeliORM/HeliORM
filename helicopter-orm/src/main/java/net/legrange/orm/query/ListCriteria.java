@@ -1,8 +1,7 @@
-package net.legrange.orm.rep;
+package net.legrange.orm.query;
 
 import java.util.List;
 import net.legrange.orm.def.Field;
-import net.legrange.orm.rep.ListCriteria.Operator;
 
 /**
  *

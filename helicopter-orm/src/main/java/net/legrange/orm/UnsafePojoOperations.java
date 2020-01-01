@@ -1,12 +1,8 @@
 package net.legrange.orm;
 
-import static java.lang.String.format;
-
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-
-import net.legrange.orm.def.Field;
 import sun.misc.Unsafe;
+
+import static java.lang.String.format;
 
 /**
  * An implementation of PojoOperations that uses the sun.misc.Unsafe API to

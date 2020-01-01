@@ -3,12 +3,10 @@ package net.legrange.orm.driver;
 import static java.lang.String.format;
 
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.Instant;
@@ -46,16 +44,16 @@ import net.legrange.orm.impl.JoinPart;
 import net.legrange.orm.impl.OrderedPart;
 import net.legrange.orm.impl.Part;
 import net.legrange.orm.impl.SelectPart;
-import net.legrange.orm.rep.AndCriteria;
-import net.legrange.orm.rep.Criteria;
-import net.legrange.orm.rep.Link;
-import net.legrange.orm.rep.ListCriteria;
-import net.legrange.orm.rep.OrCriteria;
-import net.legrange.orm.rep.Order;
-import net.legrange.orm.rep.Parser;
-import net.legrange.orm.rep.Query;
-import net.legrange.orm.rep.TableSpec;
-import net.legrange.orm.rep.ValueCriteria;
+import net.legrange.orm.query.AndCriteria;
+import net.legrange.orm.query.Criteria;
+import net.legrange.orm.query.Link;
+import net.legrange.orm.query.ListCriteria;
+import net.legrange.orm.query.OrCriteria;
+import net.legrange.orm.query.Order;
+import net.legrange.orm.query.Parser;
+import net.legrange.orm.query.Query;
+import net.legrange.orm.query.TableSpec;
+import net.legrange.orm.query.ValueCriteria;
 
 /**
  * @author gideon
