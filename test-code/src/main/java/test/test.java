@@ -1,28 +1,27 @@
 package test;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.time.Duration;
-import java.util.List;
-
-import net.legrange.orm.BeanPojoOperations;
 import net.legrange.orm.Orm;
 import net.legrange.orm.OrmBuilder;
 import net.legrange.orm.OrmException;
 import net.legrange.orm.OrmTransaction;
 import net.legrange.orm.Table;
-import static test.Tables.BIRD;
-import static test.Tables.CAT;
-import static test.Tables.PERSON;
-import static test.Tables.PET;
-import static test.Tables.TEST;
 import test.pets.Bird;
 import test.pets.Bird.Kind;
 import test.pets.Cat;
 import test.pets.Cat.Type;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.time.Duration;
+import java.util.List;
+
+import static test.Tables.BIRD;
+import static test.Tables.CAT;
+import static test.Tables.PERSON;
+import static test.Tables.PET;
+import static test.Tables.TEST;
+
 /**
- *
  * @author gideon
  */
 public class test {
@@ -33,10 +32,17 @@ public class test {
         Orm orm = OrmBuilder.create(con)
                 .setDialect(Orm.Dialect.MYSQL)
                 .setRollbackOnUncommittedClose(false)
-                .withPojoOperations(new BeanPojoOperations())
+//                .withPojoOperations(new BeanPojoOperations())
                 .mapDatabase(TEST, "petz").build();
         test t = new test();
+        t.test1(orm);
+        t.test2(orm);
+        t.test3(orm);
+        t.test4(orm);
         t.test5(orm);
+        t.test6(orm);
+        t.test7(orm);
+        t.test8(orm);
     }
 
 
@@ -54,8 +60,7 @@ public class test {
         try (OrmTransaction tx = orm.openTransaction()) {
             bird = orm.create(bird);
             tx.commit();
-        }
-        catch (OrmException ex) {
+        } catch (OrmException ex) {
             System.out.printf("Creating bird failed: %s\n", ex.getMessage());
         }
         System.out.println("Bird created with key " + bird.getBirdId());
@@ -64,8 +69,7 @@ public class test {
         try (OrmTransaction tx = orm.openTransaction()) {
             bird = orm.create(bird);
             tx.commit();
-        }
-        catch (OrmException ex) {
+        } catch (OrmException ex) {
             System.out.printf("Creating bird failed: %s\n", ex.getMessage());
             ex.printStackTrace();
         }
@@ -87,8 +91,7 @@ public class test {
         try (OrmTransaction tx = orm.openTransaction()) {
             bird = orm.create(bird);
             tx.rollback();
-        }
-        catch (OrmException ex) {
+        } catch (OrmException ex) {
             System.out.printf("Creating bird failed: %s\n", ex.getMessage());
         }
         System.out.println("Bird created with key " + bird.getBirdId());
@@ -108,8 +111,7 @@ public class test {
         try (OrmTransaction tx = orm.openTransaction()) {
             bird = orm.create(bird);
             tx.commit();
-        }
-        catch (OrmException ex) {
+        } catch (OrmException ex) {
             System.out.printf("Creating bird failed: %s\n", ex.getMessage());
         }
         System.out.println("Bird created with key " + bird.getBirdId());
@@ -223,7 +225,11 @@ public class test {
      * Load all pets owned by a person called John
      */
     private void test4(Orm orm) throws OrmException {
-        orm.select(PET).join(PERSON).on(PET.personNumber, PERSON.personNumber).where(PERSON.firstName.eq("John")).list().forEach(System.out::println);
+        System.out.println("-- query on abstract pet ---");
+        orm.select(PET).list()
+                .forEach(System.out::println);
+
+        //.join(PERSON).on(PET.personNumber, PERSON.personNumber).where(PERSON.firstName.eq("John")).list().forEach(System.out::println);
     }
 
     /**

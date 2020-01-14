@@ -1,14 +1,14 @@
 package net.legrange.orm.driver;
 
-import java.util.Optional;
 import net.legrange.orm.OrmException;
 import net.legrange.orm.PojoOperations;
 import net.legrange.orm.Table;
 import net.legrange.orm.UncaughtOrmException;
 import net.legrange.orm.def.Field;
 
+import java.util.Optional;
+
 /**
- *
  * @author gideon
  */
 class Wrapper<O> implements Comparable<Wrapper<O>> {
@@ -29,18 +29,21 @@ class Wrapper<O> implements Comparable<Wrapper<O>> {
 
     @Override
     public int compareTo(Wrapper<O> w) {
-        Optional<Field> primaryKey = table.getPrimaryKey();
-        if (primaryKey.isPresent()) {
-            try {
-                return pops.compareTo(pojo, w.getPojo(), primaryKey.get());
-            } catch (OrmException ex) {
-                throw new UncaughtOrmException(ex.getMessage(), ex);
+        if (table.equals(w.table)) {
+            Optional<Field> primaryKey = table.getPrimaryKey();
+            if (primaryKey.isPresent()) {
+                try {
+                    return pops.compareTo(pojo, w.getPojo(), primaryKey.get());
+                } catch (OrmException ex) {
+                    throw new UncaughtOrmException(ex.getMessage(), ex);
+                }
+            }
+            if (pojo instanceof Comparable) {
+                return ((Comparable) pojo).compareTo(w.getPojo());
             }
         }
-        if (pojo instanceof Comparable) {
-            return ((Comparable) pojo).compareTo(w.getPojo());
-        }
         return 0;
+
     }
 
     @Override
