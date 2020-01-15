@@ -1,5 +1,6 @@
 package net.legrange.orm.impl;
 
+import java.lang.reflect.Modifier;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -57,6 +58,11 @@ public class AliasTable<O> implements Table<O> {
     @Override
     public Database getDatabase() {
         return database;
+    }
+
+    @Override
+    public boolean isAbstract() {
+      return table.isAbstract();
     }
 
 }

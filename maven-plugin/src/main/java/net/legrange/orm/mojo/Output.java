@@ -143,22 +143,22 @@ class Output {
             }
 
             out.println("@Override");
-            out.println("public final List<Table> getTables() {");
-            out.printf("\treturn Arrays.asList(%s);", sj.toString());
-            out.println("\n}");
+            out.println("\tpublic final List<Table> getTables() {");
+            out.printf("\t\treturn Arrays.asList(%s);", sj.toString());
+            out.println("\n\t}");
             out.println("");
 
             out.println("@Override");
-            out.println("public final String getSqlDatabase() {");
-            out.printf("\treturn \"%s\";", database.getSqlDatabase());
-            out.println("\n}");
+            out.println("\tpublic final String getSqlDatabase() {");
+            out.printf("\t\treturn \"%s\";", database.getSqlDatabase());
+            out.println("\n\t}");
             out.println("");
 
-            out.printf("public final static Tables %s = new Tables();\n", shortDatabaseName());
+            out.printf("\tpublic final static Tables %s = new Tables();\n", shortDatabaseName());
             for (Table table : tables.keySet()) {
-                out.printf("public final static %s %s = new %s();\n", tableName(table), shortFieldName(table), tableName(table));
+                out.printf("\tpublic final static %s %s = new %s();\n", tableName(table), shortFieldName(table), tableName(table));
             }
-            out.println("}");
+            out.println("\n}");
         } catch (IOException ex) {
             throw new GeneratorException(format("Error opening output file '%s' (%s)", fileName, ex.getMessage()), ex);
         } finally {
@@ -248,6 +248,7 @@ class Output {
         pop();
         emit("}");
         pop();
+
         // getDatabase()
         push();
         emit("");
@@ -255,6 +256,18 @@ class Output {
         emit("public Database getDatabase() {");
         push();
         emit("return %s;", shortDatabaseName());
+        pop();
+        emit("}");
+        pop();
+
+        // isAbstract()
+        // getDatabase()
+        push();
+        emit("");
+        emit("@Override");
+        emit("public boolean isAbstract() {");
+        push();
+        emit("return %b;", cm.isAbstract());
         pop();
         emit("}");
         pop();

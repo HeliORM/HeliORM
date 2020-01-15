@@ -225,7 +225,7 @@ public class test {
      * Load all pets owned by a person called John
      */
     private void test4(Orm orm) throws OrmException {
-        System.out.println("-- query on abstract pet ---");
+        System.out.println("-- query on abstract class ---");
         orm.select(PET).list()
                 .forEach(System.out::println);
 

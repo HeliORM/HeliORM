@@ -20,12 +20,12 @@ import net.legrange.orm.def.Field;
  *
  * @author gideon
  */
-public class AnnotatedPojoTable implements Table {
+public final class AnnotatedPojoTable implements Table {
 
     private final Database database;
     private final Class<?> pojoClass;
     private List<Field> fieldModels;
-    private final Set<AnnotatedPojoTable> subs;
+    private final Set<Table> subs;
 
     /**
      * Create a new table with the given database, POJO class and set of
@@ -38,7 +38,7 @@ public class AnnotatedPojoTable implements Table {
     public AnnotatedPojoTable(Database database, Class<?> pojoClass, Set<AnnotatedPojoTable> subTables) {
         this.database = database;
         this.pojoClass = pojoClass;
-        this.subs = subTables;
+        this.subs = unrollSubTables(subTables);
     }
 
     @Override
@@ -84,6 +84,11 @@ public class AnnotatedPojoTable implements Table {
     @Override
     public Set<Table> getSubTables() {
         return new HashSet(subs);
+    }
+
+    @Override
+    public boolean isAbstract() {
+        return Modifier.isAbstract(pojoClass.getModifiers());
     }
 
     /**
@@ -142,6 +147,17 @@ public class AnnotatedPojoTable implements Table {
             res.addAll(getAllFields(clazz.getSuperclass()));
         }
         res.addAll(Arrays.asList(clazz.getDeclaredFields()));
+        return res;
+    }
+
+    private Set<Table> unrollSubTables(Set<AnnotatedPojoTable> subs) {
+        Set<Table> res = new HashSet();
+        for (Table sub : subs) {
+            if (!sub.isAbstract()) {
+                res.add(sub);
+            }
+            res.addAll(unrollSubTables(sub.getSubTables()));
+        }
         return res;
     }
 

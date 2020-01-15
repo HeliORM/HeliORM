@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>net.legrange.orm</groupId>
     <artifactId>orm</artifactId>
-    <version>0.40</version>
+    <version>0.42</version>
     <packaging>pom</packaging>
     <modules>
         <module>helicopter-orm</module>

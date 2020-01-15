@@ -43,7 +43,7 @@ public interface Table<O> {
     String getSqlTable();
 
     /**
-     * Return tables which support POJOs which are sub-classes of the POJO
+     * Return tables which support POJOs which are concrete sub-classes of the POJO
      * supported by this table.
      *
      * @return The sub tables
@@ -56,4 +56,11 @@ public interface Table<O> {
      * @return The database
      */
     Database getDatabase();
+
+    /** Return true if this table refers to an abstract POJO and not to a concrete
+     * POJO with a database table.
+     *
+     * @return true if abstract
+     */
+    boolean isAbstract();
 }
