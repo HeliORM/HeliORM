@@ -8,7 +8,7 @@ import net.legrange.orm.annotation.PrimaryKey;
  * @author gideon
  */
 @Pojo
-public class Cat extends Pet {
+public class Cat extends Mamal {
 
     public enum Type {
         INDOOR, OUTDOOR;

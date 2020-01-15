@@ -9,7 +9,7 @@ import net.legrange.orm.annotation.PrimaryKey;
  * @author gideon
  */
 @Pojo
-public class Bird extends Pet {
+public class Bird extends Avian {
 
     public enum Kind {
         CAGED, FREERANGE;
