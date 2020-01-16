@@ -93,6 +93,7 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
                         throw new UncaughtOrmException(ex.getMessage(), ex);
                     }
                 });
+        res = res.distinct();
         if (queries.size() > 1) {
             if (tail.getType() == Part.Type.ORDER) {
                 res = res.sorted(makeComparatorForTail(tail));
@@ -100,7 +101,7 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
                 res = res.sorted();
             }
         }
-        return res.distinct().map(wrapper -> wrapper.getPojo());
+        return res.map(wrapper -> wrapper.getPojo());
     }
 
     @Override
@@ -811,16 +812,16 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
     private <O, P extends Part> Comparator<Wrapper<O>> makeComparatorForTail(P tail) {
         List<OrderedPart> order = new LinkedList();
         while (tail.getType() == Part.Type.ORDER) {
-            order.add((OrderedPart) tail);
+            order.add(0, (OrderedPart) tail);
             tail = (P) tail.left();
         }
         List<Comparator<Wrapper<O>>> comps = new LinkedList();
         for (OrderedPart op : order) {
             comps.add((Comparator<Wrapper<O>>) (Wrapper<O> w1, Wrapper<O> w2) -> {
                 if (op.getDirection() == OrderedPart.Direction.ASCENDING) {
-                    return w1.compareTo(w2);
+                    return w1.compareTo(w2, op.getField());
                 } else {
-                    return w2.compareTo(w1);
+                    return w2.compareTo(w1, op.getField());
 
                 }
             });

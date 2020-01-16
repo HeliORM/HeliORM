@@ -70,4 +70,13 @@ class Wrapper<O> implements Comparable<Wrapper<O>> {
         return compareTo((Wrapper<O>) obj) == 0;
     }
 
+    int compareTo(Wrapper<O> w, Field<?, O, ?> field) throws UncaughtOrmException {
+        try {
+            return pops.compareTo(pojo, w.getPojo(), field);
+        }
+        catch (OrmException ex) {
+            throw new UncaughtOrmException(ex.getMessage(), ex);
+        }
+    }
+
 }

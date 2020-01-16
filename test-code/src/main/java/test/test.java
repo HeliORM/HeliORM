@@ -226,7 +226,9 @@ public class test {
      */
     private void test4(Orm orm) throws OrmException {
         System.out.println("-- query on abstract class ---");
-        orm.select(PET).list()
+        orm.select(PET)
+                .orderBy(PET.age).thenBy(PET.name)
+                .list()
                 .forEach(System.out::println);
 
         //.join(PERSON).on(PET.personNumber, PERSON.personNumber).where(PERSON.firstName.eq("John")).list().forEach(System.out::println);
