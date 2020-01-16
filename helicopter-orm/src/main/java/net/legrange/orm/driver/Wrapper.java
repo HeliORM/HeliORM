@@ -42,7 +42,7 @@ class Wrapper<O> implements Comparable<Wrapper<O>> {
                 return ((Comparable) pojo).compareTo(w.getPojo());
             }
         }
-        return 0;
+        return table.hashCode() - w.table.hashCode();
 
     }
 

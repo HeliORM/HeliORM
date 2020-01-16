@@ -283,18 +283,20 @@ final class UnsafePojoOperations extends AbstractPojoOperations {
      * @param value The value to set
      */
     protected void setEnum(Object pojo, java.lang.reflect.Field field, Object value) throws OrmException {
-        Class<?> valueClass = value.getClass();
-        if (valueClass.isEnum()) {
-            unsafe.putObject(pojo, unsafe.objectFieldOffset(field), value);
-        } else {
-            if (!String.class.isAssignableFrom(valueClass)) {
-                throw new OrmException(format("Cannot update Pojo enum field from data of type %s", valueClass.getSimpleName()));
+        if (value != null) {
+            Class<?> valueClass = value.getClass();
+            if (valueClass.isEnum()) {
+                unsafe.putObject(pojo, unsafe.objectFieldOffset(field), value);
+            } else {
+                if (!String.class.isAssignableFrom(valueClass)) {
+                    throw new OrmException(format("Cannot update Pojo enum field from data of type %s", valueClass.getSimpleName()));
+                }
+                Class<?> fieldClass = field.getType();
+                if (!fieldClass.isEnum()) {
+                    throw new OrmException(format("Field '%s' on %s is supposed to be an emum type. BUG!", field.getName(), field.getDeclaringClass().getSimpleName()));
+                }
+                unsafe.putObject(pojo, unsafe.objectFieldOffset(field), Enum.valueOf((Class<Enum>) fieldClass, (String) value));
             }
-            Class<?> fieldClass = field.getType();
-            if (!fieldClass.isEnum()) {
-                throw new OrmException(format("Field '%s' on %s is supposed to be an emum type. BUG!", field.getName(), field.getDeclaringClass().getSimpleName()));
-            }
-            unsafe.putObject(pojo, unsafe.objectFieldOffset(field), Enum.valueOf((Class<Enum>) fieldClass, (String) value));
         }
     }
 

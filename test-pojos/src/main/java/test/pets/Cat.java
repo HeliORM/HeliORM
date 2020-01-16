@@ -35,4 +35,6 @@ public class Cat extends Mamal {
         this.type = type;
     }
 
+
+
 }

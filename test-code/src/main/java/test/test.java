@@ -27,7 +27,7 @@ import static test.Tables.TEST;
 public class test {
 
     public static void main(String... args) throws Exception {
-        Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/orm?user=root");
+        Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/?user=root");
 //        Orm orm = Orm.open(con, Orm.Dialect.MYSQL);
         Orm orm = OrmBuilder.create(con)
                 .setDialect(Orm.Dialect.MYSQL)
@@ -35,14 +35,14 @@ public class test {
 //                .withPojoOperations(new BeanPojoOperations())
                 .mapDatabase(TEST, "petz").build();
         test t = new test();
-        t.test1(orm);
-        t.test2(orm);
-        t.test3(orm);
+//        t.test1(orm);
+//        t.test2(orm);
+//        t.test3(orm);
         t.test4(orm);
-        t.test5(orm);
-        t.test6(orm);
-        t.test7(orm);
-        t.test8(orm);
+//        t.test5(orm);
+//        t.test6(orm);
+//        t.test7(orm);
+//        t.test8(orm);
     }
 
 

@@ -416,11 +416,16 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
      * @throws OrmException Thrown if there is an error building the Pojo.
      */
     private <O> O makePojoFromResultSet(ResultSet rs, Table<O> table) throws OrmException {
-        O pojo = (O) pops.newPojoInstance(table);
-        for (Field field : table.getFields()) {
-            setValueInPojo(pojo, field, rs);
+        try {
+            O pojo = (O) pops.newPojoInstance(table);
+            for (Field field : table.getFields()) {
+                setValueInPojo(pojo, field, rs);
+            }
+            return pojo;
         }
-        return pojo;
+        catch (OrmException ex) {
+            throw new OrmException(format("Error reading table %s (%s)", table.getSqlTable(), ex.getMessage()), ex);
+        }
     }
 
     private void setValueInPojo(Object pojo, Field field, ResultSet rs) throws OrmException {
