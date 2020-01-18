@@ -1,16 +1,19 @@
 package test.pets;
 
-import test.persons.Person;
 import net.legrange.orm.annotation.ForeignKey;
 import net.legrange.orm.annotation.Pojo;
+import net.legrange.orm.annotation.PrimaryKey;
 import pojos.Obj;
+import test.persons.Person;
 
 /**
- *
  * @author gideon
  */
 @Pojo
 public abstract class Pet extends Obj {
+
+    @PrimaryKey(autoIncrement = true)
+    private Long id;
 
     @ForeignKey(pojo = Person.class)
     private Long personNumber;
@@ -46,4 +49,11 @@ public abstract class Pet extends Obj {
         return "" + getClass().getSimpleName() + "{" + "name=" + name + ", age=" + age + '}';
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 }
