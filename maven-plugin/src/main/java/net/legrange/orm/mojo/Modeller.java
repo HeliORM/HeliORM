@@ -55,49 +55,27 @@ class Modeller<T extends Table> {
     }
 
     private List<Entry> buildTree(Set<Class<?>> classes) {
-        List<Entry> entries = classes.stream().map(clazz -> new Entry(clazz)).collect(Collectors.toList());
-        buildTree_(entries);
-        return entries;
+        Map<String, Entry> classMap = classes.stream()
+                .collect(Collectors.toMap(clazz -> clazz.getName(), clazz -> new Entry(clazz)));
+        return buildTree(classMap);
     }
 
-    private Map<String, List<Entry>> makeParentMap(List<Entry> list) {
-        Map<String, List<Entry>> map = new HashMap<>();
-        for (Entry entry : list) {
-            String key = entry.clazz.getSuperclass().getCanonicalName();
-            List<Entry> forClass = map.get(key);
-            if (forClass == null) {
-                forClass = new ArrayList<>();
-                map.put(key, forClass);
-            }
-            forClass.add(entry);
-        }
-        return map;
-    }
-
-    private void buildTree_(List<Entry> list) {
-        Map<String, List<Entry>> parentMap = makeParentMap(list);
-        Map<String, Entry> classMap = list.stream().collect(Collectors.toMap(e -> e.clazz.getName(), e -> e));
-        for (String parent : parentMap.keySet()) {
-            List<Entry> forClass = parentMap.get(parent);
-            if (!forClass.isEmpty()) {
-                if (classMap.containsKey(parent)) {
-                    Entry pe = classMap.get(parent);
-                    for (Entry e : forClass) {
-                        pe.add(e);
-                    }
-                }
-            }
-            if (classMap.containsKey(parent)) {
-                if (classMap.containsKey(classMap.get(parent).clazz.getSuperclass().getName())) {
-                    classMap.remove(parent);
-                }
+    private List<Entry> buildTree(Map<String, Entry> entryMap) {
+        List<Entry> root = new ArrayList<>();
+        for (String name : entryMap.keySet()) {
+            Entry entry = entryMap.get(name);
+            String parentName = entry.clazz.getSuperclass().getName();
+            if (entryMap.containsKey(parentName)) {
+                Entry parentEntry = entryMap.get(parentName);
+                parentEntry.add(entry);
+            } else {
+                root.add(entry);
             }
         }
-        list.clear();
-        list.addAll(classMap.values());
-//        System.out.println("################");
-//        list.forEach(k -> k.dump(0));
-//        System.out.println("################");
+        System.out.println("################");
+        root.forEach(k -> k.dump(0));
+        System.out.println("################");
+        return root;
     }
 
     private Map<String, String> makeDatabaseMap(Set<Class<?>> allPojoClasses) {
@@ -164,13 +142,15 @@ class Modeller<T extends Table> {
             this.clazz = clazz;
         }
 
+
         void add(Entry child) {
             kids.add(child);
         }
 
         boolean isChildOf(Entry parent) {
-            return clazz.getSuperclass().getCanonicalName().equals(parent.clazz.getCanonicalName());
+            return clazz.getSuperclass().getName().equals(parent.clazz.getName());
         }
+
 
         private void dump(int indent) {
             for (int i = 0; i < indent; ++i) {
