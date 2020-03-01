@@ -1,20 +1,5 @@
 package net.legrange.orm.mojo;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import static java.lang.String.format;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.StringJoiner;
-import java.util.stream.Collectors;
 import net.legrange.orm.Database;
 import net.legrange.orm.Table;
 import net.legrange.orm.def.BooleanField;
@@ -44,8 +29,24 @@ import net.legrange.orm.impl.ShortFieldPart;
 import net.legrange.orm.impl.StringFieldPart;
 import net.legrange.orm.impl.TimestampFieldPart;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.StringJoiner;
+import java.util.stream.Collectors;
+
+import static java.lang.String.format;
+
 /**
- *
  * @author gideon
  */
 class Output {
@@ -261,7 +262,6 @@ class Output {
         pop();
 
         // isAbstract()
-        // getDatabase()
         push();
         emit("");
         emit("@Override");

@@ -1,15 +1,15 @@
 package net.legrange.orm.mojo;
 
+import net.legrange.orm.Table;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import net.legrange.orm.Table;
 
 /**
- *
  * @author gideon
  */
 class Modeller<T extends Table> {
@@ -60,30 +60,44 @@ class Modeller<T extends Table> {
         return entries;
     }
 
+    private Map<String, List<Entry>> makeParentMap(List<Entry> list) {
+        Map<String, List<Entry>> map = new HashMap<>();
+        for (Entry entry : list) {
+            String key = entry.clazz.getSuperclass().getCanonicalName();
+            List<Entry> forClass = map.get(key);
+            if (forClass == null) {
+                forClass = new ArrayList<>();
+                map.put(key, forClass);
+            }
+            forClass.add(entry);
+        }
+        return map;
+    }
+
     private void buildTree_(List<Entry> list) {
-        boolean changed = true;
-        while (changed) {
-            changed = false;
-            List<Entry> rootIdx = new ArrayList(list);
-            for (Entry root : rootIdx) {
-                if (list.contains(root)) {
-                    List<Entry> entryIdx = new ArrayList(list);
-                    for (Entry entry : entryIdx) {
-                        if (list.contains(entry)) {
-                            if (entry.isChildOf(root)) {
-                                root.add(entry);
-                                list.remove(entry);
-                                changed = true;
-                            } else if (root.isChildOf(entry)) {
-                                entry.add(root);
-                                list.remove(root);
-                                changed = true;
-                            }
-                        }
+        Map<String, List<Entry>> parentMap = makeParentMap(list);
+        Map<String, Entry> classMap = list.stream().collect(Collectors.toMap(e -> e.clazz.getName(), e -> e));
+        for (String parent : parentMap.keySet()) {
+            List<Entry> forClass = parentMap.get(parent);
+            if (!forClass.isEmpty()) {
+                if (classMap.containsKey(parent)) {
+                    Entry pe = classMap.get(parent);
+                    for (Entry e : forClass) {
+                        pe.add(e);
                     }
                 }
             }
+            if (classMap.containsKey(parent)) {
+                if (classMap.containsKey(classMap.get(parent).clazz.getSuperclass().getName())) {
+                    classMap.remove(parent);
+                }
+            }
         }
+        list.clear();
+        list.addAll(classMap.values());
+//        System.out.println("################");
+//        list.forEach(k -> k.dump(0));
+//        System.out.println("################");
     }
 
     private Map<String, String> makeDatabaseMap(Set<Class<?>> allPojoClasses) {
@@ -156,6 +170,16 @@ class Modeller<T extends Table> {
 
         boolean isChildOf(Entry parent) {
             return clazz.getSuperclass().getCanonicalName().equals(parent.clazz.getCanonicalName());
+        }
+
+        private void dump(int indent) {
+            for (int i = 0; i < indent; ++i) {
+                System.out.print("  ");
+            }
+            System.out.println(clazz.getSimpleName());
+            for (Entry k : kids) {
+                k.dump(indent + 1);
+            }
         }
 
     }
