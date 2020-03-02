@@ -164,6 +164,7 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
             stream.onClose(() -> {
                 try {
                     rs.close();
+                    sql.close();
                 } catch (SQLException ex) {
                     throw new UncaughtOrmException(ex.getMessage(), ex);
                 }
