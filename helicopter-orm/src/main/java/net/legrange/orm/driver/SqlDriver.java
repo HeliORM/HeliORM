@@ -63,9 +63,9 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
     private final Supplier<Connection> connectionSupplier;
     private SqlTransaction currentTransaction;
     private boolean rollbackOnUncommittedClose = false;
-    private final Map<Table, PreparedStatement> inserts = new HashMap();
-    private final Map<Table, PreparedStatement> updates = new HashMap();
-    private final Map<Table, PreparedStatement> deletes = new HashMap();
+    private final Map<Table, String> inserts = new HashMap();
+    private final Map<Table, String> updates = new HashMap();
+    private final Map<Table, String> deletes = new HashMap();
     private final PojoOperations pops;
     private final Map<Database, Database> aliases;
 
@@ -178,44 +178,46 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
     @Override
     public <T extends Table<O>, O> O create(T table, O pojo) throws OrmException {
         try {
-            PreparedStatement stmt = inserts.get(table);
-            if (stmt == null) {
-                stmt = getConnection().prepareStatement(buildInsertQuery(table), Statement.RETURN_GENERATED_KEYS);
-                inserts.put(table, stmt);
+            String query = inserts.get(table);
+            if (query == null) {
+                query = buildInsertQuery(table);
+                inserts.put(table, query);
             }
-            int par = 1;
-            for (Field field : table.getFields()) {
-                if (field.isPrimaryKey()) {
-                    if (field.isAutoNumber()) {
-                        if (field.getFieldType() == Field.FieldType.STRING) {
-                            pops.setValue(pojo, field, UUID.randomUUID().toString());
-                            setValueInStatement(stmt, pojo, field, par);
+            try (Connection con = getConnection(); PreparedStatement stmt = con.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+                int par = 1;
+                for (Field field : table.getFields()) {
+                    if (field.isPrimaryKey()) {
+                        if (field.isAutoNumber()) {
+                            if (field.getFieldType() == Field.FieldType.STRING) {
+                                pops.setValue(pojo, field, UUID.randomUUID().toString());
+                                setValueInStatement(stmt, pojo, field, par);
+                            } else {
+                                stmt.setObject(par, null);
+                            }
                         } else {
-                            stmt.setObject(par, null);
+                            setValueInStatement(stmt, pojo, field, par);
                         }
                     } else {
                         setValueInStatement(stmt, pojo, field, par);
                     }
-                } else {
-                    setValueInStatement(stmt, pojo, field, par);
+                    par++;
                 }
-                par++;
-            }
-            stmt.executeUpdate();
-            Optional<Field> opt = table.getPrimaryKey();
-            if (opt.isPresent()) {
-                Field keyField = opt.get();
-                if (keyField.isAutoNumber()) {
-                    if (keyField.getFieldType() != Field.FieldType.STRING) {
-                        try (ResultSet rs = stmt.getGeneratedKeys()) {
-                            if (rs.next()) {
-                                pops.setValue(pojo, keyField, getKeyValueFromResultSet(rs, opt.get()));
+                stmt.executeUpdate();
+                Optional<Field> opt = table.getPrimaryKey();
+                if (opt.isPresent()) {
+                    Field keyField = opt.get();
+                    if (keyField.isAutoNumber()) {
+                        if (keyField.getFieldType() != Field.FieldType.STRING) {
+                            try (ResultSet rs = stmt.getGeneratedKeys()) {
+                                if (rs.next()) {
+                                    pops.setValue(pojo, keyField, getKeyValueFromResultSet(rs, opt.get()));
+                                }
                             }
                         }
                     }
                 }
+                return pojo;
             }
-            return pojo;
         } catch (SQLException ex) {
             throw new OrmSqlException(ex.getMessage(), ex);
         }
@@ -224,21 +226,23 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
     @Override
     public <T extends Table<O>, O> O update(T table, O pojo) throws OrmException {
         try {
-            PreparedStatement stmt = updates.get(table);
-            if (stmt == null) {
-                stmt = getConnection().prepareStatement(buildUpdateQuery(table));
-                updates.put(table, stmt);
+            String query = updates.get(table);
+            if (query == null) {
+                query = buildUpdateQuery(table);
+                updates.put(table, query);
             }
-            int par = 1;
-            for (Field field : table.getFields()) {
-                if (!field.isPrimaryKey()) {
-                    setValueInStatement(stmt, pojo, field, par);
-                    par++;
+            try (Connection con = getConnection(); PreparedStatement stmt = con.prepareStatement(query)) {
+                int par = 1;
+                for (Field field : table.getFields()) {
+                    if (!field.isPrimaryKey()) {
+                        setValueInStatement(stmt, pojo, field, par);
+                        par++;
+                    }
                 }
+                setValueInStatement(stmt, pojo, table.getPrimaryKey().get(), par);
+                stmt.executeUpdate();
+                return pojo;
             }
-            setValueInStatement(stmt, pojo, table.getPrimaryKey().get(), par);
-            stmt.executeUpdate();
-            return pojo;
         } catch (SQLException ex) {
             throw new OrmSqlException(ex.getMessage(), ex);
         }
@@ -247,13 +251,15 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
     @Override
     public <T extends Table<O>, O> void delete(T table, O pojo) throws OrmException {
         try {
-            PreparedStatement stmt = deletes.get(table);
-            if (stmt == null) {
-                stmt = getConnection().prepareStatement(buildDeleteQuery(table));
-                deletes.put(table, stmt);
+            String query = deletes.get(table);
+            if (query == null) {
+                query = buildDeleteQuery(table);
+                deletes.put(table, query);
             }
-            setValueInStatement(stmt, pojo, table.getPrimaryKey().get(), 1);
-            stmt.executeUpdate();
+            try (Connection con = getConnection(); PreparedStatement stmt = con.prepareStatement(query)) {
+                setValueInStatement(stmt, pojo, table.getPrimaryKey().get(), 1);
+                stmt.executeUpdate();
+            }
         } catch (SQLException ex) {
             throw new OrmSqlException(ex.getMessage(), ex);
         }
@@ -424,8 +430,7 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
                 setValueInPojo(pojo, field, rs);
             }
             return pojo;
-        }
-        catch (OrmException ex) {
+        } catch (OrmException ex) {
             throw new OrmException(format("Error reading table %s (%s)", table.getSqlTable(), ex.getMessage()), ex);
         }
     }
@@ -690,9 +695,10 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
         return (String) value;
     }
 
-    /** Get a timestamp value from SQL for the given POJO and field
+    /**
+     * Get a timestamp value from SQL for the given POJO and field
      *
-     * @param rs The ResultSet
+     * @param rs    The ResultSet
      * @param field The field
      * @return The correct value
      */
@@ -705,16 +711,16 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
             if (!(value instanceof Timestamp)) {
                 throw new OrmException(format("Could not read Timestamp value from SQL for field '%s' with type '%s'.", field.getJavaName(), field.getFieldType()));
             }
-            return ((Timestamp)value).toInstant();
-        }
-        catch (SQLException ex) {
+            return ((Timestamp) value).toInstant();
+        } catch (SQLException ex) {
             throw new OrmException(format("Could not read timestamp value from SQL (%s)", ex.getMessage()), ex);
         }
     }
 
-    /** Get a duration value from SQL for the given POJO and field
+    /**
+     * Get a duration value from SQL for the given POJO and field
      *
-     * @param rs The ResultSet
+     * @param rs    The ResultSet
      * @param field The field
      * @return The correct value
      */
@@ -725,8 +731,7 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
                 return null;
             }
             return Duration.parse(value);
-        }
-        catch (SQLException ex) {
+        } catch (SQLException ex) {
             throw new OrmException(format("Could not read duration value from SQL (%s)", ex.getMessage()), ex);
         }
     }
