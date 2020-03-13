@@ -271,7 +271,7 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
         StringJoiner fields = new StringJoiner(",");
         StringJoiner values = new StringJoiner(",");
         for (Field field : table.getFields()) {
-            fields.add(field.getSqlName());
+            fields.add(format("`%s`", field.getSqlName()));
             values.add("?");
         }
         query.append(fields.toString());
