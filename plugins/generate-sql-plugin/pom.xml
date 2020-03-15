@@ -7,12 +7,13 @@
         <artifactId>plugins</artifactId>
         <version>0.47</version>
     </parent>
-    <artifactId>generate-model-plugin</artifactId>
+    <artifactId>generate-sql-plugin</artifactId>
     <packaging>maven-plugin</packaging>
-    <name>[Helicopter ORM] Model Generation Plugin</name>
+    <name>[Helicopter ORM] SQL Generation Plugin</name>
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.version>3.6.0</maven.version>
     </properties>
 
     <dependencies>

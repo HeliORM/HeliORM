@@ -13,6 +13,7 @@
     <artifactId>plugins</artifactId>
     <modules>
         <module>generate-model-plugin</module>
+        <module>generate-sql-plugin</module>
     </modules>
 
 </project>

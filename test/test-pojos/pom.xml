@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>net.legrange.orm</groupId>
-        <artifactId>orm</artifactId>
+        <artifactId>test</artifactId>
         <version>0.47</version>
     </parent>
     <groupId>net.legrange.orm</groupId>
@@ -13,8 +13,6 @@
     <version>0.47</version>
     <packaging>jar</packaging>
     <properties>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
         <sourceOutputDir>${basedir}/target/generated-sources</sourceOutputDir>
         <resourceOutputDir>${basedir}/target/classes</resourceOutputDir>
     </properties>
@@ -47,7 +45,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.6.1</version>
+                <version>${maven.version}</version>
                 <executions>
                     <execution>
                         <phase>prepare-package</phase>
