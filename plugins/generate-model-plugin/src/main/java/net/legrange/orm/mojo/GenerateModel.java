@@ -1,18 +1,5 @@
 package net.legrange.orm.mojo;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import static java.lang.String.format;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import net.legrange.orm.Database;
 import net.legrange.orm.Table;
 import net.legrange.orm.mojo.annotated.AnnotatedPojoGenerator;
@@ -27,12 +14,26 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import static java.lang.String.format;
+
 /**
- *
  * @author gideon
  */
 @Mojo(name = "generate-model", defaultPhase = LifecyclePhase.PROCESS_CLASSES,
-        requiresDependencyResolution = ResolutionScope.COMPILE)
+        requiresDependencyResolution = ResolutionScope.COMPILE, requiresProject = true)
 public class GenerateModel extends AbstractMojo {
 
     @Parameter(property = "strategy", required = true)

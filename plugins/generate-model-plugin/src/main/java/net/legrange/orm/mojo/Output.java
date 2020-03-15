@@ -366,11 +366,11 @@ class Output {
         }
     }
 
-    private void addType3Field(Class<? extends Field> fieldClass, Class<? extends FieldPart> partClass, Table cm, Field fm) throws GeneratorException {
+    private void addType3Field(Class<? extends Field> fieldClass, Class<? extends FieldPart> partClass, Table cm, Field<?, ?, ?> fm) throws GeneratorException {
         impt(fieldClass);
         impt(partClass);
         impt(fm.getJavaType());
-        emit("public final %s<%s, %s, %s> %s = new %s(%s.class, \"%s\", \"%s\");",
+        emit("public final %s<%s, %s, %s> %s = new %s(%s.class, \"%s\", \"%s\") {",
                 fieldClass.getSimpleName(),
                 tableName(cm),
                 cm.getObjectClass().getSimpleName(),
@@ -379,6 +379,22 @@ class Output {
                 partClass.getSimpleName(),
                 fm.getJavaType().getSimpleName(),
                 fm.getJavaName(), fm.getSqlName());
+        if (fm.getFieldType() == Field.FieldType.ENUM) {
+            push();
+            emit("@Override");
+            emit("public Set<String> getEnumValues() {");
+            push();
+            StringJoiner sj = new StringJoiner(",");
+            for (String val : fm.getEnumValues()) {
+                sj.add(format("\"%s\"", val));
+            }
+            emit("return new HashSet(Arrays.asList(%s));", sj.toString());
+
+            pop();
+            emit("}");
+            pop();
+        }
+        emit("};");
     }
 
     private void addLongField(Table cm, Field fm) throws GeneratorException {

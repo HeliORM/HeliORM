@@ -2,13 +2,16 @@ package net.legrange.orm.def;
 
 import net.legrange.orm.Table;
 
+import java.util.Collections;
+import java.util.Set;
+
 /**
  * A field on a table.
  *
- * @author gideon
  * @param <T> The type of the table
  * @param <O> The type of the POJO to which the table and this field applies
  * @param <C> The data type of the field
+ * @author gideon
  */
 public interface Field<T extends Table<O>, O, C> {
 
@@ -62,5 +65,9 @@ public interface Field<T extends Table<O>, O, C> {
      * @return True if auto-number
      */
     boolean isAutoNumber();
+
+    default Set<String> getEnumValues() {
+        return Collections.EMPTY_SET;
+    }
 
 }

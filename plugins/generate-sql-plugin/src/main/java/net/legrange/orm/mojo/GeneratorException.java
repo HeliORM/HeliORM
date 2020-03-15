@@ -1,17 +1,14 @@
 package net.legrange.orm.mojo;
 
-/**
- *
- * @author gideon
- */
-public class GeneratorException extends Exception {
+import org.apache.maven.plugin.MojoExecutionException;
 
-    public GeneratorException(String message) {
-        super(message);
-    }
+public class GeneratorException extends MojoExecutionException {
 
     public GeneratorException(String message, Throwable cause) {
         super(message, cause);
     }
 
+    public GeneratorException(String message) {
+        super(message);
+    }
 }

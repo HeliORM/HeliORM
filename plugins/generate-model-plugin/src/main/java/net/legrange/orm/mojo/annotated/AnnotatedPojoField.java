@@ -1,17 +1,21 @@
 package net.legrange.orm.mojo.annotated;
 
-import static java.lang.String.format;
-import java.lang.annotation.Annotation;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.Date;
-import java.util.Optional;
 import net.legrange.orm.annotation.Column;
 import net.legrange.orm.annotation.PrimaryKey;
 import net.legrange.orm.def.Field;
 
+import java.lang.annotation.Annotation;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static java.lang.String.format;
+
 /**
- *
  * @author gideon
  */
 public class AnnotatedPojoField implements Field {
@@ -110,11 +114,19 @@ public class AnnotatedPojoField implements Field {
         return true;
     }
 
+    @Override
+    public Set<String> getEnumValues() {
+        return Arrays.asList(pojoField.getType().getEnumConstants())
+                .stream()
+                .map(object -> (Enum) object)
+                .map((Enum e) -> e.name()).collect(Collectors.toSet());
+    }
+
     /**
      * Return the annotation of the given type from the POJO field, if it
      * exists.
      *
-     * @param <T> The type of annotation
+     * @param <T>             The type of annotation
      * @param annotationClass The annotation class
      * @return
      */

@@ -1,14 +1,13 @@
 package net.legrange.orm.impl;
 
-import net.legrange.orm.def.EnumField;
 import net.legrange.orm.Table;
+import net.legrange.orm.def.EnumField;
 
 /**
- *
- * @author gideon
  * @param <T>
  * @param <O>
  * @param <E>
+ * @author gideon
  */
 public class EnumFieldPart<T extends Table<O>, O, E extends Enum> extends FieldPart<T, O, E> implements
         EnumField<T, O, E>,
