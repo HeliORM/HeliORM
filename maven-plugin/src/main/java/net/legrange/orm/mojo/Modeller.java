@@ -72,9 +72,6 @@ class Modeller<T extends Table> {
                 root.add(entry);
             }
         }
-        System.out.println("################");
-        root.forEach(k -> k.dump(0));
-        System.out.println("################");
         return root;
     }
 
