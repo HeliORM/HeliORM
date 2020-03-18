@@ -381,6 +381,7 @@ class Output {
                 fm.getJavaName(), fm.getSqlName());
         if (fm.getFieldType() == Field.FieldType.ENUM) {
             push();
+            impt(HashSet.class);
             emit("@Override");
             emit("public Set<String> getEnumValues() {");
             push();
