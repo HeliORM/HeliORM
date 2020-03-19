@@ -35,7 +35,7 @@ import static java.lang.String.format;
 /**
  * @author gideon
  */
-@Mojo(name = "generate-sql", defaultPhase = LifecyclePhase.PROCESS_CLASSES,
+@Mojo(name = "generate-sql", defaultPhase = LifecyclePhase.PREPARE_PACKAGE,
         requiresDependencyResolution = ResolutionScope.COMPILE)
 public class GenerateSql extends AbstractMojo {
 
@@ -68,7 +68,7 @@ public class GenerateSql extends AbstractMojo {
         }
         Set<Class<Database>> classes = getDatabaseClasses();
         if (classes.isEmpty()) {
-            throw new MojoExecutionException("Could not find any database classes");
+            throw new MojoExecutionException(format("Could not find any database classes for packages %s", packages));
         }
         for (Class<Database> type : classes) {
             processDatabase(type);
