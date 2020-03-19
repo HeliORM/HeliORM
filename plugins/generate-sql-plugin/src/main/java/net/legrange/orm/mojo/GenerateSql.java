@@ -66,7 +66,11 @@ public class GenerateSql extends AbstractMojo {
             default:
                 throw new MojoExecutionException(format("Unsupported SQL Dialect '%s'. BUG?", dialect));
         }
-        for (Class<Database> type : getDatabaseClasses()) {
+        Set<Class<Database>> classes = getDatabaseClasses();
+        if (classes.isEmpty()) {
+            throw new MojoExecutionException("Could not find any database classes");
+        }
+        for (Class<Database> type : classes) {
             processDatabase(type);
         }
     }
@@ -75,6 +79,7 @@ public class GenerateSql extends AbstractMojo {
         try {
             StringBuilder sqlForDatabase = new StringBuilder();
             Database database = type.newInstance();
+            info("Generating SQL for database %s", database.getSqlDatabase());
             for (Table table : database.getTables()) {
                 if (!table.isAbstract()) {
                     String sqlForTable = processTable(table);
@@ -97,6 +102,7 @@ public class GenerateSql extends AbstractMojo {
 
     private void writeSqlFile(String name, String sql) throws GeneratorException {
         String fileName = format("%s/%s.sql", outputDir, name);
+        info("Writing SQL to %s", fileName);
         try (PrintWriter out = new PrintWriter(new FileWriter(fileName))) {
             out.print(sql);
         } catch (IOException e) {
@@ -143,7 +149,14 @@ public class GenerateSql extends AbstractMojo {
             }
         }
         classLoader = new URLClassLoader(projectClasspathList.toArray(new URL[]{}), Thread.currentThread().getContextClassLoader());
+        debug("Classloader created from %d elements", classpathElements.size());
     }
 
+    private void debug(String fmt, Object... args) {
+        getLog().debug(format(fmt, args));
+    }
 
+    private void info(String fmt, Object... args) {
+        getLog().info(format(fmt, args));
+    }
 }

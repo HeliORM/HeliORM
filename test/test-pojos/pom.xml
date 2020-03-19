@@ -57,9 +57,7 @@
                             <packages>
                                 <package>test</package>
                             </packages>
-                            <database>test</database>
                             <outputDir>${sourceOutputDir}</outputDir>
-                            <resourceDir>${resourceOutputDir}</resourceDir>
                         </configuration>
                     </execution>
                 </executions>
