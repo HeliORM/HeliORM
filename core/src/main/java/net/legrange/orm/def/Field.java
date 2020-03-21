@@ -2,6 +2,8 @@ package net.legrange.orm.def;
 
 import net.legrange.orm.Table;
 
+import java.util.Optional;
+
 /**
  * A field on a table.
  *
@@ -62,5 +64,14 @@ public interface Field<T extends Table<O>, O, C> {
      * @return True if auto-number
      */
     boolean isAutoNumber();
+
+    /**
+     * Return the field length, if a specific length is known.
+     *
+     * @return The length, if known
+     */
+    default Optional<Integer> getLength() {
+        return Optional.empty();
+    }
 
 }

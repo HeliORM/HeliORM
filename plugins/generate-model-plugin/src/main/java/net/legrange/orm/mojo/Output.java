@@ -353,9 +353,8 @@ class Output {
                 emit("}");
                 pop();
             }
-            emit("};");
         } else {
-            emit("public final %s<%s, %s> %s = new %s(\"%s\", \"%s\");",
+            emit("public final %s<%s, %s> %s = new %s(\"%s\", \"%s\") {",
                     fieldClass.getSimpleName(),
                     tableName(cm),
                     cm.getObjectClass().getSimpleName(),
@@ -364,6 +363,21 @@ class Output {
                     fm.getJavaName(),
                     fm.getSqlName());
         }
+        if (fm.getFieldType() == Field.FieldType.STRING) {
+            if (fm.getLength().isPresent()) {
+                impt(Optional.class);
+                push();
+                emit("@Override");
+                emit("public Optional<Integer> getLength() {");
+                push();
+                emit("return Optional.of(%d);", fm.getLength().get());
+                pop();
+                emit("}");
+                pop();
+            }
+        }
+        emit("};");
+
     }
 
     private void addType3Field(Class<? extends Field> fieldClass, Class<? extends FieldPart> partClass, Table cm, Field<?, ?, ?> fm) throws GeneratorException {

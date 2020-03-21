@@ -1,5 +1,6 @@
 package test.pets;
 
+import net.legrange.orm.annotation.Column;
 import net.legrange.orm.annotation.ForeignKey;
 import net.legrange.orm.annotation.Pojo;
 import net.legrange.orm.annotation.PrimaryKey;
@@ -17,6 +18,7 @@ public abstract class Pet extends Obj {
 
     @ForeignKey(pojo = Person.class)
     private Long personNumber;
+    @Column(length = 32)
     private String name;
     private int age;
 

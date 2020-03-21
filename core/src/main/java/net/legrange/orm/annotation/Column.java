@@ -23,4 +23,11 @@ public @interface Column {
      */
     String fieldName() default "";
 
+    /**
+     * Provide the SQL field length for this column, assuming it is a String.
+     *
+     * @return The field length
+     */
+    int length() default 0;
+
 }

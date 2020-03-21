@@ -111,6 +111,17 @@ public class AnnotatedPojoField implements Field {
         return true;
     }
 
+    @Override
+    public Optional<Integer> getLength() {
+        Optional<Column> lA = getAnnotation(Column.class);
+        if (lA.isPresent()) {
+            if (lA.get().length() > 0) {
+                return Optional.of(lA.get().length());
+            }
+        }
+        return Optional.empty();
+    }
+
     /**
      * Return the annotation of the given type from the POJO field, if it
      * exists.

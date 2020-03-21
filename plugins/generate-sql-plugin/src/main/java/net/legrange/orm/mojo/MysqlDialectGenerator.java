@@ -54,8 +54,13 @@ public class MysqlDialectGenerator implements DialectGenerator {
                 return "REAL";
             case ENUM:
                 return format("ENUM(%s)", getEnumValues(table, field));
-            case STRING:
-                return "VARCHAR(255)";
+            case STRING: {
+                int length = 255;
+                if (field.getLength().isPresent()) {
+                    length = (int) field.getLength().get();
+                }
+                return format("VARCHAR(%d)", length);
+            }
             case DATE:
                 return "DATE";
             case TIMESTAMP:
