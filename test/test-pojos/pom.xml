@@ -5,12 +5,12 @@
     <parent>
         <groupId>net.legrange.orm</groupId>
         <artifactId>test</artifactId>
-        <version>0.49</version>
+        <version>0.50</version>
     </parent>
     <groupId>net.legrange.orm</groupId>
     <artifactId>test-pojos</artifactId>
     <name>[Helicopter ORM] Test POJOs</name>
-    <version>0.49</version>
+    <version>0.50</version>
     <packaging>jar</packaging>
     <properties>
         <sourceOutputDir>${basedir}/target/generated-sources</sourceOutputDir>
@@ -71,7 +71,7 @@
                             <goal>generate-sql</goal>
                         </goals>
                         <configuration>
-                            <dialect>MYSQL</dialect>
+                            <dialect>POSTGRESQL</dialect>
                             <packages>
                                 <package>test</package>
                             </packages>

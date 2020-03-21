@@ -1,12 +1,15 @@
 package net.legrange.orm;
 
-import static java.lang.String.format;
+import net.legrange.orm.driver.MySqlDriver;
+import net.legrange.orm.driver.PostgreSqlDriver;
+import net.legrange.orm.impl.AliasDatabase;
+
 import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
-import net.legrange.orm.driver.MySqlDriver;
-import net.legrange.orm.impl.AliasDatabase;
+
+import static java.lang.String.format;
 
 /**
  * A builder pattern that allows for very specific ORM configuration.
@@ -45,6 +48,7 @@ public class OrmBuilder {
     public static OrmBuilder create(Connection con) throws OrmException {
         return new OrmBuilder(() -> con);
     }
+
     /**
      * Create a new ORM builder.
      *
@@ -61,7 +65,7 @@ public class OrmBuilder {
      * Map a database object to a specific SQL database.
      *
      * @param database The database
-     * @param sqlName The SQL database
+     * @param sqlName  The SQL database
      * @returnThe ORM builder
      */
     public OrmBuilder mapDatabase(Database database, String sqlName) {
@@ -92,7 +96,8 @@ public class OrmBuilder {
         return this;
     }
 
-    /** Setup the ORM to rollback transactions if a transaction is auto-closed at the end of a try-with-resources block.
+    /**
+     * Setup the ORM to rollback transactions if a transaction is auto-closed at the end of a try-with-resources block.
      * Default is false and this means that by default an exception will be thrown if there is no commit or rollback call
      * before the block closes.
      *
@@ -121,11 +126,14 @@ public class OrmBuilder {
             case MYSQL:
                 driver = new MySqlDriver(con, pops, aliases);
                 break;
+            case POSTGRESQL:
+                driver = new PostgreSqlDriver(con, pops, aliases);
+                break;
             default:
                 throw new OrmException(format("Don't know how to create a driver for dialect %s", dialect));
         }
         if (driver instanceof OrmTransactionDriver) {
-            ((OrmTransactionDriver)driver).setRollbackOnUncommittedClose(rollbackOnUncommittedClose);
+            ((OrmTransactionDriver) driver).setRollbackOnUncommittedClose(rollbackOnUncommittedClose);
         }
         return new Orm(driver);
     }

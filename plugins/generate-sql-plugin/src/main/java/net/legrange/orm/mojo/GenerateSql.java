@@ -63,6 +63,9 @@ public class GenerateSql extends AbstractMojo {
             case MYSQL:
                 gen = new MysqlDialectGenerator();
                 break;
+            case POSTGRESQL:
+                gen = new PostgresDialectGenerator();
+                break;
             default:
                 throw new MojoExecutionException(format("Unsupported SQL Dialect '%s'. BUG?", dialect));
         }

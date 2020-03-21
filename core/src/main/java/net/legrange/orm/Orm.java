@@ -1,6 +1,9 @@
 package net.legrange.orm;
 
-import static java.lang.String.format;
+import net.legrange.orm.def.Executable;
+import net.legrange.orm.def.Select;
+import net.legrange.orm.impl.Part;
+import net.legrange.orm.impl.SelectPart;
 
 import java.sql.Connection;
 import java.util.HashMap;
@@ -12,11 +15,7 @@ import java.util.ServiceLoader;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import net.legrange.orm.def.Executable;
-import net.legrange.orm.def.Select;
-import net.legrange.orm.driver.MySqlDriver;
-import net.legrange.orm.impl.Part;
-import net.legrange.orm.impl.SelectPart;
+import static java.lang.String.format;
 
 /**
  * The object relational mapper. This is the class that provides the user
@@ -28,7 +27,7 @@ import net.legrange.orm.impl.SelectPart;
 public final class Orm implements AutoCloseable {
 
     public enum Dialect {
-        MYSQL;
+        MYSQL, POSTGRESQL;
     }
 
     private final OrmDriver driver;
