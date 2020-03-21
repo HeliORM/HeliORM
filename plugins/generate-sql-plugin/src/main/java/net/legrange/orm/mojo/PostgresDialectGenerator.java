@@ -62,9 +62,9 @@ public class PostgresDialectGenerator implements DialectGenerator {
                 }
                 return "BIGINT";
             case DOUBLE:
-                return "DOUBLE";
+                return "DOUBLE PRECISION";
             case FLOAT:
-                return "DOUBLE";
+                return "DOUBLE PRECISION";
             case ENUM:
                 return format("%s", enumTypeName(table, field));
             case STRING: {
