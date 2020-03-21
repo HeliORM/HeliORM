@@ -2,9 +2,6 @@ package net.legrange.orm.def;
 
 import net.legrange.orm.Table;
 
-import java.util.Collections;
-import java.util.Set;
-
 /**
  * A field on a table.
  *
@@ -65,9 +62,5 @@ public interface Field<T extends Table<O>, O, C> {
      * @return True if auto-number
      */
     boolean isAutoNumber();
-
-    default Set<String> getEnumValues() {
-        return Collections.EMPTY_SET;
-    }
 
 }

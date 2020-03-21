@@ -7,11 +7,8 @@ import net.legrange.orm.def.Field;
 import java.lang.annotation.Annotation;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 
@@ -112,14 +109,6 @@ public class AnnotatedPojoField implements Field {
             return pkA.get().autoIncrement();
         }
         return true;
-    }
-
-    @Override
-    public Set<String> getEnumValues() {
-        return Arrays.asList(pojoField.getType().getEnumConstants())
-                .stream()
-                .map(object -> (Enum) object)
-                .map((Enum e) -> e.name()).collect(Collectors.toSet());
     }
 
     /**

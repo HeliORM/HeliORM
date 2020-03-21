@@ -41,28 +41,6 @@
                     </execution>
                 </executions>
             </plugin>
-
-            <plugin>
-                <groupId>net.legrange.orm</groupId>
-                <artifactId>generate-sql-plugin</artifactId>
-                <version>${project.version}</version>
-                <executions>
-                    <execution>
-                        <phase>process-classes</phase>
-                        <goals>
-                            <goal>generate-sql</goal>
-                        </goals>
-                        <configuration>
-                            <dialect>MYSQL</dialect>
-                            <packages>
-                                <package>test</package>
-                            </packages>
-                            <outputDir>${sourceOutputDir}</outputDir>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -81,6 +59,28 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <plugin>
+                <groupId>net.legrange.orm</groupId>
+                <artifactId>generate-sql-plugin</artifactId>
+                <version>${project.version}</version>
+                <executions>
+                    <execution>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>generate-sql</goal>
+                        </goals>
+                        <configuration>
+                            <dialect>MYSQL</dialect>
+                            <packages>
+                                <package>test</package>
+                            </packages>
+                            <outputDir>${sourceOutputDir}</outputDir>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
         </plugins>
     </build>
     <dependencies>

@@ -21,7 +21,7 @@ public class MysqlDialectGenerator implements DialectGenerator {
                 sql.append(",\n");
             }
             sql.append(format("\t`%s` ", field.getSqlName()));
-            sql.append(generateFieldSql(field));
+            sql.append(generateFieldSql(table, field));
             sql.append(" NOT NULL");
             if (field.isPrimaryKey() && field.isAutoNumber() && field.getFieldType() != Field.FieldType.STRING) {
                 sql.append(" AUTO_INCREMENT");
@@ -36,7 +36,7 @@ public class MysqlDialectGenerator implements DialectGenerator {
         return sql.toString();
     }
 
-    private String generateFieldSql(Field field) throws GeneratorException {
+    private String generateFieldSql(Table table, Field field) throws GeneratorException {
         switch (field.getFieldType()) {
             case BOOLEAN:
                 return "TINYINT(1)";
@@ -53,7 +53,7 @@ public class MysqlDialectGenerator implements DialectGenerator {
             case FLOAT:
                 return "REAL";
             case ENUM:
-                return format("ENUM(%s)", getEnumValues((field)));
+                return format("ENUM(%s)", getEnumValues(table, field));
             case STRING:
                 return "VARCHAR(255)";
             case DATE:
@@ -67,10 +67,11 @@ public class MysqlDialectGenerator implements DialectGenerator {
         }
     }
 
-    private String getEnumValues(Field<?, ?, ?> field) {
+    private String getEnumValues(Table table, Field<?, ?, ?> field) {
         StringJoiner sql = new StringJoiner(",");
-        for (String value : field.getEnumValues()) {
-            sql.add(format("'%s'", value));
+        Class<?> javaType = field.getJavaType();
+        for (Object v : javaType.getEnumConstants()) {
+            sql.add(format("'%s'", ((Enum) v).name()));
         }
         return sql.toString();
     }

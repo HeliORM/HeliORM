@@ -379,22 +379,6 @@ class Output {
                 partClass.getSimpleName(),
                 fm.getJavaType().getSimpleName(),
                 fm.getJavaName(), fm.getSqlName());
-        if (fm.getFieldType() == Field.FieldType.ENUM) {
-            push();
-            impt(HashSet.class);
-            emit("@Override");
-            emit("public Set<String> getEnumValues() {");
-            push();
-            StringJoiner sj = new StringJoiner(",");
-            for (String val : fm.getEnumValues()) {
-                sj.add(format("\"%s\"", val));
-            }
-            emit("return new HashSet(Arrays.asList(%s));", sj.toString());
-
-            pop();
-            emit("}");
-            pop();
-        }
         emit("};");
     }
 
