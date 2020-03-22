@@ -71,7 +71,7 @@
                             <goal>generate-sql</goal>
                         </goals>
                         <configuration>
-                            <dialect>POSTGRESQL</dialect>
+                            <dialect>MYSQL</dialect>
                             <packages>
                                 <package>test</package>
                             </packages>

@@ -10,8 +10,7 @@ import test.pets.Bird.Kind;
 import test.pets.Cat;
 import test.pets.Cat.Type;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.time.Duration;
 import java.util.List;
 
@@ -28,23 +27,24 @@ import static test.Tables.TEST;
 public class test {
 
     public static void main(String... args) throws Exception {
-        Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/?user=root");
-//        Server dbServer = new Server();
-//        dbServer.setLogWriter(new PrintWriter((out)));
-//        dbServer.setDatabaseName(0, "petz");
-//        dbServer.setDatabasePath(0, "mem");
-//        dbServer.start();
-//
-//        Connection con = DriverManager.getConnection(
-//                "jdbc:hsqldb:mem:petz", "sa", "");
-//
-//
-        Orm orm = OrmBuilder.create(con)
+        ConnectionPool pool = new ConnectionPool("jdbc:mysql://0.0.0.0:3306/petz", "root", "foo");
+        Orm orm = OrmBuilder.create(() -> {
+            try {
+                return pool.getConnection();
+            } catch (SQLException e) {
+                e.printStackTrace();
+                return null;
+            }
+        })
                 .setDialect(Orm.Dialect.MYSQL)
                 .setRollbackOnUncommittedClose(false)
 //                .withPojoOperations(new BeanPojoOperations())
                 .mapDatabase(TEST, "petz").build();
         test t = new test();
+//        t.test61(orm);
+//        t.test62(orm);
+        t.test71(orm);
+        t.test72(orm);
 //        t.test1(orm);
 //        t.test2(orm);
 //        t.test3(orm);
@@ -196,7 +196,7 @@ public class test {
     /**
      * Create a cat for person #1
      */
-    private void test6(Orm orm) throws OrmException {
+    private void test61(Orm orm) throws OrmException {
         out.println("-- Create Cat ---");
         Cat cat = new Cat();
         cat.setName("Supreme Cat");
@@ -205,6 +205,45 @@ public class test {
         cat.setPersonNumber(1L);
         cat = orm.create(cat);
         out.println("Cat created with key " + cat.getId());
+    }
+
+    /**
+     * Create a cat for person #1
+     */
+    private void test62(Orm orm) throws OrmException {
+        out.println("-- Create Cat ---");
+        Cat cat = new Cat();
+        cat.setName("A Cool Cat");
+        cat.setAge(2);
+        cat.setType(Type.OUTDOOR);
+        cat.setPersonNumber(1L);
+        cat = orm.create(cat);
+        out.println("Cat created with key " + cat.getId());
+    }
+
+
+    private void test71(Orm orm) throws OrmException {
+        out.println("-- Create Bird ---");
+        Bird bird = new Bird();
+        bird.setName("Bigger Bird");
+        bird.setAge(2);
+        bird.setKind(Kind.FREERANGE);
+        bird.setPersonNumber(1L);
+        bird.setSingTime(Duration.ofMinutes(12));
+        bird = orm.create(bird);
+        out.println("Bird created with key " + bird.getId());
+    }
+
+    private void test72(Orm orm) throws OrmException {
+        out.println("-- Create Bird ---");
+        Bird bird = new Bird();
+        bird.setName("Big Bird");
+        bird.setAge(3);
+        bird.setKind(Kind.CAGED);
+        bird.setPersonNumber(1L);
+        bird.setSingTime(Duration.ofMinutes(32));
+        bird = orm.create(bird);
+        out.println("Bird created with key " + bird.getId());
     }
 
     /**

@@ -271,7 +271,7 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
         StringJoiner fields = new StringJoiner(",");
         StringJoiner values = new StringJoiner(",");
         for (Field field : table.getFields()) {
-            fields.add(format("`%s`", field.getSqlName()));
+            fields.add(format("%s", fieldName(table, field)));
             values.add("?");
         }
         query.append(fields.toString());
@@ -288,16 +288,16 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
         StringJoiner values = new StringJoiner(",");
         for (Field field : table.getFields()) {
             if (!field.isPrimaryKey()) {
-                fields.add(format("%s=?", field.getSqlName()));
+                fields.add(format("%s=?", fieldName(table, field)));
             }
         }
         query.append(fields.toString());
-        query.append(format(" WHERE %s=?", table.getPrimaryKey().get().getSqlName()));
+        query.append(format(" WHERE %s=?", fieldName(table, table.getPrimaryKey().get())));
         return query.toString();
     }
 
     protected String buildDeleteQuery(Table<?> table) throws OrmException {
-        return format("DELETE FROM %s WHERE %s=?", fullTableName(table), table.getPrimaryKey().get().getSqlName());
+        return format("DELETE FROM %s WHERE %s=?", fullTableName(table), fieldName(table, table.getPrimaryKey().get()));
     }
 
     protected String buildSelectQuery(Query root) throws OrmException {
@@ -335,10 +335,10 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
 
     private String expandLinkTables(TableSpec left, Link right) {
         StringBuilder query = new StringBuilder();
-        query.append(format(" JOIN %s ON %s.%s=%s.%s ",
+        query.append(format(" JOIN %s ON %s=%s ",
                 fullTableName(right.getTable()),
-                fullTableName(left.getTable()), right.getLeftField().getSqlName(),
-                fullTableName(right.getTable()), right.getField().getSqlName()));
+                fieldName(left.getTable(), right.getLeftField()),
+                fieldName(right.getTable(), right.getField())));
         if (right.getLink().isPresent()) {
             query.append(expandLinkTables(right, right.getLink().get()));
         }
@@ -377,7 +377,7 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
 
     private String expandListFieldCriteria(TableSpec table, ListCriteria crit) throws OrmException {
         StringBuilder query = new StringBuilder();
-        query.append(format("%s.%s %s (", fullTableName(table.getTable()), crit.getField().getSqlName(), listOperator(crit)));
+        query.append(format("%s %s (", fieldName(table.getTable(), crit.getField()), listOperator(crit)));
         for (Object val : crit.getValues()) {
             query.append(format("'%s'", sqlValue(val)));
         }
@@ -387,7 +387,7 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
 
     private String expandValueFieldCriteria(TableSpec table, ValueCriteria crit) throws OrmException {
         StringBuilder query = new StringBuilder();
-        query.append(format("%s.%s%s'%s'", fullTableName(table.getTable()), crit.getField().getSqlName(), valueOperator(crit), sqlValue(crit.getValue())
+        query.append(format("%s%s'%s'", fieldName(table.getTable(), crit.getField()), valueOperator(crit), sqlValue(crit.getValue())
         ));
         return query.toString();
     }
@@ -401,7 +401,7 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
      */
     private String expandOrder(TableSpec table, Order order) {
         StringBuilder query = new StringBuilder();
-        query.append(format("%s.%s", fullTableName(table.getTable()), order.getField().getSqlName()));
+        query.append(format("%s", fieldName(table.getTable(), order.getField())));
         if (order.getDirection() == Order.Direction.DESCENDING) {
             query.append(" DESC");
         }
@@ -917,6 +917,14 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
      */
     protected abstract String fullTableName(Table table);
 
+    /**
+     * Work out the exact field name to use.
+     *
+     * @param field The field
+     * @param table The table
+     * @return The SQL field name
+     */
+    protected abstract String fieldName(Table table, Field field);
 
     /**
      * Work out the short table name to use.
