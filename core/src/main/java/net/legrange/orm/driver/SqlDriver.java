@@ -1,6 +1,30 @@
 package net.legrange.orm.driver;
 
-import static java.lang.String.format;
+import net.legrange.orm.Database;
+import net.legrange.orm.OrmDriver;
+import net.legrange.orm.OrmException;
+import net.legrange.orm.OrmTransaction;
+import net.legrange.orm.OrmTransactionDriver;
+import net.legrange.orm.OrmTransactionException;
+import net.legrange.orm.PojoOperations;
+import net.legrange.orm.Table;
+import net.legrange.orm.UncaughtOrmException;
+import net.legrange.orm.def.Executable;
+import net.legrange.orm.def.Field;
+import net.legrange.orm.impl.JoinPart;
+import net.legrange.orm.impl.OrderedPart;
+import net.legrange.orm.impl.Part;
+import net.legrange.orm.impl.SelectPart;
+import net.legrange.orm.query.AndCriteria;
+import net.legrange.orm.query.Criteria;
+import net.legrange.orm.query.Link;
+import net.legrange.orm.query.ListCriteria;
+import net.legrange.orm.query.OrCriteria;
+import net.legrange.orm.query.Order;
+import net.legrange.orm.query.Parser;
+import net.legrange.orm.query.Query;
+import net.legrange.orm.query.TableSpec;
+import net.legrange.orm.query.ValueCriteria;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -29,31 +53,7 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import net.legrange.orm.Database;
-import net.legrange.orm.OrmDriver;
-import net.legrange.orm.OrmException;
-import net.legrange.orm.OrmTransaction;
-import net.legrange.orm.OrmTransactionException;
-import net.legrange.orm.PojoOperations;
-import net.legrange.orm.Table;
-import net.legrange.orm.UncaughtOrmException;
-import net.legrange.orm.OrmTransactionDriver;
-import net.legrange.orm.def.Executable;
-import net.legrange.orm.def.Field;
-import net.legrange.orm.impl.JoinPart;
-import net.legrange.orm.impl.OrderedPart;
-import net.legrange.orm.impl.Part;
-import net.legrange.orm.impl.SelectPart;
-import net.legrange.orm.query.AndCriteria;
-import net.legrange.orm.query.Criteria;
-import net.legrange.orm.query.Link;
-import net.legrange.orm.query.ListCriteria;
-import net.legrange.orm.query.OrCriteria;
-import net.legrange.orm.query.Order;
-import net.legrange.orm.query.Parser;
-import net.legrange.orm.query.Query;
-import net.legrange.orm.query.TableSpec;
-import net.legrange.orm.query.ValueCriteria;
+import static java.lang.String.format;
 
 /**
  * @author gideon
@@ -915,9 +915,8 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
      * @param table The table we're referencing
      * @return The SQL table name
      */
-    private String fullTableName(Table table) {
-        return format("%s.%s", databaseName(table), tableName(table));
-    }
+    protected abstract String fullTableName(Table table);
+
 
     /**
      * Work out the short table name to use.
@@ -925,7 +924,7 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
      * @param table The table we're referencing
      * @return The SQL table name
      */
-    private String tableName(Table table) {
+    protected final String tableName(Table table) {
         return format("%s", table.getSqlTable());
     }
 
@@ -935,7 +934,7 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
      * @param table The table we're referencing
      * @return The SQL table name
      */
-    private String databaseName(Table table) {
+    protected final String databaseName(Table table) {
         Database database = table.getDatabase();
         Database alias = aliases.get(database);
         if (alias == null) {
