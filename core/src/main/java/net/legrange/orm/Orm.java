@@ -68,6 +68,9 @@ public final class Orm implements AutoCloseable {
      * @throws OrmException
      */
     public <O> O create(O pojo) throws OrmException {
+        if (pojo == null) {
+            throw new OrmException("Attempt to create a null POJO");
+        }
         return driver.create(tableFor(pojo), pojo);
     }
 
@@ -80,6 +83,9 @@ public final class Orm implements AutoCloseable {
      * @throws OrmException
      */
     public <O> O update(O pojo) throws OrmException {
+        if (pojo == null) {
+            throw new OrmException("Attempt to update a null POJO");
+        }
         return driver.update(tableFor(pojo), pojo);
     }
 
@@ -91,6 +97,9 @@ public final class Orm implements AutoCloseable {
      * @throws OrmException
      */
     public <O> void delete(O pojo) throws OrmException {
+        if (pojo == null) {
+            throw new OrmException("Attempt to delete a null POJO");
+        }
         driver.delete(tableFor(pojo), pojo);
     }
 
@@ -127,6 +136,9 @@ public final class Orm implements AutoCloseable {
      * @throws OrmException
      */
     public <O> Table<O> tableFor(O pojo) throws OrmException {
+        if (pojo == null) {
+            throw new OrmException("Attempt to do table lookup for a null POJO");
+        }
         if (tables.isEmpty()) {
             ServiceLoader<Database> svl = ServiceLoader.load(Database.class);
             for (Database database : svl) {
