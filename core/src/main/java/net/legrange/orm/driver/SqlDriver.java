@@ -32,6 +32,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.sql.Types;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.format.DateTimeParseException;
@@ -337,8 +338,8 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
         StringBuilder query = new StringBuilder();
         query.append(format(" JOIN %s ON %s=%s ",
                 fullTableName(right.getTable()),
-                fieldName(left.getTable(), right.getLeftField()),
-                fieldName(right.getTable(), right.getField())));
+                fullFieldName(left.getTable(), right.getLeftField()),
+                fullFieldName(right.getTable(), right.getField())));
         if (right.getLink().isPresent()) {
             query.append(expandLinkTables(right, right.getLink().get()));
         }
@@ -377,7 +378,7 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
 
     private String expandListFieldCriteria(TableSpec table, ListCriteria crit) throws OrmException {
         StringBuilder query = new StringBuilder();
-        query.append(format("%s %s (", fieldName(table.getTable(), crit.getField()), listOperator(crit)));
+        query.append(format("%s %s (", fullFieldName(table.getTable(), crit.getField()), listOperator(crit)));
         for (Object val : crit.getValues()) {
             query.append(format("'%s'", sqlValue(val)));
         }
@@ -387,7 +388,7 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
 
     private String expandValueFieldCriteria(TableSpec table, ValueCriteria crit) throws OrmException {
         StringBuilder query = new StringBuilder();
-        query.append(format("%s%s'%s'", fieldName(table.getTable(), crit.getField()), valueOperator(crit), sqlValue(crit.getValue())
+        query.append(format("%s%s'%s'", fullFieldName(table.getTable(), crit.getField()), valueOperator(crit), sqlValue(crit.getValue())
         ));
         return query.toString();
     }
@@ -401,7 +402,7 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
      */
     private String expandOrder(TableSpec table, Order order) {
         StringBuilder query = new StringBuilder();
-        query.append(format("%s", fieldName(table.getTable(), order.getField())));
+        query.append(format("%s", fullFieldName(table.getTable(), order.getField())));
         if (order.getDirection() == Order.Direction.DESCENDING) {
             query.append(" DESC");
         }
@@ -483,7 +484,7 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
                     stmt.setObject(par, getValueFromPojo(pojo, field));
                     break;
                 case ENUM:
-                    stmt.setString(par, getStringFromPojo(pojo, field));
+                    stmt.setObject(par, getStringFromPojo(pojo, field), Types.OTHER);
                     break;
                 case STRING:
                     stmt.setString(par, getStringFromPojo(pojo, field));
@@ -924,7 +925,17 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
      * @param table The table
      * @return The SQL field name
      */
+    protected abstract String fullFieldName(Table table, Field field);
+
+    /**
+     * Work out the short field name to use.
+     *
+     * @param field The field
+     * @param table The table
+     * @return The SQL field name
+     */
     protected abstract String fieldName(Table table, Field field);
+
 
     /**
      * Work out the short table name to use.

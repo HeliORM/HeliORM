@@ -30,7 +30,12 @@ public final class MySqlDriver extends SqlDriver {
     }
 
     @Override
-    protected String fieldName(Table table, Field field) {
+    protected String fullFieldName(Table table, Field field) {
         return format("%s.`%s`", fullTableName(table), field.getSqlName());
+    }
+
+    @Override
+    protected String fieldName(Table table, Field field) {
+        return fullFieldName(table, field);
     }
 }
