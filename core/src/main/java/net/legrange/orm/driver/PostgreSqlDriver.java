@@ -6,12 +6,15 @@ import net.legrange.orm.Table;
 import net.legrange.orm.def.Field;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Types;
 import java.util.Map;
 import java.util.function.Supplier;
 
 import static java.lang.String.format;
 
-public class PostgreSqlDriver extends SqlDriver {
+public final class PostgreSqlDriver extends SqlDriver {
 
     public PostgreSqlDriver(Supplier<Connection> connectionSupplier, PojoOperations pops) {
         super(connectionSupplier, pops);
@@ -34,5 +37,10 @@ public class PostgreSqlDriver extends SqlDriver {
     @Override
     protected String fieldName(Table table, Field field) {
         return format("\"%s\"", field.getSqlName());
+    }
+
+    @Override
+    protected void setEnum(PreparedStatement stmt, int par, String value) throws SQLException {
+        stmt.setObject(par, value, Types.OTHER);
     }
 }

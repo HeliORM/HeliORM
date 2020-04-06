@@ -334,6 +334,10 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
         return query.toString();
     }
 
+    protected void setEnum(PreparedStatement stmt, int par, String value) throws SQLException {
+        stmt.setString(par, value);
+    }
+
     private String expandLinkTables(TableSpec left, Link right) {
         StringBuilder query = new StringBuilder();
         query.append(format(" JOIN %s ON %s=%s ",
@@ -484,7 +488,7 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
                     stmt.setObject(par, getValueFromPojo(pojo, field));
                     break;
                 case ENUM:
-                    stmt.setObject(par, getStringFromPojo(pojo, field), Types.OTHER);
+                    setEnum(stmt, par,  getStringFromPojo(pojo, field));
                     break;
                 case STRING:
                     stmt.setString(par, getStringFromPojo(pojo, field));
