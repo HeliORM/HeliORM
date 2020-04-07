@@ -376,8 +376,17 @@ class Output {
                 pop();
             }
         }
+        if (fm.isNullable()) {
+            push();
+            emit("@Override");
+            emit("public boolean isNullable() {");
+            push();
+            emit("return true;");
+            pop();
+            emit("}");
+            pop();
+        }
         emit("};");
-
     }
 
     private void addType3Field(Class<? extends Field> fieldClass, Class<? extends FieldPart> partClass, Table cm, Field<?, ?, ?> fm) throws GeneratorException {

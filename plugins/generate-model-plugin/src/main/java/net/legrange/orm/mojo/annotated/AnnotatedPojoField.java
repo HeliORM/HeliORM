@@ -122,6 +122,15 @@ public class AnnotatedPojoField implements Field {
         return Optional.empty();
     }
 
+    @Override
+    public boolean isNullable() {
+        Optional<Column> lA = getAnnotation(Column.class);
+        if (lA.isPresent()) {
+                return lA.get().nullable();
+        }
+        return false;
+    }
+
     /**
      * Return the annotation of the given type from the POJO field, if it
      * exists.
