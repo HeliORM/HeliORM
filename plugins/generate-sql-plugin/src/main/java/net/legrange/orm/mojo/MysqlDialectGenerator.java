@@ -22,7 +22,9 @@ public class MysqlDialectGenerator implements DialectGenerator {
             }
             sql.append(format("\t`%s` ", field.getSqlName()));
             sql.append(generateFieldSql(table, field));
-            sql.append(" NOT NULL");
+            if (!field.isNullable()) {
+                sql.append(" NOT NULL");
+            }
             if (field.isPrimaryKey() && field.isAutoNumber() && field.getFieldType() != Field.FieldType.STRING) {
                 sql.append(" AUTO_INCREMENT");
             }

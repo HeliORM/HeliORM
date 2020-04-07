@@ -23,7 +23,9 @@ public class PostgresDialectGenerator implements DialectGenerator {
             }
             sql.append(format("\t\"%s\" ", field.getSqlName()));
             sql.append(generateFieldSql(table, field));
-            sql.append(" NOT NULL");
+            if (!field.isNullable()) {
+                sql.append(" NOT NULL");
+            }
             if (field.getFieldType() == Field.FieldType.ENUM) {
                 enums.append(format("CREATE TYPE %s as ENUM(%s);\n", enumTypeName(table, field), getEnumValues(table, field)));
             }

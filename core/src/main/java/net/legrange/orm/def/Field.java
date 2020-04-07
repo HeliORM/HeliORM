@@ -74,4 +74,11 @@ public interface Field<T extends Table<O>, O, C> {
         return Optional.empty();
     }
 
+    /** Return true if the field can be null.
+     *
+     * @return True if it can be null
+     */
+    default boolean isNullable() {
+        return false;
+    }
 }
