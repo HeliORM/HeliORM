@@ -380,13 +380,11 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
     }
 
     private String expandListFieldCriteria(TableSpec table, ListCriteria crit) throws OrmException {
-        StringBuilder query = new StringBuilder();
-        query.append(format("%s %s (", fullFieldName(table.getTable(), crit.getField()), listOperator(crit)));
+        StringJoiner list = new StringJoiner(",");
         for (Object val : crit.getValues()) {
-            query.append(format("'%s'", sqlValue(val)));
+            list.add(format("'%s'", sqlValue(val)));
         }
-        query.append(")");
-        return query.toString();
+        return format("%s %s (%s)", fullFieldName(table.getTable(), crit.getField()), listOperator(crit), list.toString());
     }
 
     private String expandValueFieldCriteria(TableSpec table, ValueCriteria crit) throws OrmException {
