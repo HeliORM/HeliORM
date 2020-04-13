@@ -297,7 +297,11 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
     }
 
     protected String buildDeleteQuery(Table<?> table) throws OrmException {
-        return format("DELETE FROM %s WHERE %s=?", fullTableName(table), fieldName(table, table.getPrimaryKey().get()));
+        if (table.getPrimaryKey().isPresent()) {
+            return format("DELETE FROM %s WHERE %s=?", fullTableName(table), fieldName(table, table.getPrimaryKey().get()));
+        } else {
+            throw new OrmException("A table needs primary key for objects to be deleted");
+        }
     }
 
     protected String buildSelectQuery(Query root) throws OrmException {
