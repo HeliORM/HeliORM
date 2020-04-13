@@ -282,6 +282,9 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
     }
 
     protected String buildUpdateQuery(Table<?> table) throws OrmException {
+        if (!table.getPrimaryKey().isPresent()) {
+            throw new OrmException("A table needs primary key for objects to be updated");
+        }
         StringBuilder query = new StringBuilder();
         query.append(format("UPDATE %s SET ", fullTableName(table)));
         StringJoiner fields = new StringJoiner(",");
