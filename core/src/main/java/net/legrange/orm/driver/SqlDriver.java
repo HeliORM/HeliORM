@@ -32,7 +32,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
-import java.sql.Types;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.format.DateTimeParseException;
@@ -386,7 +385,7 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
         for (Object val : crit.getValues()) {
             query.append(format("'%s'", sqlValue(val)));
         }
-        query.append("'");
+        query.append(")");
         return query.toString();
     }
 
@@ -488,7 +487,7 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
                     stmt.setObject(par, getValueFromPojo(pojo, field));
                     break;
                 case ENUM:
-                    setEnum(stmt, par,  getStringFromPojo(pojo, field));
+                    setEnum(stmt, par, getStringFromPojo(pojo, field));
                     break;
                 case STRING:
                     stmt.setString(par, getStringFromPojo(pojo, field));
