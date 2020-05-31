@@ -1,11 +1,12 @@
-package net.legrange.orm.driver;
+package net.legrange.orm.driver.postgresql;
 
 import net.legrange.orm.Database;
 import net.legrange.orm.OrmException;
 import net.legrange.orm.PojoOperations;
 import net.legrange.orm.Table;
 import net.legrange.orm.def.Field;
-import net.legrange.orm.driver.postgresql.PostgresDialectGenerator;
+import net.legrange.orm.driver.SqlDriver;
+import net.legrange.orm.driver.TableGenerator;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
