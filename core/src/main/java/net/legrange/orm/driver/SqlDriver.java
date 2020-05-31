@@ -26,12 +26,7 @@ import net.legrange.orm.query.Query;
 import net.legrange.orm.query.TableSpec;
 import net.legrange.orm.query.ValueCriteria;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Timestamp;
+import java.sql.*;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.format.DateTimeParseException;
@@ -62,10 +57,12 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
 
     private final Supplier<Connection> connectionSupplier;
     private SqlTransaction currentTransaction;
+    private boolean createTables = false;
     private boolean rollbackOnUncommittedClose = false;
     private final Map<Table, String> inserts = new HashMap();
     private final Map<Table, String> updates = new HashMap();
     private final Map<Table, String> deletes = new HashMap();
+    private final Map<Table, Boolean> exists = new HashMap();
     private final PojoOperations pops;
     private final Map<Database, Database> aliases;
 
@@ -121,8 +118,23 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
         rollbackOnUncommittedClose = rollback;
     }
 
+    public final void setCreateTables(boolean createTables) {
+        this.createTables = createTables;
+    }
+
     boolean getRollbackOnUncommittedClose() {
         return rollbackOnUncommittedClose;
+    }
+
+    private final boolean tableExists(Table table) throws OrmException {
+        try {
+            DatabaseMetaData dbm = getConnection().getMetaData();
+            try (ResultSet tables = dbm.getTables(null, null, databaseName(table), null)) {
+                return tables.next();
+            }
+        } catch (SQLException ex) {
+            throw new OrmSqlException(format("Error checking table existance (%s)", ex.getMessage()), ex);
+        }
     }
 
     /**
@@ -344,7 +356,7 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
         stmt.setString(par, value);
     }
 
-    private String expandLinkTables(TableSpec left, Link right) {
+    private String expandLinkTables(TableSpec left, Link right) throws OrmException {
         StringBuilder query = new StringBuilder();
         query.append(format(" JOIN %s ON %s=%s ",
                 fullTableName(right.getTable()),
@@ -408,7 +420,7 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
      * @param order The order part
      * @return The partial SQL query string
      */
-    private String expandOrder(TableSpec table, Order order) {
+    private String expandOrder(TableSpec table, Order order) throws OrmException {
         StringBuilder query = new StringBuilder();
         query.append(format("%s", fullFieldName(table.getTable(), order.getField())));
         if (order.getDirection() == Order.Direction.DESCENDING) {
@@ -924,7 +936,7 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
      * @param table The table we're referencing
      * @return The SQL table name
      */
-    protected abstract String fullTableName(Table table);
+    protected abstract String fullTableName(Table table) throws OrmException;
 
     /**
      * Work out the exact field name to use.
@@ -933,7 +945,7 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
      * @param table The table
      * @return The SQL field name
      */
-    protected abstract String fullFieldName(Table table, Field field);
+    protected abstract String fullFieldName(Table table, Field field) throws OrmException;
 
     /**
      * Work out the short field name to use.
@@ -942,8 +954,15 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
      * @param table The table
      * @return The SQL field name
      */
-    protected abstract String fieldName(Table table, Field field);
+    protected abstract String fieldName(Table table, Field field) throws OrmException;
 
+    /**
+     * Get the table generator for this driver
+     *
+     * @return The table generator
+     * @throws OrmException Thrown if there isn't one.
+     */
+    protected abstract TableGenerator getTableGenerator() throws OrmException;
 
     /**
      * Work out the short table name to use.
@@ -951,7 +970,8 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
      * @param table The table we're referencing
      * @return The SQL table name
      */
-    protected final String tableName(Table table) {
+    protected final String tableName(Table table) throws OrmException {
+        checkTable(table);
         return format("%s", table.getSqlTable());
     }
 
@@ -968,6 +988,24 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
             alias = database;
         }
         return format("%s", alias.getSqlDatabase());
+    }
+
+    private void checkTable(Table table) throws OrmException {
+        if (createTables) {
+            if (!exists.containsKey(table)) {
+                if (!tableExists(table)) {
+                    try {
+                        getConnection()
+                                .createStatement()
+                                .executeUpdate(
+                                        getTableGenerator().generateSql(table));
+                    } catch (SQLException ex) {
+                        throw new OrmSqlException(format("Error creating table (%s)", ex.getMessage()),ex);
+                    }
+                }
+                exists.put(table, Boolean.TRUE);
+            }
+        }
     }
 
 }

@@ -5,13 +5,14 @@
     <groupId>net.legrange.orm</groupId>
     <artifactId>orm</artifactId>
     <name>[Helicopter ORM]</name>
-    <version>0.57</version>
+    <version>0.60</version>
     <packaging>pom</packaging>
     <modules>
         <module>core</module>
+        <module>drivers</module>
         <module>plugins</module>
         <module>test</module>
-    </modules>
+   </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>

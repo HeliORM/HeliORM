@@ -35,7 +35,7 @@ class Modeller<T extends Table> {
     private void generate() throws GeneratorException {
         Set<Class<?>> allPojoClasses = gen.getAllPojoClasses()
                 .stream()
-                .collect(Collectors.toSet());
+                    .collect(Collectors.toSet());
         classPackageMap = makeDatabaseMap(allPojoClasses);
         Set<String> uniquePackages = classPackageMap.values().stream()
                 .distinct()

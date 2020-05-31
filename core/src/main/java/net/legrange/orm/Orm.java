@@ -2,6 +2,7 @@ package net.legrange.orm;
 
 import net.legrange.orm.def.Executable;
 import net.legrange.orm.def.Select;
+import net.legrange.orm.driver.SqlDriver;
 import net.legrange.orm.impl.Part;
 import net.legrange.orm.impl.SelectPart;
 
@@ -38,13 +39,11 @@ public final class Orm implements AutoCloseable {
      * the given dialect.
      *
      * @param con     The SQL connection
-     * @param dialect The SQL dialect to use
      * @return The newly created ORM
      * @throws OrmException
      */
-    public static Orm open(Connection con, Dialect dialect) throws OrmException {
-        return OrmBuilder.create(con)
-                .setDialect(dialect)
+    public static Orm open(Connection con, Class<SqlDriver> driverClass) throws OrmException {
+        return OrmBuilder.create(() -> con, driverClass)
                 .build();
     }
 

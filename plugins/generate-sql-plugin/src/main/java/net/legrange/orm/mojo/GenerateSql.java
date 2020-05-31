@@ -7,6 +7,10 @@ import io.github.classgraph.ScanResult;
 import net.legrange.orm.Database;
 import net.legrange.orm.Orm;
 import net.legrange.orm.Table;
+import net.legrange.orm.driver.OrmSqlException;
+import net.legrange.orm.driver.TableGenerator;
+import net.legrange.orm.driver.mysql.MysqlDialectGenerator;
+import net.legrange.orm.driver.postgresql.PostgresDialectGenerator;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -50,7 +54,7 @@ public class GenerateSql extends AbstractMojo {
 
     private ClassLoader globalClassLoader;
     private ClassLoader localClassLoader;
-    private DialectGenerator gen;
+    private TableGenerator gen;
 
     public GenerateSql() throws GeneratorException, DependencyResolutionRequiredException {
     }
@@ -99,7 +103,12 @@ public class GenerateSql extends AbstractMojo {
     }
 
     private String processTable(Table table) throws GeneratorException {
-        return gen.generateSql(table);
+        try {
+            return gen.generateSql(table);
+        }
+        catch (OrmSqlException ex) {
+            throw new GeneratorException(ex.getMessage(), ex);
+        }
     }
 
     private void writeSqlFile(String name, String sql) throws GeneratorException {

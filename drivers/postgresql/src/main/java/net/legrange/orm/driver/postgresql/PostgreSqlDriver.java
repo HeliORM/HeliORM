@@ -1,9 +1,11 @@
 package net.legrange.orm.driver;
 
 import net.legrange.orm.Database;
+import net.legrange.orm.OrmException;
 import net.legrange.orm.PojoOperations;
 import net.legrange.orm.Table;
 import net.legrange.orm.def.Field;
+import net.legrange.orm.driver.postgresql.PostgresDialectGenerator;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -25,12 +27,12 @@ public final class PostgreSqlDriver extends SqlDriver {
     }
 
     @Override
-    protected String fullTableName(Table table) {
+    protected String fullTableName(Table table) throws OrmException {
         return format("\"%s\".public.\"%s\"", databaseName(table), tableName(table));
     }
 
     @Override
-    protected String fullFieldName(Table table, Field field) {
+    protected String fullFieldName(Table table, Field field) throws OrmException {
         return format("%s.\"%s\"", fullTableName(table), field.getSqlName());
     }
 
@@ -42,5 +44,10 @@ public final class PostgreSqlDriver extends SqlDriver {
     @Override
     protected void setEnum(PreparedStatement stmt, int par, String value) throws SQLException {
         stmt.setObject(par, value, Types.OTHER);
+    }
+
+    @Override
+    protected TableGenerator getTableGenerator() throws OrmException {
+        return new PostgresDialectGenerator();
     }
 }

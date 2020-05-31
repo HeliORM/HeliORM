@@ -1,9 +1,10 @@
 package net.legrange.orm;
 
-import net.legrange.orm.driver.MySqlDriver;
-import net.legrange.orm.driver.PostgreSqlDriver;
+import net.legrange.orm.driver.SqlDriver;
 import net.legrange.orm.impl.AliasDatabase;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Map;
@@ -19,10 +20,11 @@ import static java.lang.String.format;
 public class OrmBuilder {
 
     private final Supplier<Connection> con;
+    private final Class<? extends SqlDriver> driverClass;
     private final Map<Database, String> databases = new HashMap();
-    private Orm.Dialect dialect;
     private PojoOperations pops;
     private boolean rollbackOnUncommittedClose = false;
+    private boolean createMissingTables = false;
 
     /**
      * Create a new OrmBuilder using the given connection supplier. This makes
@@ -34,19 +36,8 @@ public class OrmBuilder {
      * @return The ORM builder
      * @throws OrmException
      */
-    public static OrmBuilder create(Supplier<Connection> con) throws OrmException {
-        return new OrmBuilder(con);
-    }
-
-    /**
-     * Create a new OrmBuilder using the given connection. T
-     *
-     * @param con The connection to use
-     * @return The ORM builder
-     * @throws OrmException
-     */
-    public static OrmBuilder create(Connection con) throws OrmException {
-        return new OrmBuilder(() -> con);
+    public static OrmBuilder create(Supplier<Connection> con, Class<? extends SqlDriver> driverClass) throws OrmException {
+        return new OrmBuilder(con, driverClass);
     }
 
     /**
@@ -55,9 +46,9 @@ public class OrmBuilder {
      * @param con The connection supplier to start with.
      * @throws OrmException
      */
-    private OrmBuilder(Supplier<Connection> con) throws OrmException {
+    private OrmBuilder(Supplier<Connection> con, Class<? extends SqlDriver> driverClass) throws OrmException {
         this.con = con;
-        this.dialect = Orm.Dialect.MYSQL;
+        this.driverClass = driverClass;
         this.pops = new UnsafePojoOperations();
     }
 
@@ -70,17 +61,6 @@ public class OrmBuilder {
      */
     public OrmBuilder mapDatabase(Database database, String sqlName) {
         databases.put(database, sqlName);
-        return this;
-    }
-
-    /**
-     * Select the SQL dialect to use.
-     *
-     * @param dialect The dialect
-     * @return The ORM builder
-     */
-    public OrmBuilder setDialect(Orm.Dialect dialect) {
-        this.dialect = dialect;
         return this;
     }
 
@@ -108,6 +88,11 @@ public class OrmBuilder {
         this.rollbackOnUncommittedClose = rollback;
         return this;
     }
+    
+    public OrmBuilder setCreateMissingTables(boolean createMissingTables) { 
+        this.createMissingTables = createMissingTables;
+        return this;
+    }
 
 
     /**
@@ -121,16 +106,13 @@ public class OrmBuilder {
         for (Database database : databases.keySet()) {
             aliases.put(database, new AliasDatabase(database, databases.get(database)));
         }
-        OrmDriver driver;
-        switch (dialect) {
-            case MYSQL:
-                driver = new MySqlDriver(con, pops, aliases);
-                break;
-            case POSTGRESQL:
-                driver = new PostgreSqlDriver(con, pops, aliases);
-                break;
-            default:
-                throw new OrmException(format("Don't know how to create a driver for dialect %s", dialect));
+        SqlDriver driver;
+        try {
+            Constructor<? extends  SqlDriver> constructor = driverClass.getConstructor(Supplier.class, PojoOperations.class, Map.class);
+            driver = constructor.newInstance(con, pops, aliases);
+            driver.setCreateTables(createMissingTables);
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException e) {
+            throw new OrmException(format("Cannot start driver of type '%s' (%s)", driverClass.getSimpleName(), e.getMessage()),e);
         }
         if (driver instanceof OrmTransactionDriver) {
             ((OrmTransactionDriver) driver).setRollbackOnUncommittedClose(rollbackOnUncommittedClose);

@@ -7,13 +7,13 @@ import net.legrange.orm.OrmException;
  *
  * @author gideon
  */
-public class OrmSqlException extends OrmException {
+public final class OrmSqlException extends OrmException {
 
-    OrmSqlException(String message) {
+    public OrmSqlException(String message) {
         super(message);
     }
 
-    OrmSqlException(String message, Throwable cause) {
+    public OrmSqlException(String message, Throwable cause) {
         super(message, cause);
     }
 

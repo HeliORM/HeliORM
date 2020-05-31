@@ -2,18 +2,19 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>net.legrange.orm</groupId>
         <artifactId>orm</artifactId>
+        <groupId>net.legrange.orm</groupId>
         <version>0.60</version>
     </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>drivers</artifactId>
+    <name>[Helicopter ORM] Database Drivers</name>
     <packaging>pom</packaging>
-    <name>[Helicopter ORM] Plugins</name>
-    <artifactId>plugins</artifactId>
     <modules>
-        <module>generate-model-plugin</module>
-        <module>generate-sql-plugin</module>
+        <module>mysql</module>
+        <module>postgresql</module>
     </modules>
 
 </project>

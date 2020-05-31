@@ -5,6 +5,7 @@ import net.legrange.orm.OrmBuilder;
 import net.legrange.orm.OrmException;
 import net.legrange.orm.OrmTransaction;
 import net.legrange.orm.Table;
+import net.legrange.orm.driver.mysql.MySqlDriver;
 import test.pets.Bird;
 import test.pets.Bird.Kind;
 import test.pets.Cat;
@@ -35,8 +36,7 @@ public class test {
                 e.printStackTrace();
                 return null;
             }
-        })
-                .setDialect(Orm.Dialect.MYSQL)
+        }, MySqlDriver.class)
                 .setRollbackOnUncommittedClose(false)
 //                .withPojoOperations(new BeanPojoOperations())
                 .mapDatabase(TEST, "petz").build();

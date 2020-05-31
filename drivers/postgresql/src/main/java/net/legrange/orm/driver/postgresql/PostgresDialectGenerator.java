@@ -1,61 +1,76 @@
-package net.legrange.orm.mojo;
+package net.legrange.orm.driver.postgresql;
 
 import net.legrange.orm.Table;
 import net.legrange.orm.def.Field;
+import net.legrange.orm.driver.OrmSqlException;
+import net.legrange.orm.driver.TableGenerator;
 
 import java.util.Optional;
 import java.util.StringJoiner;
 
 import static java.lang.String.format;
 
-public class MysqlDialectGenerator implements DialectGenerator {
+public class PostgresDialectGenerator implements TableGenerator {
     @Override
-    public String generateSql(Table<?> table) throws GeneratorException {
+    public String generateSql(Table<?> table) throws OrmSqlException {
         StringBuilder sql = new StringBuilder();
-        sql.append(format("CREATE TABLE `%s` (\n", table.getSqlTable()));
+        sql.append(format("CREATE TABLE \"%s\" (\n", table.getSqlTable()));
         boolean first = true;
+        StringBuilder enums = new StringBuilder();
         for (Field field : table.getFields()) {
             if (first) {
                 first = false;
             } else {
                 sql.append(",\n");
             }
-            sql.append(format("\t`%s` ", field.getSqlName()));
+            sql.append(format("\t\"%s\" ", field.getSqlName()));
             sql.append(generateFieldSql(table, field));
             if (!field.isNullable()) {
                 sql.append(" NOT NULL");
             }
-            if (field.isPrimaryKey() && field.isAutoNumber() && field.getFieldType() != Field.FieldType.STRING) {
-                sql.append(" AUTO_INCREMENT");
+            if (field.getFieldType() == Field.FieldType.ENUM) {
+                enums.append(format("CREATE TYPE %s as ENUM(%s);\n", enumTypeName(table, field), getEnumValues(table, field)));
             }
         }
         Optional<Field> key = table.getPrimaryKey();
         if (key.isPresent()) {
             sql.append(",\n");
-            sql.append(format("PRIMARY KEY (`%s`)", key.get().getSqlName()));
+            sql.append(format("PRIMARY KEY (\"%s\")", key.get().getSqlName()));
         }
         sql.append(");\n");
-        return sql.toString();
+        return enums.toString() + sql.toString();
     }
 
-    private String generateFieldSql(Table table, Field field) throws GeneratorException {
+    private String generateFieldSql(Table table, Field field) throws OrmSqlException {
         switch (field.getFieldType()) {
             case BOOLEAN:
-                return "TINYINT(1)";
+                return "BIT";
             case BYTE:
+                if (field.isPrimaryKey() && field.isAutoNumber()) {
+                    return "SERIAL";
+                }
                 return "TINYINT";
             case SHORT:
+                if (field.isPrimaryKey() && field.isAutoNumber()) {
+                    return "SERIAL";
+                }
                 return "SMALLINT";
             case INTEGER:
+                if (field.isPrimaryKey() && field.isAutoNumber()) {
+                    return "SERIAL";
+                }
                 return "INTEGER";
             case LONG:
+                if (field.isPrimaryKey() && field.isAutoNumber()) {
+                    return "BIGSERIAL";
+                }
                 return "BIGINT";
             case DOUBLE:
-                return "DOUBLE";
+                return "DOUBLE PRECISION";
             case FLOAT:
-                return "REAL";
+                return "DOUBLE PRECISION";
             case ENUM:
-                return format("ENUM(%s)", getEnumValues(table, field));
+                return format("%s", enumTypeName(table, field));
             case STRING: {
                 int length = 255;
                 if (field.getLength().isPresent()) {
@@ -66,12 +81,16 @@ public class MysqlDialectGenerator implements DialectGenerator {
             case DATE:
                 return "DATE";
             case TIMESTAMP:
-                return "DATETIME";
+                return "TIMESTAMP";
             case DURATION:
                 return "VARCHAR(32)";
             default:
-                throw new GeneratorException(format("Unkown field type '%s'. BUG!", field.getFieldType()));
+                throw new OrmSqlException(format("Unkown field type '%s'. BUG!", field.getFieldType()));
         }
+    }
+
+    private String enumTypeName(Table table, Field field) {
+        return format("%s_%s", table.getSqlTable(), field.getSqlName());
     }
 
     private String getEnumValues(Table table, Field<?, ?, ?> field) {
@@ -82,4 +101,5 @@ public class MysqlDialectGenerator implements DialectGenerator {
         }
         return sql.toString();
     }
+
 }
