@@ -22,20 +22,16 @@ import org.apache.maven.artifact.DependencyResolutionRequiredException;
 public class AnnotatedPojoGenerator implements Generator<AnnotatedPojoTable> {
 
     private ScanResult scan;
-    private Map<String, AnnotatedPojoTable> map;
     private final GenerateModel generator;
 
+
     public AnnotatedPojoGenerator(GenerateModel generator) throws GeneratorException {
-        try {
-            this.generator = generator;
-            scan = new ClassGraph()
-                    .enableAllInfo()
-                    .addClassLoader(generator.getCompiledClassesLoader())
-                    .whitelistPackages(generator.getPackages().toArray(new String[]{}))
-                    .scan();
-        } catch (DependencyResolutionRequiredException ex) {
-            throw new GeneratorException(format("Error setting up class path scanner (%s)", ex.getMessage()), ex);
-        }
+        this.generator = generator;
+        scan = new ClassGraph()
+                .enableAllInfo()
+                .addClassLoader(generator.getLocalClassLoader())
+                .whitelistPackages(generator.getPackages().toArray(new String[]{}))
+                .scan();
     }
 
     @Override
@@ -44,10 +40,10 @@ public class AnnotatedPojoGenerator implements Generator<AnnotatedPojoTable> {
             HashSet<Class<?>> res = new HashSet();
             ClassInfoList list = scan.getClassesWithAnnotation(Pojo.class.getName());
             for (ClassInfo info : list) {
-                res.add(generator.getCompiledClassesLoader().loadClass(info.getName()));
+                res.add(generator.getGlobalClassLoader().loadClass(info.getName()));
             }
             return res;
-        } catch (ClassNotFoundException | DependencyResolutionRequiredException ex) {
+        } catch (ClassNotFoundException ex) {
             throw new GeneratorException(ex.getMessage(), ex);
         }
 

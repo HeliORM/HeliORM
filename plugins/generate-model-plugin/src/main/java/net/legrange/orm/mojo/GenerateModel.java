@@ -21,11 +21,7 @@ import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static java.lang.String.format;
 
@@ -48,6 +44,9 @@ public class GenerateModel extends AbstractMojo {
     private String database;
     @Component
     private MavenProject project;
+    private ClassLoader localClassLoader;
+    private ClassLoader globalClassLoader;
+
 
     private Generator gen;
     private Modeller modeller;
@@ -59,6 +58,7 @@ public class GenerateModel extends AbstractMojo {
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
+            setupClassLoader();
             switch (strategy) {
                 case annotated:
                     gen = new AnnotatedPojoGenerator(this);
@@ -95,25 +95,12 @@ public class GenerateModel extends AbstractMojo {
         }
     }
 
-    /**
-     * Get a class loader that will load classes compiled during the build
-     *
-     * @return The class loader
-     * @throws net.legrange.orm.mojo.GeneratorException
-     * @throws org.apache.maven.artifact.DependencyResolutionRequiredException
-     */
-    public ClassLoader getCompiledClassesLoader() throws GeneratorException, DependencyResolutionRequiredException {
-        List<String> classpathElements = project.getCompileClasspathElements();
-        List<URL> projectClasspathList = new ArrayList<>();
-        for (String element : classpathElements) {
-            try {
-                projectClasspathList.add(new File(element).toURI().toURL());
-            } catch (MalformedURLException e) {
-                throw new GeneratorException(element + " is an invalid classpath element", e);
-            }
-        }
-        return new URLClassLoader(projectClasspathList.toArray(new URL[]{}), Thread.currentThread().getContextClassLoader());
+    public ClassLoader getLocalClassLoader() {
+        return localClassLoader;
+    }
 
+    public ClassLoader getGlobalClassLoader() {
+        return globalClassLoader;
     }
 
     public Set<String> getPackages() {
@@ -122,6 +109,33 @@ public class GenerateModel extends AbstractMojo {
 
     String getTablesPackageFor(Table table) {
         return modeller.getPackageDatabase(table.getObjectClass().getCanonicalName()).getPackageName();
+    }
+    /**
+     * Get a class loader that will load classes compiled during the build
+     *
+     * @return The class loader
+     */
+    private void setupClassLoader() throws GeneratorException {
+        List<String> classpathElements = null;
+        try {
+            classpathElements = project.getCompileClasspathElements();
+        } catch (DependencyResolutionRequiredException e) {
+            throw new GeneratorException(format("Error getting compiled class path elements (%s)", e.getMessage()), e);
+        }
+        globalClassLoader = makeClassLoader(classpathElements);
+        localClassLoader = makeClassLoader(Collections.singletonList(project.getBuild().getOutputDirectory()));
+    }
+
+    private ClassLoader makeClassLoader(List<String> classpathElements) throws GeneratorException {
+        List<URL> projectClasspathList = new ArrayList<>();
+        for (String element : classpathElements) {
+            try {
+                projectClasspathList.add(new File(element).toURI().toURL());
+            } catch (MalformedURLException e) {
+                throw new GeneratorException(e.getMessage(), e);
+            }
+        }
+        return new URLClassLoader(projectClasspathList.toArray(new URL[]{}), Thread.currentThread().getContextClassLoader());
     }
 
 }

@@ -22,13 +22,11 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static java.lang.String.format;
 
@@ -50,7 +48,8 @@ public class GenerateSql extends AbstractMojo {
     @Component
     private MavenProject project;
 
-    private URLClassLoader classLoader;
+    private ClassLoader globalClassLoader;
+    private ClassLoader localClassLoader;
     private DialectGenerator gen;
 
     public GenerateSql() throws GeneratorException, DependencyResolutionRequiredException {
@@ -81,7 +80,7 @@ public class GenerateSql extends AbstractMojo {
     private void processDatabase(Class<Database> type) throws GeneratorException {
         try {
             StringBuilder sqlForDatabase = new StringBuilder();
-            Database database = type.newInstance();
+            Database database = type.getConstructor().newInstance();
             info("Generating SQL for database %s", database.getSqlDatabase());
             for (Table table : database.getTables()) {
                 if (!table.isAbstract()) {
@@ -94,7 +93,7 @@ public class GenerateSql extends AbstractMojo {
                 }
             }
             writeSqlFile(database.getSqlDatabase(), sqlForDatabase.toString());
-        } catch (InstantiationException | IllegalAccessException e) {
+        } catch (InstantiationException | NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
             throw new GeneratorException(format("Cannot instantiate table of type '%s' (%s)", type.getCanonicalName(), e.getMessage()), e);
         }
     }
@@ -116,14 +115,14 @@ public class GenerateSql extends AbstractMojo {
     private Set<Class<Database>> getDatabaseClasses() throws GeneratorException {
         ScanResult scan = new ClassGraph()
                 .enableAllInfo()
-                .addClassLoader(classLoader)
+                .addClassLoader(localClassLoader)
                 .whitelistPackages(packages.toArray(new String[]{}))
                 .scan();
         ClassInfoList infos = scan.getClassesImplementing(Database.class.getCanonicalName());
         Set<Class<Database>> res = new HashSet<>();
         for (ClassInfo info : infos) {
             try {
-                res.add((Class<Database>) classLoader.loadClass(info.getName()));
+                res.add((Class<Database>) globalClassLoader.loadClass(info.getName()));
             } catch (ClassNotFoundException e) {
                 throw new GeneratorException(format("Error loading classes '%s' from custom class loader (%s)", info.getName(), e.getMessage()), e);
             }
@@ -143,6 +142,11 @@ public class GenerateSql extends AbstractMojo {
         } catch (DependencyResolutionRequiredException e) {
             throw new GeneratorException(format("Error getting compiled class path elements (%s)", e.getMessage()), e);
         }
+        globalClassLoader = makeClassLoader(classpathElements);
+        localClassLoader = makeClassLoader(Collections.singletonList(project.getBuild().getOutputDirectory()));
+    }
+
+    private ClassLoader makeClassLoader(List<String> classpathElements) throws GeneratorException {
         List<URL> projectClasspathList = new ArrayList<>();
         for (String element : classpathElements) {
             try {
@@ -151,8 +155,8 @@ public class GenerateSql extends AbstractMojo {
                 throw new GeneratorException(e.getMessage(), e);
             }
         }
-        classLoader = new URLClassLoader(projectClasspathList.toArray(new URL[]{}), Thread.currentThread().getContextClassLoader());
         debug("Classloader created from %d elements", classpathElements.size());
+        return new URLClassLoader(projectClasspathList.toArray(new URL[]{}), Thread.currentThread().getContextClassLoader());
     }
 
     private void debug(String fmt, Object... args) {

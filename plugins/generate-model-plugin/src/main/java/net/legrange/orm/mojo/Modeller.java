@@ -2,6 +2,7 @@ package net.legrange.orm.mojo;
 
 import net.legrange.orm.Table;
 
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,7 +33,10 @@ class Modeller<T extends Table> {
     }
 
     private void generate() throws GeneratorException {
-        Set<Class<?>> allPojoClasses = gen.getAllPojoClasses();
+        Set<Class<?>> allPojoClasses = gen.getAllPojoClasses()
+                .stream()
+                .filter(type -> !Modifier.isAbstract(type.getModifiers()))
+                .collect(Collectors.toSet());
         classPackageMap = makeDatabaseMap(allPojoClasses);
         Set<String> uniquePackages = classPackageMap.values().stream()
                 .distinct()
