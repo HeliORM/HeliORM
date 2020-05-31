@@ -28,7 +28,7 @@ import static test.Tables.TEST;
 public class test {
 
     public static void main(String... args) throws Exception {
-        ConnectionPool pool = new ConnectionPool("jdbc:mysql://0.0.0.0:3306/petz", "root", "foo");
+        ConnectionPool pool = new ConnectionPool("jdbc:mysql://127.0.0.1:3306/petz", "test", "test");
         Orm orm = OrmBuilder.create(() -> {
             try {
                 return pool.getConnection();
@@ -38,9 +38,11 @@ public class test {
             }
         }, MySqlDriver.class)
                 .setRollbackOnUncommittedClose(false)
+                .setCreateMissingTables(true)
 //                .withPojoOperations(new BeanPojoOperations())
                 .mapDatabase(TEST, "petz").build();
         test t = new test();
+        t.test4(orm);
 //        t.test61(orm);
 //        t.test62(orm);
         t.test71(orm);
