@@ -127,8 +127,8 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
     }
 
     private final boolean tableExists(Table table) throws OrmException {
-        try {
-            DatabaseMetaData dbm = getConnection().getMetaData();
+        try (Connection con = getConnection()) {
+            DatabaseMetaData dbm = con.getMetaData();
             try (ResultSet tables = dbm.getTables(null, null, databaseName(table), null)) {
                 return tables.next();
             }
@@ -994,13 +994,10 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
         if (createTables) {
             if (!exists.containsKey(table)) {
                 if (!tableExists(table)) {
-                    try {
-                        getConnection()
-                                .createStatement()
-                                .executeUpdate(
-                                        getTableGenerator().generateSql(table));
+                    try (Connection con = getConnection(); Statement stmt = con.createStatement()) {
+                        stmt.executeUpdate(getTableGenerator().generateSql(table));
                     } catch (SQLException ex) {
-                        throw new OrmSqlException(format("Error creating table (%s)", ex.getMessage()),ex);
+                        throw new OrmSqlException(format("Error creating table (%s)", ex.getMessage()), ex);
                     }
                 }
                 exists.put(table, Boolean.TRUE);
