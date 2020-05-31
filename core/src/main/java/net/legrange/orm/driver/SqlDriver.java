@@ -129,7 +129,7 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
     private final boolean tableExists(Table table) throws OrmException {
         try (Connection con = getConnection()) {
             DatabaseMetaData dbm = con.getMetaData();
-            try (ResultSet tables = dbm.getTables(null, null, databaseName(table), null)) {
+            try (ResultSet tables = dbm.getTables(databaseName(table), null, makeTableName(table), null)) {
                 return tables.next();
             }
         } catch (SQLException ex) {
@@ -972,6 +972,10 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
      */
     protected final String tableName(Table table) throws OrmException {
         checkTable(table);
+        return makeTableName(table);
+    }
+
+    private final String makeTableName(Table table) throws OrmException {
         return format("%s", table.getSqlTable());
     }
 
