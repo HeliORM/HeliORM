@@ -28,7 +28,8 @@ import static test.Tables.TEST;
 public class test {
 
     public static void main(String... args) throws Exception {
-        ConnectionPool pool = new ConnectionPool("jdbc:mysql://127.0.0.1:3306/petz", "test", "test");
+        ConnectionPool pool = new ConnectionPool("jdbc:postgresql://127.0.0.1:5432/petz", "postgres", "dev");
+//        ConnectionPool pool = new ConnectionPool("jdbc:mysql://127.0.0.1:3306/petz", "test", "test");
         Orm orm = OrmBuilder.create(() -> {
             try {
                 return pool.getConnection();

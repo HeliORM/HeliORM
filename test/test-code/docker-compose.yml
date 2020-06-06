@@ -14,7 +14,17 @@ services:
       MYSQL_PASSWORD: test
     networks:
       - test_network
-
+  postgres:
+    image: postgres
+    container_name: test-postgres
+    ports:
+      - 127.0.0.1:5432:5432
+    volumes:
+      - test_postgres:/var/lib/postgresql/data
+    networks:
+      - test_network
+    environment:
+      POSTGRES_PASSWORD: dev
 
 networks:
   test_network:
@@ -22,3 +32,4 @@ networks:
 
 volumes:
   test_mariadb: {}
+  test_postgres: {}
