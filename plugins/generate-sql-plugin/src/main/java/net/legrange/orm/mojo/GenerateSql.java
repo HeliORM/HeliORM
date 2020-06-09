@@ -104,7 +104,7 @@ public class GenerateSql extends AbstractMojo {
 
     private String processTable(Table table) throws GeneratorException {
         try {
-            return gen.generateSql(table);
+            return gen.generateSchema(table);
         }
         catch (OrmSqlException ex) {
             throw new GeneratorException(ex.getMessage(), ex);

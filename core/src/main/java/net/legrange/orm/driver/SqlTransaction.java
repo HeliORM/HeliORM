@@ -9,12 +9,20 @@ import java.sql.SQLException;
 
 import static java.lang.String.format;
 
-class SqlTransaction implements OrmTransaction, AutoCloseable {
+/** A SQL transaction
+ *
+ */
+final class SqlTransaction implements OrmTransaction, AutoCloseable {
 
     private final SqlDriver driver;
     private final Connection connection;
     private boolean open;
 
+    /** Create a new transactoion for the given driver.
+     *
+     * @param driver The driver to use
+     * @throws OrmTransactionException
+     */
     SqlTransaction(SqlDriver driver) throws OrmTransactionException {
         this.driver = driver;
         this.connection = driver.getConnection();
@@ -34,8 +42,7 @@ class SqlTransaction implements OrmTransaction, AutoCloseable {
             }
             connection.commit();
             open = false;
-        }
-        catch (SQLException ex) {
+        } catch (SQLException ex) {
             throw new OrmException(format("Error commiting transaction (%s)", ex.getMessage()));
         }
     }
@@ -48,8 +55,7 @@ class SqlTransaction implements OrmTransaction, AutoCloseable {
             }
             connection.rollback();
             open = false;
-        }
-        catch (SQLException ex) {
+        } catch (SQLException ex) {
             throw new OrmException(format("Error rolling back transaction (%s)", ex.getMessage()));
         }
 

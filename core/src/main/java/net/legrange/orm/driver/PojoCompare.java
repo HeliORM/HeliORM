@@ -11,13 +11,13 @@ import java.util.Optional;
 /**
  * @author gideon
  */
-class Wrapper<O> implements Comparable<Wrapper<O>> {
+final class PojoCompare<O> implements Comparable<PojoCompare<O>> {
 
     private final PojoOperations pops;
     private final Table<O> table;
     private final O pojo;
 
-    public Wrapper(PojoOperations pops, Table<O> table, O pojo) {
+    public PojoCompare(PojoOperations pops, Table<O> table, O pojo) {
         this.pops = pops;
         this.table = table;
         this.pojo = pojo;
@@ -28,7 +28,7 @@ class Wrapper<O> implements Comparable<Wrapper<O>> {
     }
 
     @Override
-    public int compareTo(Wrapper<O> w) {
+    public int compareTo(PojoCompare<O> w) {
         if (table.equals(w.table)) {
             Optional<Field> primaryKey = table.getPrimaryKey();
             if (primaryKey.isPresent()) {
@@ -64,13 +64,13 @@ class Wrapper<O> implements Comparable<Wrapper<O>> {
         if (obj == null) {
             return false;
         }
-        if (Wrapper.class != obj.getClass()) {
+        if (PojoCompare.class != obj.getClass()) {
             return false;
         }
-        return compareTo((Wrapper<O>) obj) == 0;
+        return compareTo((PojoCompare<O>) obj) == 0;
     }
 
-    int compareTo(Wrapper<O> w, Field<?, O, ?> field) throws UncaughtOrmException {
+    int compareTo(PojoCompare<O> w, Field<?, O, ?> field) throws UncaughtOrmException {
         try {
             return pops.compareTo(pojo, w.getPojo(), field);
         }

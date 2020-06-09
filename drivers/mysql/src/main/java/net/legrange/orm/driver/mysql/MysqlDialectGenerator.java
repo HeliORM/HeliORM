@@ -12,7 +12,7 @@ import static java.lang.String.format;
 
 public class MysqlDialectGenerator implements TableGenerator {
     @Override
-    public String generateSql(Table<?> table) throws OrmSqlException {
+    public String generateSchema(Table<?> table) throws OrmSqlException {
         StringBuilder sql = new StringBuilder();
         sql.append(format("CREATE TABLE `%s` (\n", table.getSqlTable()));
         boolean first = true;

@@ -47,7 +47,6 @@ import java.util.UUID;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-
 import static java.lang.String.format;
 
 /**
@@ -82,7 +81,7 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
         if (queries.isEmpty()) {
             throw new OrmException("Could not build query from parts. BUG!");
         }
-        Stream<Wrapper<O>> res = queries.stream()
+        Stream<PojoCompare<O>> res = queries.stream()
                 .flatMap(parts -> {
                     try {
                         return streamSingle(parts.get(0).getReturnTable(), buildSelectQuery(Parser.parse(parts)));
@@ -98,7 +97,7 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
                 res = res.sorted();
             }
         }
-        return res.map(wrapper -> wrapper.getPojo());
+        return res.map(pojoCompare -> pojoCompare.getPojo());
     }
 
     @Override
@@ -114,15 +113,19 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
 
 
     @Override
-    public void setRollbackOnUncommittedClose(boolean rollback) {
+    public final void setRollbackOnUncommittedClose(boolean rollback) {
         rollbackOnUncommittedClose = rollback;
     }
 
+    /** Configure driver to create missing SQL tables.
+     *
+     * @param createTables True to create tables
+     */
     public final void setCreateTables(boolean createTables) {
         this.createTables = createTables;
     }
 
-    boolean getRollbackOnUncommittedClose() {
+    final boolean getRollbackOnUncommittedClose() {
         return rollbackOnUncommittedClose;
     }
 
@@ -147,13 +150,13 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
      * @return The stream of results.
      * @throws OrmException
      */
-    private <O, P extends Part & Executable> Stream<Wrapper<O>> streamSingle(Table<O> table, String query) throws OrmException {
+    private <O, P extends Part & Executable> Stream<PojoCompare<O>> streamSingle(Table<O> table, String query) throws OrmException {
         Connection sql = getConnection();
         try {
             Statement stmt = sql.createStatement();
             ResultSet rs = stmt.executeQuery(query);
-            Stream<Wrapper<O>> stream = StreamSupport.stream(
-                    Spliterators.spliteratorUnknownSize(new Iterator<Wrapper<O>>() {
+            Stream<PojoCompare<O>> stream = StreamSupport.stream(
+                    Spliterators.spliteratorUnknownSize(new Iterator<PojoCompare<O>>() {
                                                             @Override
                                                             public boolean hasNext() {
                                                                 try {
@@ -164,9 +167,9 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
                                                             }
 
                                                             @Override
-                                                            public Wrapper<O> next() {
+                                                            public PojoCompare<O> next() {
                                                                 try {
-                                                                    return new Wrapper(pops, table, makePojoFromResultSet(rs, table));
+                                                                    return new PojoCompare(pops, table, makePojoFromResultSet(rs, table));
                                                                 } catch (OrmException ex) {
                                                                     throw new UncaughtOrmException(ex.getMessage(), ex);
                                                                 }
@@ -791,6 +794,10 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
         throw new OrmException(format("Could not read Duration value for field '%s' with type '%s'.", field.getJavaName(), field.getFieldType()));
     }
 
+    /** Obtain the SQL connection to use 
+     * 
+     * @return The connection
+     */
     Connection getConnection() {
         if (currentTransaction != null) {
             if (currentTransaction.isOpen()) {
@@ -810,15 +817,15 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
      * @param tail
      * @return
      */
-    private <O, P extends Part> Comparator<Wrapper<O>> makeComparatorForTail(P tail) {
+    private <O, P extends Part> Comparator<PojoCompare<O>> makeComparatorForTail(P tail) {
         List<OrderedPart> order = new LinkedList();
         while (tail.getType() == Part.Type.ORDER) {
             order.add(0, (OrderedPart) tail);
             tail = (P) tail.left();
         }
-        List<Comparator<Wrapper<O>>> comps = new LinkedList();
+        List<Comparator<PojoCompare<O>>> comps = new LinkedList();
         for (OrderedPart op : order) {
-            comps.add((Comparator<Wrapper<O>>) (Wrapper<O> w1, Wrapper<O> w2) -> {
+            comps.add((Comparator<PojoCompare<O>>) (PojoCompare<O> w1, PojoCompare<O> w2) -> {
                 if (op.getDirection() == OrderedPart.Direction.ASCENDING) {
                     return w1.compareTo(w2, op.getField());
                 } else {
@@ -973,7 +980,7 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
             if (!exists.containsKey(table)) {
                 if (!tableExists(table)) {
                     try (Connection con = getConnection(); Statement stmt = con.createStatement()) {
-                        stmt.executeUpdate(getTableGenerator().generateSql(table));
+                        stmt.executeUpdate(getTableGenerator().generateSchema(table));
                     } catch (SQLException ex) {
                         throw new OrmSqlException(format("Error creating table (%s)", ex.getMessage()), ex);
                     }
