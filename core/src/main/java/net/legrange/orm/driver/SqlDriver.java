@@ -204,15 +204,16 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
                                 pops.setValue(pojo, field, UUID.randomUUID().toString());
                                 setValueInStatement(stmt, pojo, field, par);
                             } else {
-                                stmt.setObject(par, null);
+//                                stmt.setObject(par, null);
                             }
                         } else {
                             setValueInStatement(stmt, pojo, field, par);
+                            par++;
                         }
                     } else {
                         setValueInStatement(stmt, pojo, field, par);
+                        par++;
                     }
-                    par++;
                 }
                 stmt.executeUpdate();
                 Optional<Field> opt = table.getPrimaryKey();
@@ -283,8 +284,10 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
         StringJoiner fields = new StringJoiner(",");
         StringJoiner values = new StringJoiner(",");
         for (Field field : table.getFields()) {
-            fields.add(format("%s", fieldName(table, field)));
-            values.add("?");
+            if (!(field.isPrimaryKey() && field.isAutoNumber())) {
+                fields.add(format("%s", fieldName(table, field)));
+                values.add("?");
+            }
         }
         query.append(fields.toString());
         query.append(") VALUES(");
@@ -431,7 +434,6 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
             query.append(expandOrder(table, order.getThenBy().get()));
         }
         return query.toString();
-
     }
 
     /**
@@ -545,9 +547,7 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
                 return " NOT IN";
             default:
                 throw new OrmException(format("Unsupported operator '%s'. BUG!", part.getOperator()));
-
         }
-
     }
 
     /**
@@ -578,7 +578,6 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
             default:
                 throw new OrmException(format("Unsupported operator '%s'. BUG!", part.getOperator()));
         }
-
     }
 
     /**
@@ -658,32 +657,7 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
      * @throws OrmException Thrown if we cannot work out how to extract the
      *                      data.
      */
-    private Object getKeyValueFromResultSet(ResultSet rs, Field field) throws OrmException {
-        try {
-            switch (field.getFieldType()) {
-                case LONG:
-                    return rs.getLong(1);
-                case INTEGER:
-                    return rs.getInt(1);
-                case STRING:
-                    return rs.getString(1);
-                case SHORT:
-                case BYTE:
-                case DOUBLE:
-                case FLOAT:
-                case BOOLEAN:
-                case ENUM:
-                case DATE:
-                case TIMESTAMP:
-                case DURATION:
-                    throw new OrmException(format("Field type '%s' is not a supported primary key type", field.getFieldType()));
-                default:
-                    throw new OrmException(format("Field type '%s' is unsupported. BUG!", field.getFieldType()));
-            }
-        } catch (SQLException ex) {
-            throw new OrmSqlException(ex.getMessage(), ex);
-        }
-    }
+    protected abstract Object getKeyValueFromResultSet(ResultSet rs, Field field) throws OrmException;
 
     /**
      * Get a value from the given POJO for the given field as an object

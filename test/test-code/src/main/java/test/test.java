@@ -6,6 +6,7 @@ import net.legrange.orm.OrmException;
 import net.legrange.orm.OrmTransaction;
 import net.legrange.orm.Table;
 import net.legrange.orm.driver.mysql.MySqlDriver;
+import net.legrange.orm.driver.postgresql.PostgreSqlDriver;
 import test.pets.Bird;
 import test.pets.Bird.Kind;
 import test.pets.Cat;
@@ -27,10 +28,26 @@ import static test.Tables.TEST;
  */
 public class test {
 
-    public static void main(String... args) throws Exception {
+    private static Orm postgresOrm() throws OrmException {
         ConnectionPool pool = new ConnectionPool("jdbc:postgresql://127.0.0.1:5432/petz", "postgres", "dev");
-//        ConnectionPool pool = new ConnectionPool("jdbc:mysql://127.0.0.1:3306/petz", "test", "test");
-        Orm orm = OrmBuilder.create(() -> {
+       return OrmBuilder.create(() -> {
+            try {
+                return pool.getConnection();
+            } catch (SQLException e) {
+                e.printStackTrace();
+                return null;
+            }
+        }, PostgreSqlDriver.class)
+                .setRollbackOnUncommittedClose(false)
+                .setCreateMissingTables(true)
+//                .withPojoOperations(new BeanPojoOperations())
+                .mapDatabase(TEST, "petz").build();
+
+    }
+
+    private static Orm mysqlOrm() throws OrmException {
+        ConnectionPool pool = new ConnectionPool("jdbc:mysql://127.0.0.1:3306/petz", "test", "test");
+        return OrmBuilder.create(() -> {
             try {
                 return pool.getConnection();
             } catch (SQLException e) {
@@ -42,16 +59,22 @@ public class test {
                 .setCreateMissingTables(true)
 //                .withPojoOperations(new BeanPojoOperations())
                 .mapDatabase(TEST, "petz").build();
+
+    }
+
+    public static void main(String... args) throws Exception {
+        Orm orm = mysqlOrm();
+
         test t = new test();
-        t.test4(orm);
+//        t.test4(orm);
 //        t.test61(orm);
 //        t.test62(orm);
         t.test71(orm);
-        t.test72(orm);
+//        t.test72(orm);
 //        t.test1(orm);
 //        t.test2(orm);
 //        t.test3(orm);
-        t.test4(orm);
+//        t.test4(orm);
 //        t.test5(orm);
 //        t.test6(orm);
 //        t.test7(orm);
@@ -228,11 +251,11 @@ public class test {
     private void test71(Orm orm) throws OrmException {
         out.println("-- Create Bird ---");
         Bird bird = new Bird();
-        bird.setName("Bigger Bird");
-        bird.setAge(2);
+        bird.setName("Mofo Big Bird");
+        bird.setAge(5);
         bird.setKind(Kind.FREERANGE);
         bird.setPersonNumber(1L);
-        bird.setSingTime(Duration.ofMinutes(12));
+        bird.setSingTime(Duration.ofMinutes(62));
         bird = orm.create(bird);
         out.println("Bird created with key " + bird.getId());
     }
