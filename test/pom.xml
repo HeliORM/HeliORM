@@ -5,11 +5,11 @@
     <parent>
         <groupId>net.legrange.orm</groupId>
         <artifactId>orm</artifactId>
-        <version>0.63</version>
+        <version>0.64</version>
     </parent>
     <artifactId>test</artifactId>
     <name>[Helicopter ORM] Test</name>
-    <version>0.63</version>
+    <version>0.64</version>
     <packaging>pom</packaging>
     <modules>
         <module>test-pojos</module>

@@ -5,7 +5,7 @@
     <parent>
         <groupId>net.legrange.orm</groupId>
         <artifactId>plugins</artifactId>
-        <version>0.63</version>
+        <version>0.64</version>
     </parent>
     <artifactId>generate-sql-plugin</artifactId>
     <packaging>maven-plugin</packaging>
@@ -49,13 +49,13 @@
         <dependency>
             <groupId>net.legrange.orm</groupId>
             <artifactId>mysql</artifactId>
-            <version>0.63</version>
+            <version>0.64</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>net.legrange.orm</groupId>
             <artifactId>postgresql</artifactId>
-            <version>0.63</version>
+            <version>0.64</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>

@@ -211,6 +211,7 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
                         if (field.getFieldType() == Field.FieldType.STRING) {
                             pops.setValue(pojo, field, UUID.randomUUID().toString());
                             setValueInStatement(stmt, pojo, field, par);
+                            par++;
                         }
                     } else {
                         setValueInStatement(stmt, pojo, field, par);
