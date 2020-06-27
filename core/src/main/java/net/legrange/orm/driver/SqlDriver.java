@@ -298,10 +298,15 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
         StringJoiner fields = new StringJoiner(",");
         StringJoiner values = new StringJoiner(",");
         for (Field field : table.getFields()) {
-            if (!(field.isPrimaryKey() && field.isAutoNumber())) {
-                fields.add(format("%s", fieldName(table, field)));
-                values.add("?");
+            if (field.isPrimaryKey()) {
+                if (field.isAutoNumber()) {
+                    if (field.getFieldType() != Field.FieldType.STRING) {
+                        continue;
+                    }
+                }
             }
+            fields.add(format("%s", fieldName(table, field)));
+            values.add("?");
         }
         query.append(fields.toString());
         query.append(") VALUES(");

@@ -5,12 +5,12 @@
     <parent>
         <groupId>net.legrange.orm</groupId>
         <artifactId>test</artifactId>
-        <version>0.64</version>
+        <version>0.65</version>
     </parent>
     <groupId>net.legrange.orm</groupId>
     <artifactId>test-code</artifactId>
     <name>[Helicopter ORM] Examples</name>
-    <version>0.64</version>
+    <version>0.65</version>
     <packaging>jar</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -43,6 +43,11 @@
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
             <version>3.4.2</version>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.20</version>
         </dependency>
     </dependencies>
 </project>

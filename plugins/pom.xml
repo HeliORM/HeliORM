@@ -6,7 +6,7 @@
     <parent>
         <groupId>net.legrange.orm</groupId>
         <artifactId>orm</artifactId>
-        <version>0.64</version>
+        <version>0.65</version>
     </parent>
     <packaging>pom</packaging>
     <name>[Helicopter ORM] Plugins</name>

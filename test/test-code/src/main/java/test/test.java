@@ -11,6 +11,7 @@ import test.pets.Bird;
 import test.pets.Bird.Kind;
 import test.pets.Cat;
 import test.pets.Cat.Type;
+import test.pets.Fish;
 
 import java.sql.SQLException;
 import java.time.Duration;
@@ -69,7 +70,7 @@ public class test {
 //        t.test4(orm);
 //        t.test61(orm);
 //        t.test62(orm);
-        t.test71(orm);
+        t.testStringAuto(orm);
 //        t.test72(orm);
 //        t.test1(orm);
 //        t.test2(orm);
@@ -79,6 +80,13 @@ public class test {
 //        t.test6(orm);
 //        t.test7(orm);
 //        t.test8(orm);
+    }
+
+    private void testStringAuto(Orm orm) throws OrmException {
+        Fish fish = new Fish();
+        fish.setName("Wanda");
+        fish = orm.create(fish);
+        System.out.println("fish id = "  + fish.getId());
     }
 
 
