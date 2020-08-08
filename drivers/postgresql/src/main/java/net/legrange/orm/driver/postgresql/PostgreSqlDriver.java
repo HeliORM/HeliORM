@@ -46,6 +46,16 @@ public final class PostgreSqlDriver extends SqlDriver {
     }
 
     @Override
+    protected String virtualFieldName(String name) {
+        return format("\"%s\"", name);
+    }
+
+    @Override
+    protected String virtualValue(String name) {
+        return format("'%s'", name);
+    }
+
+    @Override
     protected TableGenerator getTableGenerator() throws OrmException {
         return new PostgresDialectGenerator();
     }

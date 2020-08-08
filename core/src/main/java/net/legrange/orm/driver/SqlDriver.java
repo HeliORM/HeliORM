@@ -45,6 +45,7 @@ import java.util.Spliterators;
 import java.util.StringJoiner;
 import java.util.UUID;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -55,6 +56,8 @@ import static java.lang.String.format;
  */
 public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
 
+    private static final boolean USE_UNION_ALL = true;
+    private static final String POJO_NAME_FIELD = "pojo_field_name";
     private final Supplier<Connection> connectionSupplier;
     private SqlTransaction currentTransaction;
     private boolean createTables = false;
@@ -82,23 +85,89 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
         if (queries.isEmpty()) {
             throw new OrmException("Could not build query from parts. BUG!");
         }
-        Stream<PojoCompare<O>> res = queries.stream()
-                .flatMap(parts -> {
-                    try {
-                        return streamSingle(parts.get(0).getReturnTable(), buildSelectQuery(Parser.parse(parts)));
-                    } catch (OrmException ex) {
-                        throw new UncaughtOrmException(ex.getMessage(), ex);
-                    }
-                });
-        res = res.distinct();
-        if (queries.size() > 1) {
-            if (tail.getType() == Part.Type.ORDER) {
-                res = res.sorted(makeComparatorForTail(tail));
+        if (queries.size() == 1) {
+            List<Part> parts = queries.get(0);
+            return streamSingle(parts.get(0).getReturnTable(), buildSelectQuery(Parser.parse(parts)));
+        } else {
+            if (USE_UNION_ALL) {
+                Map<String, Table<O>> tableMap = queries.stream()
+                        .map(parts -> parts.get(0).getReturnTable())
+                        .collect(Collectors.toMap(table -> table.getObjectClass().getName(), table -> table));
+                return streamUnion(buildSelectUnionQuery(queries), tableMap);
             } else {
-                res = res.sorted();
+                Stream<PojoCompare<O>> res = queries.stream()
+                        .flatMap(parts -> {
+                            try {
+                                return streamSingle(parts.get(0).getReturnTable(), buildSelectQuery(Parser.parse(parts)));
+                            } catch (OrmException ex) {
+                                throw new UncaughtOrmException(ex.getMessage(), ex);
+                            }
+                        });
+                res = res.distinct();
+                if (queries.size() > 1) {
+                    if (tail.getType() == Part.Type.ORDER) {
+                        res = res.sorted(makeComparatorForTail(tail));
+                    } else {
+                        res = res.sorted();
+                    }
+                }
+                return res.map(pojoCompare -> pojoCompare.getPojo());
             }
         }
-        return res.map(pojoCompare -> pojoCompare.getPojo());
+    }
+
+    private String buildSelectUnionQuery(List<List<Part>> queries) throws OrmException {
+        Set<String> allFields = queries.stream()
+                .map(parts -> parts.get(0).getReturnTable())
+                .flatMap(table -> (Stream<Field>) (table.getFields().stream()))
+                .map(field -> field.getSqlName())
+                .collect(Collectors.toSet());
+        StringJoiner buf = new StringJoiner(" UNION ALL ");
+        Query root = null;
+        for (List<Part> parts : queries) {
+            root = Parser.parse(parts);
+            StringBuilder tablesQuery = new StringBuilder();
+            tablesQuery.append(format("SELECT %s.*", fullTableName(root.getTable())));
+            Map<String, String> tableFields = root.getTable().getFields().stream()
+                    .map(field -> field.getSqlName())
+                    .collect(Collectors.toMap(name -> name, name -> name));
+            for (String name : allFields) {
+                if (!tableFields.containsKey(name)) {
+                    tablesQuery.append(format(", NULL AS %s", virtualFieldName(name)));
+                }
+            }
+            tablesQuery.append(format(",%s AS %s", virtualValue(root.getTable().getObjectClass().getName()), virtualFieldName(POJO_NAME_FIELD)));
+
+            tablesQuery.append(format(" FROM %s", fullTableName(root.getTable()), fullTableName(root.getTable())));
+            StringBuilder whereQuery = new StringBuilder();
+            Optional<Criteria> optCrit = root.getCriteria();
+            if (optCrit.isPresent()) {
+                whereQuery.append(expandCriteria(root, optCrit.get()));
+
+            }
+            Optional<Link> optLink = root.getLink();
+            if (optLink.isPresent()) {
+                tablesQuery.append(expandLinkTables(root, optLink.get()));
+                if (whereQuery.length() > 0) {
+                    whereQuery.append(" AND ");
+                }
+                whereQuery.append(expandLinkWheres(optLink.get()));
+            }
+            if (whereQuery.length() > 0) {
+                tablesQuery.append(" WHERE ");
+                tablesQuery.append(whereQuery);
+            }
+            buf.add(tablesQuery.toString());
+        }
+        StringBuilder query = new StringBuilder(buf.toString());
+        // do ordering
+        Optional<Order> optOrder = root.getOrder();
+        if (optOrder.isPresent()) {
+            query.append(" ORDER BY ");
+            query.append(expandOrder(root, optOrder.get()));
+        }
+        System.out.println(query);
+        return query.toString();
     }
 
     @Override
@@ -131,6 +200,13 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
         return rollbackOnUncommittedClose;
     }
 
+    /**
+     * Determine if the SQL table exists for a table structure
+     *
+     * @param table The Table
+     * @return True if it exsits in the database
+     * @throws OrmException
+     */
     private final boolean tableExists(Table table) throws OrmException {
         Connection con = getConnection();
         try {
@@ -181,6 +257,45 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
                                                             }
                                                         },
                             Spliterator.ORDERED), false);
+            stream.onClose(() -> {
+                try {
+                    rs.close();
+                    close(con);
+                } catch (SQLException | OrmException ex) {
+                    throw new UncaughtOrmException(ex.getMessage(), ex);
+                }
+            });
+            return stream;
+        } catch (SQLException | UncaughtOrmException ex) {
+            throw new OrmSqlException(ex.getMessage(), ex);
+        }
+    }
+
+    private <O> Stream<O> streamUnion(String query, Map<String, Table<O>> tables) throws OrmException {
+        Connection con = getConnection();
+        try {
+            Statement stmt = con.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
+            Stream<O> stream = StreamSupport.stream(
+                    Spliterators.spliteratorUnknownSize(new Iterator<O>() {
+                        @Override
+                        public boolean hasNext() {
+                            try {
+                                return rs.next();
+                            } catch (SQLException ex) {
+                                throw new UncaughtOrmException(ex.getMessage(), ex);
+                            }
+                        }
+
+                        @Override
+                        public O next() {
+                            try {
+                                return makePojoFromResultSet(rs, tables.get(rs.getString(POJO_NAME_FIELD)));
+                            } catch (OrmException | SQLException ex) {
+                                throw new UncaughtOrmException(ex.getMessage(), ex);
+                            }
+                        }
+                    }, Spliterator.ORDERED), false);
             stream.onClose(() -> {
                 try {
                     rs.close();
@@ -444,7 +559,8 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
      */
     private String expandOrder(TableSpec table, Order order) throws OrmException {
         StringBuilder query = new StringBuilder();
-        query.append(format("%s", fullFieldName(table.getTable(), order.getField())));
+        query.append(format("%s", fieldName(table.getTable(), order.getField())));
+//        query.append(format("%s", fullFieldName(table.getTable(), order.getField())));
         if (order.getDirection() == Order.Direction.DESCENDING) {
             query.append(" DESC");
         }
@@ -963,6 +1079,22 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
      * @return The SQL field name
      */
     protected abstract String fieldName(Table table, Field field) throws OrmException;
+
+    /**
+     * Create a virtual field name based on the supplied value
+     *
+     * @param name The name
+     * @return The correctly quoted field name
+     */
+    protected abstract String virtualFieldName(String name);
+
+    /**
+     * Create a virtual field value based on the supplied value
+     *
+     * @param name The name
+     * @return The correctly quoted field name
+     */
+    protected abstract String virtualValue(String name);
 
     /**
      * Get the table generator for this driver

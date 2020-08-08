@@ -17,7 +17,7 @@ public abstract class TableSpec {
         this.table = table;
     }
 
-    public Table getTable() {
+    public Table<?> getTable() {
         return table;
     }
 
