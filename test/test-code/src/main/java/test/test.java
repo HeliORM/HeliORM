@@ -73,11 +73,11 @@ public class test {
     }
 
     public static void main(String... args) throws Exception {
-//        Orm orm = mysqlOrm();
-        Orm orm = postgresOrm();
+        Orm orm = mysqlOrm();
+      //  Orm orm = postgresOrm();
 
         test t = new test();
-        t.makeSomeData(orm);
+//        t.makeSomeData(orm);
         t.abstractSelect(orm);
     }
 

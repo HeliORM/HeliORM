@@ -127,17 +127,19 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
         for (List<Part> parts : queries) {
             root = Parser.parse(parts);
             StringBuilder tablesQuery = new StringBuilder();
-            tablesQuery.append(format("SELECT %s.*", fullTableName(root.getTable())));
-            Map<String, String> tableFields = root.getTable().getFields().stream()
-                    .map(field -> field.getSqlName())
-                    .collect(Collectors.toMap(name -> name, name -> name));
+            StringJoiner fieldsQuery  = new StringJoiner(",");
+            Map<String, Field> tableFields = root.getTable().getFields().stream()
+                    .collect(Collectors.toMap(field -> field.getSqlName(), field -> field));
             for (String name : allFields) {
-                if (!tableFields.containsKey(name)) {
-                    tablesQuery.append(format(", NULL AS %s", virtualFieldName(name)));
+                if (tableFields.containsKey(name)) {
+                    fieldsQuery.add(fieldName(root.getTable(), tableFields.get(name)));
+                }
+                else {
+                    fieldsQuery.add(format("NULL AS %s", virtualFieldName(name)));
                 }
             }
+            tablesQuery.append(format("SELECT %s", fieldsQuery.toString()));
             tablesQuery.append(format(",%s AS %s", virtualValue(root.getTable().getObjectClass().getName()), virtualFieldName(POJO_NAME_FIELD)));
-
             tablesQuery.append(format(" FROM %s", fullTableName(root.getTable()), fullTableName(root.getTable())));
             StringBuilder whereQuery = new StringBuilder();
             Optional<Criteria> optCrit = root.getCriteria();
