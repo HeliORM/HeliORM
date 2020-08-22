@@ -99,6 +99,11 @@ public final class Orm implements AutoCloseable {
         return new SelectPart(null, table, this);
     }
 
+    /** Open a new transaction.
+     *
+     * @return The transaction
+     * @throws OrmException Thrown if the driver doesn't support transactions of if there is a problem opening one
+     */
     public OrmTransaction openTransaction() throws OrmException {
         if (!(driver instanceof OrmTransactionDriver)) {
             throw new OrmTransactionException("The ORM driver does not support transactions");
