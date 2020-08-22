@@ -27,9 +27,6 @@ import static java.lang.String.format;
  */
 public final class Orm implements AutoCloseable {
 
-    public enum Dialect {
-        MYSQL, POSTGRESQL;
-    }
 
     private final OrmDriver driver;
     private final Map<Class<?>, Table> tables = new HashMap();

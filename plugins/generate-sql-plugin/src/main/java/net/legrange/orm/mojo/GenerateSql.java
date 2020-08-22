@@ -41,8 +41,12 @@ import static java.lang.String.format;
         requiresDependencyResolution = ResolutionScope.COMPILE)
 public class GenerateSql extends AbstractMojo {
 
+    public enum Dialect {
+        MYSQL, POSTGRESQL;
+    }
+
     @Parameter(property = "dialect", required = true)
-    private Orm.Dialect dialect;
+    private Dialect dialect;
     @Parameter(property = "filePerTable", required = false, defaultValue = "false")
     private boolean filePerTable;
     @Parameter(property = "packages", required = true)
