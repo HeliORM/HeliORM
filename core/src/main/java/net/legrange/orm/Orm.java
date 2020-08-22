@@ -33,7 +33,6 @@ public final class Orm implements AutoCloseable {
 
     private final OrmDriver driver;
     private final Map<Class<?>, Table> tables = new HashMap();
-    
 
     /**
      * Create an ORM mapper using the supplied driver instance. This is meant to

@@ -32,17 +32,28 @@ public final class MySqlDriver extends SqlDriver {
 
     @Override
     protected String fullTableName(Table table) throws OrmException {
-        return String.format("%s.%s", databaseName(table), tableName(table));
+        return format("%s.%s", databaseName(table), tableName(table));
     }
 
     @Override
     protected String fullFieldName(Table table, Field field) throws OrmException {
-        return String.format("%s.`%s`", fullTableName(table), field.getSqlName());
+        return format("%s.`%s`", fullTableName(table), field.getSqlName());
     }
 
     @Override
     protected String fieldName(Table table, Field field) throws OrmException {
-        return fullFieldName(table, field);
+//        return fullFieldName(table, field);
+        return format("`%s`", field.getSqlName());
+    }
+
+    @Override
+    protected String virtualFieldName(String name) {
+        return format("`%s`", name);
+    }
+
+    @Override
+    protected String virtualValue(String name) {
+        return format("'%s'", name);
     }
 
     @Override
