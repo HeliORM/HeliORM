@@ -13,22 +13,9 @@ public class Bird extends Avian {
     public enum Kind {
         CAGED, FREERANGE;
     }
-//
-//    @PrimaryKey(autoIncrement = true)
-//    private String birdId;
-
     private Kind kind;
 
     private Duration singTime;
-//
-//    public String getBirdId() {
-//        return birdId;
-//    }
-//
-//    public void setBirdId(String birdId) {
-//        this.birdId = birdId;
-//    }
-
     public Kind getKind() {
         return kind;
     }

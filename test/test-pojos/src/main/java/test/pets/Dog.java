@@ -8,7 +8,5 @@ import net.legrange.orm.annotation.Pojo;
 @Pojo
 public class Dog extends Mamal {
 
-//    @PrimaryKey
-//    private Long dogNumber;
 
 }

@@ -12,18 +12,7 @@ public class Cat extends Mamal {
         INDOOR, OUTDOOR;
     }
 
-//    @PrimaryKey
-//    private Long catNumber;
-
     private Type type;
-//
-//    public Long getCatNumber() {
-//        return catNumber;
-//    }
-//
-//    public void setCatNumber(Long catNumber) {
-//        this.catNumber = catNumber;
-//    }
 
     public Type getType() {
         return type;
