@@ -33,19 +33,7 @@ public final class Orm implements AutoCloseable {
 
     private final OrmDriver driver;
     private final Map<Class<?>, Table> tables = new HashMap();
-
-    /**
-     * Create an ORM mapper using the supplied connection to a SQL database of
-     * the given dialect.
-     *
-     * @param con     The SQL connection
-     * @return The newly created ORM
-     * @throws OrmException
-     */
-    public static Orm open(Connection con, Class<SqlDriver> driverClass) throws OrmException {
-        return OrmBuilder.create(() -> con, driverClass)
-                .build();
-    }
+    
 
     /**
      * Create an ORM mapper using the supplied driver instance. This is meant to
