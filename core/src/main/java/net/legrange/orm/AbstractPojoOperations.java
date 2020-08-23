@@ -164,6 +164,9 @@ abstract class AbstractPojoOperations implements PojoOperations {
             case DURATION:
                 Object val1 = getValue(pojo1, field);
                 Object val2 = getValue(pojo2, field);
+                if (val1 == val2) return 0;
+                if (val1 == null) return -1;
+                if (val2 == null) return 1;
                 if (val1 instanceof Comparable) {
                     return ((Comparable) val1).compareTo(val2);
                 } else {
