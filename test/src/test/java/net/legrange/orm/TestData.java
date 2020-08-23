@@ -2,6 +2,8 @@ package net.legrange.orm;
 
 import test.pets.Cat;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 class TestData {
@@ -25,6 +27,14 @@ class TestData {
         cat.setName(names[random.nextInt(names.length)]);
         cat.setPersonNumber((long) random.nextInt(5));
         return cat;
+    }
+
+    static List<Cat> makeCats() {
+        List<Cat> res = new ArrayList<>();
+        for (int i = 0; i < 20; i++ ) {
+            res.add(makeCat());
+        }
+        return res;
     }
 
 }
