@@ -18,7 +18,7 @@
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
-<!--            <scope>test</scope>-->
+            <scope>test</scope>
             <version>1.4.199</version>
         </dependency>
         <dependency>
@@ -28,10 +28,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.12</version>
-            <scope>test</scope>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>5.6.2</version>
         </dependency>
         <dependency>
             <groupId>net.legrange.orm</groupId>

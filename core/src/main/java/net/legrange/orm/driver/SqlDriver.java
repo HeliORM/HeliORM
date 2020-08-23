@@ -1152,15 +1152,6 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
                 exists.put(table, Boolean.TRUE);
             }
         }
-        try (Connection con = getConnection(); Statement stmt = con.createStatement()) {
-            ResultSet rs = stmt.executeQuery("SHOW TABLES");
-            while (rs.next()) {
-                System.out.println(rs.getString(1));
-            }
-        }
-        catch (Exception ex) {
-            ex.printStackTrace();
-        }
     }
 
 }

@@ -14,7 +14,7 @@ public class MysqlDialectGenerator implements TableGenerator {
     @Override
     public String generateSchema(Table<?> table) throws OrmSqlException {
         StringBuilder sql = new StringBuilder();
-        sql.append(format("CREATE TABLE `%s` (\n", table.getSqlTable()));
+        sql.append(format("CREATE TABLE %s (\n", fullTableName(table)));
         boolean first = true;
         for (Field field : table.getFields()) {
             if (first) {
@@ -83,5 +83,9 @@ public class MysqlDialectGenerator implements TableGenerator {
             sql.add(format("'%s'", ((Enum) v).name()));
         }
         return sql.toString();
+    }
+
+    private String fullTableName(Table table) {
+        return format("`%s`.`%s`", table.getDatabase().getSqlDatabase(), table.getSqlTable());
     }
 }
