@@ -2,14 +2,13 @@ package net.legrange.orm.persons;
 
 import net.legrange.orm.annotation.Pojo;
 import net.legrange.orm.annotation.PrimaryKey;
-import pojos.Obj;
 
 /**
  *
  * @author gideon
  */
 @Pojo
-public class Company extends Obj {
+public class Company  {
 
     @PrimaryKey
     private Long companyNumber;

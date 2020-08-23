@@ -94,7 +94,6 @@ public class OrmBuilder {
         return this;
     }
 
-
     /**
      * Create the ORM based on the setup supplied using the builder pattern.
      *

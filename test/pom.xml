@@ -10,9 +10,97 @@
     <artifactId>test</artifactId>
     <name>[Helicopter ORM] Test</name>
     <version>0.66</version>
-    <packaging>pom</packaging>
-    <modules>
-        <module>test-pojos</module>
-        <module>test-code</module>
-    </modules>
+    <packaging>jar</packaging>
+
+    <dependencies>
+
+        <!-- these dependencies are for testing -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+<!--            <scope>test</scope>-->
+            <version>1.4.199</version>
+        </dependency>
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>3.4.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.legrange.orm</groupId>
+            <artifactId>mysql</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.20</version>
+        </dependency>
+        <dependency>
+            <groupId>net.legrange.orm</groupId>
+            <artifactId>core</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
+
+    <properties>
+        <sourceOutputDir>${basedir}/target/generated-sources</sourceOutputDir>
+        <resourceOutputDir>${basedir}/target/classes</resourceOutputDir>
+    </properties>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>net.legrange.orm</groupId>
+                <artifactId>generate-model-plugin</artifactId>
+                <version>${project.version}</version>
+                <executions>
+                    <execution>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>generate-model</goal>
+                        </goals>
+                        <configuration>
+                            <strategy>annotated</strategy>
+                            <packages>
+                                <package>net.legrange.orm.pets</package>
+                                <package>net.legrange.orm.persons</package>
+                            </packages>
+                            <database>petz</database>
+                            <outputDir>${sourceOutputDir}</outputDir>
+                            <resourceDir>${resourceOutputDir}</resourceDir>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven.version}</version>
+                <executions>
+                    <execution>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                        <configuration>
+                            <compileSourceRoots>
+                                ${sourceOutputDir}
+                            </compileSourceRoots>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+        </plugins>
+    </build>
+
 </project>
