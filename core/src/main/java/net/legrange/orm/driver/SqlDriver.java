@@ -320,6 +320,10 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
             inserts.put(table, query);
         }
         Connection con = getConnection();
+        O popo = (O) pops.newPojoInstance(table);
+        for (Field field : table.getFields()) {
+            pops.setValue(popo, field, pops.getValue(pojo, field));
+        }
         try (PreparedStatement stmt = con.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
             int par = 1;
             for (Field field : table.getFields()) {
@@ -327,15 +331,15 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
                     if (field.isAutoNumber()) {
                         if (field.getFieldType() == Field.FieldType.STRING) {
                             pops.setValue(pojo, field, UUID.randomUUID().toString());
-                            setValueInStatement(stmt, pojo, field, par);
+                            setValueInStatement(stmt, popo, field, par);
                             par++;
                         }
                     } else {
-                        setValueInStatement(stmt, pojo, field, par);
+                        setValueInStatement(stmt, popo, field, par);
                         par++;
                     }
                 } else {
-                    setValueInStatement(stmt, pojo, field, par);
+                    setValueInStatement(stmt, popo, field, par);
                     par++;
                 }
             }
@@ -347,13 +351,13 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
                     if (keyField.getFieldType() != Field.FieldType.STRING) {
                         try (ResultSet rs = stmt.getGeneratedKeys()) {
                             if (rs.next()) {
-                                pops.setValue(pojo, keyField, getKeyValueFromResultSet(rs, opt.get()));
+                                pops.setValue(popo, keyField, getKeyValueFromResultSet(rs, opt.get()));
                             }
                         }
                     }
                 }
             }
-            return pojo;
+            return popo;
         } catch (SQLException ex) {
             throw new OrmSqlException(ex.getMessage(), ex);
         } finally {
