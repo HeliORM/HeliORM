@@ -2,11 +2,9 @@ package net.legrange.orm;
 
 import net.legrange.orm.def.Executable;
 import net.legrange.orm.def.Select;
-import net.legrange.orm.driver.SqlDriver;
 import net.legrange.orm.impl.Part;
 import net.legrange.orm.impl.SelectPart;
 
-import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
