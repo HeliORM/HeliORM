@@ -7,7 +7,7 @@ import test.pets.Cat;
 import java.util.List;
 
 import static net.legrange.orm.TestData.makeCat;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -34,8 +34,12 @@ public class CrudTest  extends AbstractOrmTest {
         Cat cat = makeCat();
         Cat saved = orm.create(cat);
         List<Cat> all = orm.select(CAT).list();
+        Cat loaded = orm.select(CAT)
+                .where(CAT.name.eq(cat.getName()))
+                .one();
         assertNotNull(all, "The list returned by list() should be non-null");
-        assertFalse(all.isEmpty(), "The list returned by select must be non-empty (in this test)");
+        assertNotNull(loaded, "The selected data must not be null");
+        assertEquals(cat.getName(), loaded.getName(), "The object loaded with a where clause has the correct value");
     }
 
 
