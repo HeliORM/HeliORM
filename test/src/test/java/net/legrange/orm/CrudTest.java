@@ -1,22 +1,19 @@
 package net.legrange.orm;
 
-import net.legrange.orm.pets.Cat;
-import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
+import org.junit.jupiter.api.Test;
+import test.pets.Cat;
+
 import java.util.List;
 
-import static net.legrange.orm.Tables.CAT;
 import static net.legrange.orm.TestData.makeCat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
+import static test.Tables.CAT;
 
 public class CrudTest  extends AbstractOrmTest {
-
-    private List<Cat> cats = new ArrayList<>();
 
     @Test
     public void testCreate() throws Exception {

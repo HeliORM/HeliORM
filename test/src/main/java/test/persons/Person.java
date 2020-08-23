@@ -1,4 +1,4 @@
-package net.legrange.orm.persons;
+package test.persons;
 
 import net.legrange.orm.annotation.Column;
 import net.legrange.orm.annotation.ForeignKey;

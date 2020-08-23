@@ -70,8 +70,8 @@
                         <configuration>
                             <strategy>annotated</strategy>
                             <packages>
-                                <package>net.legrange.orm.pets</package>
-                                <package>net.legrange.orm.persons</package>
+                                <package>test.pets</package>
+                                <package>test.persons</package>
                             </packages>
                             <database>petz</database>
                             <outputDir>${sourceOutputDir}</outputDir>

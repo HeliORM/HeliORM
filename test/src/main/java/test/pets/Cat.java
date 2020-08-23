@@ -1,4 +1,4 @@
-package net.legrange.orm.pets;
+package test.pets;
 
 import net.legrange.orm.annotation.Pojo;
 

@@ -1,10 +1,10 @@
-package net.legrange.orm.pets;
+package test.pets;
 
 import net.legrange.orm.annotation.Column;
 import net.legrange.orm.annotation.ForeignKey;
 import net.legrange.orm.annotation.Pojo;
 import net.legrange.orm.annotation.PrimaryKey;
-import net.legrange.orm.persons.Person;
+import test.persons.Person;
 
 /**
  * @author gideon

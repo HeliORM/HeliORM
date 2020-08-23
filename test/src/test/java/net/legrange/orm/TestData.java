@@ -1,6 +1,6 @@
 package net.legrange.orm;
 
-import net.legrange.orm.pets.Cat;
+import test.pets.Cat;
 
 import java.util.Random;
 
