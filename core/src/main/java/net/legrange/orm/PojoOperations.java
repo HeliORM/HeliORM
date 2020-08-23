@@ -24,7 +24,7 @@ public interface PojoOperations {
     /**
      * Set the value of the given field to the given value on the given POJO.
      *
-     * @param pojo The POJO on which to set the value
+     * @param pojo  The POJO on which to set the value
      * @param field The field
      * @param value The value to set
      * @throws OrmException
@@ -34,7 +34,7 @@ public interface PojoOperations {
     /**
      * Read the value of the given field on the given POJO.
      *
-     * @param pojo The POJO from which to read the value
+     * @param pojo  The POJO from which to read the value
      * @param field The field
      * @return The value read
      * @throws OrmException
@@ -47,7 +47,7 @@ public interface PojoOperations {
      * @param pojo1 The first POJO
      * @param pojo2 The second POJO
      * @param field The field of which the value on each POJO must be used to
-     * compare them
+     *              compare them
      * @return A comparator compatible comparison result
      * @throws OrmException
      */

@@ -87,7 +87,8 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
         }
         if (queries.size() == 1) {
             List<Part> parts = queries.get(0);
-            return streamSingle(parts.get(0).getReturnTable(), buildSelectQuery(Parser.parse(parts)));
+            Stream<PojoCompare<O>> res = streamSingle(parts.get(0).getReturnTable(), buildSelectQuery(Parser.parse(parts)));
+            return res.map(pojoCompare -> pojoCompare.getPojo());
         } else {
             if (USE_UNION_ALL) {
                 Map<String, Table<O>> tableMap = queries.stream()

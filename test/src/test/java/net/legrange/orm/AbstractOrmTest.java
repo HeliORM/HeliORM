@@ -8,7 +8,7 @@ import org.junit.jupiter.api.BeforeAll;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-public class AbstractOrmTest {
+abstract class AbstractOrmTest {
 
     protected static Orm orm;
     private static JdbcDataSource jdbcDataSource;
@@ -33,7 +33,13 @@ public class AbstractOrmTest {
                 .build();
     }
 
-
+    /** Compare two POJOs to see that they are the same type and all their fields are the same.
+     *
+     * @param o1
+     * @param o2
+     * @return
+     * @throws OrmException
+     */
     protected boolean pojoCompare(Object o1, Object o2) throws OrmException {
         Table<Object> t1 = orm.tableFor(o1);
         Table<Object> t2 = orm.tableFor(o2);
@@ -43,6 +49,30 @@ public class AbstractOrmTest {
             }
         }
         return false;
+    }
+
+    /** Compare two POJOs to see that they are the same type and all their fields are the same, apart from
+     * their primary keys.
+     *
+     * @param o1
+     * @param o2
+     * @return
+     * @throws OrmException
+     */
+    protected boolean pojoCompareExcludingKey(Object o1, Object o2) throws OrmException {
+        Table<Object> t1 = orm.tableFor(o1);
+        Table<Object> t2 = orm.tableFor(o2);
+        if (t1 != t2) {
+            return false;
+        }
+        for (Field field : t1.getFields()) {
+            if (!field.isPrimaryKey()) {
+                if (pops.compareTo(o1, o2, field) != 0) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
 }
