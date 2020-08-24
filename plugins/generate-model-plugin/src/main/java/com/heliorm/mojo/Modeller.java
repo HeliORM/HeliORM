@@ -150,16 +150,5 @@ class Modeller<T extends Table> {
             return clazz.getSuperclass().getName().equals(parent.clazz.getName());
         }
 
-
-        private void dump(int indent) {
-            for (int i = 0; i < indent; ++i) {
-                System.out.print("  ");
-            }
-            System.out.println(clazz.getSimpleName());
-            for (Entry k : kids) {
-                k.dump(indent + 1);
-            }
-        }
-
     }
 }

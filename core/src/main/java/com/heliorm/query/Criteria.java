@@ -20,7 +20,4 @@ public abstract class Criteria {
         return type;
     }
 
-    void dump() {
-        System.out.printf("%s ", type);
-    }
 }

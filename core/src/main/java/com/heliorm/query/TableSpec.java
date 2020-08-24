@@ -37,14 +37,4 @@ public abstract class TableSpec {
         this.link = Optional.ofNullable(link);
     }
 
-    void dump() {
-        System.out.printf("Table: %s ", table.getSqlTable());
-        if (criteria.isPresent()) {
-            criteria.get().dump();
-        }
-        if (link.isPresent()) {
-            link.get().dump();
-        }
-    }
-
 }

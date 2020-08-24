@@ -16,17 +16,17 @@ public abstract class Pet  {
     private Long id;
 
     @ForeignKey(pojo = Person.class)
-    private Long personNumber;
+    private Long personId;
     @Column(length = 32)
     private String name;
     private int age;
 
-    public Long getPersonNumber() {
-        return personNumber;
+    public Long getPersonId() {
+        return personId;
     }
 
-    public void setPersonNumber(Long personNumber) {
-        this.personNumber = personNumber;
+    public void setPersonId(Long personId) {
+        this.personId = personId;
     }
 
     public String getName() {

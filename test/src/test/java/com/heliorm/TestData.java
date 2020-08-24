@@ -168,7 +168,7 @@ class TestData {
     private static <P extends Pet> P makePet(P pet, Person person) {
         pet.setAge(random.nextInt(18));
         pet.setName(names[random.nextInt(names.length)]);
-        pet.setPersonNumber(person.getId());
+        pet.setPersonId(person.getId());
         return pet;
     }
 

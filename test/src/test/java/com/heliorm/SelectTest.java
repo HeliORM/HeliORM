@@ -119,15 +119,19 @@ public class SelectTest extends AbstractOrmTest {
     public void testJoin() throws Exception {
         Person person = persons.get(0);
         List<Cat> wanted = cats.stream()
-                .filter(cat -> cat.getPersonNumber() == person.getId())
+                .filter(cat -> cat.getPersonId() == person.getId())
                 .collect(Collectors.toList());
         List<Cat> all = orm.select(CAT)
-                .join(PERSON).on(CAT.personNumber,PERSON.id)
+                .join(PERSON).on(CAT.personId,PERSON.id)
                 .where(PERSON.emailAddress.eq(person.getEmailAddress()))
                 .list();
+        List<Cat> forPerson = all.stream()
+                .filter(cat -> cat.getPersonId() == person.getId())
+                .collect(Collectors.toList());
         assertNotNull(all, "The list returned by list() should be non-null");
         assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
         assertTrue(listCompareOrdered(all, wanted), "The items loaded are exactly the same as the ones we expected");
+        assertTrue(listCompareOrdered(forPerson, all), "The items loaded are exactly the same as the ones we expected");
     }
 
 }
