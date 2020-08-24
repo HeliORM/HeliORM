@@ -169,7 +169,6 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
             query.append(" ORDER BY ");
             query.append(expandOrder(root, optOrder.get()));
         }
-        System.out.println(query);
         return query.toString();
     }
 
