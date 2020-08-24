@@ -1,4 +1,5 @@
 # HeliORM 
+![Java CI with Maven](https://github.com/GideonLeGrange/HeliORM/workflows/Java%20CI%20with%20Maven/badge.svg)
 
 A code-first object-relational model for accessing SQL data from Java
 
