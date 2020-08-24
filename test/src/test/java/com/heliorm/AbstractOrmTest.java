@@ -7,6 +7,9 @@ import org.junit.jupiter.api.BeforeAll;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 abstract class AbstractOrmTest {
 
@@ -40,7 +43,7 @@ abstract class AbstractOrmTest {
      * @return
      * @throws OrmException
      */
-    protected boolean pojoCompare(Object o1, Object o2) throws OrmException {
+    protected final boolean pojoCompare(Object o1, Object o2) throws OrmException {
         Table<Object> t1 = orm.tableFor(o1);
         Table<Object> t2 = orm.tableFor(o2);
         if (t1 == t2) {
@@ -59,7 +62,7 @@ abstract class AbstractOrmTest {
      * @return
      * @throws OrmException
      */
-    protected boolean pojoCompareExcludingKey(Object o1, Object o2) throws OrmException {
+    protected final boolean pojoCompareExcludingKey(Object o1, Object o2) throws OrmException {
         Table<Object> t1 = orm.tableFor(o1);
         Table<Object> t2 = orm.tableFor(o2);
         if (t1 != t2) {
@@ -73,6 +76,44 @@ abstract class AbstractOrmTest {
             }
         }
         return true;
+    }
+
+    protected final <O> boolean listCompare(List<O> l1, List<O> l2) throws OrmException {
+        if (l1.size() != l2.size()) {
+            return false;
+        }
+        if (l1.isEmpty()) {
+            return true;
+        }
+        Table<?> t1 = orm.tableFor(l1.get(0));
+        l1 = sort(l1);
+        l2 = sort(l2);
+        for (int i = 0; i < l1.size(); ++i) {
+            if (!pojoCompare(l1.get(i), l2.get(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    protected final <O> List<O> createAll(List<O> data) throws OrmException {
+        List<O> res = new ArrayList<>();
+        for (O object : data) {
+            res.add(orm.create(object));
+        }
+        return res;
+    }
+
+    private <O> List<O> sort(List<O> data) throws OrmException {
+        Table<?> t1 = orm.tableFor(data.get(0));
+        Collections.sort(data, (o1,o2) -> {
+            try {
+                return pops.compareTo(o1,o2,t1.getPrimaryKey().get());
+            } catch (OrmException e) {
+                return 0;
+            }
+        });
+        return data;
     }
 
 }

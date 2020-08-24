@@ -16,7 +16,7 @@ import static test.Tables.CAT;
 
 public class CrudTest extends AbstractOrmTest {
 
-    @Test
+//    @Test
     public void testCreate() throws Exception {
         Cat cat = makeCat();
         Cat saved = orm.create(cat);
@@ -28,21 +28,6 @@ public class CrudTest extends AbstractOrmTest {
         assertTrue(pojoCompareExcludingKey(cat, saved), "Fields (excluding the primary key) should be the same after save");
         assertNotEquals(cat.getId(), saved.getId(), "The primary key on an auto-number field should change on create");
         assertTrue(pojoCompare(saved, loaded), "After create, the object should be loadable on it's primary key");
-    }
-
-    @Test
-    public void testSelectWhere() throws Exception {
-        List<Cat> cats = makeCats();
-        for (Cat cat : cats) {
-            orm.create(cat);
-        }
-        List<Cat> all = orm.select(CAT).list();
-        List<Cat> some = orm.select(CAT)
-                .where(CAT.name.eq(cats.get(0).getName()))
-                .list();
-        assertNotNull(all, "The list returned by list() should be non-null");
-        assertTrue(all.size() == cats.size(), "The loaded data should be all the items");
-        assertFalse(some.size() == all.size(), "The where clause must only include some data");
     }
 
 
