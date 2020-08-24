@@ -3,6 +3,7 @@ package com.heliorm;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import test.persons.Person;
 import test.pets.Cat;
 import test.pets.Dog;
 import test.pets.Mamal;
@@ -12,27 +13,25 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.heliorm.TestData.makeCats;
-import static com.heliorm.TestData.makeDogs;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static test.Tables.CAT;
+import static com.heliorm.TestData.*;
 import static java.lang.String.format;
-import static test.Tables.MAMAL;
+import static org.junit.jupiter.api.Assertions.*;
+import static test.Tables.*;
 
 public class SelectTest extends AbstractOrmTest {
 
     private static final int MAX_CATS = 20;
     private static final int MAX_DOGS = 15;
+    private static final int MAX_PERSONS = 3;
+    private static List<Person> persons;
     private static List<Cat> cats;
     private static List<Dog> dogs;
 
     @BeforeAll
     public static void setupData() throws OrmException {
-        cats = createAll(makeCats(MAX_CATS));
-        dogs = createAll(makeDogs(MAX_DOGS));
+        persons = createAll(makePersons(MAX_PERSONS));
+        cats = createAll(makeCats(MAX_CATS, persons));
+        dogs = createAll(makeDogs(MAX_DOGS, persons));
     }
 
 
@@ -111,6 +110,21 @@ public class SelectTest extends AbstractOrmTest {
         List< Mamal> wanted = new ArrayList<>();
         wanted.addAll(cats);
         wanted.addAll(dogs);
+        assertNotNull(all, "The list returned by list() should be non-null");
+        assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
+        assertTrue(listCompareOrdered(all, wanted), "The items loaded are exactly the same as the ones we expected");
+    }
+
+    @Test
+    public void testJoin() throws Exception {
+        Person person = persons.get(0);
+        List<Cat> wanted = cats.stream()
+                .filter(cat -> cat.getPersonNumber() == person.getId())
+                .collect(Collectors.toList());
+        List<Cat> all = orm.select(CAT)
+                .join(PERSON).on(CAT.personNumber,PERSON.id)
+                .where(PERSON.emailAddress.eq(person.getEmailAddress()))
+                .list();
         assertNotNull(all, "The list returned by list() should be non-null");
         assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
         assertTrue(listCompareOrdered(all, wanted), "The items loaded are exactly the same as the ones we expected");

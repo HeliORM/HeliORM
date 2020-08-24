@@ -1,5 +1,6 @@
 package com.heliorm;
 
+import test.persons.Person;
 import test.pets.Cat;
 import test.pets.Dog;
 import test.pets.Pet;
@@ -114,42 +115,60 @@ class TestData {
     };
     private static Random random = new Random();
 
-    private TestData() {}
+    private TestData() {
+    }
 
-    static Cat makeCat() {
+    static Cat makeCat(Person person) {
         Cat cat = new Cat();
-        cat = makePet(cat);
+        cat = makePet(cat, person);
         cat.setType(random.nextBoolean() ? Cat.Type.INDOOR : Cat.Type.OUTDOOR);
         return cat;
     }
 
 
-    static Dog makeDog() {
+    static Dog makeDog(Person person) {
         Dog dog = new Dog();
-        dog = makePet(dog);
+        dog = makePet(dog, person);
         return dog;
     }
 
-    static List<Cat> makeCats(int n) {
+
+    static Person makePerson(int n) {
+        Person person = new Person();
+        person.setFirstName(names[random.nextInt(names.length)]);
+        person.setLastName(names[random.nextInt(names.length)]);
+        person.setEmailAddress(names[random.nextInt(names.length)].toLowerCase()+ n +"@gmail.com");
+        return person;
+    }
+
+    static List<Person> makePersons(int n) {
+        List<Person> res = new ArrayList<>();
+        for (int i = 0; i < n; i++) {
+            res.add(makePerson(i));
+        }
+        return res;
+    }
+
+    static List<Cat> makeCats(int n, List<Person> persons) {
         List<Cat> res = new ArrayList<>();
-        for (int i = 0; i < n; i++ ) {
-            res.add(makeCat());
+        for (int i = 0; i < n; i++) {
+            res.add(makeCat(persons.get(random.nextInt(persons.size()))));
         }
         return res;
     }
 
-    static List<Dog> makeDogs(int n) {
+    static List<Dog> makeDogs(int n, List<Person> persons) {
         List<Dog> res = new ArrayList<>();
-        for (int i = 0; i < n; i++ ) {
-            res.add(makeDog());
+        for (int i = 0; i < n; i++) {
+            res.add(makeDog(persons.get(random.nextInt(persons.size()))));
         }
         return res;
     }
 
-    private static <P extends Pet> P makePet(P pet) {
+    private static <P extends Pet> P makePet(P pet, Person person) {
         pet.setAge(random.nextInt(18));
         pet.setName(names[random.nextInt(names.length)]);
-        pet.setPersonNumber((long) random.nextInt(5));
+        pet.setPersonNumber(person.getId());
         return pet;
     }
 

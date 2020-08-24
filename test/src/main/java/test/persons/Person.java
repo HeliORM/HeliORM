@@ -12,28 +12,22 @@ import com.heliorm.annotation.PrimaryKey;
 @Pojo
 public class Person {
 
-    public enum Sex {
-        MALE, FEMALE, CONFUSED;
-    }
 
     @PrimaryKey
-    private Long personNumber;
+    private Long id;
     @Column
     private String firstName;
     @Column
     private String lastName;
     @Column
     private String emailAddress;
-    @ForeignKey(pojo = Company.class)
-    private Long companyNumber;
-    private Sex sex;
 
-    public Long getPersonNumber() {
-        return personNumber;
+    public Long getId() {
+        return id;
     }
 
-    public void setPersonNumber(Long personNumber) {
-        this.personNumber = personNumber;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getFirstName() {
@@ -60,25 +54,13 @@ public class Person {
         this.emailAddress = emailAddress;
     }
 
-    public Sex getSex() {
-        return sex;
-    }
-
-    public void setSex(Sex sex) {
-        this.sex = sex;
-    }
-
-    public Long getCompanyNumber() {
-        return companyNumber;
-    }
-
-    public void setCompanyNumber(Long companyNumber) {
-        this.companyNumber = companyNumber;
-    }
-
     @Override
     public String toString() {
-        return "Person{" + "personNumber=" + personNumber + ", firstName=" + firstName + ", lastName=" + lastName + ", emailAddress=" + emailAddress + ", companyNumber=" + companyNumber + ", sex=" + sex + '}';
+        return "Person{" +
+                "id=" + id +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", emailAddress='" + emailAddress + '\'' +
+                '}';
     }
-
 }
