@@ -4,12 +4,13 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>net.legrange.orm</groupId>
+        <groupId>com.heliorm</groupId>
         <artifactId>orm</artifactId>
         <version>0.70</version>
     </parent>
     <packaging>pom</packaging>
     <name>[Helicopter ORM] Plugins</name>
+    <groupId>com.heliorm</groupId>
     <artifactId>plugins</artifactId>
     <modules>
         <module>generate-model-plugin</module>

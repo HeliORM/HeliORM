@@ -4,17 +4,17 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>drivers</artifactId>
-        <groupId>net.legrange.orm</groupId>
+        <groupId>com.heliorm</groupId>
         <version>0.70</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
+    <groupId>com.heliorm</groupId>
     <artifactId>mysql</artifactId>
     <name>[Helicopter ORM] MySQL Driver</name>
-
     <dependencies>
         <dependency>
-            <groupId>net.legrange.orm</groupId>
+            <groupId>com.heliorm</groupId>
             <artifactId>core</artifactId>
             <version>${project.version}</version>
         </dependency>

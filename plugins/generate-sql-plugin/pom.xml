@@ -3,10 +3,11 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>net.legrange.orm</groupId>
+        <groupId>com.heliorm</groupId>
         <artifactId>plugins</artifactId>
         <version>0.70</version>
     </parent>
+    <groupId>com.heliorm</groupId>
     <artifactId>generate-sql-plugin</artifactId>
     <packaging>maven-plugin</packaging>
     <name>[Helicopter ORM] SQL Generation Plugin</name>
@@ -47,15 +48,15 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>net.legrange.orm</groupId>
+            <groupId>com.heliorm</groupId>
             <artifactId>mysql</artifactId>
             <version>0.70</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>net.legrange.orm</groupId>
+            <groupId>com.heliorm</groupId>
             <artifactId>postgresql</artifactId>
-            <version>0.70</version>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>

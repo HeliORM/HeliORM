@@ -3,7 +3,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>net.legrange.orm</groupId>
+        <groupId>com.heliorm</groupId>
         <artifactId>orm</artifactId>
         <version>0.70</version>
     </parent>
@@ -13,7 +13,6 @@
     <packaging>jar</packaging>
 
     <dependencies>
-
         <!-- these dependencies are for testing -->
         <dependency>
             <groupId>com.h2database</groupId>
@@ -33,7 +32,7 @@
             <version>5.6.2</version>
         </dependency>
         <dependency>
-            <groupId>net.legrange.orm</groupId>
+            <groupId>com.heliorm</groupId>
             <artifactId>mysql</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
@@ -44,7 +43,7 @@
             <version>8.0.20</version>
         </dependency>
         <dependency>
-            <groupId>net.legrange.orm</groupId>
+            <groupId>com.heliorm</groupId>
             <artifactId>core</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
@@ -58,7 +57,7 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>net.legrange.orm</groupId>
+                <groupId>com.heliorm</groupId>
                 <artifactId>generate-model-plugin</artifactId>
                 <version>${project.version}</version>
                 <executions>
