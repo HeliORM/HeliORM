@@ -40,7 +40,7 @@ public class SelectTest extends AbstractOrmTest {
         assertNotNull(all, "The list returned by list() should be non-null");
         assertFalse(all.isEmpty(), "The list returned by list() should be non-empty");
         assertTrue(all.size() == MAX_CATS, format("The amount of loaded data should match the number of the items (%d vs %s)", all.size(), MAX_CATS));
-        assertTrue(listCompare(all, cats), "The items loaded are exactly the same as the ones we have");
+        assertTrue(listCompare(all, cats), "The items loaded are exactly the same as the ones we expected");
     }
 
     @Test
@@ -53,7 +53,7 @@ public class SelectTest extends AbstractOrmTest {
                 .list();
         assertNotNull(all, "The list returned by list() should be non-null");
         assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
-        assertTrue(listCompare(all, wanted), "The items loaded are exactly the same as the ones we have");
+        assertTrue(listCompare(all, wanted), "The items loaded are exactly the same as the ones we expected");
     }
 
 
