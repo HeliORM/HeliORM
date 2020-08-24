@@ -41,7 +41,7 @@ public class SelectTest extends AbstractOrmTest {
         assertNotNull(all, "The list returned by list() should be non-null");
         assertFalse(all.isEmpty(), "The list returned by list() should be non-empty");
         assertTrue(all.size() == MAX_CATS, format("The amount of loaded data should match the number of the items (%d vs %s)", all.size(), MAX_CATS));
-        assertTrue(listCompareAsIs(all, cats), "The items loaded are exactly the same as the ones we expected");
+        assertTrue(listCompareOrdered(all, cats), "The items loaded are exactly the same as the ones we expected");
     }
 
     @Test
@@ -54,7 +54,35 @@ public class SelectTest extends AbstractOrmTest {
                 .list();
         assertNotNull(all, "The list returned by list() should be non-null");
         assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
-        assertTrue(listCompareAsIs(all, wanted), "The items loaded are exactly the same as the ones we expected");
+        assertTrue(listCompareOrdered(all, wanted), "The items loaded are exactly the same as the ones we expected");
+    }
+
+
+    @Test
+    public void testSelectWhereAnd() throws Exception {
+        List<Cat> wanted = cats.stream()
+                .filter(cat -> cat.getAge() < 5)
+                .filter(cat -> cat.getType().equals(Cat.Type.INDOOR))
+                .collect(Collectors.toList());
+        List<Cat> all = orm.select(CAT)
+                .where(CAT.age.lt(5)).and(CAT.type.eq(Cat.Type.INDOOR))
+                .list();
+        assertNotNull(all, "The list returned by list() should be non-null");
+        assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
+        assertTrue(listCompareOrdered(all, wanted), "The items loaded are exactly the same as the ones we expected");
+    }
+
+    @Test
+    public void testSelectWhereOr() throws Exception {
+        List<Cat> wanted = cats.stream()
+                .filter(cat -> cat.getAge() < 5 ||  cat.getAge() > 10)
+                .collect(Collectors.toList());
+        List<Cat> all = orm.select(CAT)
+                .where(CAT.age.lt(5)).or(CAT.age.gt(10))
+                .list();
+        assertNotNull(all, "The list returned by list() should be non-null");
+        assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
+        assertTrue(listCompareOrdered(all, wanted), "The items loaded are exactly the same as the ones we expected");
     }
 
     @Test
