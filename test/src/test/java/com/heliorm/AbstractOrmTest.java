@@ -10,6 +10,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 abstract class AbstractOrmTest {
 
@@ -36,7 +37,8 @@ abstract class AbstractOrmTest {
                 .build();
     }
 
-    /** Compare two POJOs to see that they are the same type and all their fields are the same.
+    /**
+     * Compare two POJOs to see that they are the same type and all their fields are the same.
      *
      * @param o1
      * @param o2
@@ -54,7 +56,8 @@ abstract class AbstractOrmTest {
         return false;
     }
 
-    /** Compare two POJOs to see that they are the same type and all their fields are the same, apart from
+    /**
+     * Compare two POJOs to see that they are the same type and all their fields are the same, apart from
      * their primary keys.
      *
      * @param o1
@@ -78,7 +81,7 @@ abstract class AbstractOrmTest {
         return true;
     }
 
-    protected final <O> boolean listCompare(List<O> l1, List<O> l2) throws OrmException {
+    protected final <O> boolean listCompareAsIs(List<O> l1, List<O> l2) throws OrmException {
         if (l1.size() != l2.size()) {
             return false;
         }
@@ -86,14 +89,16 @@ abstract class AbstractOrmTest {
             return true;
         }
         Table<?> t1 = orm.tableFor(l1.get(0));
-        l1 = sort(l1);
-        l2 = sort(l2);
         for (int i = 0; i < l1.size(); ++i) {
             if (!pojoCompare(l1.get(i), l2.get(i))) {
                 return false;
             }
         }
         return true;
+    }
+
+    protected final <O> boolean listCompareOrdered(List<O> l1, List<O> l2) throws OrmException {
+        return listCompareAsIs(sort(l1), sort(l2));
     }
 
     protected static final <O> List<O> createAll(List<O> data) throws OrmException {
@@ -106,14 +111,18 @@ abstract class AbstractOrmTest {
 
     private <O> List<O> sort(List<O> data) throws OrmException {
         Table<?> t1 = orm.tableFor(data.get(0));
-        Collections.sort(data, (o1,o2) -> {
+        return data.stream().sorted((o1, o2) -> {
             try {
-                return pops.compareTo(o1,o2,t1.getPrimaryKey().get());
+                int o = o1.getClass().getName().compareTo(o2.getClass().getName());
+                if (o == 0) {
+                    return pops.compareTo(o1, o2, t1.getPrimaryKey().get());
+                }
+                return o;
             } catch (OrmException e) {
                 return 0;
             }
-        });
-        return data;
+        })
+                .collect(Collectors.toList());
     }
 
 }
