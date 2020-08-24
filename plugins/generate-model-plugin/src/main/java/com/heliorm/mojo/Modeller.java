@@ -32,9 +32,7 @@ class Modeller<T extends Table> {
     }
 
     private void generate() throws GeneratorException {
-        Set<Class<?>> allPojoClasses = gen.getAllPojoClasses()
-                .stream()
-                    .collect(Collectors.toSet());
+        Set<Class<?>> allPojoClasses = gen.getAllPojoClasses();
         classPackageMap = makeDatabaseMap(allPojoClasses);
         Set<String> uniquePackages = classPackageMap.values().stream()
                 .distinct()
@@ -66,7 +64,8 @@ class Modeller<T extends Table> {
         List<Entry> root = new ArrayList<>();
         for (String name : entryMap.keySet()) {
             Entry entry = entryMap.get(name);
-            String parentName = entry.clazz.getSuperclass().getName();
+            Class<?> superClass = entry.clazz.getSuperclass();
+            String parentName = superClass.getName();
             if (entryMap.containsKey(parentName)) {
                 Entry parentEntry = entryMap.get(parentName);
                 parentEntry.add(entry);

@@ -70,7 +70,6 @@ public class GenerateModel extends AbstractMojo {
             if (!dir.exists()) {
                 dir.mkdirs();
             }
-            Set<Class<?>> allPojoClasses = gen.getAllPojoClasses();
             modeller = new Modeller(gen);
             Map<String, PackageDatabase> packageDatabases = modeller.getPackageDatabases();
             svc = new PrintWriter(new FileWriter(resourceDir + "/META-INF/services/" + Database.class.getCanonicalName()));
