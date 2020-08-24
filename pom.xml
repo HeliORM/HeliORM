@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.heliorm</groupId>
     <artifactId>orm</artifactId>
-    <name>[Helicopter ORM]</name>
+    <name>[HeliORM]</name>
     <version>0.70</version>
     <packaging>pom</packaging>
     <modules>

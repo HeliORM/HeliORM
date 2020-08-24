@@ -9,7 +9,7 @@
     </parent>
     <artifactId>core</artifactId>
     <groupId>com.heliorm</groupId>
-    <name>[Helicopter ORM] Core</name>
+    <name>[HeliORM] Core</name>
     <packaging>jar</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

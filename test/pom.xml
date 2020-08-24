@@ -8,7 +8,7 @@
         <version>0.70</version>
     </parent>
     <artifactId>test</artifactId>
-    <name>[Helicopter ORM] Test</name>
+    <name>[HeliORM] Test</name>
     <version>0.70</version>
     <packaging>jar</packaging>
 

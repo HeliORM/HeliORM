@@ -11,7 +11,7 @@
 
     <groupId>com.heliorm</groupId>
     <artifactId>mysql</artifactId>
-    <name>[Helicopter ORM] MySQL Driver</name>
+    <name>[HeliORM] MySQL Driver</name>
     <dependencies>
         <dependency>
             <groupId>com.heliorm</groupId>

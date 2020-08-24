@@ -9,7 +9,7 @@
         <version>0.70</version>
     </parent>
     <packaging>pom</packaging>
-    <name>[Helicopter ORM] Plugins</name>
+    <name>[HeliORM] Plugins</name>
     <groupId>com.heliorm</groupId>
     <artifactId>plugins</artifactId>
     <modules>

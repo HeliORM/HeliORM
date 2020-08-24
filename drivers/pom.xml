@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.heliorm</groupId>
     <artifactId>drivers</artifactId>
-    <name>[Helicopter ORM] Database Drivers</name>
+    <name>[HeliORM] Database Drivers</name>
     <packaging>pom</packaging>
     <modules>
         <module>mysql</module>

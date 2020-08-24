@@ -11,7 +11,7 @@
 
     <artifactId>postgresql</artifactId>
     <groupId>com.heliorm</groupId>
-    <name>[Helicopter ORM] PostgreSQL Driver</name>
+    <name>[HeliORM] PostgreSQL Driver</name>
 
     <dependencies>
         <dependency>
