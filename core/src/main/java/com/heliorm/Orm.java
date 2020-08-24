@@ -181,7 +181,7 @@ public final class Orm implements AutoCloseable {
      * @throws OrmException Thrown if any of the large number of things that can
      *                      go wrong did go wrong.
      */
-    public <O, P extends Part & Executable> Optional<O> oneOrNone(P tail) throws OrmException {
+    public <O, P extends Part & Executable> Optional<O> optional(P tail) throws OrmException {
         Stream<O> stream = stream(tail);
         O one;
         Iterator<O> iterator = stream.iterator();
