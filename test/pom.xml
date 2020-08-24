@@ -86,7 +86,7 @@
                 <version>${maven.version}</version>
                 <executions>
                     <execution>
-                        <phase>prepare-package</phase>
+                        <phase>generate-test-sources</phase>
                         <goals>
                             <goal>compile</goal>
                         </goals>
