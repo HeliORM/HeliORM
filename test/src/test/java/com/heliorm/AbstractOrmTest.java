@@ -96,7 +96,7 @@ abstract class AbstractOrmTest {
         return true;
     }
 
-    protected final <O> List<O> createAll(List<O> data) throws OrmException {
+    protected static final <O> List<O> createAll(List<O> data) throws OrmException {
         List<O> res = new ArrayList<>();
         for (O object : data) {
             res.add(orm.create(object));
