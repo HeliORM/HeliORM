@@ -1,9 +1,9 @@
 package test.persons;
 
-import net.legrange.orm.annotation.Column;
-import net.legrange.orm.annotation.ForeignKey;
-import net.legrange.orm.annotation.Pojo;
-import net.legrange.orm.annotation.PrimaryKey;
+import com.heliorm.annotation.Column;
+import com.heliorm.annotation.ForeignKey;
+import com.heliorm.annotation.Pojo;
+import com.heliorm.annotation.PrimaryKey;
 
 /**
  *

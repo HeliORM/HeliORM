@@ -1,7 +1,7 @@
 package test.persons;
 
-import net.legrange.orm.annotation.Pojo;
-import net.legrange.orm.annotation.PrimaryKey;
+import com.heliorm.annotation.Pojo;
+import com.heliorm.annotation.PrimaryKey;
 
 /**
  *

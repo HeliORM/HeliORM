@@ -1,6 +1,6 @@
 package test.pets;
 
-import net.legrange.orm.annotation.Pojo;
+import com.heliorm.annotation.Pojo;
 
 import java.time.Duration;
 
