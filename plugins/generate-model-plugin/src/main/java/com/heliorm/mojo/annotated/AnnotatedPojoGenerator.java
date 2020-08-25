@@ -7,7 +7,10 @@ import io.github.classgraph.ClassInfo;
 import io.github.classgraph.ClassInfoList;
 import io.github.classgraph.ScanResult;
 import static java.lang.String.format;
+
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import com.heliorm.mojo.GenerateModel;
@@ -37,10 +40,36 @@ public class AnnotatedPojoGenerator implements Generator<AnnotatedPojoTable> {
     public Set<Class<?>> getAllPojoClasses() throws GeneratorException {
         try {
             HashSet<Class<?>> res = new HashSet();
-            ClassInfoList list = scan.getClassesWithAnnotation(Pojo.class.getName());
+            ClassInfoList list = scan.getAllClasses().getStandardClasses();
+
+            Map<String, ClassInfo> map = new HashMap<>();
             for (ClassInfo info : list) {
-                res.add(generator.getGlobalClassLoader().loadClass(info.getName()));
+                if (info.hasAnnotation(Pojo.class.getName())) {
+                    res.add(generator.getGlobalClassLoader().loadClass(info.getName()));
+                }
+                else {
+                    map.put(info.getName(), info);
+                }
             }
+            // I think there must be a more elegant, possibly functional way of doing this
+            ClassInfo add = null;
+            do {
+                if (add != null) {
+                    res.add(generator.getGlobalClassLoader().loadClass(add.getName()));
+                    map.remove(add.getName());
+                    add=null;
+                }
+                for (Class<?> clazz : res) {
+                    for (String name : map.keySet()) {
+                        ClassInfo info = map.get(name);
+                        if (clazz.getName().equals(info.getSuperclass().getName())) {
+                            // clazz with Pojo annotation is super class for non-Pojo class
+                            // this ain't right
+                            add = info;
+                        }
+                    }
+                }
+            } while (add != null);
             return res;
         } catch (ClassNotFoundException ex) {
             throw new GeneratorException(ex.getMessage(), ex);
