@@ -20,6 +20,6 @@ public interface Executable<T extends Table<O>, O> {
 
     O one() throws OrmException;
 
-    Optional<O> oneOrNone() throws OrmException;
+    Optional<O> optional() throws OrmException;
 
 }

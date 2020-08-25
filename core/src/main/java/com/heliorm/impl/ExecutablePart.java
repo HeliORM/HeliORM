@@ -34,7 +34,7 @@ abstract class ExecutablePart<T extends Table<O>, O> extends Part<T, O, T, O>
     }
 
     @Override
-    public Optional<O> oneOrNone() throws OrmException {
+    public Optional<O> optional() throws OrmException {
         return getOrm().optional(this);
     }
 
