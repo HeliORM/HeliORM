@@ -104,7 +104,7 @@ class Output {
     }
 
     void impt(Class clazz) {
-        if (!clazz.getPackage().getName().equals(packageName) || clazz.isEnum()) {
+        if (!clazz.getPackage().getName().equals(packageName) && !clazz.isEnum()) {
             imports.add(clazz.getCanonicalName());
         }
     }
@@ -434,8 +434,23 @@ class Output {
     }
 
     private void addEnumField(Table cm, Field fm) throws GeneratorException {
+        impt(EnumField.class);
+        impt(EnumFieldPart.class);
         impt(fm.getJavaType());
-        addType3Field(EnumField.class, EnumFieldPart.class, cm, fm);
+        emit("public final %s<%s, %s, %s.%s> %s = new %s(%s.%s.class, \"%s\", \"%s\") {",
+                EnumFieldPart.class.getSimpleName(),
+                tableName(cm),
+                cm.getObjectClass().getSimpleName(),
+               cm.getObjectClass().getSimpleName(),
+                fm.getJavaType().getSimpleName(),
+                fm.getJavaName(),
+                EnumFieldPart.class.getSimpleName(),
+                cm.getObjectClass().getSimpleName(),
+                fm.getJavaType().getSimpleName(),
+                fm.getJavaName(), fm.getSqlName());
+        emit("};");
+
+//        addType3Field(EnumField.class, EnumFieldPart.class, cm, fm);
     }
 
     private void addDateField(Table cm, Field fm) throws GeneratorException {
