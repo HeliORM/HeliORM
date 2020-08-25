@@ -56,7 +56,6 @@ import static java.lang.String.format;
  */
 public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
 
-    private static final boolean USE_UNION_ALL = true;
     private static final String POJO_NAME_FIELD = "pojo_field_name";
     private final Supplier<Connection> connectionSupplier;
     private SqlTransaction currentTransaction;
@@ -90,7 +89,7 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
             Stream<PojoCompare<O>> res = streamSingle(parts.get(0).getReturnTable(), buildSelectQuery(Parser.parse(parts)));
             return res.map(pojoCompare -> pojoCompare.getPojo());
         } else {
-            if (USE_UNION_ALL) {
+            if (useUnionAll()) {
                 Map<String, Table<O>> tableMap = queries.stream()
                         .map(parts -> parts.get(0).getReturnTable())
                         .collect(Collectors.toMap(table -> table.getObjectClass().getName(), table -> table));
@@ -117,6 +116,36 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
         }
     }
 
+    @Override
+    public OrmTransaction openTransaction() throws OrmException {
+        if (currentTransaction != null) {
+            if (currentTransaction.isOpen()) {
+                throw new OrmTransactionException(format("A transaction is already open"));
+            }
+        }
+        currentTransaction = new SqlTransaction(this);
+        return currentTransaction;
+    }
+
+
+    @Override
+    public final void setRollbackOnUncommittedClose(boolean rollback) {
+        rollbackOnUncommittedClose = rollback;
+    }
+
+    /**
+     * Configure driver to create missing SQL tables.
+     *
+     * @param createTables True to create tables
+     */
+    public final void setCreateTables(boolean createTables) {
+        this.createTables = createTables;
+    }
+
+    final boolean getRollbackOnUncommittedClose() {
+        return rollbackOnUncommittedClose;
+    }
+
     private String buildSelectUnionQuery(List<List<Part>> queries) throws OrmException {
         Set<String> allFields = queries.stream()
                 .map(parts -> parts.get(0).getReturnTable())
@@ -128,14 +157,13 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
         for (List<Part> parts : queries) {
             root = Parser.parse(parts);
             StringBuilder tablesQuery = new StringBuilder();
-            StringJoiner fieldsQuery  = new StringJoiner(",");
+            StringJoiner fieldsQuery = new StringJoiner(",");
             Map<String, Field> tableFields = root.getTable().getFields().stream()
                     .collect(Collectors.toMap(field -> field.getSqlName(), field -> field));
             for (String name : allFields) {
                 if (tableFields.containsKey(name)) {
                     fieldsQuery.add(fieldName(root.getTable(), tableFields.get(name)));
-                }
-                else {
+                } else {
                     fieldsQuery.add(format("NULL AS %s", virtualFieldName(name)));
                 }
             }
@@ -170,36 +198,6 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
             query.append(expandOrder(root, optOrder.get()));
         }
         return query.toString();
-    }
-
-    @Override
-    public OrmTransaction openTransaction() throws OrmException {
-        if (currentTransaction != null) {
-            if (currentTransaction.isOpen()) {
-                throw new OrmTransactionException(format("A transaction is already open"));
-            }
-        }
-        currentTransaction = new SqlTransaction(this);
-        return currentTransaction;
-    }
-
-
-    @Override
-    public final void setRollbackOnUncommittedClose(boolean rollback) {
-        rollbackOnUncommittedClose = rollback;
-    }
-
-    /**
-     * Configure driver to create missing SQL tables.
-     *
-     * @param createTables True to create tables
-     */
-    public final void setCreateTables(boolean createTables) {
-        this.createTables = createTables;
-    }
-
-    final boolean getRollbackOnUncommittedClose() {
-        return rollbackOnUncommittedClose;
     }
 
     /**
@@ -413,7 +411,13 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
         }
     }
 
-    protected String buildInsertQuery(Table<?> table) throws OrmException {
+    protected void setEnum(PreparedStatement stmt, int par, String value) throws SQLException {
+        stmt.setString(par, value);
+    }
+
+    protected abstract boolean useUnionAll();
+
+    private String buildInsertQuery(Table<?> table) throws OrmException {
         StringBuilder query = new StringBuilder();
         query.append(format("INSERT INTO %s(", fullTableName(table)));
         StringJoiner fields = new StringJoiner(",");
@@ -436,7 +440,7 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
         return query.toString();
     }
 
-    protected String buildUpdateQuery(Table<?> table) throws OrmException {
+    private String buildUpdateQuery(Table<?> table) throws OrmException {
         if (!table.getPrimaryKey().isPresent()) {
             throw new OrmException("A table needs primary key for objects to be updated");
         }
@@ -454,7 +458,7 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
         return query.toString();
     }
 
-    protected String buildDeleteQuery(Table<?> table) throws OrmException {
+    private String buildDeleteQuery(Table<?> table) throws OrmException {
         if (table.getPrimaryKey().isPresent()) {
             return format("DELETE FROM %s WHERE %s=?", fullTableName(table), fieldName(table, table.getPrimaryKey().get()));
         } else {
@@ -462,7 +466,7 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
         }
     }
 
-    protected String buildSelectQuery(Query root) throws OrmException {
+    private String buildSelectQuery(Query root) throws OrmException {
         StringBuilder tablesQuery = new StringBuilder();
         tablesQuery.append(format("SELECT DISTINCT %s.* FROM %s", fullTableName(root.getTable()), fullTableName(root.getTable())));
         StringBuilder whereQuery = new StringBuilder();
@@ -493,10 +497,6 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
             query.append(expandOrder(root, optOrder.get()));
         }
         return query.toString();
-    }
-
-    protected void setEnum(PreparedStatement stmt, int par, String value) throws SQLException {
-        stmt.setString(par, value);
     }
 
     private String expandLinkTables(TableSpec left, Link right) throws OrmException {

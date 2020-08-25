@@ -71,6 +71,7 @@ public final class MySqlDriver extends SqlDriver {
      * @throws OrmException Thrown if we cannot work out how to extract the
      *                      data.
      */
+    @Override
     protected Object getKeyValueFromResultSet(ResultSet rs, Field field) throws OrmException {
         try {
             int idx = 1;
@@ -97,5 +98,10 @@ public final class MySqlDriver extends SqlDriver {
         } catch (SQLException ex) {
             throw new OrmSqlException(ex.getMessage(), ex);
         }
+    }
+
+    @Override
+    protected boolean useUnionAll() {
+        return true;
     }
 }

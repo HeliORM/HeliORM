@@ -86,4 +86,9 @@ public final class PostgreSqlDriver extends SqlDriver {
             throw new OrmSqlException(ex.getMessage(), ex);
         }
     }
+
+    @Override
+    protected boolean useUnionAll() {
+        return true;
+    }
 }
