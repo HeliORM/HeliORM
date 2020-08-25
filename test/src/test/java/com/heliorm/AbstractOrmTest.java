@@ -125,4 +125,9 @@ abstract class AbstractOrmTest {
                 .collect(Collectors.toList());
     }
 
+    protected final void say(String fmt, Object...args) {
+        System.out.printf(fmt, args);
+        System.out.println();
+    }
+
 }

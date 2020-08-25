@@ -37,6 +37,7 @@ public class SelectTest extends AbstractOrmTest {
 
     @Test
     public void testSelect() throws Exception {
+        say("Testing simple select");
         List<Cat> all = orm.select(CAT).list();
         assertNotNull(all, "The list returned by list() should be non-null");
         assertFalse(all.isEmpty(), "The list returned by list() should be non-empty");
@@ -46,6 +47,7 @@ public class SelectTest extends AbstractOrmTest {
 
     @Test
     public void testSelectWhere() throws Exception {
+        say("Testing select with a simple where clause");
         List<Cat> wanted = cats.stream()
                 .filter(cat -> cat.getAge() < 5)
                 .collect(Collectors.toList());
@@ -60,6 +62,7 @@ public class SelectTest extends AbstractOrmTest {
 
     @Test
     public void testSelectWhereAnd() throws Exception {
+        say("Testing select with a simple where clause with and");
         List<Cat> wanted = cats.stream()
                 .filter(cat -> cat.getAge() < 5)
                 .filter(cat -> cat.getType().equals(Cat.Type.INDOOR))
@@ -74,8 +77,9 @@ public class SelectTest extends AbstractOrmTest {
 
     @Test
     public void testSelectWhereOr() throws Exception {
+        say("Testing select with a where clause with or");
         List<Cat> wanted = cats.stream()
-                .filter(cat -> cat.getAge() < 5 ||  cat.getAge() > 10)
+                .filter(cat -> cat.getAge() < 5 || cat.getAge() > 10)
                 .collect(Collectors.toList());
         List<Cat> all = orm.select(CAT)
                 .where(CAT.age.lt(5)).or(CAT.age.gt(10))
@@ -87,6 +91,7 @@ public class SelectTest extends AbstractOrmTest {
 
     @Test
     public void testSelectOrder() throws Exception {
+        say("Testing select with a simple ordering");
         List<Cat> wanted = cats.stream()
                 .sorted(Comparator.comparing(Cat::getName))
                 .collect(Collectors.toList());
@@ -100,8 +105,9 @@ public class SelectTest extends AbstractOrmTest {
 
     @Test
     public void testSelectOrderDesc() throws Exception {
+        say("Testing select with a descending ordering");
         List<Cat> wanted = cats.stream()
-                .sorted((c1,c2) -> c2.getName().compareTo(c1.getName()))
+                .sorted((c1, c2) -> c2.getName().compareTo(c1.getName()))
                 .collect(Collectors.toList());
         List<Cat> all = orm.select(CAT)
                 .orderByDesc(CAT.name)
@@ -114,8 +120,9 @@ public class SelectTest extends AbstractOrmTest {
 
     @Test
     public void testSelectOrderThen() throws Exception {
+        say("Testing select with a complex ordering");
         List<Cat> wanted = cats.stream()
-                .sorted((c1,c2) -> {
+                .sorted((c1, c2) -> {
                     int o = c1.getAge() - c2.getAge();
                     if (o == 0) {
                         return c1.getName().compareTo(c2.getName());
@@ -134,8 +141,9 @@ public class SelectTest extends AbstractOrmTest {
 
     @Test
     public void testSelectOnAbstract() throws Exception {
-        List< Mamal> all = orm.select(MAMAL).list();
-        List< Mamal> wanted = new ArrayList<>();
+        say("Testing select on an abstract object");
+        List<Mamal> all = orm.select(MAMAL).list();
+        List<Mamal> wanted = new ArrayList<>();
         wanted.addAll(cats);
         wanted.addAll(dogs);
         assertNotNull(all, "The list returned by list() should be non-null");
@@ -145,12 +153,13 @@ public class SelectTest extends AbstractOrmTest {
 
     @Test
     public void testJoin() throws Exception {
+        say("Testing select with a join");
         Person person = persons.get(0);
         List<Cat> wanted = cats.stream()
                 .filter(cat -> cat.getPersonId() == person.getId())
                 .collect(Collectors.toList());
         List<Cat> all = orm.select(CAT)
-                .join(PERSON).on(CAT.personId,PERSON.id)
+                .join(PERSON).on(CAT.personId, PERSON.id)
                 .where(PERSON.emailAddress.eq(person.getEmailAddress()))
                 .list();
         List<Cat> forPerson = all.stream()
