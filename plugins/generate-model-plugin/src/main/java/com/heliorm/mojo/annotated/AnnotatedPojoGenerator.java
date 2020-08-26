@@ -28,7 +28,6 @@ public class AnnotatedPojoGenerator implements Generator<AnnotatedPojoTable> {
     private ScanResult scan;
     private final GenerateModel generator;
 
-
     public AnnotatedPojoGenerator(GenerateModel generator) throws GeneratorException {
         this.generator = generator;
         scan = new ClassGraph()
@@ -59,6 +58,12 @@ public class AnnotatedPojoGenerator implements Generator<AnnotatedPojoTable> {
         return new AnnotatedPojoTable(database, clazz, subTables);
     }
 
+    /** Find subclasses for Pojo super classes which are not annotated as Pojo.
+     *
+     * @param annos The list of super class
+     * @param all The list of subclasses
+     * @return The list containing the missing classes
+     */
     private List<ClassInfo> findMissingSubClasses(ClassInfoList annos, ClassInfoList all) {
         List<ClassInfo> res = new ArrayList<>();
         for (ClassInfo info : annos) {
@@ -68,7 +73,12 @@ public class AnnotatedPojoGenerator implements Generator<AnnotatedPojoTable> {
         return res;
     }
 
-
+    /** Find subclasses off Pojo super class which are not annotated as Pojo.
+     *
+     * @param superClass The super class
+     * @param possibleSubClasses The list of subclasses
+     * @return The list containing the missing classes
+     */
     private List<ClassInfo> findMissingSubClasses(ClassInfo superClass, ClassInfoList possibleSubClasses) {
         List<ClassInfo> subClasses = new ArrayList();
         for (ClassInfo info : possibleSubClasses) {
