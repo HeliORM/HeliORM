@@ -1,12 +1,14 @@
 package com.heliorm;
 
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import test.persons.Person;
 import test.pets.Cat;
 import test.pets.Dog;
 import test.pets.Mamal;
+import test.pets.Pet;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -24,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static test.Tables.CAT;
 import static test.Tables.MAMAL;
 import static test.Tables.PERSON;
+import static test.Tables.PET;
 
 public class CrudTest extends AbstractOrmTest {
 
@@ -48,4 +51,11 @@ public class CrudTest extends AbstractOrmTest {
         assertTrue(pojoCompareExcludingKey(cat, saved), "The new and created objects must be the same apart from the key");
     }
 
+    @AfterAll
+    public static void removeData() throws OrmException {
+        List<Pet> pets = orm.select(PET).list();
+        for (Pet pet : pets) {
+            orm.delete(pet);
+        }
+    }
 }
