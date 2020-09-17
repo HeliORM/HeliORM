@@ -4,9 +4,11 @@ import com.heliorm.annotation.Column;
 import com.heliorm.annotation.ForeignKey;
 import com.heliorm.annotation.Pojo;
 import com.heliorm.annotation.PrimaryKey;
+import test.pets.Pet;
+
+import java.util.List;
 
 /**
- *
  * @author gideon
  */
 @Pojo
