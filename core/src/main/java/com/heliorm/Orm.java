@@ -151,7 +151,9 @@ public final class Orm implements AutoCloseable {
      *                      go wrong did go wrong.
      */
     public <O, P extends Part & Executable> List<O> list(P tail) throws OrmException {
-        return ((Stream<O>) stream(tail)).collect(Collectors.toList());
+        try (Stream<O> stream = stream(tail)) {
+            return stream.collect(Collectors.toList());
+        }
     }
 
     /**
@@ -182,18 +184,19 @@ public final class Orm implements AutoCloseable {
      *                      go wrong did go wrong.
      */
     public <O, P extends Part & Executable> Optional<O> optional(P tail) throws OrmException {
-        Stream<O> stream = stream(tail);
-        O one;
-        Iterator<O> iterator = stream.iterator();
-        if (iterator.hasNext()) {
-            one = iterator.next();
-        } else {
-            return Optional.empty();
+        try (Stream<O> stream = stream(tail)) {
+            O one;
+            Iterator<O> iterator = stream.iterator();
+            if (iterator.hasNext()) {
+                one = iterator.next();
+            } else {
+                return Optional.empty();
+            }
+            if (iterator.hasNext()) {
+                throw new OrmException(format("Required one or none %s but found more than one", tail.getReturnTable().getObjectClass().getSimpleName()));
+            }
+            return Optional.of(one);
         }
-        if (iterator.hasNext()) {
-            throw new OrmException(format("Required one or none %s but found more than one", tail.getReturnTable().getObjectClass().getSimpleName()));
-        }
-        return Optional.of(one);
     }
 
     /**
@@ -209,18 +212,19 @@ public final class Orm implements AutoCloseable {
      *                      go wrong did go wrong.
      */
     public <O, P extends Part & Executable> O one(P tail) throws OrmException {
-        Stream<O> stream = stream(tail);
-        Iterator<O> iterator = stream.iterator();
-        O one;
-        if (iterator.hasNext()) {
-            one = iterator.next();
-        } else {
-            throw new OrmException(format("Required exactly one %s but found none", tail.getReturnTable().getObjectClass().getSimpleName()));
+        try (Stream<O> stream = stream(tail)) {
+            Iterator<O> iterator = stream.iterator();
+            O one;
+            if (iterator.hasNext()) {
+                one = iterator.next();
+            } else {
+                throw new OrmException(format("Required exactly one %s but found none", tail.getReturnTable().getObjectClass().getSimpleName()));
+            }
+            if (iterator.hasNext()) {
+                throw new OrmException(format("Required exactly one %s but found more than one", tail.getReturnTable().getObjectClass().getSimpleName()));
+            }
+            return one;
         }
-        if (iterator.hasNext()) {
-            throw new OrmException(format("Required exactly one %s but found more than one", tail.getReturnTable().getObjectClass().getSimpleName()));
-        }
-        return one;
     }
 
 }
