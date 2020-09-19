@@ -6,10 +6,10 @@ import com.heliorm.Table;
 /**
  *
  * @author gideon
- * @param <T>
- * @param <O>
- * @param <C>
- */
+ * @param <T> Type of table
+ * @param <O> Type of POJO
+ * @param <C> Type of the field
+ * */
 public class ValueExpressionPart<T extends Table<O>, O, C> extends ExpressionPart<T, O, C> {
 
     private final Operator operator;

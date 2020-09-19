@@ -8,9 +8,9 @@ import com.heliorm.def.Field;
 /**
  *
  * @author gideon
- * @param <T>
- * @param <O>
- * @param <C>
+ * @param <T> Type of table
+ * @param <O> Type of POJO
+ * @param <C> Type of the field
  */
 public abstract class FieldPart<T extends Table<O>, O, C> extends Part<T, O, T, O> implements Field<T, O, C>, Cloneable {
 

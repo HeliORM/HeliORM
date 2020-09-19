@@ -17,7 +17,7 @@ public interface PojoOperations {
      *
      * @param table The table
      * @return The new POJO instance
-     * @throws OrmException
+     * @throws OrmException Thrown if there is an error creating a new POJO
      */
     Object newPojoInstance(Table table) throws OrmException;
 
@@ -27,7 +27,7 @@ public interface PojoOperations {
      * @param pojo  The POJO on which to set the value
      * @param field The field
      * @param value The value to set
-     * @throws OrmException
+     * @throws OrmException Thrown if there is an error setting the value
      */
     void setValue(Object pojo, Field field, Object value) throws OrmException;
 
@@ -37,7 +37,7 @@ public interface PojoOperations {
      * @param pojo  The POJO from which to read the value
      * @param field The field
      * @return The value read
-     * @throws OrmException
+     * @throws OrmException Thrown if there is an error reading the value
      */
     Object getValue(Object pojo, Field field) throws OrmException;
 
@@ -49,7 +49,7 @@ public interface PojoOperations {
      * @param field The field of which the value on each POJO must be used to
      *              compare them
      * @return A comparator compatible comparison result
-     * @throws OrmException
+     * @throws OrmException Thrown if there is an error comparing the two fields
      */
     int compareTo(Object pojo1, Object pojo2, Field field) throws OrmException;
 

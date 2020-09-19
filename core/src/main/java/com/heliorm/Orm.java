@@ -46,7 +46,7 @@ public final class Orm implements AutoCloseable {
      * @param <O>  The type of the POJO
      * @param pojo The POJO to persist
      * @return The updated POJO
-     * @throws OrmException
+     * @throws OrmException Thrown if there is an error creating the POJO
      */
     public <O> O create(O pojo) throws OrmException {
         if (pojo == null) {
@@ -61,7 +61,7 @@ public final class Orm implements AutoCloseable {
      * @param <O>  The type of the POJO
      * @param pojo The POJO to persist
      * @return The updated POJO
-     * @throws OrmException
+     * @throws OrmException Thrown if there is an error updating the POJO
      */
     public <O> O update(O pojo) throws OrmException {
         if (pojo == null) {
@@ -75,7 +75,7 @@ public final class Orm implements AutoCloseable {
      *
      * @param <O>  The type of the POJO
      * @param pojo The POJO to delete
-     * @throws OrmException
+     * @throws OrmException Thrown if there is an error deleting the POJO
      */
     public <O> void delete(O pojo) throws OrmException {
         if (pojo == null) {
@@ -119,7 +119,7 @@ public final class Orm implements AutoCloseable {
      * @param <O>  The type of the POJO
      * @param pojo The pojo
      * @return The table
-     * @throws OrmException
+     * @throws OrmException Thrown if there is an finding the table the POJO
      */
     public <O> Table<O> tableFor(O pojo) throws OrmException {
         if (pojo == null) {

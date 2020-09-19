@@ -9,7 +9,7 @@ public interface TableGenerator {
      *
      * @param table The table for which to generate the schema
      * @return The schema
-     * @throws OrmSqlException
+     * @throws OrmSqlException Throws if there is an error generating the schema
      */
     String generateSchema(Table<?> table) throws OrmSqlException;
 

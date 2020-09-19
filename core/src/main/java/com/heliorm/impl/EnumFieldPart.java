@@ -4,10 +4,11 @@ import com.heliorm.Table;
 import com.heliorm.def.EnumField;
 
 /**
- * @param <T>
- * @param <O>
- * @param <E>
  * @author gideon
+ * @param <T> Type of table
+ * @param <O> Type of POJO
+ * @param <E> Type of the enum
+ *
  */
 public class EnumFieldPart<T extends Table<O>, O, E extends Enum> extends FieldPart<T, O, E> implements
         EnumField<T, O, E>,

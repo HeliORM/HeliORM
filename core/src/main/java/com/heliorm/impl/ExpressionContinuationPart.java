@@ -7,8 +7,8 @@ import com.heliorm.Table;
 /**
  *
  * @author gideon
- * @param <T>
- * @param <O>
+ * @param <T> Type of table
+ * @param <O> Type of POJO
  */
 public class ExpressionContinuationPart<T extends Table<O>, O> extends Part<T, O, T, O> implements ExpressionContinuation<T, O> {
 

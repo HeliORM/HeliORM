@@ -29,12 +29,12 @@ public class OrmBuilder {
     /**
      * Create a new OrmBuilder using the given connection supplier. This makes
      * it easy to use a connection pool, since most pool implementation has a
-     * getConnection() method, so one can just pass () -> pool.getConnection()
+     * getConnection() method, so one can just pass a lambda.
      * to create.
      *
      * @param con The connection supplier
      * @return The ORM builder
-     * @throws OrmException
+     * @throws OrmException Thrown if there is a problem creating the OrmBuilder
      */
     public static OrmBuilder create(Supplier<Connection> con, Class<? extends SqlDriver> driverClass) throws OrmException {
         return new OrmBuilder(con, driverClass);
@@ -44,7 +44,7 @@ public class OrmBuilder {
      * Create a new ORM builder.
      *
      * @param con The connection supplier to start with.
-     * @throws OrmException
+     * @throws OrmException Thrown if there is a problem creating the OrmBuilder
      */
     private OrmBuilder(Supplier<Connection> con, Class<? extends SqlDriver> driverClass) throws OrmException {
         this.con = con;
@@ -57,7 +57,6 @@ public class OrmBuilder {
      *
      * @param database The database
      * @param sqlName  The SQL database
-     * @returnThe ORM builder
      */
     public OrmBuilder mapDatabase(Database database, String sqlName) {
         databases.put(database, sqlName);
@@ -98,7 +97,7 @@ public class OrmBuilder {
      * Create the ORM based on the setup supplied using the builder pattern.
      *
      * @return The ORM instance
-     * @throws OrmException
+     * @throws OrmException Thrown if there is an error building the ORM
      */
     public Orm build() throws OrmException {
         Map<Database, Database> aliases = new HashMap();

@@ -1067,6 +1067,7 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
      *
      * @param table The table we're referencing
      * @return The SQL table name
+     * @throws OrmException Thrown if something goes wrong determining the table name
      */
     protected abstract String fullTableName(Table table) throws OrmException;
 
@@ -1076,6 +1077,7 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
      * @param field The field
      * @param table The table
      * @return The SQL field name
+     * @throws OrmException Thrown if something goes wrong determining the field name
      */
     protected abstract String fullFieldName(Table table, Field field) throws OrmException;
 
@@ -1085,6 +1087,7 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
      * @param field The field
      * @param table The table
      * @return The SQL field name
+     * @throws OrmException Thrown if something goes wrong determining the field name
      */
     protected abstract String fieldName(Table table, Field field) throws OrmException;
 
