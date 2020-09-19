@@ -25,8 +25,14 @@ import com.heliorm.query.Parser;
 import com.heliorm.query.Query;
 import com.heliorm.query.TableSpec;
 import com.heliorm.query.ValueCriteria;
-
-import java.sql.*;
+;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.format.DateTimeParseException;
@@ -364,50 +370,46 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
     }
 
     public <T extends Table<O>, O> O update(T table, O pojo) throws OrmException {
-        try {
-            String query = updates.get(table);
-            if (query == null) {
-                query = buildUpdateQuery(table);
-                updates.put(table, query);
-            }
-            Connection con = getConnection();
-            try (PreparedStatement stmt = con.prepareStatement(query)) {
-                int par = 1;
-                for (Field field : table.getFields()) {
-                    if (!field.isPrimaryKey()) {
-                        setValueInStatement(stmt, pojo, field, par);
-                        par++;
-                    }
+        String query = updates.get(table);
+        if (query == null) {
+            query = buildUpdateQuery(table);
+            updates.put(table, query);
+        }
+        Connection con = getConnection();
+        try (PreparedStatement stmt = con.prepareStatement(query)) {
+            int par = 1;
+            for (Field field : table.getFields()) {
+                if (!field.isPrimaryKey()) {
+                    setValueInStatement(stmt, pojo, field, par);
+                    par++;
                 }
-                setValueInStatement(stmt, pojo, table.getPrimaryKey().get(), par);
-                stmt.executeUpdate();
-                return pojo;
-            } finally {
-                close(con);
             }
+            setValueInStatement(stmt, pojo, table.getPrimaryKey().get(), par);
+            stmt.executeUpdate();
+            return pojo;
         } catch (SQLException ex) {
             throw new OrmSqlException(ex.getMessage(), ex);
+        } finally {
+            close(con);
         }
 
     }
 
     @Override
     public <T extends Table<O>, O> void delete(T table, O pojo) throws OrmException {
-        try {
-            String query = deletes.get(table);
-            if (query == null) {
-                query = buildDeleteQuery(table);
-                deletes.put(table, query);
-            }
-            Connection con = getConnection();
-            try (PreparedStatement stmt = con.prepareStatement(query)) {
-                setValueInStatement(stmt, pojo, table.getPrimaryKey().get(), 1);
-                stmt.executeUpdate();
-            } finally {
-                close(con);
-            }
+        String query = deletes.get(table);
+        if (query == null) {
+            query = buildDeleteQuery(table);
+            deletes.put(table, query);
+        }
+        Connection con = getConnection();
+        try (PreparedStatement stmt = con.prepareStatement(query)) {
+            setValueInStatement(stmt, pojo, table.getPrimaryKey().get(), 1);
+            stmt.executeUpdate();
         } catch (SQLException ex) {
             throw new OrmSqlException(ex.getMessage(), ex);
+        } finally {
+            close(con);
         }
     }
 
