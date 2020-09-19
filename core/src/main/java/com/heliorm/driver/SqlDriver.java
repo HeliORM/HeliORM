@@ -940,6 +940,7 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
      * @return The connection
      */
     Connection getConnection() {
+        System.out.println("getConnect()");
         if (currentTransaction != null) {
             if (currentTransaction.isOpen()) {
                 return currentTransaction.getConnection();
@@ -950,6 +951,7 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
     }
 
     private void close(Connection con) throws OrmException {
+        System.out.println("close(con)");
         if ((currentTransaction == null) || (currentTransaction.getConnection() != con)) {
             try {
                 con.close();
