@@ -5,11 +5,11 @@
     <parent>
         <groupId>com.heliorm</groupId>
         <artifactId>orm</artifactId>
-        <version>0.71</version>
+        <version>0.72</version>
     </parent>
     <artifactId>test</artifactId>
     <name>[HeliORM] Test</name>
-    <version>0.71</version>
+    <version>0.72</version>
     <packaging>jar</packaging>
 
     <dependencies>
@@ -71,6 +71,7 @@
                             <packages>
                                 <package>test.pets</package>
                                 <package>test.persons</package>
+                                <package>test.place</package>
                             </packages>
                             <database>petz</database>
                             <outputDir>${sourceOutputDir}</outputDir>

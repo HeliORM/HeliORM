@@ -1,0 +1,67 @@
+package com.heliorm;
+
+
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import test.persons.Person;
+import test.pets.Cat;
+import test.pets.Pet;
+import test.place.Town;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import static com.heliorm.TestData.makeCat;
+import static com.heliorm.TestData.makePersons;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static test.Tables.CAT;
+
+public class AutoNumberTest extends AbstractOrmTest {
+
+    private static final int MAX_PERSONS = 3;
+    private static List<Person> persons;
+    private static List<Cat> cats = new ArrayList<>();
+
+    @BeforeAll
+    public static void setupData() throws OrmException {
+        persons = createAll(makePersons(MAX_PERSONS));
+    }
+
+
+    @Test
+    public void testCreateWithLongKey() throws Exception {
+        say("Testing create with auto-number Long key");
+        Person person = persons.get(0);
+        Cat cat = makeCat(person);
+        Cat saved = orm.create(cat);
+        cats.add(saved);
+        assertNotNull(saved, "The object returned by create should not be null");
+        assertTrue(cat.getId() == null, "The id of the new object must be null before create");
+        assertTrue(saved.getId() != null, "The id of the new object must be not-null after create");
+        assertTrue(pojoCompareExcludingKey(cat, saved), "The new and created objects must be the same apart from the key");
+    }
+
+    @Test
+    public void testCreateWithStringKey() throws Exception {
+        say("Testing create with auto-number String key");
+        Town town = new Town();
+        town.setName("Somerset West");
+        Town saved = orm.create(town);
+        assertNotNull(saved, "The object returned by create should not be null");
+        assertTrue(town.getId() == null, "The id of the new object must be null before create");
+        assertTrue(saved.getId() != null, "The id of the new object must be not-null after create");
+        assertTrue(pojoCompareExcludingKey(town, saved), "The new and created objects must be the same apart from the key");
+    }
+
+
+    @AfterAll
+    public static void removeData() throws OrmException {
+        for (Pet pet : cats) {
+            orm.delete(pet);
+        }
+    }
+}

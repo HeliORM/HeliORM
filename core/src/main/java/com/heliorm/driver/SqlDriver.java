@@ -334,7 +334,7 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
                 if (field.isPrimaryKey()) {
                     if (field.isAutoNumber()) {
                         if (field.getFieldType() == Field.FieldType.STRING) {
-                            pops.setValue(pojo, field, UUID.randomUUID().toString());
+                            pops.setValue(popo, field, UUID.randomUUID().toString());
                             setValueInStatement(stmt, popo, field, par);
                             par++;
                         }
@@ -391,7 +391,7 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
             throw new OrmSqlException(ex.getMessage(), ex);
         } finally {
             close(con);
-        }
+        }   
 
     }
 
