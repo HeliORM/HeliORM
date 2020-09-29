@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.heliorm</groupId>
         <artifactId>orm</artifactId>
-        <version>0.73</version>
+        <version>0.74</version>
     </parent>
     <artifactId>test</artifactId>
     <name>[HeliORM] Test</name>
@@ -58,7 +58,7 @@
         <dependency>
             <groupId>com.heliorm</groupId>
             <artifactId>postgresql</artifactId>
-            <version>0.73</version>
+            <version>0.74</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
