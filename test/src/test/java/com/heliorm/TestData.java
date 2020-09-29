@@ -4,14 +4,18 @@ import test.persons.Person;
 import test.pets.Cat;
 import test.pets.Dog;
 import test.pets.Pet;
+import test.place.Province;
+import test.place.Town;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 class TestData {
 
-    private static final String[] names = {
+    private static final String[] PEOPLE_NAMES = {
             "Oliver",
             "Leo",
             "Milo",
@@ -113,9 +117,48 @@ class TestData {
             "Hobbes",
             "Remi"
     };
+
+    private static final String[][] TOWN_NAMES = {
+            {"Somerset West",
+                    "Gordons Bay",
+                    "Stellenbosch"},
+            {"Vreyheid", "Durban", "Pinetown"}
+    };
+
+    private static final String[] PROVINCE_NAMES = {
+            "Western Cape",
+            "Kwazulu-Natal"
+    };
+
     private static Random random = new Random();
+    private List<Province> provinces = new ArrayList<>();
 
     private TestData() {
+    }
+
+    static List<Province> makeProvinces() {
+        return Arrays.stream(PROVINCE_NAMES)
+                .map(name -> {
+                    Province province = new Province();
+                    province.setName(name);
+                    return province;
+
+                }).collect(Collectors.toList());
+    }
+
+    static List<Town> makeTowns(List<Province> provinces) {
+        List<Town> towns = new ArrayList<>();
+        for (int i = 0; i < TOWN_NAMES.length; ++i) {
+            String names[] = TOWN_NAMES[i];
+            Province province = provinces.get(i);
+            for (String name : names) {
+                Town town = new Town();
+                town.setProvinceId(province.getProvinceId());
+                town.setName(name);
+                towns.add(town);
+            }
+        }
+        return towns;
     }
 
     static Cat makeCat(Person person) {
@@ -135,18 +178,28 @@ class TestData {
 
     static Person makePerson(int n) {
         Person person = new Person();
-        person.setFirstName(names[random.nextInt(names.length)]);
-        person.setLastName(names[random.nextInt(names.length)]);
-        person.setEmailAddress(names[random.nextInt(names.length)].toLowerCase()+ n +"@gmail.com");
+        person.setFirstName(PEOPLE_NAMES[random.nextInt(PEOPLE_NAMES.length)]);
+        person.setLastName(PEOPLE_NAMES[random.nextInt(PEOPLE_NAMES.length)]);
+        person.setEmailAddress(PEOPLE_NAMES[random.nextInt(PEOPLE_NAMES.length)].toLowerCase() + n + "@gmail.com");
         return person;
     }
 
-    static List<Person> makePersons(int n) {
-        List<Person> res = new ArrayList<>();
-        for (int i = 0; i < n; i++) {
-            res.add(makePerson(i));
+    static List<Person> makePersons(List<Town> towns) {
+        List<Person> persons = new ArrayList<>();
+        for (Town town : towns) {
+            for (int i = 0; i < 4; ++i) {
+                String first = PEOPLE_NAMES[random.nextInt(PEOPLE_NAMES.length)];
+                String last = PEOPLE_NAMES[random.nextInt(PEOPLE_NAMES.length)];
+                Person person = new Person();
+                person.setFirstName(first);
+                person.setLastName(last);
+                person.setEmailAddress(first + "." + last + i + "@gmail.com");
+                person.setTownId(town.getProvinceId());
+                persons.add(person);
+            }
+
         }
-        return res;
+        return persons;
     }
 
     static List<Cat> makeCats(int n, List<Person> persons) {
@@ -167,7 +220,7 @@ class TestData {
 
     private static <P extends Pet> P makePet(P pet, Person person) {
         pet.setAge(random.nextInt(18));
-        pet.setName(names[random.nextInt(names.length)]);
+        pet.setName(PEOPLE_NAMES[random.nextInt(PEOPLE_NAMES.length)]);
         pet.setPersonId(person.getId());
         return pet;
     }

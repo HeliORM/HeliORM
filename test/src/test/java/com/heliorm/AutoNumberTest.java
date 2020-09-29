@@ -6,29 +6,33 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import test.persons.Person;
 import test.pets.Cat;
-import test.pets.Pet;
+import test.place.Province;
 import test.place.Town;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static com.heliorm.TestData.makeCat;
 import static com.heliorm.TestData.makePersons;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static com.heliorm.TestData.makeProvinces;
+import static com.heliorm.TestData.makeTowns;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static test.Tables.CAT;
 
 public class AutoNumberTest extends AbstractOrmTest {
 
     private static final int MAX_PERSONS = 3;
+
+    private static List<Province> provinces;
+    private static List<Town> towns;
     private static List<Person> persons;
     private static List<Cat> cats = new ArrayList<>();
 
     @BeforeAll
     public static void setupData() throws OrmException {
-        persons = createAll(makePersons(MAX_PERSONS));
+        provinces = createAll(makeProvinces());
+        towns = createAll(makeTowns(provinces));
+        persons = createAll(makePersons(towns));
     }
 
 
@@ -60,8 +64,9 @@ public class AutoNumberTest extends AbstractOrmTest {
 
     @AfterAll
     public static void removeData() throws OrmException {
-        for (Pet pet : cats) {
-            orm.delete(pet);
-        }
+        deleteall(Cat.class);
+        deleteall(Person.class);
+        deleteall(Town.class);
+        deleteall(Province.class);
     }
 }

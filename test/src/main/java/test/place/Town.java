@@ -1,6 +1,7 @@
 package test.place;
 
 import com.heliorm.annotation.Column;
+import com.heliorm.annotation.ForeignKey;
 import com.heliorm.annotation.Pojo;
 import com.heliorm.annotation.PrimaryKey;
 
@@ -11,6 +12,8 @@ public class Town {
     private String id;
     @Column(length = 30, nullable = false)
     private String name;
+    @ForeignKey(pojo = Province.class)
+    private Long provinceId;
 
     public String getId() {
         return id;
@@ -26,5 +29,13 @@ public class Town {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Long getProvinceId() {
+        return provinceId;
+    }
+
+    public void setProvinceId(Long provinceId) {
+        this.provinceId = provinceId;
     }
 }

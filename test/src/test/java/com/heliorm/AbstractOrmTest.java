@@ -1,14 +1,13 @@
 package com.heliorm;
 
-import com.heliorm.driver.mysql.MySqlDriver;
 import com.heliorm.def.Field;
+import com.heliorm.driver.mysql.MySqlDriver;
 import org.h2.jdbcx.JdbcDataSource;
 import org.junit.jupiter.api.BeforeAll;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -109,7 +108,25 @@ abstract class AbstractOrmTest {
         return res;
     }
 
+    protected static <O> List<O> selectAll(Class<O> type) throws OrmException {
+        try {
+            return orm.select(orm.tableFor(type.newInstance())).list();
+        } catch (InstantiationException | IllegalAccessException e) {
+
+            throw new OrmException(e.getMessage(),e);
+        }
+    }
+
+    protected static <O> void deleteall(Class<O> type) throws OrmException {
+        for (O obj : selectAll(type)) {
+            orm.delete(obj);
+        }
+    }
+
     private <O> List<O> sort(List<O> data) throws OrmException {
+        if (data.size() < 2) {
+            return data;
+        }
         Table<?> t1 = orm.tableFor(data.get(0));
         return data.stream().sorted((o1, o2) -> {
             try {
@@ -125,7 +142,7 @@ abstract class AbstractOrmTest {
                 .collect(Collectors.toList());
     }
 
-    protected final void say(String fmt, Object...args) {
+    protected final void say(String fmt, Object... args) {
         System.out.printf(fmt, args);
         System.out.println();
     }

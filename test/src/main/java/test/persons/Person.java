@@ -5,6 +5,7 @@ import com.heliorm.annotation.ForeignKey;
 import com.heliorm.annotation.Pojo;
 import com.heliorm.annotation.PrimaryKey;
 import test.pets.Pet;
+import test.place.Town;
 
 import java.util.List;
 
@@ -17,6 +18,8 @@ public class Person {
 
     @PrimaryKey
     private Long id;
+    @ForeignKey(pojo = Town.class)
+    private Long townId;
     @Column
     private String firstName;
     @Column
@@ -56,10 +59,19 @@ public class Person {
         this.emailAddress = emailAddress;
     }
 
+    public Long getTownId() {
+        return townId;
+    }
+
+    public void setTownId(Long townId) {
+        this.townId = townId;
+    }
+
     @Override
     public String toString() {
         return "Person{" +
                 "id=" + id +
+                ", townId=" + townId +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", emailAddress='" + emailAddress + '\'' +

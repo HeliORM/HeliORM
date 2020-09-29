@@ -1,12 +1,15 @@
 package com.heliorm;
 
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import test.persons.Person;
 import test.pets.Cat;
 import test.pets.Dog;
 import test.pets.Mamal;
+import test.place.Province;
+import test.place.Town;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -20,18 +23,20 @@ import static test.Tables.*;
 
 public class SelectTest extends AbstractOrmTest {
 
-    private static final int MAX_CATS = 20;
-    private static final int MAX_DOGS = 15;
-    private static final int MAX_PERSONS = 3;
+    private static List<Province> provinces;
+    private static List<Town> towns;
     private static List<Person> persons;
     private static List<Cat> cats;
     private static List<Dog> dogs;
 
+
     @BeforeAll
     public static void setupData() throws OrmException {
-        persons = createAll(makePersons(MAX_PERSONS));
-        cats = createAll(makeCats(MAX_CATS, persons));
-        dogs = createAll(makeDogs(MAX_DOGS, persons));
+        provinces = createAll(makeProvinces());
+        towns = createAll(makeTowns(provinces));
+        persons = createAll(makePersons(towns));
+        cats = createAll(makeCats(persons.size() * 5, persons));
+        dogs = createAll(makeDogs(persons.size() * 4, persons));
     }
 
 
@@ -41,7 +46,7 @@ public class SelectTest extends AbstractOrmTest {
         List<Cat> all = orm.select(CAT).list();
         assertNotNull(all, "The list returned by list() should be non-null");
         assertFalse(all.isEmpty(), "The list returned by list() should be non-empty");
-        assertTrue(all.size() == MAX_CATS, format("The amount of loaded data should match the number of the items (%d vs %s)", all.size(), MAX_CATS));
+        assertTrue(all.size() == cats.size(), format("The amount of loaded data should match the number of the items (%d vs %s)", all.size(), cats.size()));
         assertTrue(listCompareOrdered(all, cats), "The items loaded are exactly the same as the ones we expected");
     }
 
@@ -171,4 +176,29 @@ public class SelectTest extends AbstractOrmTest {
         assertTrue(listCompareOrdered(forPerson, all), "The items loaded are exactly the same as the ones we expected");
     }
 
+    @Test
+    public void testJoinWithSameKeys() throws Exception {
+        say("Testing select with a join with same key names");
+        List<Town> selected = orm.select(TOWN)
+                .join(PROVINCE).on(TOWN.provinceId, PROVINCE.provinceId)
+                .where(PROVINCE.name.eq(provinces.get(0).getName()))
+                .list();
+
+        List<Town> wanted = towns.stream()
+                .filter(town -> town.getProvinceId().equals(provinces.get(0).getProvinceId()))
+                .collect(Collectors.toList());
+
+        assertNotNull(selected, "The list returned by list() should be non-null");
+        assertTrue(selected.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", selected.size(), wanted.size()));
+        assertTrue(listCompareOrdered(selected, wanted), "The items loaded are exactly the same as the ones we expected");
+    }
+
+    @AfterAll
+    public static void removeData() throws OrmException {
+        deleteall(Cat.class);
+        deleteall(Dog.class);
+        deleteall(Person.class);
+        deleteall(Town.class);
+        deleteall(Province.class);
+    }
 }

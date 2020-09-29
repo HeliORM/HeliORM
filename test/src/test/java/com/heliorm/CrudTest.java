@@ -6,40 +6,35 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import test.persons.Person;
 import test.pets.Cat;
-import test.pets.Dog;
-import test.pets.Mamal;
-import test.pets.Pet;
+import test.place.Province;
+import test.place.Town;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static com.heliorm.TestData.makeCat;
-import static com.heliorm.TestData.makeCats;
-import static com.heliorm.TestData.makeDogs;
 import static com.heliorm.TestData.makePersons;
-import static java.lang.String.format;
+import static com.heliorm.TestData.makeProvinces;
+import static com.heliorm.TestData.makeTowns;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static test.Tables.CAT;
-import static test.Tables.MAMAL;
-import static test.Tables.PERSON;
-import static test.Tables.PET;
 
 public class CrudTest extends AbstractOrmTest {
 
-    private static final int MAX_PERSONS = 3;
     private static List<Person> persons;
     private static List<Cat> cats = new ArrayList<>();
+    private static List<Province> provinces;
+    private static List<Town> towns;
 
     @BeforeAll
     public static void setupData() throws OrmException {
-        persons = createAll(makePersons(MAX_PERSONS));
+        provinces = createAll(makeProvinces());
+        towns = createAll(makeTowns(provinces));
+        persons = createAll(makePersons(towns));
     }
-
 
     @Test
     public void testCreate() throws Exception {
@@ -66,8 +61,9 @@ public class CrudTest extends AbstractOrmTest {
 
     @AfterAll
     public static void removeData() throws OrmException {
-        for (Pet pet : cats) {
-            orm.delete(pet);
-        }
+        deleteall(Cat.class);
+        deleteall(Person.class);
+        deleteall(Town.class);
+        deleteall(Province.class);
     }
 }
