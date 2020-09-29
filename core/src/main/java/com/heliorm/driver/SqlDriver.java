@@ -25,7 +25,6 @@ import com.heliorm.query.Parser;
 import com.heliorm.query.Query;
 import com.heliorm.query.TableSpec;
 import com.heliorm.query.ValueCriteria;
-;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
@@ -74,6 +73,7 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
     private final Map<Table, Boolean> exists = new HashMap();
     private final PojoOperations pops;
     private final Map<Database, Database> aliases;
+    private final Map<Field, String> fieldIds = new HashMap();
 
     public SqlDriver(Supplier<Connection> connectionSupplier, PojoOperations pops) {
         this(connectionSupplier, pops, Collections.EMPTY_MAP);
@@ -163,10 +163,9 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
     }
 
     private String buildSelectUnionQuery(List<List<Part>> queries) throws OrmException {
-        Set<String> allFields = queries.stream()
+        Set<Field> allFields = queries.stream()
                 .map(parts -> parts.get(0).getReturnTable())
                 .flatMap(table -> (Stream<Field>) (table.getFields().stream()))
-                .map(field -> field.getSqlName())
                 .collect(Collectors.toSet());
         StringJoiner buf = new StringJoiner(" UNION ALL ");
         Query root = null;
@@ -174,13 +173,15 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
             root = Parser.parse(parts);
             StringBuilder tablesQuery = new StringBuilder();
             StringJoiner fieldsQuery = new StringJoiner(",");
-            Map<String, Field> tableFields = root.getTable().getFields().stream()
-                    .collect(Collectors.toMap(field -> field.getSqlName(), field -> field));
-            for (String name : allFields) {
-                if (tableFields.containsKey(name)) {
-                    fieldsQuery.add(fieldName(root.getTable(), tableFields.get(name)));
-                } else {
-                    fieldsQuery.add(format("NULL AS %s", virtualFieldName(name)));
+            List<Field> tableFields = root.getTable().getFields();
+            for (Field field : allFields) {
+                String fieldId = getFieldId(field);
+                if (tableFields.contains(field)) {
+                    fieldsQuery.add(format("%s AS %s",fullFieldName(root.getTable(), field), virtualFieldName(fieldId)));
+                }
+                else {
+                    String empty = "NULL";
+                    fieldsQuery.add(format("%s AS %s", empty, virtualFieldName(fieldId)));
                 }
             }
             tablesQuery.append(format("SELECT %s", fieldsQuery.toString()));
@@ -401,7 +402,7 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
             throw new OrmSqlException(ex.getMessage(), ex);
         } finally {
             close(con);
-        }   
+        }
 
     }
 
@@ -480,12 +481,17 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
 
     private String buildSelectQuery(Query root) throws OrmException {
         StringBuilder tablesQuery = new StringBuilder();
-        tablesQuery.append(format("SELECT DISTINCT %s.* FROM %s", fullTableName(root.getTable()), fullTableName(root.getTable())));
+        tablesQuery.append("SELECT DISTINCT  ");
+        StringJoiner fieldList = new StringJoiner(",");
+        for (Field field : root.getTable().getFields()) {
+            fieldList.add(format("%s AS %s", fullFieldName(root.getTable(), field), virtualFieldName(getFieldId(field))));
+        }
+        tablesQuery.append(fieldList.toString());
+        tablesQuery.append(format(" FROM %s",fullTableName(root.getTable()), fullTableName(root.getTable())));
         StringBuilder whereQuery = new StringBuilder();
         Optional<Criteria> optCrit = root.getCriteria();
         if (optCrit.isPresent()) {
             whereQuery.append(expandCriteria(root, optCrit.get()));
-
         }
         Optional<Link> optLink = root.getLink();
         if (optLink.isPresent()) {
@@ -612,6 +618,7 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
     }
 
     private void setValueInPojo(Object pojo, Field field, ResultSet rs) throws OrmException {
+        String column = getFieldId(field);
         switch (field.getFieldType()) {
             case LONG:
             case INTEGER:
@@ -626,10 +633,10 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
                 pops.setValue(pojo, field, getValueFromResultSet(rs, field));
                 break;
             case TIMESTAMP:
-                pops.setValue(pojo, field, getTimestampFromSql(rs, field));
+                pops.setValue(pojo, field, getTimestampFromSql(rs, column));
                 break;
             case DURATION:
-                pops.setValue(pojo, field, getDurationFromSql(rs, field));
+                pops.setValue(pojo, field, getDurationFromSql(rs, column));
                 break;
             default:
                 throw new OrmException(format("Field type '%s' is unsupported. BUG!", field.getFieldType()));
@@ -743,8 +750,8 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
      *                      data.
      */
     private Object getValueFromResultSet(ResultSet rs, Field field) throws OrmException {
+        String column = getFieldId(field);
         try {
-            String column = field.getSqlName();
             switch (field.getFieldType()) {
                 case LONG:
                     return rs.getLong(column);
@@ -847,17 +854,17 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
      * Get a timestamp value from SQL for the given POJO and field
      *
      * @param rs    The ResultSet
-     * @param field The field
+     * @param column The SQL column
      * @return The correct value
      */
-    private Instant getTimestampFromSql(ResultSet rs, Field field) throws OrmException {
+    private Instant getTimestampFromSql(ResultSet rs, String column) throws OrmException {
         try {
-            Timestamp value = rs.getTimestamp(field.getSqlName());
+            Timestamp value = rs.getTimestamp(column);
             if (value == null) {
                 return null;
             }
             if (!(value instanceof Timestamp)) {
-                throw new OrmException(format("Could not read Timestamp value from SQL for field '%s' with type '%s'.", field.getJavaName(), field.getFieldType()));
+                throw new OrmException(format("Could not read Timestamp value from SQL for field '%s'", column));
             }
             return ((Timestamp) value).toInstant();
         } catch (SQLException ex) {
@@ -869,12 +876,12 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
      * Get a duration value from SQL for the given POJO and field
      *
      * @param rs    The ResultSet
-     * @param field The field
+     * @param column  The SQL column field
      * @return The correct value
      */
-    private Duration getDurationFromSql(ResultSet rs, Field field) throws OrmException {
+    private Duration getDurationFromSql(ResultSet rs, String column) throws OrmException {
         try {
-            String value = rs.getString(field.getSqlName());
+            String value = rs.getString(column);
             if (value == null) {
                 return null;
             }
@@ -1173,4 +1180,16 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
         }
     }
 
+    private String getFieldId(Field field) {
+        return fieldIds.computeIfAbsent(field, k -> makeFieldId(k));
+    }
+
+    private String makeFieldId(Field field) {
+        String uuid;
+        do { // very simple collison avoidance
+            uuid = UUID.randomUUID().toString().substring(0, 8);
+        }
+        while (fieldIds.containsKey(uuid));
+        return uuid;
+    }
 }

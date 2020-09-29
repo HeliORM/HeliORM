@@ -14,7 +14,7 @@ import java.util.Optional;
  */
 public interface Field<T extends Table<O>, O, C> {
 
-    public enum FieldType {
+    enum FieldType {
         LONG, INTEGER, SHORT, BYTE,
         DOUBLE, FLOAT,
         BOOLEAN,

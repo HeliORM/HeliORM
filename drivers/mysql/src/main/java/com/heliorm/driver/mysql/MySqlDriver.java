@@ -102,6 +102,6 @@ public final class MySqlDriver extends SqlDriver {
 
     @Override
     protected boolean supportsUnionAll() {
-        return false;
+        return true;
     }
 }

@@ -5,6 +5,8 @@ import com.heliorm.OrmException;
 import com.heliorm.Table;
 import com.heliorm.def.Field;
 
+import java.util.Objects;
+
 /**
  *
  * @author gideon
@@ -76,10 +78,6 @@ public abstract class FieldPart<T extends Table<O>, O, C> extends Part<T, O, T, 
             return super.left();
         }
         return left;
-    }
-
-    void setLeft(Part left) {
-        this.left = left;
     }
 
     @Override
