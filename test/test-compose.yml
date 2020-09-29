@@ -1,0 +1,36 @@
+version: "3"
+services:
+  mariadb:
+    image: mariadb
+    container_name: mariadb
+    ports:
+      - 127.0.0.1:3306:3306
+    networks:
+      - test
+    volumes:
+      - mariadb:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: dev
+      MYSQL_DATABASE: petz
+      TZ: Africa/Johannesburg
+
+  postgres:
+    image:  postgres:latest
+    container_name: postgres
+    ports:
+      - 127.0.0.1:5432:5432
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    networks:
+      - test
+    environment:
+      POSTGRES_PASSWORD: dev
+      POSTGRES_DB: petz
+
+networks:
+  test:
+    driver: bridge
+
+volumes:
+  mariadb: {}
+  postgres: {}

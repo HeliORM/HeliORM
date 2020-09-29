@@ -5,21 +5,34 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import test.persons.Person;
+import test.pets.Bird;
 import test.pets.Cat;
 import test.pets.Dog;
-import test.pets.Mamal;
+import test.pets.Pet;
 import test.place.Province;
 import test.place.Town;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import static com.heliorm.TestData.*;
+import static com.heliorm.TestData.makeCats;
+import static com.heliorm.TestData.makeDogs;
+import static com.heliorm.TestData.makePersons;
+import static com.heliorm.TestData.makeProvinces;
+import static com.heliorm.TestData.makeTowns;
 import static java.lang.String.format;
-import static org.junit.jupiter.api.Assertions.*;
-import static test.Tables.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static test.Tables.CAT;
+import static test.Tables.PERSON;
+import static test.Tables.PET;
+import static test.Tables.PROVINCE;
+import static test.Tables.TOWN;
 
 public class SelectTest extends AbstractOrmTest {
 
@@ -28,6 +41,7 @@ public class SelectTest extends AbstractOrmTest {
     private static List<Person> persons;
     private static List<Cat> cats;
     private static List<Dog> dogs;
+    private static List<Bird> birds;
 
 
     @BeforeAll
@@ -153,10 +167,11 @@ public class SelectTest extends AbstractOrmTest {
     @Test
     public void testSelectOnAbstract() throws Exception {
         say("Testing select on an abstract object");
-        List<Mamal> all = orm().select(MAMAL).list();
-        List<Mamal> wanted = new ArrayList<>();
+        List<Pet> all = orm().select(PET).list();
+        List<Pet> wanted = new ArrayList<>();
         wanted.addAll(cats);
         wanted.addAll(dogs);
+        wanted.addAll(birds);
         assertNotNull(all, "The list returned by list() should be non-null");
         assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
         assertTrue(listCompareOrdered(all, wanted), "The items loaded are exactly the same as the ones we expected");
@@ -179,7 +194,7 @@ public class SelectTest extends AbstractOrmTest {
     }
 
     @Test
-    public void testJoinWithSameKeys() throws Exception {
+    public void testSelectJoinWithSameKeys() throws Exception {
         say("Testing select with a join with same key names");
         List<Town> selected = orm().select(TOWN)
                 .join(PROVINCE).on(TOWN.provinceId, PROVINCE.provinceId)
@@ -188,6 +203,27 @@ public class SelectTest extends AbstractOrmTest {
 
         List<Town> wanted = towns.stream()
                 .filter(town -> town.getProvinceId().equals(provinces.get(0).getProvinceId()))
+                .collect(Collectors.toList());
+
+        assertNotNull(selected, "The list returned by list() should be non-null");
+        assertTrue(selected.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", selected.size(), wanted.size()));
+        assertTrue(listCompareOrdered(selected, wanted), "The items loaded are exactly the same as the ones we expected");
+    }
+
+    @Test
+    public void testSelectAbstractJoinWithSameKeys() throws Exception {
+        say("Testing select of abstract type with a join with same key names");
+        List<Pet> selected = orm().select(PET)
+                .join(PERSON).on(PET.personId, PERSON.id)
+                .where(PERSON.firstName.eq(persons.get(0).getFirstName()))
+                .list();
+
+        Map<Long, Person> personMap = persons.stream()
+                .filter(person -> person.getFirstName().equals(persons.get(0).getFirstName()))
+                .collect(Collectors.toMap(person -> person.getId(), person -> person));
+
+        List<Pet> wanted = Stream.concat(cats.stream(), dogs.stream())
+                .filter(pet -> personMap.containsKey(pet.getPersonId()))
                 .collect(Collectors.toList());
 
         assertNotNull(selected, "The list returned by list() should be non-null");
