@@ -67,6 +67,7 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
     private SqlTransaction currentTransaction;
     private boolean createTables = false;
     private boolean rollbackOnUncommittedClose = false;
+    private boolean useUnionAll = false;
     private final Map<Table, String> inserts = new HashMap();
     private final Map<Table, String> updates = new HashMap();
     private final Map<Table, String> deletes = new HashMap();
@@ -139,6 +140,11 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
         rollbackOnUncommittedClose = rollback;
     }
 
+    public final void setUseUnionAll(boolean useUnionAll) {
+        this.useUnionAll = useUnionAll;
+    }
+
+
     /**
      * Configure driver to create missing SQL tables.
      *
@@ -150,6 +156,10 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
 
     final boolean getRollbackOnUncommittedClose() {
         return rollbackOnUncommittedClose;
+    }
+
+    private boolean useUnionAll() {
+        return useUnionAll && supportsUnionAll();
     }
 
     private String buildSelectUnionQuery(List<List<Part>> queries) throws OrmException {
@@ -417,7 +427,7 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
         stmt.setString(par, value);
     }
 
-    protected abstract boolean useUnionAll();
+    protected abstract boolean supportsUnionAll();
 
     private String buildInsertQuery(Table<?> table) throws OrmException {
         StringBuilder query = new StringBuilder();

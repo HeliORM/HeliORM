@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.heliorm.TestData.makeBirds;
 import static com.heliorm.TestData.makeCats;
 import static com.heliorm.TestData.makeDogs;
 import static com.heliorm.TestData.makePersons;
@@ -51,6 +52,7 @@ public class SelectTest extends AbstractOrmTest {
         persons = createAll(makePersons(towns));
         cats = createAll(makeCats(persons.size() * 5, persons));
         dogs = createAll(makeDogs(persons.size() * 4, persons));
+        birds = createAll(makeBirds(persons.size()*2, persons));
     }
 
 
@@ -222,7 +224,7 @@ public class SelectTest extends AbstractOrmTest {
                 .filter(person -> person.getFirstName().equals(persons.get(0).getFirstName()))
                 .collect(Collectors.toMap(person -> person.getId(), person -> person));
 
-        List<Pet> wanted = Stream.concat(cats.stream(), dogs.stream())
+        List<Pet> wanted = Stream.concat(Stream.concat(cats.stream(), dogs.stream()), birds.stream())
                 .filter(pet -> personMap.containsKey(pet.getPersonId()))
                 .collect(Collectors.toList());
 

@@ -25,6 +25,7 @@ public class OrmBuilder {
     private PojoOperations pops;
     private boolean rollbackOnUncommittedClose = false;
     private boolean createMissingTables = false;
+    private boolean useUnionAll = true;
 
     /**
      * Create a new OrmBuilder using the given connection supplier. This makes
@@ -93,6 +94,17 @@ public class OrmBuilder {
         return this;
     }
 
+    /** Configure the ORM to use or not use SQU 'UNION ALL' statements.
+     * Default is true
+     *
+     * @param useUnionAll Use or don't use 'UNION ALL'
+     * @return The OrmBuilder
+     */
+    public OrmBuilder setUseUnionAll(boolean useUnionAll) {
+        this.useUnionAll = useUnionAll;
+        return this;
+    }
+
     /**
      * Create the ORM based on the setup supplied using the builder pattern.
      *
@@ -109,6 +121,7 @@ public class OrmBuilder {
             Constructor<? extends  SqlDriver> constructor = driverClass.getConstructor(Supplier.class, PojoOperations.class, Map.class);
             driver = constructor.newInstance(con, pops, aliases);
             driver.setCreateTables(createMissingTables);
+            driver.setUseUnionAll(useUnionAll);
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException e) {
             throw new OrmException(format("Cannot start driver of type '%s' (%s)", driverClass.getSimpleName(), e.getMessage()),e);
         }

@@ -1,12 +1,14 @@
 package com.heliorm;
 
 import test.persons.Person;
+import test.pets.Bird;
 import test.pets.Cat;
 import test.pets.Dog;
 import test.pets.Pet;
 import test.place.Province;
 import test.place.Town;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -175,6 +177,13 @@ class TestData {
         return dog;
     }
 
+    static Bird makeBird(Person person) {
+        Bird bird = new Bird();
+        bird = makePet(bird, person);
+        bird.setType(random.nextBoolean() ? Bird.Type.CAGED : Bird.Type.FREERANGE);
+        bird.setSingTime(Duration.ofMinutes(random.nextInt(31)));
+        return bird;
+    }
 
     static Person makePerson(int n) {
         Person person = new Person();
@@ -217,7 +226,13 @@ class TestData {
         }
         return res;
     }
-
+    static List<Bird> makeBirds(int n, List<Person> persons) {
+        List<Bird> res = new ArrayList<>();
+        for (int i = 0; i < n; i++) {
+            res.add(makeBird(persons.get(random.nextInt(persons.size()))));
+        }
+        return res;
+    }
     private static <P extends Pet> P makePet(P pet, Person person) {
         pet.setAge(random.nextInt(18));
         pet.setName(PEOPLE_NAMES[random.nextInt(PEOPLE_NAMES.length)]);

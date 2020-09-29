@@ -88,7 +88,7 @@ public final class PostgreSqlDriver extends SqlDriver {
     }
 
     @Override
-    protected boolean useUnionAll() {
+    protected boolean supportsUnionAll() {
         return true;
     }
 }
