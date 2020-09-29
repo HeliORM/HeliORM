@@ -3,6 +3,7 @@ package com.heliorm;
 import com.heliorm.def.Field;
 import com.heliorm.driver.SqlDriver;
 import com.heliorm.driver.mysql.MySqlDriver;
+import com.heliorm.driver.postgresql.PostgreSqlDriver;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.h2.jdbcx.JdbcDataSource;
@@ -44,11 +45,16 @@ abstract class AbstractOrmTest {
                 jdbcDataSource = setupMysqlDataSource();
                 driver = MySqlDriver.class;
                 break;
+            case "postgresql":
+                jdbcDataSource = setupPostgreSqlDatasource();
+                driver = PostgreSqlDriver.class;
+                break;
             case "h2" :
             default:
                 jdbcDataSource = setupH2DataSource();
                 driver = MySqlDriver.class;
         }
+        say("Using %s data source with driver %s", dbType, driver.getSimpleName());
         pops = new UnsafePojoOperations();
         orm = OrmBuilder.create(AbstractOrmTest::getConnection, driver)
                 .setCreateMissingTables(true)
@@ -171,7 +177,7 @@ abstract class AbstractOrmTest {
                 .collect(Collectors.toList());
     }
 
-    protected final void say(String fmt, Object... args) {
+    protected static final void say(String fmt, Object... args) {
         System.out.printf(fmt, args);
         System.out.println();
     }
@@ -191,4 +197,13 @@ abstract class AbstractOrmTest {
         return ds;
     }
 
+
+    private static DataSource setupPostgreSqlDatasource() throws SQLException {
+        HikariConfig conf = new HikariConfig();
+        conf.setJdbcUrl("jdbc:postgresql://127.0.0.1:5432/petz");
+        conf.setUsername("postgres");
+        conf.setPassword("dev");
+        HikariDataSource ds = new HikariDataSource(conf);
+        return ds;
+    }
 }

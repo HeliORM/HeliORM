@@ -54,6 +54,7 @@ public class AutoNumberTest extends AbstractOrmTest {
         say("Testing create with auto-number String key");
         Town town = new Town();
         town.setName("Somerset West");
+        town.setProvinceId(0L);
         Town saved = orm().create(town);
         assertNotNull(saved, "The object returned by create should not be null");
         assertTrue(town.getId() == null, "The id of the new object must be null before create");

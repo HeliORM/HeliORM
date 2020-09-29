@@ -43,12 +43,23 @@
             <version>8.0.20</version>
             <scope>test</scope>
         </dependency>
-
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.2.10</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>com.heliorm</groupId>
             <artifactId>core</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.heliorm</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>0.72</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
