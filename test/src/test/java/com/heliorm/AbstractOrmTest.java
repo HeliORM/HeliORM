@@ -59,7 +59,7 @@ abstract class AbstractOrmTest {
         orm = OrmBuilder.create(AbstractOrmTest::getConnection, driver)
                 .setCreateMissingTables(true)
                 .setRollbackOnUncommittedClose(false)
-                .setUseUnionAll(false)
+
                 .build();
         deleteAll(Cat.class);
         deleteAll(Dog.class);

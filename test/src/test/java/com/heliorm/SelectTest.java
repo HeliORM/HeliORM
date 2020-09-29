@@ -237,6 +237,7 @@ public class SelectTest extends AbstractOrmTest {
     public static void removeData() throws OrmException {
         deleteAll(Cat.class);
         deleteAll(Dog.class);
+        deleteAll(Bird.class);
         deleteAll(Person.class);
         deleteAll(Town.class);
         deleteAll(Province.class);
