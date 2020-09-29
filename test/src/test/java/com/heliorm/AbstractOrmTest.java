@@ -184,7 +184,7 @@ abstract class AbstractOrmTest {
 
     private static DataSource setupMysqlDataSource() throws SQLException {
         HikariConfig conf = new HikariConfig();
-        conf.setJdbcUrl("jdbc:mysql://0.0.0.0:3306/petz");
+        conf.setJdbcUrl("jdbc:mysql://127.0.0.1:3306/petz");
         conf.setUsername("root");
         conf.setPassword("dev");
         HikariDataSource ds = new HikariDataSource(conf);

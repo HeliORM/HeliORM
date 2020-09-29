@@ -97,11 +97,11 @@ public class SelectTest extends AbstractOrmTest {
     @Test
     public void testSelectOrder() throws Exception {
         say("Testing select with a simple ordering");
-        List<Cat> wanted = cats.stream()
-                .sorted(Comparator.comparing(Cat::getName))
+        List<Town> wanted = towns.stream()
+                .sorted(Comparator.comparing(Town::getName))
                 .collect(Collectors.toList());
-        List<Cat> all = orm().select(CAT)
-                .orderBy(CAT.name)
+        List<Town> all = orm().select(TOWN)
+                .orderBy(TOWN.name)
                 .list();
         assertNotNull(all, "The list returned by list() should be non-null");
         assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
@@ -112,13 +112,17 @@ public class SelectTest extends AbstractOrmTest {
     public void testSelectOrderDesc() throws Exception {
         say("Testing select with a descending ordering");
         List<Cat> wanted = cats.stream()
-                .sorted(Comparator.comparing((Cat cat) -> cat.getName())
-                        .thenComparing((Cat cat) -> cat.getAge())
+                .sorted(Comparator.comparing(Cat::getName)
+                        .thenComparing(Cat::getAge)
+                        .thenComparing(Cat::getType)
+                        .thenComparing(Cat::getPersonId)
                         .reversed())
                 .collect(Collectors.toList());
         List<Cat> all = orm().select(CAT)
                 .orderByDesc(CAT.name)
                 .thenByDesc(CAT.age)
+                .thenByDesc(CAT.type)
+                .thenByDesc(CAT.personId)
                 .list();
         assertNotNull(all, "The list returned by list() should be non-null");
         assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
@@ -130,17 +134,16 @@ public class SelectTest extends AbstractOrmTest {
     public void testSelectOrderThen() throws Exception {
         say("Testing select with a complex ordering");
         List<Cat> wanted = cats.stream()
-                .sorted((c1, c2) -> {
-                    int o = c1.getAge() - c2.getAge();
-                    if (o == 0) {
-                        return c1.getName().compareTo(c2.getName());
-                    }
-                    return o;
-                })
+                .sorted(Comparator.comparing(Cat::getAge)
+                        .thenComparing(Cat::getName)
+                        .thenComparing(Cat::getPersonId)
+                        .thenComparing(Cat::getId))
                 .collect(Collectors.toList());
         List<Cat> all = orm().select(CAT)
                 .orderBy(CAT.age)
                 .thenBy(CAT.name)
+                .thenBy(CAT.personId)
+                .thenBy(CAT.id)
                 .list();
         assertNotNull(all, "The list returned by list() should be non-null");
         assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
