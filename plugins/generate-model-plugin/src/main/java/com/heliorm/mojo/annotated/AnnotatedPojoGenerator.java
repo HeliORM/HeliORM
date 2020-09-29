@@ -2,23 +2,18 @@ package com.heliorm.mojo.annotated;
 
 import com.heliorm.Database;
 import com.heliorm.annotation.Pojo;
+import com.heliorm.mojo.GenerateModel;
+import com.heliorm.mojo.Generator;
+import com.heliorm.mojo.GeneratorException;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfo;
 import io.github.classgraph.ClassInfoList;
 import io.github.classgraph.ScanResult;
 
-import static java.lang.String.format;
-
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-
-import com.heliorm.mojo.GenerateModel;
-import com.heliorm.mojo.Generator;
-import com.heliorm.mojo.GeneratorException;
 
 /**
  * @author gideon
@@ -33,6 +28,7 @@ public class AnnotatedPojoGenerator implements Generator<AnnotatedPojoTable> {
         scan = new ClassGraph()
                 .enableAllInfo()
                 .addClassLoader(generator.getLocalClassLoader())
+                .addClassLoader(generator.getGlobalClassLoader())
                 .whitelistPackages(generator.getPackages().toArray(new String[]{}))
                 .scan();
     }
