@@ -1,10 +1,19 @@
 package com.heliorm;
 
 import com.heliorm.def.Field;
+import com.heliorm.driver.SqlDriver;
 import com.heliorm.driver.mysql.MySqlDriver;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import org.h2.jdbcx.JdbcDataSource;
 import org.junit.jupiter.api.BeforeAll;
+import test.persons.Person;
+import test.pets.Cat;
+import test.pets.Dog;
+import test.place.Province;
+import test.place.Town;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -13,8 +22,9 @@ import java.util.stream.Collectors;
 
 abstract class AbstractOrmTest {
 
-    protected static Orm orm;
-    private static JdbcDataSource jdbcDataSource;
+    private static Orm orm;
+    private static DataSource jdbcDataSource;
+    private static Class<? extends SqlDriver> driver;
     private static PojoOperations pops;
 
     private static Connection getConnection() {
@@ -27,13 +37,32 @@ abstract class AbstractOrmTest {
 
     @BeforeAll
     public static void setup() throws Exception {
-        jdbcDataSource = new JdbcDataSource();
-        jdbcDataSource.setUrl("jdbc:h2:mem:petz;DB_CLOSE_DELAY=-1;INIT=CREATE SCHEMA IF NOT EXISTS petz;MODE=MYSQL;DATABASE_TO_UPPER=false");
+        String dbType = System.getenv("ORM_TEST_DB");
+        dbType = (dbType == null) ? "" : dbType;
+        switch (dbType) {
+            case "mysql":
+                jdbcDataSource = setupMysqlDataSource();
+                driver = MySqlDriver.class;
+                break;
+            case "h2" :
+            default:
+                jdbcDataSource = setupH2DataSource();
+                driver = MySqlDriver.class;
+        }
         pops = new UnsafePojoOperations();
-        orm = OrmBuilder.create(AbstractOrmTest::getConnection, MySqlDriver.class)
+        orm = OrmBuilder.create(AbstractOrmTest::getConnection, driver)
                 .setCreateMissingTables(true)
                 .setRollbackOnUncommittedClose(false)
                 .build();
+        deleteAll(Cat.class);
+        deleteAll(Dog.class);
+        deleteAll(Person.class);
+        deleteAll(Town.class);
+        deleteAll(Province.class);
+    }
+
+    protected final Orm orm() {
+        return orm;
     }
 
     /**
@@ -113,11 +142,11 @@ abstract class AbstractOrmTest {
             return orm.select(orm.tableFor(type.newInstance())).list();
         } catch (InstantiationException | IllegalAccessException e) {
 
-            throw new OrmException(e.getMessage(),e);
+            throw new OrmException(e.getMessage(), e);
         }
     }
 
-    protected static <O> void deleteall(Class<O> type) throws OrmException {
+    protected static <O> void deleteAll(Class<O> type) throws OrmException {
         for (O obj : selectAll(type)) {
             orm.delete(obj);
         }
@@ -145,6 +174,21 @@ abstract class AbstractOrmTest {
     protected final void say(String fmt, Object... args) {
         System.out.printf(fmt, args);
         System.out.println();
+    }
+
+    private static DataSource setupH2DataSource() {
+        JdbcDataSource jdbcDataSource = new JdbcDataSource();
+        jdbcDataSource.setUrl("jdbc:h2:mem:petz;DB_CLOSE_DELAY=-1;INIT=CREATE SCHEMA IF NOT EXISTS petz;MODE=MYSQL;DATABASE_TO_UPPER=false");
+        return jdbcDataSource;
+    }
+
+    private static DataSource setupMysqlDataSource() throws SQLException {
+        HikariConfig conf = new HikariConfig();
+        conf.setJdbcUrl("jdbc:mysql://0.0.0.0:3306/petz");
+        conf.setUsername("root");
+        conf.setPassword("dev");
+        HikariDataSource ds = new HikariDataSource(conf);
+        return ds;
     }
 
 }
