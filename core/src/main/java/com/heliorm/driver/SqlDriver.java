@@ -49,6 +49,7 @@ import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.StringJoiner;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -67,13 +68,13 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
     private boolean createTables = false;
     private boolean rollbackOnUncommittedClose = false;
     private boolean useUnionAll = false;
-    private final Map<Table, String> inserts = new HashMap();
-    private final Map<Table, String> updates = new HashMap();
-    private final Map<Table, String> deletes = new HashMap();
-    private final Map<Table, Boolean> exists = new HashMap();
+    private final Map<Table, String> inserts = new ConcurrentHashMap<>();
+    private final Map<Table, String> updates = new ConcurrentHashMap();
+    private final Map<Table, String> deletes = new ConcurrentHashMap();
+    private final Map<Table, Boolean> exists = new ConcurrentHashMap();
     private final PojoOperations pops;
     private final Map<Database, Database> aliases;
-    private final Map<Field, String> fieldIds = new HashMap();
+    private final Map<Field, String> fieldIds = new ConcurrentHashMap<>();
 
     public SqlDriver(Supplier<Connection> connectionSupplier, PojoOperations pops) {
         this(connectionSupplier, pops, Collections.EMPTY_MAP);
