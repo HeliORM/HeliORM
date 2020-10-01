@@ -804,7 +804,7 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
                     throw new OrmException(format("Field type '%s' is unsupported. BUG!", field.getFieldType()));
             }
         } catch (SQLException ex) {
-            throw new OrmSqlException(ex.getMessage(), ex);
+            throw new OrmSqlException(format("Error reading field value from SQL for '%s' (%s)", field.getJavaName(), ex.getMessage()), ex);
         }
     }
 
