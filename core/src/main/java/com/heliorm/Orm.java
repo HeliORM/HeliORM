@@ -6,11 +6,13 @@ import com.heliorm.impl.Part;
 import com.heliorm.impl.SelectPart;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.ServiceLoader;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -28,6 +30,7 @@ public final class Orm implements AutoCloseable {
 
     private final OrmDriver driver;
     private final Map<Class<?>, Table> tables = new HashMap();
+    private final Set<Stream>  unclosedStreams = new HashSet();
 
     /**
      * Create an ORM mapper using the supplied driver instance. This is meant to
@@ -111,6 +114,7 @@ public final class Orm implements AutoCloseable {
 
     @Override
     public void close() throws OrmException {
+        unclosedStreams.forEach(Stream::close);
     }
 
     /**
@@ -168,7 +172,10 @@ public final class Orm implements AutoCloseable {
      *                      go wrong did go wrong.
      */
     public <O, P extends Part & Executable> Stream<O> stream(P tail) throws OrmException {
-        return driver.stream(tail);
+        Stream<O> stream = driver.stream(tail);
+        unclosedStreams.add(stream);
+        stream.onClose(() -> unclosedStreams.remove(stream));
+        return stream;
     }
 
     /**
