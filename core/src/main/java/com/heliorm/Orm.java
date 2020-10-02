@@ -5,14 +5,11 @@ import com.heliorm.def.Select;
 import com.heliorm.impl.Part;
 import com.heliorm.impl.SelectPart;
 
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.ServiceLoader;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -30,16 +27,15 @@ public final class Orm implements AutoCloseable {
 
 
     private final OrmDriver driver;
-    private final Map<Class<?>, Table> tables = new HashMap();
+    private final Map<Class<?>, Table<?>> tables = new ConcurrentHashMap<>();
 
     /**
      * Create an ORM mapper using the supplied driver instance. This is meant to
      * be used with third party drivers.
      *
      * @param driver The driver used to access data.
-     * @throws OrmException
      */
-    public Orm(OrmDriver driver) throws OrmException {
+     Orm(OrmDriver driver) {
         this.driver = driver;
     }
 
@@ -97,7 +93,7 @@ public final class Orm implements AutoCloseable {
      * query data.
      */
     public <T extends Table<O>, O> Select<T, O, T, O> select(T table) {
-        return new SelectPart(null, table, this);
+        return new SelectPart<>(null, table, this);
     }
 
     /** Open a new transaction.
@@ -113,7 +109,7 @@ public final class Orm implements AutoCloseable {
     }
 
     @Override
-    public void close() throws OrmException {
+    public void close() {
     }
 
     /**
@@ -131,16 +127,16 @@ public final class Orm implements AutoCloseable {
         if (tables.isEmpty()) {
             ServiceLoader<Database> svl = ServiceLoader.load(Database.class);
             for (Database database : svl) {
-                for (Table table : database.getTables()) {
+                for (Table<?> table : database.getTables()) {
                     tables.put(table.getObjectClass(), table);
                 }
             }
         }
-        Table<O> table = tables.get(pojo.getClass());
+        Table<?> table = tables.get(pojo.getClass());
         if (table == null) {
             throw new OrmException("Cannot find table for pojo of type " + pojo.getClass().getCanonicalName());
         }
-        return table;
+        return (Table<O>) table;
     }
 
     /**
