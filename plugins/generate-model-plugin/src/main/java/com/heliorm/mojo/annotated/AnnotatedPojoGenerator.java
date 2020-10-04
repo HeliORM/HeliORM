@@ -23,13 +23,13 @@ public class AnnotatedPojoGenerator implements Generator<AnnotatedPojoTable> {
     private ScanResult scan;
     private final GenerateModel generator;
 
-    public AnnotatedPojoGenerator(GenerateModel generator) throws GeneratorException {
+    public AnnotatedPojoGenerator(GenerateModel generator, Set<String> packages) throws GeneratorException {
         this.generator = generator;
         scan = new ClassGraph()
                 .enableAllInfo()
                 .addClassLoader(generator.getLocalClassLoader())
                 .addClassLoader(generator.getGlobalClassLoader())
-                .whitelistPackages(generator.getPackages().toArray(new String[]{}))
+                .whitelistPackages(packages.toArray(new String[]{}))
                 .scan();
     }
 

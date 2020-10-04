@@ -18,9 +18,9 @@ class Modeller<T extends Table> {
     private Map<String, String> classPackageMap;
     private Map<String, PackageDatabase> packageDatabases;
 
-    Modeller(Generator gen) throws GeneratorException {
+    Modeller(Generator gen, Set<String> topLevelPackages) throws GeneratorException {
         this.gen = gen;
-        generate();
+        generate(topLevelPackages);
     }
 
     Map<String, PackageDatabase> getPackageDatabases() {
@@ -31,11 +31,10 @@ class Modeller<T extends Table> {
         return packageDatabases.get(classPackageMap.get(className));
     }
 
-    private void generate() throws GeneratorException {
+    private void generate(Set<String> topLevelPackages) throws GeneratorException {
         Set<Class<?>> allPojoClasses = gen.getAllPojoClasses();
-        classPackageMap = makeDatabaseMap(allPojoClasses);
+        classPackageMap = makeDatabaseMap(topLevelPackages, allPojoClasses);
         Set<String> uniquePackages = classPackageMap.values().stream()
-                .distinct()
                 .collect(Collectors.toSet());
         packageDatabases = makeDatabases(uniquePackages);
         List<Entry> roots = buildTree(allPojoClasses);
@@ -76,19 +75,21 @@ class Modeller<T extends Table> {
         return root;
     }
 
-    private Map<String, String> makeDatabaseMap(Set<Class<?>> allPojoClasses) {
+    private Map<String, String> makeDatabaseMap(Set<String> topLevelPackages, Set<Class<?>> allPojoClasses) {
         Map<String, String> map = new HashMap();
         for (Class<?> clazz : allPojoClasses) {
             map.put(clazz.getCanonicalName(), clazz.getPackage().getName());
         }
-        reduce(map);
+        reduce(topLevelPackages, map);
         return map;
     }
 
-    private void reduce(Map<String, String> map) {
-        boolean changed = false;
+    private void reduce(Set<String> topLevelPackages, Map<String, String> map) {
         for (String c1 : map.keySet()) {
             String o1 = map.get(c1);
+            if (topLevelPackages.contains(o1)) {
+                continue;
+            }
             for (String c2 : map.keySet()) {
                 if (c1.equals(c2)) {
                     continue;

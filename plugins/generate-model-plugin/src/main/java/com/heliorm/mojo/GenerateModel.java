@@ -61,7 +61,7 @@ public class GenerateModel extends AbstractMojo {
             setupClassLoader();
             switch (strategy) {
                 case annotated:
-                    gen = new AnnotatedPojoGenerator(this);
+                    gen = new AnnotatedPojoGenerator(this, packages);
                     break;
                 default:
                     throw new MojoExecutionException(format("Unsupported POJO strategy '%s'. BUG?", strategy));
@@ -70,7 +70,7 @@ public class GenerateModel extends AbstractMojo {
             if (!dir.exists()) {
                 dir.mkdirs();
             }
-            modeller = new Modeller(gen);
+            modeller = new Modeller(gen, packages);
             Map<String, PackageDatabase> packageDatabases = modeller.getPackageDatabases();
             svc = new PrintWriter(new FileWriter(resourceDir + "/META-INF/services/" + Database.class.getCanonicalName()));
             Set<Output> outputs = new HashSet();
@@ -100,10 +100,6 @@ public class GenerateModel extends AbstractMojo {
 
     public ClassLoader getGlobalClassLoader() {
         return globalClassLoader;
-    }
-
-    public Set<String> getPackages() {
-        return packages;
     }
 
     String getTablesPackageFor(Table table) {

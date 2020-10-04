@@ -82,9 +82,7 @@
                         <configuration>
                             <strategy>annotated</strategy>
                             <packages>
-                                <package>test.pets</package>
-                                <package>test.persons</package>
-                                <package>test.place</package>
+                                <package>test</package>
                             </packages>
                             <database>petz</database>
                             <outputDir>${sourceOutputDir}</outputDir>
