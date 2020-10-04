@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.heliorm</groupId>
         <artifactId>orm</artifactId>
-        <version>0.74</version>
+        <version>0.75</version>
     </parent>
     <packaging>pom</packaging>
     <name>[HeliORM] Plugins</name>

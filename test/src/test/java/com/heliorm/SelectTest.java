@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import test.persons.Person;
 import test.pets.Bird;
 import test.pets.Cat;
+import test.pets.CatType;
 import test.pets.Dog;
 import test.pets.Pet;
 import test.place.Province;
@@ -86,10 +87,10 @@ public class SelectTest extends AbstractOrmTest {
         say("Testing select with a simple where clause with and");
         List<Cat> wanted = cats.stream()
                 .filter(cat -> cat.getAge() < 5)
-                .filter(cat -> cat.getType().equals(Cat.Type.INDOOR))
+                .filter(cat -> cat.getType().equals(CatType.INDOOR))
                 .collect(Collectors.toList());
         List<Cat> all = orm().select(CAT)
-                .where(CAT.age.lt(5)).and(CAT.type.eq(Cat.Type.INDOOR))
+                .where(CAT.age.lt(5)).and(CAT.type.eq(CatType.INDOOR))
                 .list();
         assertNotNull(all, "The list returned by list() should be non-null");
         assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));

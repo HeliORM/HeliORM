@@ -3,6 +3,7 @@ package com.heliorm;
 import test.persons.Person;
 import test.pets.Bird;
 import test.pets.Cat;
+import test.pets.CatType;
 import test.pets.Dog;
 import test.pets.Pet;
 import test.place.Province;
@@ -166,7 +167,7 @@ class TestData {
     static Cat makeCat(Person person) {
         Cat cat = new Cat();
         cat = makePet(cat, person);
-        cat.setType(random.nextBoolean() ? Cat.Type.INDOOR : Cat.Type.OUTDOOR);
+        cat.setType(random.nextBoolean() ? CatType.INDOOR : CatType.OUTDOOR);
         return cat;
     }
 
