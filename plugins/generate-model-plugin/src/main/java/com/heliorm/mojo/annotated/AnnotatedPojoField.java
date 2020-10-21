@@ -1,6 +1,8 @@
 package com.heliorm.mojo.annotated;
 
+import com.heliorm.Table;
 import com.heliorm.annotation.Column;
+import com.heliorm.annotation.ForeignKey;
 import com.heliorm.annotation.PrimaryKey;
 import com.heliorm.def.Field;
 
@@ -17,9 +19,11 @@ import static java.lang.String.format;
  */
 public class AnnotatedPojoField implements Field {
 
+    private final Table table;
     private final java.lang.reflect.Field pojoField;
 
-    public AnnotatedPojoField(java.lang.reflect.Field pojoField) {
+    public AnnotatedPojoField(Table table, java.lang.reflect.Field pojoField) {
+        this.table = table;
         this.pojoField = pojoField;
     }
 
@@ -129,6 +133,25 @@ public class AnnotatedPojoField implements Field {
                 return lA.get().nullable();
         }
         return false;
+    }
+
+    @Override
+    public boolean isForeignKey() {
+        return getAnnotation(ForeignKey.class).isPresent();
+    }
+
+    @Override
+    public Optional<Table<?>> getForeignTable() {
+        Optional<ForeignKey> fk = getAnnotation(ForeignKey.class);
+        if (fk.isPresent()) {
+            Class<?> type = fk.get().pojo();
+            if (type != null)  {
+                return table.getDatabase().getTables().stream()
+                        .filter(table -> table.getObjectClass().equals(type))
+                        .findFirst();
+            }
+        }
+        return Optional.empty();
     }
 
     /**

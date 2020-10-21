@@ -15,12 +15,18 @@ import java.util.Optional;
 public interface Field<T extends Table<O>, O, C> {
 
     enum FieldType {
-        LONG, INTEGER, SHORT, BYTE,
-        DOUBLE, FLOAT,
+        LONG,
+        INTEGER,
+        SHORT,
+        BYTE,
+        DOUBLE,
+        FLOAT,
         BOOLEAN,
         ENUM,
         STRING,
-        DATE, TIMESTAMP, DURATION;
+        DATE,
+        TIMESTAMP,
+        DURATION;
     }
 
     /**
@@ -54,9 +60,17 @@ public interface Field<T extends Table<O>, O, C> {
     /**
      * Returns true if this field represents the table's primary key.
      *
-     * @return True if it does
+     * @return True if it is
      */
     boolean isPrimaryKey();
+
+    /** Return true if this field is the foreign key from another table.
+     *
+     * @return True if it is
+     */
+    default boolean isForeignKey() {
+        return false;
+    }
 
     /**
      * Return true if this is an auto-number key
@@ -64,6 +78,14 @@ public interface Field<T extends Table<O>, O, C> {
      * @return True if auto-number
      */
     boolean isAutoNumber();
+
+    /**
+     * Return the table to which this field links if it is a foreign key.
+     * @return The linked table
+     */
+    default Optional<Table<?>> getForeignTable() {
+        return Optional.empty();
+    }
 
     /**
      * Return the field length, if a specific length is known.

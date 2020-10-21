@@ -42,7 +42,7 @@ public class CrudTest extends AbstractOrmTest {
         Person person = persons.get(0);
         Cat cat = makeCat(person);
         Cat saved = orm().create(cat);
-        cats.add(saved);
+        cats.add(saved);    
         assertNotNull(saved, "The object returned by create should not be null");
         assertTrue(cat.getId() == null, "The id of the new object must be null before create");
         assertTrue(saved.getId() != null, "The id of the new object must be not-null after create");

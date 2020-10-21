@@ -1,9 +1,10 @@
 package com.heliorm.impl;
 
-import java.util.ArrayList;
-import java.util.List;
 import com.heliorm.Database;
 import com.heliorm.Table;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -13,7 +14,7 @@ public class AliasDatabase implements Database {
 
     private final Database database;
     private final String sqlDatabase;
-    private List<Table> tables;
+    private List<Table<?>> tables;
 
     public AliasDatabase(Database database, String sqlDatabase) {
         this.database = database;
@@ -26,7 +27,7 @@ public class AliasDatabase implements Database {
     }
 
     @Override
-    public List<Table> getTables() {
+    public List<Table<?>> getTables() {
         if (tables == null) {
             tables = new ArrayList();
             for (Table<?> table : database.getTables()) {

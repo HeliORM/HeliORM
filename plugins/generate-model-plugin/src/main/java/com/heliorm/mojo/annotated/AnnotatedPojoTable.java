@@ -1,5 +1,11 @@
 package com.heliorm.mojo.annotated;
 
+import com.heliorm.Database;
+import com.heliorm.Table;
+import com.heliorm.annotation.Ignore;
+import com.heliorm.annotation.Pojo;
+import com.heliorm.def.Field;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -9,12 +15,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-
-import com.heliorm.Database;
-import com.heliorm.Table;
-import com.heliorm.annotation.Ignore;
-import com.heliorm.annotation.Pojo;
-import com.heliorm.def.Field;
 
 /**
  * Implementation of Table that is build from POJO annotations.
@@ -60,7 +60,7 @@ public final class AnnotatedPojoTable implements Table {
             fieldModels = new ArrayList();
             for (java.lang.reflect.Field field : fields) {
                 if (isDataField(field)) {
-                    fieldModels.add(new AnnotatedPojoField(field));
+                    fieldModels.add(new AnnotatedPojoField(this, field));
                 }
             }
         }

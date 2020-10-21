@@ -144,7 +144,7 @@ class Output {
             }
 
             out.println("@Override");
-            out.println("\tpublic final List<Table> getTables() {");
+            out.println("\tpublic final List<Table<?>> getTables() {");
             out.printf("\t\treturn Arrays.asList(%s);", sj.toString());
             out.println("\n\t}");
             out.println("");
@@ -329,7 +329,7 @@ class Output {
 
     }
 
-    private void addType2Field(Class<? extends Field> fieldClass, Class<? extends FieldPart> partClass, Table cm, Field fm) throws GeneratorException {
+    private void addType2Field(Class<? extends Field> fieldClass, Class<? extends FieldPart> partClass, Table cm, Field<?,?,?> fm) throws GeneratorException {
         impt(fieldClass);
         impt(partClass);
         boolean isKey = fm.isPrimaryKey();
@@ -382,6 +382,24 @@ class Output {
             emit("public boolean isNullable() {");
             push();
             emit("return true;");
+            pop();
+            emit("}");
+            pop();
+        }
+        if (fm.isForeignKey()) {
+            Table<?> table = fm.getForeignTable().get();
+            push();
+            emit("@Override");
+            emit("public boolean isForeignKey() {");
+            push();
+            emit("return true;");
+            pop();
+            emit("}");
+            emit("");
+            emit("@Override");
+            emit("public Optional<Table<?>> getForeignTable() {");
+            push();
+            emit("return Optional.of(%s);",shortFieldName(table));
             pop();
             emit("}");
             pop();

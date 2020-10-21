@@ -22,6 +22,6 @@ public interface Database {
      *
      * @return The tables
      */
-    List<Table> getTables();
+    List<Table<?>> getTables();
 
 }

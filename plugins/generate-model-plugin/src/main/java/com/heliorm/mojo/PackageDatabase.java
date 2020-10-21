@@ -1,10 +1,10 @@
 package com.heliorm.mojo;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.heliorm.Database;
 import com.heliorm.Table;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Implementation of database that organizes tables for POJO classes in a table
@@ -16,7 +16,7 @@ public class PackageDatabase implements Database {
 
     private final String packageName;
     private String sqlDatabase;
-    private final List<Table> tables = new ArrayList();
+    private final List<Table<?>> tables = new ArrayList();
 
     /**
      * Create a database package with the given package name.
@@ -34,7 +34,7 @@ public class PackageDatabase implements Database {
     }
 
     @Override
-    public List<Table> getTables() {
+    public List<Table<?>> getTables() {
         return tables;
     }
 
