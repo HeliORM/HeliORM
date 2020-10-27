@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static java.lang.String.format;
+
 /**
  * @author gideon
  */
@@ -75,56 +77,21 @@ class Modeller<T extends Table> {
         return root;
     }
 
-    private Map<String, String> makeDatabaseMap(Set<String> topLevelPackages, Set<Class<?>> allPojoClasses) {
+    private Map<String, String> makeDatabaseMap(Set<String> topLevelPackages, Set<Class<?>> allPojoClasses) throws GeneratorException {
         Map<String, String> map = new HashMap();
         for (Class<?> clazz : allPojoClasses) {
-            map.put(clazz.getCanonicalName(), clazz.getPackage().getName());
+            for (String tlp : topLevelPackages) {
+                String name = clazz.getCanonicalName();
+                if (name.startsWith(tlp)) {
+                    if (map.containsKey(name)) {
+                        throw new GeneratorException(format("Class '%s' matches more than one top level package (%s and %s)", tlp, map.get(name)));
+                    }
+                    map.put(name, tlp);
+                    break;
+                }
+            }
         }
-        reduce(topLevelPackages, map);
         return map;
-    }
-
-    private void reduce(Set<String> topLevelPackages, Map<String, String> map) {
-        for (String c1 : map.keySet()) {
-            String o1 = map.get(c1);
-            if (topLevelPackages.contains(o1)) {
-                continue;
-            }
-            for (String c2 : map.keySet()) {
-                if (c1.equals(c2)) {
-                    continue;
-                }
-                String o2 = map.get(c2);
-                String com = common(o1, o2);
-                if (com != null) {
-                    map.put(c1, com);
-                    map.put(c2, com);
-                }
-            }
-        }
-
-    }
-
-    private String common(String o1, String o2) {
-        if (o1.equals(o2)) {
-            return o1;
-        }
-        if (o1.startsWith(o2)) {
-            return o2;
-        }
-        if (o2.startsWith(o1)) {
-            return o1;
-        }
-        int idx = o1.lastIndexOf('.');
-        while (idx > 0) {
-            o1 = o1.substring(0, idx);
-            if (o2.startsWith(o1)) {
-                return o1;
-            }
-            idx = o1.lastIndexOf('.');
-        }
-        return null;
-
     }
 
     private Map<String, PackageDatabase> makeDatabases(Set<String> packages) {
@@ -144,10 +111,6 @@ class Modeller<T extends Table> {
 
         void add(Entry child) {
             kids.add(child);
-        }
-
-        boolean isChildOf(Entry parent) {
-            return clazz.getSuperclass().getName().equals(parent.clazz.getName());
         }
 
     }

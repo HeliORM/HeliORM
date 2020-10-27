@@ -330,81 +330,86 @@ class Output {
     }
 
     private void addType2Field(Class<? extends Field> fieldClass, Class<? extends FieldPart> partClass, Table cm, Field<?,?,?> fm) throws GeneratorException {
-        impt(fieldClass);
-        impt(partClass);
-        boolean isKey = fm.isPrimaryKey();
-        if (isKey) {
-            emit("public final %s<%s, %s> %s = new %s(\"%s\", \"%s\", %b) {",
-                    fieldClass.getSimpleName(),
-                    tableName(cm),
-                    cm.getObjectClass().getSimpleName(),
-                    fm.getJavaName(),
-                    partClass.getSimpleName(),
-                    fm.getJavaName(),
-                    fm.getSqlName(),
-                    fm.isPrimaryKey());
-            if (fm.isAutoNumber()) {
+        try {
+            impt(fieldClass);
+            impt(partClass);
+            boolean isKey = fm.isPrimaryKey();
+            if (isKey) {
+                emit("public final %s<%s, %s> %s = new %s(\"%s\", \"%s\", %b) {",
+                        fieldClass.getSimpleName(),
+                        tableName(cm),
+                        cm.getObjectClass().getSimpleName(),
+                        fm.getJavaName(),
+                        partClass.getSimpleName(),
+                        fm.getJavaName(),
+                        fm.getSqlName(),
+                        fm.isPrimaryKey());
+                if (fm.isAutoNumber()) {
+                    push();
+                    emit("@Override");
+                    emit("public boolean isAutoNumber() {");
+                    push();
+                    emit("return true;");
+                    pop();
+                    emit("}");
+                    pop();
+                }
+            } else {
+                emit("public final %s<%s, %s> %s = new %s(\"%s\", \"%s\") {",
+                        fieldClass.getSimpleName(),
+                        tableName(cm),
+                        cm.getObjectClass().getSimpleName(),
+                        fm.getJavaName(),
+                        partClass.getSimpleName(),
+                        fm.getJavaName(),
+                        fm.getSqlName());
+            }
+            if (fm.getFieldType() == Field.FieldType.STRING) {
+                if (fm.getLength().isPresent()) {
+                    impt(Optional.class);
+                    push();
+                    emit("@Override");
+                    emit("public Optional<Integer> getLength() {");
+                    push();
+                    emit("return Optional.of(%d);", fm.getLength().get());
+                    pop();
+                    emit("}");
+                    pop();
+                }
+            }
+            if (fm.isNullable()) {
                 push();
                 emit("@Override");
-                emit("public boolean isAutoNumber() {");
+                emit("public boolean isNullable() {");
                 push();
                 emit("return true;");
                 pop();
                 emit("}");
                 pop();
             }
-        } else {
-            emit("public final %s<%s, %s> %s = new %s(\"%s\", \"%s\") {",
-                    fieldClass.getSimpleName(),
-                    tableName(cm),
-                    cm.getObjectClass().getSimpleName(),
-                    fm.getJavaName(),
-                    partClass.getSimpleName(),
-                    fm.getJavaName(),
-                    fm.getSqlName());
-        }
-        if (fm.getFieldType() == Field.FieldType.STRING) {
-            if (fm.getLength().isPresent()) {
-                impt(Optional.class);
+            if (fm.isForeignKey()) {
+                Table<?> table = fm.getForeignTable().get();
                 push();
                 emit("@Override");
-                emit("public Optional<Integer> getLength() {");
+                emit("public boolean isForeignKey() {");
                 push();
-                emit("return Optional.of(%d);", fm.getLength().get());
+                emit("return true;");
+                pop();
+                emit("}");
+                emit("");
+                emit("@Override");
+                emit("public Optional<Table<?>> getForeignTable() {");
+                push();
+                emit("return Optional.of(%s);", shortFieldName(table));
                 pop();
                 emit("}");
                 pop();
             }
+            emit("};");
         }
-        if (fm.isNullable()) {
-            push();
-            emit("@Override");
-            emit("public boolean isNullable() {");
-            push();
-            emit("return true;");
-            pop();
-            emit("}");
-            pop();
+        catch (Exception ex) {
+                throw new GeneratorException(format("Error generating code for field %s for %s (%s)", fm.getJavaName(), cm.getObjectClass().getSimpleName(), ex.getMessage()));
         }
-        if (fm.isForeignKey()) {
-            Table<?> table = fm.getForeignTable().get();
-            push();
-            emit("@Override");
-            emit("public boolean isForeignKey() {");
-            push();
-            emit("return true;");
-            pop();
-            emit("}");
-            emit("");
-            emit("@Override");
-            emit("public Optional<Table<?>> getForeignTable() {");
-            push();
-            emit("return Optional.of(%s);",shortFieldName(table));
-            pop();
-            emit("}");
-            pop();
-        }
-        emit("};");
     }
 
     private void addType3Field(Class<? extends Field> fieldClass, Class<? extends FieldPart> partClass, Table cm, Field<?, ?, ?> fm) throws GeneratorException {
