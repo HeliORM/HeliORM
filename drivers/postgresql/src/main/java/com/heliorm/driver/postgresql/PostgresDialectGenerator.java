@@ -73,6 +73,9 @@ public class PostgresDialectGenerator implements TableGenerator {
                 return format("%s", enumTypeName(table, field));
             case STRING: {
                 int length = 255;
+                if (field.isPrimaryKey()) {
+                    length = 36;
+                }
                 if (field.getLength().isPresent()) {
                     length = (int) field.getLength().get();
                 }

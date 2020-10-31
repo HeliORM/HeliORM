@@ -25,6 +25,7 @@ import com.heliorm.query.Parser;
 import com.heliorm.query.Query;
 import com.heliorm.query.TableSpec;
 import com.heliorm.query.ValueCriteria;
+
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
@@ -38,7 +39,6 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -346,7 +346,9 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
                 if (field.isPrimaryKey()) {
                     if (field.isAutoNumber()) {
                         if (field.getFieldType() == Field.FieldType.STRING) {
-                            pops.setValue(popo, field, UUID.randomUUID().toString());
+                            if (pops.getValue(popo, field) == null) {
+                                pops.setValue(popo, field, UUID.randomUUID().toString());
+                            }
                             setValueInStatement(stmt, popo, field, par);
                             par++;
                         }
