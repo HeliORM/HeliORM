@@ -17,6 +17,7 @@ import com.heliorm.impl.Part;
 import com.heliorm.impl.SelectPart;
 import com.heliorm.query.AndCriteria;
 import com.heliorm.query.Criteria;
+import com.heliorm.query.IsCriteria;
 import com.heliorm.query.Link;
 import com.heliorm.query.ListCriteria;
 import com.heliorm.query.OrCriteria;
@@ -551,6 +552,8 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
                 return expandListFieldCriteria(table, (ListCriteria) crit);
             case VALUE_FIELD:
                 return expandValueFieldCriteria(table, (ValueCriteria) crit);
+            case IS_FIELD:
+                return expandIsFieldCriteria(table, (IsCriteria)crit);
             case AND:
                 AndCriteria and = (AndCriteria) crit;
                 return format("(%s AND %s)", expandCriteria(table, and.getLeft()), expandCriteria(table, and.getRight()));
@@ -574,6 +577,12 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
         StringBuilder query = new StringBuilder();
         query.append(format("%s%s'%s'", fullFieldName(table.getTable(), crit.getField()), valueOperator(crit), sqlValue(crit.getValue())
         ));
+        return query.toString();
+    }
+
+    private String expandIsFieldCriteria(TableSpec table, IsCriteria crit) throws OrmException {
+        StringBuilder query = new StringBuilder();
+        query.append(format("%s%s", fullFieldName(table.getTable(), crit.getField()), isOperator(crit)));
         return query.toString();
     }
 
@@ -738,6 +747,17 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
                 return " LIKE ";
             case NOT_LIKE:
                 return " NOT LIKE ";
+            default:
+                throw new OrmException(format("Unsupported operator '%s'. BUG!", part.getOperator()));
+        }
+    }
+
+    private String isOperator(IsCriteria part) throws OrmException {
+        switch (part.getOperator()) {
+            case IS_NULL:
+                return " IS NULL";
+            case IS_NOT_NULL:
+                return " IS NOT NULL";
             default:
                 throw new OrmException(format("Unsupported operator '%s'. BUG!", part.getOperator()));
         }

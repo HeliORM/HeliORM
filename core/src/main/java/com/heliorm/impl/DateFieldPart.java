@@ -1,8 +1,9 @@
 package com.heliorm.impl;
 
-import java.util.Date;
-import com.heliorm.def.DateField;
 import com.heliorm.Table;
+import com.heliorm.def.DateField;
+
+import java.util.Date;
 
 /**
  *
@@ -12,7 +13,7 @@ public class DateFieldPart<T extends Table<O>, O> extends FieldPart<T, O, Date> 
         DateField<T, O>,
         WithRangePart<T, O, Date>,
         WithEqualsPart<T, O, Date>,
-        WithInPart<T, O, Date> {
+        WithInPart<T, O, Date>, WithIsPart<T, O, Date> {
 
     public DateFieldPart(String javaName, String sqlName) {
         super(Date.class, javaName, sqlName);

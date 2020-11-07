@@ -1,8 +1,9 @@
 package com.heliorm.impl;
 
-import java.time.Duration;
 import com.heliorm.Table;
 import com.heliorm.def.DurationField;
+
+import java.time.Duration;
 
 /**
  *
@@ -12,7 +13,7 @@ public class DurationFieldPart<T extends Table<O>, O> extends FieldPart<T, O, Du
         DurationField<T, O>,
         WithRangePart<T, O, Duration>,
         WithEqualsPart<T, O, Duration>,
-        WithInPart<T, O, Duration> {
+        WithInPart<T, O, Duration>, WithIsPart<T, O, Duration> {
 
     public DurationFieldPart(String javaName, String sqlName) {
         super(Duration.class, javaName, sqlName);

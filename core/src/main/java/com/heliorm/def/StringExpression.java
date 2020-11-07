@@ -14,6 +14,7 @@ public interface StringExpression<T extends Table<O>, O> extends
         WithRange<T, O, String>,
         WithEquals<T, O, String>,
         WithIn<T, O, String>,
-        WithLike<T, O, String> {
+        WithLike<T, O, String>,
+        WithIs<T,O,String> {
 
 }

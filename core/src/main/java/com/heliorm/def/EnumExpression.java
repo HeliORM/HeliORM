@@ -11,6 +11,6 @@ import com.heliorm.Table;
  * @author gideon
  */
 public interface EnumExpression<T extends Table<O>, O, C> extends Expression<T, O, C>,
-        WithEquals<T, O, C>, WithIn<T, O, C> {
+        WithEquals<T, O, C>, WithIn<T, O, C>,  WithIs<T,O,C>  {
 
 }

@@ -7,7 +7,7 @@ package com.heliorm.query;
 public abstract class Criteria {
 
     public enum Type {
-        LIST_FIELD, VALUE_FIELD, AND, OR;
+        LIST_FIELD, VALUE_FIELD, IS_FIELD, AND, OR;
     }
 
     private final Type type;

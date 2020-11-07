@@ -1,14 +1,10 @@
 package com.heliorm.query;
 
-import static java.lang.String.format;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Stack;
 import com.heliorm.OrmException;
 import com.heliorm.impl.ContinuationPart;
 import com.heliorm.impl.ExpressionContinuationPart;
 import com.heliorm.impl.FieldPart;
+import com.heliorm.impl.IsExpressionPart;
 import com.heliorm.impl.JoinPart;
 import com.heliorm.impl.ListExpressionPart;
 import com.heliorm.impl.OnClausePart;
@@ -16,6 +12,13 @@ import com.heliorm.impl.OrderedPart;
 import com.heliorm.impl.Part;
 import com.heliorm.impl.SelectPart;
 import com.heliorm.impl.ValueExpressionPart;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Stack;
+
+import static java.lang.String.format;
 
 /**
  * A "parser" that takes a list of parts and turns it into a simpler query structure.
@@ -138,7 +141,7 @@ public class Parser {
         expect(Part.Type.FIELD, Part.Type.NESTED_AND, Part.Type.NESTED_OR);
         FieldPart fieldPart = ((FieldPart) part);
         next();
-        expect(Part.Type.LIST_EXPRESSION, Part.Type.VALUE_EXPRESSION);
+        expect(Part.Type.LIST_EXPRESSION, Part.Type.VALUE_EXPRESSION, Part.Type.IS_EXPRESSION);
         Criteria crit;
 
         switch (part.getType()) {
@@ -152,8 +155,13 @@ public class Parser {
                 ListExpressionPart lep = (ListExpressionPart) part;
                 crit = new ListCriteria(fieldPart.getThis(), mapOperator(lep.getOperator()), lep.getValues());
                 break;
+            case IS_EXPRESSION:
+                expect(Part.Type.IS_EXPRESSION);
+                IsExpressionPart iep = (IsExpressionPart)part;
+                crit = new IsCriteria(fieldPart.getThis(), mapOperator(iep.getOperator()));
+                break;
             default:
-                throw new ParseException("");
+                throw new ParseException(format("Don't know how to parse expression of type %s. BUG!", part.getType()));
         }
         if (hasNext()) {
             next();
@@ -195,6 +203,11 @@ public class Parser {
     private ValueCriteria.Operator mapOperator(ValueExpressionPart.Operator op) {
         return ValueCriteria.Operator.valueOf(op.name());
     }
+
+    private IsCriteria.Operator mapOperator(IsExpressionPart.Operator op) {
+        return IsCriteria.Operator.valueOf(op.name());
+    }
+
 
     private Order.Direction mapDirection(OrderedPart.Direction dir) {
         return Order.Direction.valueOf(dir.name());

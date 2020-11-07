@@ -1,7 +1,8 @@
 package com.heliorm.def;
 
-import java.util.Date;
 import com.heliorm.Table;
+
+import java.util.Date;
 
 /**
  *
@@ -13,6 +14,7 @@ import com.heliorm.Table;
 public interface DateExpression<T extends Table<O>, O> extends Expression<T, O, Date>,
         WithRange<T, O, Date>,
         WithEquals<T, O, Date>,
-        WithIn<T, O, Date> {
+        WithIn<T, O, Date>,
+        WithIs<T,O,Date> {
 
 }

@@ -11,6 +11,7 @@ import com.heliorm.Table;
  */
 public interface BooleanExpression<T extends Table<O>, O> extends
         Expression<T, O, Boolean>,
-        WithEquals<T, O, Boolean> {
+        WithEquals<T, O, Boolean>,
+        WithIs<T,O, Boolean> {
 
 }

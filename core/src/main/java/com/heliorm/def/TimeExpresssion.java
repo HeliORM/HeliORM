@@ -1,7 +1,8 @@
 package com.heliorm.def;
 
-import java.time.Instant;
 import com.heliorm.Table;
+
+import java.time.Instant;
 
 /**
  *
@@ -13,6 +14,6 @@ import com.heliorm.Table;
 public interface TimeExpresssion<T extends Table<O>, O> extends Expression<T, O, Instant>,
         WithRange<T, O, Instant>,
         WithEquals<T, O, Instant>,
-        WithIn<T, O, Instant> {
+        WithIn<T, O, Instant>,  WithIs<T,O,Instant> {
 
 }

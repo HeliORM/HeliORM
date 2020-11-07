@@ -11,7 +11,7 @@ public abstract class NumberFieldPart<T extends Table<O>, O, N extends Number> e
         NumberField<T, O, N>,
         WithEqualsPart<T, O, N>,
         WithRangePart<T, O, N>,
-        WithInPart<T, O, N> {
+        WithInPart<T, O, N>, WithIsPart<T,O,N> {
 
     public NumberFieldPart(Class<N> fieldType, String javaName, String sqlName) {
         super(fieldType, javaName, sqlName);

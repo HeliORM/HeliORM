@@ -250,6 +250,22 @@ public class SelectTest extends AbstractOrmTest {
         assertTrue(listCompareOrdered(selected, wanted), "The items loaded are exactly the same as the ones we expected");
     }
 
+    @Test
+    public void testSelectIsNotNull() throws Exception {
+        say("Testing select of data on is not null");
+        List<Person> selected = orm().select(PERSON)
+                .where(PERSON.lastName.isNotNull())
+                .list();
+        List<Person> wanted = persons.stream()
+                .filter(person ->  person.getLastName() != null)
+                .collect(Collectors.toList());
+        assertNotNull(selected, "The list returned by list() should be non-null");
+        assertTrue(selected.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", selected.size(), wanted.size()));
+        assertNotNull(selected, "The list returned by list() should be non-null");
+        assertTrue(listCompareOrdered(selected, wanted), "The items loaded are exactly the same as the ones we expected");
+    }
+
+
     @AfterAll
     public static void removeData() throws OrmException {
         deleteAll(Cat.class);

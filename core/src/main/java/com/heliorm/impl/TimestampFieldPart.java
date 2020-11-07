@@ -1,8 +1,9 @@
 package com.heliorm.impl;
 
-import java.time.Instant;
 import com.heliorm.Table;
 import com.heliorm.def.TimestampField;
+
+import java.time.Instant;
 
 /**
  *
@@ -12,7 +13,7 @@ public class TimestampFieldPart<T extends Table<O>, O> extends FieldPart<T, O, I
         TimestampField<T, O>,
         WithRangePart<T, O, Instant>,
         WithEqualsPart<T, O, Instant>,
-        WithInPart<T, O, Instant> {
+        WithInPart<T, O, Instant>, WithIsPart<T,O,Instant> {
 
     public TimestampFieldPart(String javaName, String sqlName) {
         super(Instant.class, javaName, sqlName);
