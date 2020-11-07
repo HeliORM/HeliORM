@@ -189,7 +189,12 @@ class TestData {
     static Person makePerson(int n) {
         Person person = new Person();
         person.setFirstName(PEOPLE_NAMES[random.nextInt(PEOPLE_NAMES.length)]);
-        person.setLastName(PEOPLE_NAMES[random.nextInt(PEOPLE_NAMES.length)]);
+        if (random.nextInt(5) == 0) {
+            person.setLastName(null);
+        }
+        else {
+            person.setLastName(PEOPLE_NAMES[random.nextInt(PEOPLE_NAMES.length)]);
+        }
         person.setEmailAddress(PEOPLE_NAMES[random.nextInt(PEOPLE_NAMES.length)].toLowerCase() + n + "@gmail.com");
         return person;
     }
@@ -200,6 +205,9 @@ class TestData {
             for (int i = 0; i < 4; ++i) {
                 String first = PEOPLE_NAMES[random.nextInt(PEOPLE_NAMES.length)];
                 String last = PEOPLE_NAMES[random.nextInt(PEOPLE_NAMES.length)];
+                if (random.nextInt(5) == 0) {
+                    last = null;
+                }
                 Person person = new Person();
                 person.setFirstName(first);
                 person.setLastName(last);

@@ -4,10 +4,7 @@ import com.heliorm.annotation.Column;
 import com.heliorm.annotation.ForeignKey;
 import com.heliorm.annotation.Pojo;
 import com.heliorm.annotation.PrimaryKey;
-import test.pets.Pet;
 import test.place.Town;
-
-import java.util.List;
 
 /**
  * @author gideon
@@ -22,7 +19,7 @@ public class Person {
     private Long townId;
     @Column
     private String firstName;
-    @Column
+    @Column(nullable = true)
     private String lastName;
     @Column
     private String emailAddress;
