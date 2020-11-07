@@ -121,8 +121,20 @@ public final class Orm implements AutoCloseable {
      * @throws OrmException Thrown if there is an finding the table the POJO
      */
     public <O> Table<O> tableFor(O pojo) throws OrmException {
-        if (pojo == null) {
-            throw new OrmException("Attempt to do table lookup for a null POJO");
+        return tableFor((Class<O>)pojo.getClass());
+    }
+
+    /**
+     * Find the table definition for the given POJO.
+     *
+     * @param <O>  The type of the POJO
+     * @param type The type of pojo
+     * @return The table
+     * @throws OrmException Thrown if there is an finding the table the POJO
+     */
+    public <O> Table<O> tableFor(Class<O> type) throws OrmException {
+        if (type == null) {
+            throw new OrmException("Attempt to do table lookup for a null class");
         }
         if (tables.isEmpty()) {
             ServiceLoader<Database> svl = ServiceLoader.load(Database.class);
@@ -132,9 +144,9 @@ public final class Orm implements AutoCloseable {
                 }
             }
         }
-        Table<?> table = tables.get(pojo.getClass());
+        Table<?> table = tables.get(type);
         if (table == null) {
-            throw new OrmException("Cannot find table for pojo of type " + pojo.getClass().getCanonicalName());
+            throw new OrmException("Cannot find table for pojo of type " + type.getCanonicalName());
         }
         return (Table<O>) table;
     }
