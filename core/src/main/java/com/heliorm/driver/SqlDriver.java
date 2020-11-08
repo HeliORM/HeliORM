@@ -88,7 +88,7 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
     }
 
     @Override
-    public <O, P extends Part & Executable> Stream<O> stream(P tail) throws OrmException {
+    public final <O, P extends Part & Executable> Stream<O> stream(P tail) throws OrmException {
         List<List<Part>> queries = explodeAbstractions(tailToList(tail));
         if (queries.isEmpty()) {
             throw new OrmException("Could not build query from parts. BUG!");
@@ -279,9 +279,15 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
             stream.onClose(() -> {
                 try {
                     rs.close();
-                    close(con);
-                } catch (SQLException | OrmException ex) {
+                } catch (SQLException ex) {
                     throw new UncaughtOrmException(ex.getMessage(), ex);
+                }
+                finally {
+                    try {
+                        close(con);
+                    } catch (OrmException ex) {
+                        throw new UncaughtOrmException(ex.getMessage(), ex);
+                    }
                 }
             });
             return stream;

@@ -42,7 +42,6 @@ public final class MySqlDriver extends SqlDriver {
 
     @Override
     protected String fieldName(Table table, Field field) throws OrmException {
-//        return fullFieldName(table, field);
         return format("`%s`", field.getSqlName());
     }
 
