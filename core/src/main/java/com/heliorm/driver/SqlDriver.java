@@ -27,6 +27,7 @@ import com.heliorm.query.Query;
 import com.heliorm.query.TableSpec;
 import com.heliorm.query.ValueCriteria;
 
+import javax.swing.plaf.nimbus.State;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
@@ -179,9 +180,8 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
             for (Field field : allFields) {
                 String fieldId = getFieldId(field);
                 if (tableFields.contains(field)) {
-                    fieldsQuery.add(format("%s AS %s",fullFieldName(root.getTable(), field), virtualFieldName(fieldId)));
-                }
-                else {
+                    fieldsQuery.add(format("%s AS %s", fullFieldName(root.getTable(), field), virtualFieldName(fieldId)));
+                } else {
                     String empty = "NULL";
                     fieldsQuery.add(format("%s AS %s", empty, virtualFieldName(fieldId)));
                 }
@@ -277,22 +277,38 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
                                                         },
                             Spliterator.ORDERED), false);
             stream.onClose(() -> {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    throw new UncaughtOrmException(ex.getMessage(), ex);
-                }
-                finally {
-                    try {
-                        close(con);
-                    } catch (OrmException ex) {
-                        throw new UncaughtOrmException(ex.getMessage(), ex);
-                    }
-                }
+                cleanup(con, stmt, rs);
             });
             return stream;
         } catch (SQLException | UncaughtOrmException ex) {
+            cleanup(con, null, null);
             throw new OrmSqlException(ex.getMessage(), ex);
+        }
+    }
+
+    private void cleanup(Connection con, Statement stmt, ResultSet rs) {
+        Exception error = null;
+        if (rs != null) {
+            try {
+                rs.close();
+            } catch (Exception ex) {
+                error = ex;
+            }
+        }
+        if (stmt != null) {
+            try {
+                stmt.close();
+            } catch (Exception ex) {
+                error = error != null ? error : ex;
+            }
+        }
+        try {
+            close(con);
+        } catch (Exception ex) {
+            error = error != null ? error : ex;
+        }
+        if (error != null) {
+            throw new UncaughtOrmException(error.getMessage(), error);
         }
     }
 
@@ -497,7 +513,7 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
             fieldList.add(format("%s AS %s", fullFieldName(root.getTable(), field), virtualFieldName(getFieldId(field))));
         }
         tablesQuery.append(fieldList.toString());
-        tablesQuery.append(format(" FROM %s",fullTableName(root.getTable()), fullTableName(root.getTable())));
+        tablesQuery.append(format(" FROM %s", fullTableName(root.getTable()), fullTableName(root.getTable())));
         StringBuilder whereQuery = new StringBuilder();
         Optional<Criteria> optCrit = root.getCriteria();
         if (optCrit.isPresent()) {
@@ -559,7 +575,7 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
             case VALUE_FIELD:
                 return expandValueFieldCriteria(table, (ValueCriteria) crit);
             case IS_FIELD:
-                return expandIsFieldCriteria(table, (IsCriteria)crit);
+                return expandIsFieldCriteria(table, (IsCriteria) crit);
             case AND:
                 AndCriteria and = (AndCriteria) crit;
                 return format("(%s AND %s)", expandCriteria(table, and.getLeft()), expandCriteria(table, and.getRight()));
@@ -882,7 +898,7 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
     /**
      * Get a timestamp value from SQL for the given POJO and field
      *
-     * @param rs    The ResultSet
+     * @param rs     The ResultSet
      * @param column The SQL column
      * @return The correct value
      */
@@ -904,8 +920,8 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
     /**
      * Get a duration value from SQL for the given POJO and field
      *
-     * @param rs    The ResultSet
-     * @param column  The SQL column field
+     * @param rs     The ResultSet
+     * @param column The SQL column field
      * @return The correct value
      */
     private Duration getDurationFromSql(ResultSet rs, String column) throws OrmException {
