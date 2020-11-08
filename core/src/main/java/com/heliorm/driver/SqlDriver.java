@@ -27,7 +27,6 @@ import com.heliorm.query.Query;
 import com.heliorm.query.TableSpec;
 import com.heliorm.query.ValueCriteria;
 
-import javax.swing.plaf.nimbus.State;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
@@ -286,32 +285,6 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
         }
     }
 
-    private void cleanup(Connection con, Statement stmt, ResultSet rs) {
-        Exception error = null;
-        if (rs != null) {
-            try {
-                rs.close();
-            } catch (Exception ex) {
-                error = ex;
-            }
-        }
-        if (stmt != null) {
-            try {
-                stmt.close();
-            } catch (Exception ex) {
-                error = error != null ? error : ex;
-            }
-        }
-        try {
-            close(con);
-        } catch (Exception ex) {
-            error = error != null ? error : ex;
-        }
-        if (error != null) {
-            throw new UncaughtOrmException(error.getMessage(), error);
-        }
-    }
-
     private <O> Stream<O> streamUnion(String query, Map<String, Table<O>> tables) throws OrmException {
         Connection con = getConnection();
         try {
@@ -338,15 +311,11 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
                         }
                     }, Spliterator.ORDERED), false);
             stream.onClose(() -> {
-                try {
-                    rs.close();
-                    close(con);
-                } catch (SQLException | OrmException ex) {
-                    throw new UncaughtOrmException(ex.getMessage(), ex);
-                }
+                cleanup(con, stmt, rs);
             });
             return stream;
         } catch (SQLException | UncaughtOrmException ex) {
+            cleanup(con, null, null);
             throw new OrmSqlException(ex.getMessage(), ex);
         }
     }
@@ -1011,15 +980,6 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
         return connectionSupplier.get();
     }
 
-    private void close(Connection con) throws OrmException {
-        if ((currentTransaction == null) || (currentTransaction.getConnection() != con)) {
-            try {
-                con.close();
-            } catch (SQLException ex) {
-                throw new OrmException(ex.getMessage(), ex);
-            }
-        }
-    }
 
     /**
      * Create a comparator based on the tail of the query that will compare
@@ -1237,4 +1197,54 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
         while (fieldIds.containsKey(uuid));
         return uuid;
     }
+
+
+    /** Close a SQL Connection in a way that properly deals with transactions.
+     *
+     * @param con
+     * @throws OrmException
+     */
+    private void close(Connection con) throws OrmException {
+        if ((currentTransaction == null) || (currentTransaction.getConnection() != con)) {
+            try {
+                con.close();
+            } catch (SQLException ex) {
+                throw new OrmException(ex.getMessage(), ex);
+            }
+        }
+    }
+
+    /** Cleanup SQL Connection, Statement and ResultSet insuring that
+     * errors will not result in aborted cleanup.
+     *
+     * @param con
+     * @param stmt
+     * @param rs
+     */
+    private void cleanup(Connection con, Statement stmt, ResultSet rs) {
+        Exception error = null;
+        if (rs != null) {
+            try {
+                rs.close();
+            } catch (Exception ex) {
+                error = ex;
+            }
+        }
+        if (stmt != null) {
+            try {
+                stmt.close();
+            } catch (Exception ex) {
+                error = error != null ? error : ex;
+            }
+        }
+        try {
+            close(con);
+        } catch (Exception ex) {
+            error = error != null ? error : ex;
+        }
+        if (error != null) {
+            throw new UncaughtOrmException(error.getMessage(), error);
+        }
+    }
+
 }
