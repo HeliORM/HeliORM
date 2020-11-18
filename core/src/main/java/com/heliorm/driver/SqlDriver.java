@@ -768,19 +768,13 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
         try {
             switch (field.getFieldType()) {
                 case LONG:
-                    return rs.getLong(column);
                 case INTEGER:
-                    return rs.getInt(column);
                 case SHORT:
-                    return rs.getShort(column);
                 case BYTE:
-                    return rs.getByte(column);
                 case DOUBLE:
-                    return rs.getDouble(column);
                 case FLOAT:
-                    return rs.getFloat(column);
                 case BOOLEAN:
-                    return rs.getBoolean(column);
+                    return rs.getObject(column);
                 case ENUM: {
                     Class javaType = field.getJavaType();
                     if (!javaType.isEnum()) {

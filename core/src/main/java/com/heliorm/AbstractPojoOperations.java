@@ -42,6 +42,9 @@ abstract class AbstractPojoOperations implements PojoOperations {
             throw new OrmException("Null field type passed to setValue(). BUG!");
         }
         java.lang.reflect.Field refField = getDeclaredField(pojo.getClass(), field.getJavaName());
+        if ((value == null) && refField.getType().isPrimitive()) {
+            throw new OrmException(format("Null value for primitive %s field %s. BUG", refField.getType().getSimpleName(), field.getJavaName()));
+        }
         switch (field.getFieldType()) {
             case LONG:
                 setLong(pojo, refField, value);

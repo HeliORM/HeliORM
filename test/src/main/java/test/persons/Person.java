@@ -23,6 +23,8 @@ public class Person {
     private String lastName;
     @Column
     private String emailAddress;
+    @Column(nullable = true)
+    private Double income;
 
     public Long getId() {
         return id;
@@ -62,6 +64,14 @@ public class Person {
 
     public void setTownId(Long townId) {
         this.townId = townId;
+    }
+
+    public Double getIncome() {
+        return income;
+    }
+
+    public void setIncome(Double income) {
+        this.income = income;
     }
 
     @Override

@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static test.Tables.CAT;
+import static test.Tables.PERSON;
 
 public class CrudTest extends AbstractOrmTest {
 
@@ -39,7 +40,7 @@ public class CrudTest extends AbstractOrmTest {
     @Test
     public void testCreate() throws Exception {
         say("Testing create with auto-number Long key");
-        Person person = persons.get(0);
+        Person person = orm().select(PERSON).where(PERSON.id.eq(persons.get(0).getId())).one();
         Cat cat = makeCat(person);
         Cat saved = orm().create(cat);
         cats.add(saved);    
