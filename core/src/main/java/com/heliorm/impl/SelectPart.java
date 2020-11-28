@@ -65,7 +65,7 @@ public class SelectPart<LT extends Table<LO>, LO, RT extends Table<RO>, RO> exte
         for (Field<RT,RO, ?> rightField : table.getFields()) {
             if (rightField.isForeignKey()) {
                 Table<?> other = rightField.getForeignTable().get();
-                if (other.equals(left().getSelectTable())) {
+                if (other.equals(this.table)) {
                     return join.on(other.getPrimaryKey().get(), rightField);
                 }
             }
