@@ -235,7 +235,7 @@ public class SelectTest extends AbstractOrmTest {
     }
 
     @Test
-    public void testSelectJoinOnKey() throws Exception {
+    public void testSelectJoinOnPrimaryAndForeignKey() throws Exception {
         say("Testing select with a joinOnKey");
         List<Town> selected = orm().select(TOWN)
                 .joinOnKey(PROVINCE)
@@ -251,26 +251,6 @@ public class SelectTest extends AbstractOrmTest {
         assertTrue(listCompareOrdered(selected, wanted), "The items loaded are exactly the same as the ones we expected");
     }
 
-    @Test
-    public void testSelectAbstractJoinOnKeyWithSameKeys() throws Exception {
-        say("Testing select of abstract type with a join with same key names");
-        List<Pet> selected = orm().select(PET)
-                .joinOnKey(PERSON)
-                .where(PERSON.firstName.eq(persons.get(0).getFirstName()))
-                .list();
-
-        Map<Long, Person> personMap = persons.stream()
-                .filter(person -> person.getFirstName().equals(persons.get(0).getFirstName()))
-                .collect(Collectors.toMap(person -> person.getId(), person -> person));
-
-        List<Pet> wanted = Stream.concat(Stream.concat(cats.stream(), dogs.stream()), birds.stream())
-                .filter(pet -> personMap.containsKey(pet.getPersonId()))
-                .collect(Collectors.toList());
-
-        assertNotNull(selected, "The list returned by list() should be non-null");
-        assertTrue(selected.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", selected.size(), wanted.size()));
-        assertTrue(listCompareOrdered(selected, wanted), "The items loaded are exactly the same as the ones we expected");
-    }
 
     @Test
     public void testSelectIsNull() throws Exception {
