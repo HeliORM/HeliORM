@@ -234,23 +234,6 @@ public class SelectTest extends AbstractOrmTest {
         assertTrue(listCompareOrdered(selected, wanted), "The items loaded are exactly the same as the ones we expected");
     }
 
-    @Test
-    public void testSelectJoinOnPrimaryAndForeignKey() throws Exception {
-        say("Testing select with a joinOnKey");
-        List<Town> selected = orm().select(TOWN)
-                .joinOnKey(PROVINCE)
-                .where(PROVINCE.name.eq(provinces.get(0).getName()))
-                .list();
-
-        List<Town> wanted = towns.stream()
-                .filter(town -> town.getProvinceId().equals(provinces.get(0).getProvinceId()))
-                .collect(Collectors.toList());
-
-        assertNotNull(selected, "The list returned by list() should be non-null");
-        assertTrue(selected.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", selected.size(), wanted.size()));
-        assertTrue(listCompareOrdered(selected, wanted), "The items loaded are exactly the same as the ones we expected");
-    }
-
 
     @Test
     public void testSelectIsNull() throws Exception {

@@ -1,6 +1,5 @@
 package com.heliorm.def;
 
-import com.heliorm.OrmException;
 import com.heliorm.Table;
 
 /**
@@ -18,7 +17,5 @@ public interface Continuation<LT extends Table<LO>, LO, RT extends Table<RO>, RO
     Continuation<LT, LO, RT, RO> or(ExpressionContinuation<RT, RO> cont);
 
     <RT extends Table<RO>, RO> Join<LT, LO, RT, RO> join(RT table);
-
-    OnClause<LT, LO, RT, RO> joinOnKey(RT table) throws OrmException;
 
 }
