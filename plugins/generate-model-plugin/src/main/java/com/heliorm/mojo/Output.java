@@ -10,6 +10,7 @@ import com.heliorm.def.DurationField;
 import com.heliorm.def.EnumField;
 import com.heliorm.def.Field;
 import com.heliorm.def.FloatField;
+import com.heliorm.def.Index;
 import com.heliorm.def.IntegerField;
 import com.heliorm.def.LongField;
 import com.heliorm.def.ShortField;
@@ -23,6 +24,7 @@ import com.heliorm.impl.DurationFieldPart;
 import com.heliorm.impl.EnumFieldPart;
 import com.heliorm.impl.FieldPart;
 import com.heliorm.impl.FloatFieldPart;
+import com.heliorm.impl.IndexPart;
 import com.heliorm.impl.IntegerFieldPart;
 import com.heliorm.impl.LongFieldPart;
 import com.heliorm.impl.ShortFieldPart;
@@ -272,9 +274,27 @@ class Output {
         emit("}");
         pop();
 
+
+        // getIndexes()
+        StringJoiner indexNames = new StringJoiner(",");
+        for (Index im : cm.getIndexes()) {
+            String idxName = addIndexModel(cm, im);
+            indexNames.add(idxName);
+        }
+        impt(Index.class);
+        emit("");
+        emit("@Override");
+        emit("public List<Index> getIndexes() {");
+        push();
+        emit(format("return Arrays.asList(%s);", indexNames.toString()));
+        pop();
+        emit("}");
+
         emit("");
         emit("}");
         emit("");
+
+
     }
 
     private Set<Table> explodeSubs(Set<Table> subs) {
@@ -329,7 +349,7 @@ class Output {
 
     }
 
-    private void addType2Field(Class<? extends Field> fieldClass, Class<? extends FieldPart> partClass, Table cm, Field<?,?,?> fm) throws GeneratorException {
+    private void addType2Field(Class<? extends Field> fieldClass, Class<? extends FieldPart> partClass, Table cm, Field<?, ?, ?> fm) throws GeneratorException {
         try {
             impt(fieldClass);
             impt(partClass);
@@ -406,9 +426,8 @@ class Output {
                 pop();
             }
             emit("};");
-        }
-        catch (Exception ex) {
-                throw new GeneratorException(format("Error generating code for field %s for %s (%s)", fm.getJavaName(), cm.getObjectClass().getSimpleName(), ex.getMessage()));
+        } catch (Exception ex) {
+            throw new GeneratorException(format("Error generating code for field %s for %s (%s)", fm.getJavaName(), cm.getObjectClass().getSimpleName(), ex.getMessage()));
         }
     }
 
@@ -463,8 +482,7 @@ class Output {
         String enumTypeName;
         if (fm.getJavaType().getEnclosingClass() == null) {
             enumTypeName = fm.getJavaType().getSimpleName();
-        }
-        else {
+        } else {
             enumTypeName = format("%s.%s", cm.getObjectClass().getSimpleName(), fm.getJavaType().getSimpleName());
         }
         emit("public final %s<%s, %s, %s> %s = new %s(%s.class, \"%s\", \"%s\") {",
@@ -493,6 +511,31 @@ class Output {
 
     private void addStringField(Table cm, Field fm) throws GeneratorException {
         addType2Field(StringField.class, StringFieldPart.class, cm, fm);
+    }
+
+    private String addIndexModel(Table tm, Index<?, ?> im) {
+        impt(IndexPart.class);
+        StringJoiner sj = new StringJoiner(",");
+        for (Field field : im.getFields()) {
+            sj.add(field.getJavaName());
+        }
+        String indexName = indexName(tm, im);
+        emit("private final %s %s = new %s(%s,Arrays.asList(%s));",
+                IndexPart.class.getSimpleName(),
+                indexName,
+                IndexPart.class.getSimpleName(),
+                im.isUnique(),
+                sj.toString());
+        return indexName;
+    }
+
+    private String indexName(Table tm, Index<?,?> im) {
+        StringJoiner sj = new StringJoiner("_");
+        for (Field field : im.getFields()) {
+            sj.add(field.getJavaName());
+        }
+        sj.add("idx");
+        return sj.toString();
     }
 
     private String tableName(Table table) {

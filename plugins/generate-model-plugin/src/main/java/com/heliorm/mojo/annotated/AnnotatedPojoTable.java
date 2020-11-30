@@ -5,6 +5,7 @@ import com.heliorm.Table;
 import com.heliorm.annotation.Ignore;
 import com.heliorm.annotation.Pojo;
 import com.heliorm.def.Field;
+import com.heliorm.def.Index;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Modifier;
@@ -26,6 +27,7 @@ public final class AnnotatedPojoTable implements Table {
     private final Database database;
     private final Class<?> pojoClass;
     private List<Field> fieldModels;
+    private List<Index> indexes;
     private final Set<Table> subs;
 
     /**
@@ -90,6 +92,18 @@ public final class AnnotatedPojoTable implements Table {
     @Override
     public boolean isAbstract() {
         return Modifier.isAbstract(pojoClass.getModifiers());
+    }
+
+    @Override
+    public List<Index> getIndexes() {
+        if (indexes == null) {
+            indexes = new ArrayList<>();
+            com.heliorm.annotation.Index[] anns = pojoClass.getAnnotationsByType(com.heliorm.annotation.Index.class);
+            for (com.heliorm.annotation.Index ann : anns) {
+                indexes.add(new AnnotatedPojoIndex(this, ann));
+            }
+        }
+        return indexes;
     }
 
     /**

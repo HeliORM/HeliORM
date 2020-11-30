@@ -1,10 +1,11 @@
 package com.heliorm;
 
+import com.heliorm.def.Field;
+import com.heliorm.def.Index;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-
-import com.heliorm.def.Field;
 
 /**
  * The interface that must be implemented to define a database table for use by
@@ -64,4 +65,10 @@ public interface Table<O> {
      * @return true if abstract
      */
     boolean isAbstract();
+
+    /** Return the indexes for this POJO
+     *
+     * @return The indexes
+     */
+    List<Index> getIndexes();
 }

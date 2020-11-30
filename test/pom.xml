@@ -110,6 +110,27 @@
                 </executions>
             </plugin>
             <plugin>
+                <groupId>com.heliorm</groupId>
+                <artifactId>generate-sql-plugin</artifactId>
+                <version>${project.version}</version>
+                <executions>
+                    <execution>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>generate-sql</goal>
+                        </goals>
+                        <configuration>
+                            <packages>
+                                <package>test</package>
+                            </packages>
+                            <dialect>MYSQL</dialect>
+                            <filePerTable>false</filePerTable>
+                            <outputDir>${sourceOutputDir}</outputDir>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <!-- latest version (2.20.1) does not work well with JUnit5 -->
                 <version>2.19.1</version>

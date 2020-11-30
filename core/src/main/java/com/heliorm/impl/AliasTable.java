@@ -1,12 +1,14 @@
 package com.heliorm.impl;
 
+import com.heliorm.Database;
+import com.heliorm.Table;
+import com.heliorm.def.Field;
+import com.heliorm.def.Index;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import com.heliorm.Database;
-import com.heliorm.Table;
-import com.heliorm.def.Field;
 
 /**
  *
@@ -64,4 +66,8 @@ public class AliasTable<O> implements Table<O> {
       return table.isAbstract();
     }
 
+    @Override
+    public List<Index> getIndexes() {
+        return table.getIndexes();
+    }
 }

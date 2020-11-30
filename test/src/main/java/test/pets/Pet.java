@@ -2,6 +2,7 @@ package test.pets;
 
 import com.heliorm.annotation.Column;
 import com.heliorm.annotation.ForeignKey;
+import com.heliorm.annotation.Index;
 import com.heliorm.annotation.Pojo;
 import com.heliorm.annotation.PrimaryKey;
 import test.persons.Person;
@@ -10,6 +11,8 @@ import test.persons.Person;
  * @author gideon
  */
 @Pojo
+@Index(columns={"name","age"}, unique = false)
+@Index(columns = {"id"})
 public abstract class Pet  {
 
     @PrimaryKey(autoIncrement = true)
