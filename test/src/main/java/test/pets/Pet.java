@@ -12,7 +12,7 @@ import test.persons.Person;
  */
 @Pojo
 @Index(columns={"name","age"}, unique = false)
-@Index(columns = {"id"})
+@Index(columns = {"personId"}, unique = false)
 public abstract class Pet  {
 
     @PrimaryKey(autoIncrement = true)
