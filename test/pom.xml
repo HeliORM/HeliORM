@@ -115,7 +115,7 @@
                 <version>${project.version}</version>
                 <executions>
                     <execution>
-                        <phase>process-classes</phase>
+                        <phase>install</phase>
                         <goals>
                             <goal>generate-sql</goal>
                         </goals>
