@@ -272,7 +272,6 @@ class Output {
         emit("return %b;", cm.isAbstract());
         pop();
         emit("}");
-        pop();
 
 
         // getIndexes()
@@ -289,6 +288,7 @@ class Output {
         emit(format("return Arrays.asList(%s);", indexNames.toString()));
         pop();
         emit("}");
+        pop();
 
         emit("");
         emit("}");
@@ -425,6 +425,7 @@ class Output {
                 emit("}");
                 pop();
             }
+
             emit("};");
         } catch (Exception ex) {
             throw new GeneratorException(format("Error generating code for field %s for %s (%s)", fm.getJavaName(), cm.getObjectClass().getSimpleName(), ex.getMessage()));

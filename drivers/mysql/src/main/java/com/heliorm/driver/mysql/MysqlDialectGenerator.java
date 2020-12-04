@@ -2,6 +2,7 @@ package com.heliorm.driver.mysql;
 
 import com.heliorm.Table;
 import com.heliorm.def.Field;
+import com.heliorm.def.Index;
 import com.heliorm.driver.OrmSqlException;
 import com.heliorm.driver.TableGenerator;
 
@@ -36,6 +37,23 @@ public class MysqlDialectGenerator implements TableGenerator {
             sql.append(",\n");
             sql.append(format("PRIMARY KEY (`%s`)", key.get().getSqlName()));
         }
+
+        int num = 1;
+        for (Index<?,?> index : table.getIndexes()) {
+            sql.append("\n");
+            if (index.isUnique()) {
+                sql.append("UNIQUE ");
+            }
+            sql.append(format("INDEX %s(",  format("idx%d", num)));
+            Optional<String> fields = index.getFields().stream()
+                    .map(field -> "'" + field + "'")
+                    .reduce((s1, s2) -> s1 + "," + s2);
+            if (fields.isPresent()) {
+                sql.append(fields.get());
+            }
+            num++;
+        }
+
         sql.append(");\n");
         return sql.toString();
     }
