@@ -1,10 +1,10 @@
 package com.heliorm.mojo.annotated;
 
-import com.heliorm.Database;
 import com.heliorm.annotation.Pojo;
 import com.heliorm.mojo.GenerateModel;
 import com.heliorm.mojo.Generator;
 import com.heliorm.mojo.GeneratorException;
+import com.heliorm.Database;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfo;
 import io.github.classgraph.ClassInfoList;

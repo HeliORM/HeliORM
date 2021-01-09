@@ -1,7 +1,10 @@
-package com.heliorm;
+package com.heliorm.sql;
 
-import com.heliorm.driver.SqlDriver;
+import com.heliorm.Orm;
+import com.heliorm.OrmException;
 import com.heliorm.impl.AliasDatabase;
+import com.heliorm.Database;
+import com.heliorm.OrmTransactionDriver;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -17,7 +20,7 @@ import static java.lang.String.format;
  *
  * @author gideon
  */
-public class OrmBuilder {
+public class SqlOrmBuilder {
 
     private final Supplier<Connection> con;
     private final Class<? extends SqlDriver> driverClass;
@@ -37,8 +40,8 @@ public class OrmBuilder {
      * @return The ORM builder
      * @throws OrmException Thrown if there is a problem creating the OrmBuilder
      */
-    public static OrmBuilder create(Supplier<Connection> con, Class<? extends SqlDriver> driverClass) throws OrmException {
-        return new OrmBuilder(con, driverClass);
+    public static SqlOrmBuilder create(Supplier<Connection> con, Class<? extends SqlDriver> driverClass) throws OrmException {
+        return new SqlOrmBuilder(con, driverClass);
     }
 
     /**
@@ -47,7 +50,7 @@ public class OrmBuilder {
      * @param con The connection supplier to start with.
      * @throws OrmException Thrown if there is a problem creating the OrmBuilder
      */
-    private OrmBuilder(Supplier<Connection> con, Class<? extends SqlDriver> driverClass) throws OrmException {
+    private SqlOrmBuilder(Supplier<Connection> con, Class<? extends SqlDriver> driverClass) throws OrmException {
         this.con = con;
         this.driverClass = driverClass;
         this.pops = new UnsafePojoOperations();
@@ -59,7 +62,7 @@ public class OrmBuilder {
      * @param database The database
      * @param sqlName  The SQL database
      */
-    public OrmBuilder mapDatabase(Database database, String sqlName) {
+    public SqlOrmBuilder mapDatabase(Database database, String sqlName) {
         databases.put(database, sqlName);
         return this;
     }
@@ -71,7 +74,7 @@ public class OrmBuilder {
      * @param pops PojoOperations implementation
      * @return The ORM builder
      */
-    public OrmBuilder withPojoOperations(PojoOperations pops) {
+    public SqlOrmBuilder withPojoOperations(PojoOperations pops) {
         this.pops = pops;
         return this;
     }
@@ -84,12 +87,12 @@ public class OrmBuilder {
      * @param rollback if rollback is preferred to an exception
      * @return * @return The ORM builder
      */
-    public OrmBuilder setRollbackOnUncommittedClose(boolean rollback) {
+    public SqlOrmBuilder setRollbackOnUncommittedClose(boolean rollback) {
         this.rollbackOnUncommittedClose = rollback;
         return this;
     }
     
-    public OrmBuilder setCreateMissingTables(boolean createMissingTables) { 
+    public SqlOrmBuilder setCreateMissingTables(boolean createMissingTables) {
         this.createMissingTables = createMissingTables;
         return this;
     }
@@ -100,7 +103,7 @@ public class OrmBuilder {
      * @param useUnionAll Use or don't use 'UNION ALL'
      * @return The OrmBuilder
      */
-    public OrmBuilder setUseUnionAll(boolean useUnionAll) {
+    public SqlOrmBuilder setUseUnionAll(boolean useUnionAll) {
         this.useUnionAll = useUnionAll;
         return this;
     }
@@ -128,7 +131,7 @@ public class OrmBuilder {
         if (driver instanceof OrmTransactionDriver) {
             ((OrmTransactionDriver) driver).setRollbackOnUncommittedClose(rollbackOnUncommittedClose);
         }
-        return new Orm(driver);
+        return new SqlOrm(driver);
     }
 
 }

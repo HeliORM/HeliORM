@@ -1,4 +1,4 @@
-package com.heliorm;
+package com.heliorm.sql;
 
 import test.persons.Person;
 import test.pets.Bird;

@@ -2,6 +2,7 @@ package com.heliorm.impl;
 
 import java.util.Arrays;
 import java.util.List;
+
 import com.heliorm.def.ExpressionContinuation;
 import com.heliorm.OrmException;
 import com.heliorm.Table;

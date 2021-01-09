@@ -1,7 +1,7 @@
 package com.heliorm.impl;
 
-import com.heliorm.Table;
 import com.heliorm.def.DurationField;
+import com.heliorm.Table;
 
 import java.time.Duration;
 

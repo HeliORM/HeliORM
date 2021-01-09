@@ -1,6 +1,8 @@
-package com.heliorm;
+package com.heliorm.sql;
 
 import com.heliorm.def.Field;
+import com.heliorm.OrmException;
+import com.heliorm.Table;
 
 /**
  * This interface defines the operations on POJOs required for the ORM to

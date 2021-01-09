@@ -1,9 +1,9 @@
 package com.heliorm.impl;
 
 import com.heliorm.def.ExpressionContinuation;
+import com.heliorm.def.WithEquals;
 import com.heliorm.OrmException;
 import com.heliorm.Table;
-import com.heliorm.def.WithEquals;
 
 /**
  *

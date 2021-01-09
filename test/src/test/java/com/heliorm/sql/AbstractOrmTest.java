@@ -1,9 +1,15 @@
-package com.heliorm;
+package com.heliorm.sql;
 
+import com.heliorm.Orm;
+import com.heliorm.OrmException;
+import com.heliorm.Table;
 import com.heliorm.def.Field;
-import com.heliorm.driver.SqlDriver;
-import com.heliorm.driver.mysql.MySqlDriver;
-import com.heliorm.driver.postgresql.PostgreSqlDriver;
+import com.heliorm.sql.PojoOperations;
+import com.heliorm.sql.SqlDriver;
+import com.heliorm.sql.SqlOrmBuilder;
+import com.heliorm.sql.UnsafePojoOperations;
+import com.heliorm.sql.mysql.MySqlDriver;
+import com.heliorm.sql.postgresql.PostgreSqlDriver;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.h2.jdbcx.JdbcDataSource;
@@ -56,7 +62,7 @@ abstract class AbstractOrmTest {
         }
         say("Using %s data source with driver %s", dbType, driver.getSimpleName());
         pops = new UnsafePojoOperations();
-        orm = OrmBuilder.create(AbstractOrmTest::getConnection, driver)
+        orm = SqlOrmBuilder.create(AbstractOrmTest::getConnection, driver)
                 .setCreateMissingTables(true)
                 .setRollbackOnUncommittedClose(false)
                 .setUseUnionAll(true)

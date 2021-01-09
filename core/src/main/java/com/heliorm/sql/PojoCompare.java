@@ -1,7 +1,6 @@
-package com.heliorm.driver;
+package com.heliorm.sql;
 
 import com.heliorm.OrmException;
-import com.heliorm.PojoOperations;
 import com.heliorm.Table;
 import com.heliorm.UncaughtOrmException;
 import com.heliorm.def.Field;

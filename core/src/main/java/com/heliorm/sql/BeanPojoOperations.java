@@ -1,4 +1,6 @@
-package com.heliorm;
+package com.heliorm.sql;
+
+import com.heliorm.OrmException;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

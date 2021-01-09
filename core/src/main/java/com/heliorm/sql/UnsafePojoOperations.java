@@ -1,5 +1,6 @@
-package com.heliorm;
+package com.heliorm.sql;
 
+import com.heliorm.OrmException;
 import sun.misc.Unsafe;
 
 import static java.lang.String.format;

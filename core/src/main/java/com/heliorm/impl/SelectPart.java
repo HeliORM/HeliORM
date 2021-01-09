@@ -1,13 +1,14 @@
 package com.heliorm.impl;
 
 import static java.lang.String.format;
-import com.heliorm.def.Continuation;
+
 import com.heliorm.def.ExpressionContinuation;
-import com.heliorm.def.Field;
 import com.heliorm.def.Join;
+import com.heliorm.def.Select;
+import com.heliorm.def.Continuation;
+import com.heliorm.def.Field;
 import com.heliorm.def.Ordered;
 import com.heliorm.Orm;
-import com.heliorm.def.Select;
 import com.heliorm.Table;
 
 /**

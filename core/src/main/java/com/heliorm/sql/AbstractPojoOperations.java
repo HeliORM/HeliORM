@@ -1,5 +1,7 @@
-package com.heliorm;
+package com.heliorm.sql;
 
+import com.heliorm.OrmException;
+import com.heliorm.Table;
 import com.heliorm.def.Field;
 
 import java.lang.reflect.Constructor;

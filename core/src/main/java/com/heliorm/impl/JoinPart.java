@@ -1,8 +1,9 @@
 package com.heliorm.impl;
 
 import static java.lang.String.format;
-import com.heliorm.def.Field;
+
 import com.heliorm.def.Join;
+import com.heliorm.def.Field;
 import com.heliorm.def.OnClause;
 import com.heliorm.Table;
 

@@ -1,6 +1,7 @@
-package com.heliorm;
+package com.heliorm.sql;
 
 
+import com.heliorm.OrmException;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -20,12 +21,12 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.heliorm.TestData.makeBirds;
-import static com.heliorm.TestData.makeCats;
-import static com.heliorm.TestData.makeDogs;
-import static com.heliorm.TestData.makePersons;
-import static com.heliorm.TestData.makeProvinces;
-import static com.heliorm.TestData.makeTowns;
+import static com.heliorm.sql.TestData.makeBirds;
+import static com.heliorm.sql.TestData.makeCats;
+import static com.heliorm.sql.TestData.makeDogs;
+import static com.heliorm.sql.TestData.makePersons;
+import static com.heliorm.sql.TestData.makeProvinces;
+import static com.heliorm.sql.TestData.makeTowns;
 import static java.lang.String.format;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;

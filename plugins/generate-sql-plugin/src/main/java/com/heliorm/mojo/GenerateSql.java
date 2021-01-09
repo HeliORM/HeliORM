@@ -1,15 +1,15 @@
 package com.heliorm.mojo;
 
-import com.heliorm.driver.mysql.MysqlDialectGenerator;
-import com.heliorm.driver.postgresql.PostgresDialectGenerator;
+import com.heliorm.sql.OrmSqlException;
+import com.heliorm.sql.TableGenerator;
+import com.heliorm.sql.mysql.MysqlDialectGenerator;
+import com.heliorm.sql.postgresql.PostgresDialectGenerator;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfo;
 import io.github.classgraph.ClassInfoList;
 import io.github.classgraph.ScanResult;
 import com.heliorm.Database;
 import com.heliorm.Table;
-import com.heliorm.driver.OrmSqlException;
-import com.heliorm.driver.TableGenerator;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;

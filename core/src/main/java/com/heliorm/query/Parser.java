@@ -1,17 +1,17 @@
 package com.heliorm.query;
 
-import com.heliorm.OrmException;
-import com.heliorm.impl.ContinuationPart;
 import com.heliorm.impl.ExpressionContinuationPart;
 import com.heliorm.impl.FieldPart;
-import com.heliorm.impl.IsExpressionPart;
 import com.heliorm.impl.JoinPart;
 import com.heliorm.impl.ListExpressionPart;
-import com.heliorm.impl.OnClausePart;
 import com.heliorm.impl.OrderedPart;
-import com.heliorm.impl.Part;
 import com.heliorm.impl.SelectPart;
 import com.heliorm.impl.ValueExpressionPart;
+import com.heliorm.OrmException;
+import com.heliorm.impl.ContinuationPart;
+import com.heliorm.impl.IsExpressionPart;
+import com.heliorm.impl.OnClausePart;
+import com.heliorm.impl.Part;
 
 import java.util.ArrayList;
 import java.util.Arrays;

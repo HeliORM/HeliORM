@@ -1,4 +1,4 @@
-package com.heliorm.driver;
+package com.heliorm.sql;
 
 import com.heliorm.Table;
 

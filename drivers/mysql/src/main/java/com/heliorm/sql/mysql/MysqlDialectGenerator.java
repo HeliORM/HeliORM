@@ -1,9 +1,9 @@
-package com.heliorm.driver.mysql;
+package com.heliorm.sql.mysql;
 
-import com.heliorm.Table;
 import com.heliorm.def.Field;
-import com.heliorm.driver.OrmSqlException;
-import com.heliorm.driver.TableGenerator;
+import com.heliorm.sql.OrmSqlException;
+import com.heliorm.Table;
+import com.heliorm.sql.TableGenerator;
 
 import java.util.Optional;
 import java.util.StringJoiner;

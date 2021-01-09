@@ -1,10 +1,10 @@
 package com.heliorm.mojo.annotated;
 
-import com.heliorm.Database;
-import com.heliorm.Table;
 import com.heliorm.annotation.Ignore;
 import com.heliorm.annotation.Pojo;
 import com.heliorm.def.Field;
+import com.heliorm.Database;
+import com.heliorm.Table;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Modifier;

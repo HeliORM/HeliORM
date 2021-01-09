@@ -1,9 +1,11 @@
-package com.heliorm;
+package com.heliorm.sql;
 
 import java.util.stream.Stream;
 
-import com.heliorm.def.Executable;
 import com.heliorm.impl.Part;
+import com.heliorm.OrmException;
+import com.heliorm.Table;
+import com.heliorm.def.Executable;
 
 /**
  * The interface that must be implemented to create a new (typically database)
