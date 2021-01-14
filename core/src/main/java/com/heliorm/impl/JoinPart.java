@@ -1,11 +1,11 @@
 package com.heliorm.impl;
 
-import static java.lang.String.format;
-
-import com.heliorm.def.Join;
-import com.heliorm.def.Field;
-import com.heliorm.def.OnClause;
 import com.heliorm.Table;
+import com.heliorm.def.Field;
+import com.heliorm.def.Join;
+import com.heliorm.def.OnClause;
+
+import static java.lang.String.format;
 
 /**
  *
@@ -16,18 +16,13 @@ public class JoinPart<LT extends Table<LO>, LO, RT extends Table<RO>, RO> extend
     private final RT table;
 
     public JoinPart(Part left, RT table) {
-        super(left);
+        super(Type.JOIN, left);
         this.table = table;
     }
 
     @Override
     public <L extends Field<LT, LO, C>, R extends Field<RT, RO, C>, C> OnClause<LT, LO, RT, RO> on(L leftField, R rightField) {
         return new OnClausePart(this, leftField, rightField);
-    }
-
-    @Override
-    public Type getType() {
-        return Type.JOIN;
     }
 
     @Override

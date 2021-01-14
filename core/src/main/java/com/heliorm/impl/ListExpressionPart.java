@@ -1,8 +1,10 @@
 package com.heliorm.impl;
 
-import static java.lang.String.format;
-import java.util.List;
 import com.heliorm.Table;
+
+import java.util.List;
+
+import static java.lang.String.format;
 
 /**
  *
@@ -18,14 +20,9 @@ public class ListExpressionPart<T extends Table<O>, O, C> extends ExpressionPart
     }
 
     public ListExpressionPart(Part left, Operator op, List<C> values) {
-        super(left);
+        super(Type.LIST_EXPRESSION, left);
         this.operator = op;
         this.values = values;
-    }
-
-    @Override
-    public Type getType() {
-        return Type.LIST_EXPRESSION;
     }
 
     public Operator getOperator() {

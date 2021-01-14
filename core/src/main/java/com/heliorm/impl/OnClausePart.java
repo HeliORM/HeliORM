@@ -1,9 +1,10 @@
 package com.heliorm.impl;
 
-import static java.lang.String.format;
+import com.heliorm.Table;
 import com.heliorm.def.Field;
 import com.heliorm.def.OnClause;
-import com.heliorm.Table;
+
+import static java.lang.String.format;
 
 public final class OnClausePart<LT extends Table<LO>, LO, RT extends Table<RO>, RO> extends SelectPart<LT, LO, RT, RO> implements OnClause<LT, LO, RT, RO> {
 
@@ -11,14 +12,9 @@ public final class OnClausePart<LT extends Table<LO>, LO, RT extends Table<RO>, 
     private final Field<RT, RO, ?> rightField;
 
     <C> OnClausePart(Part left, Field<LT, LO, C> leftField, Field<RT, RO, C> rightField) {
-        super(left, left.getSelectTable());
+        super(Type.ON_CLAUSE, left, left.getSelectTable());
         this.leftField = leftField;
         this.rightField = rightField;
-    }
-
-    @Override
-    public Type getType() {
-        return Type.ON_CLAUSE;
     }
 
     public Field<LT, LO, ?> getLeftField() {

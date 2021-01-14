@@ -19,14 +19,9 @@ public class OrderedPart<T extends Table<O>, O> extends ExecutablePart<T, O> imp
     private final Field<T, O, ?> field;
 
     public OrderedPart(Part left, Direction direction, Field<T, O, ?> field) {
-        super(left);
+        super(Type.ORDER, left);
         this.direction = direction;
         this.field = field;
-    }
-
-    @Override
-    public Type getType() {
-        return Type.ORDER;
     }
 
     @Override

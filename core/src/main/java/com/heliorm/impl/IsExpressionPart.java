@@ -20,13 +20,8 @@ public class IsExpressionPart<T extends Table<O>, O, C> extends ExpressionPart<T
     }
 
     public IsExpressionPart(FieldPart left, Operator op) {
-        super(left);
+        super(Type.IS_EXPRESSION, left);
         this.operator = op;
-    }
-
-    @Override
-    public Type getType() {
-        return Type.IS_EXPRESSION;
     }
 
     public Operator getOperator() {

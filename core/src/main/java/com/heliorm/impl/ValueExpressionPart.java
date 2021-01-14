@@ -1,7 +1,8 @@
 package com.heliorm.impl;
 
-import static java.lang.String.format;
 import com.heliorm.Table;
+
+import static java.lang.String.format;
 
 /**
  *
@@ -20,14 +21,9 @@ public class ValueExpressionPart<T extends Table<O>, O, C> extends ExpressionPar
     }
 
     public ValueExpressionPart(FieldPart left, Operator op, C value) {
-        super(left);
+        super(Type.VALUE_EXPRESSION, left);
         this.operator = op;
         this.value = value;
-    }
-
-    @Override
-    public Type getType() {
-        return Type.VALUE_EXPRESSION;
     }
 
     public Operator getOperator() {

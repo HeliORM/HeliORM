@@ -24,10 +24,12 @@ public abstract class Part<T extends Table<O>, O, RT extends Table<RO>, RO> {
         ORDER;
     }
 
+    private final Type type;
     private final Part left;
     private Part right;
 
-    protected Part(Part left) {
+    protected Part(Type type, Part left) {
+        this.type = type;
         this.left = left;
         if (left != null) {
             left.setRight(this);
@@ -38,7 +40,9 @@ public abstract class Part<T extends Table<O>, O, RT extends Table<RO>, RO> {
         return left.getOrm();
     }
 
-    public abstract Type getType();
+    public final Type getType() {
+        return type;
+    }
 
     public Table getReturnTable() {
         return left.getReturnTable();
@@ -52,11 +56,11 @@ public abstract class Part<T extends Table<O>, O, RT extends Table<RO>, RO> {
         return left;
     }
 
-    public Part right() {
+    public final Part right() {
         return right;
     }
 
-    public Part head() {
+    public final Part head() {
         if (left != null) {
             return left.head();
         }

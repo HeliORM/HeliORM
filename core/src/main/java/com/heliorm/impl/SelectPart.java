@@ -1,15 +1,15 @@
 package com.heliorm.impl;
 
-import static java.lang.String.format;
-
-import com.heliorm.def.ExpressionContinuation;
-import com.heliorm.def.Join;
-import com.heliorm.def.Select;
-import com.heliorm.def.Continuation;
-import com.heliorm.def.Field;
-import com.heliorm.def.Ordered;
 import com.heliorm.Orm;
 import com.heliorm.Table;
+import com.heliorm.def.Continuation;
+import com.heliorm.def.ExpressionContinuation;
+import com.heliorm.def.Field;
+import com.heliorm.def.Join;
+import com.heliorm.def.Ordered;
+import com.heliorm.def.Select;
+
+import static java.lang.String.format;
 
 /**
  *
@@ -18,15 +18,20 @@ import com.heliorm.Table;
 public class SelectPart<LT extends Table<LO>, LO, RT extends Table<RO>, RO> extends ExecutablePart<LT, LO>
         implements Select<LT, LO, RT, RO> {
 
-    private final Orm orm;
+    private final transient Orm orm;
     private final Table table;
 
+    public SelectPart(Type type, Part left, Table table) {
+        super(type, left);
+        this.orm = null;
+        this.table = table;
+    }
     public SelectPart(Part left, Table table) {
         this(left, table, null);
     }
 
     public SelectPart(Part left, Table table, Orm orm) {
-        super(left);
+        super(Type.SELECT, left);
         this.table = table;
         this.orm = orm;
     }
@@ -70,11 +75,6 @@ public class SelectPart<LT extends Table<LO>, LO, RT extends Table<RO>, RO> exte
     @Override
     public <F extends Field<LT, LO, C>, C> Ordered<LT, LO> orderByDesc(F field) {
         return new OrderedPart(this, OrderedPart.Direction.DESCENDING, field);
-    }
-
-    @Override
-    public Type getType() {
-        return Type.SELECT;
     }
 
     @Override

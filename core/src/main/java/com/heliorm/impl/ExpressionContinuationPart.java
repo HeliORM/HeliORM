@@ -12,18 +12,11 @@ import com.heliorm.Table;
  */
 public class ExpressionContinuationPart<T extends Table<O>, O> extends Part<T, O, T, O> implements ExpressionContinuation<T, O> {
 
-    private final Type type;
     private final Part expression;
 
     public ExpressionContinuationPart(Part left, Type type, ExpressionContinuation expr) {
-        super(left);
-        this.type = type;
+        super(type, left);
         expression = ((Part) expr).head();
-    }
-
-    @Override
-    public Type getType() {
-        return type;
     }
 
     @Override
