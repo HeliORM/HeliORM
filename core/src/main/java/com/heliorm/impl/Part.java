@@ -1,6 +1,5 @@
 package com.heliorm.impl;
 
-import com.heliorm.Orm;
 import com.heliorm.Table;
 
 /**
@@ -36,7 +35,7 @@ public abstract class Part<T extends Table<O>, O, RT extends Table<RO>, RO> {
         }
     }
 
-    protected Orm getOrm() {
+    protected Selector getOrm() {
         return left.getOrm();
     }
 

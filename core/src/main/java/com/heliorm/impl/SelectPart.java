@@ -1,6 +1,5 @@
 package com.heliorm.impl;
 
-import com.heliorm.Orm;
 import com.heliorm.Table;
 import com.heliorm.def.Continuation;
 import com.heliorm.def.ExpressionContinuation;
@@ -18,7 +17,7 @@ import static java.lang.String.format;
 public class SelectPart<LT extends Table<LO>, LO, RT extends Table<RO>, RO> extends ExecutablePart<LT, LO>
         implements Select<LT, LO, RT, RO> {
 
-    private final transient Orm orm;
+    private final transient Selector orm;
     private final Table table;
 
     public SelectPart(Type type, Part left, Table table) {
@@ -30,14 +29,14 @@ public class SelectPart<LT extends Table<LO>, LO, RT extends Table<RO>, RO> exte
         this(left, table, null);
     }
 
-    public SelectPart(Part left, Table table, Orm orm) {
+    public SelectPart(Part left, Table table, Selector orm) {
         super(Type.SELECT, left);
         this.table = table;
         this.orm = orm;
     }
 
     @Override
-    protected Orm getOrm() {
+    protected Selector getOrm() {
         if (left() != null) {
             return left().getOrm();
         }
