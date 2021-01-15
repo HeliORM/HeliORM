@@ -19,7 +19,8 @@ public abstract class Part<T extends Table<O>, O, RT extends Table<RO>, RO> {
         VALUE_EXPRESSION,
         LIST_EXPRESSION,
         IS_EXPRESSION,
-        ON_CLAUSE, JOIN,
+        ON_CLAUSE,
+        JOIN,
         ORDER;
     }
 
