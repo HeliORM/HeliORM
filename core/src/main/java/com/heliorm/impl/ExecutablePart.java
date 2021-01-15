@@ -21,22 +21,22 @@ abstract class ExecutablePart<T extends Table<O>, O> extends Part<T, O, T, O>
 
     @Override
     public List<O> list() throws OrmException {
-        return getOrm().list(this);
+        return getSelector().list(this);
     }
 
     @Override
     public Stream<O> stream() throws OrmException {
-        return getOrm().stream(this);
+        return getSelector().stream(this);
     }
 
     @Override
     public O one() throws OrmException {
-        return getOrm().one(this);
+        return getSelector().one(this);
     }
 
     @Override
     public Optional<O> optional() throws OrmException {
-        return getOrm().optional(this);
+        return getSelector().optional(this);
     }
 
 }

@@ -35,8 +35,8 @@ public abstract class Part<T extends Table<O>, O, RT extends Table<RO>, RO> {
         }
     }
 
-    protected Selector getOrm() {
-        return left.getOrm();
+    protected Selector getSelector() {
+        return left.getSelector();
     }
 
     public final Type getType() {

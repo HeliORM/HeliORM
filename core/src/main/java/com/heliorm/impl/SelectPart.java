@@ -17,12 +17,12 @@ import static java.lang.String.format;
 public class SelectPart<LT extends Table<LO>, LO, RT extends Table<RO>, RO> extends ExecutablePart<LT, LO>
         implements Select<LT, LO, RT, RO> {
 
-    private final transient Selector orm;
+    private final Selector selector;
     private final Table table;
 
     public SelectPart(Type type, Part left, Table table) {
         super(type, left);
-        this.orm = null;
+        this.selector = null;
         this.table = table;
     }
     public SelectPart(Part left, Table table) {
@@ -32,15 +32,15 @@ public class SelectPart<LT extends Table<LO>, LO, RT extends Table<RO>, RO> exte
     public SelectPart(Part left, Table table, Selector orm) {
         super(Type.SELECT, left);
         this.table = table;
-        this.orm = orm;
+        this.selector = orm;
     }
 
     @Override
-    protected Selector getOrm() {
+    protected Selector getSelector() {
         if (left() != null) {
-            return left().getOrm();
+            return left().getSelector();
         }
-        return orm;
+        return selector;
     }
 
     @Override
