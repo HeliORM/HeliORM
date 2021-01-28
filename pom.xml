@@ -12,6 +12,7 @@
         <module>drivers</module>
         <module>plugins</module>
         <module>test</module>
+        <module>json</module>
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

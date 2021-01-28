@@ -36,6 +36,27 @@ public final class SqlOrm implements Orm {
 
     private final OrmDriver driver;
     private final Map<Class<?>, Table<?>> tables = new ConcurrentHashMap<>();
+    private final Selector selector =  new Selector() {
+        @Override
+        public <O, P extends Part & Executable> List<O> list(P tail) throws OrmException {
+            return SqlOrm.this.list(tail);
+        }
+
+        @Override
+        public <O, P extends Part & Executable> Stream<O> stream(P tail) throws OrmException {
+            return SqlOrm.this.stream(tail);
+        }
+
+        @Override
+        public <O, P extends Part & Executable> Optional<O> optional(P tail) throws OrmException {
+            return SqlOrm.this.optional(tail);
+        }
+
+        @Override
+        public <O, P extends Part & Executable> O one(P tail) throws OrmException {
+            return SqlOrm.this.one(tail);
+        }
+    };
 
     /**
      * Create an ORM mapper using the supplied driver instance. This is meant to
@@ -73,27 +94,7 @@ public final class SqlOrm implements Orm {
 
     @Override
     public <T extends Table<O>, O> Select<T, O, T, O> select(T table) {
-        return new SelectPart<>(null, table, new Selector() {
-            @Override
-            public <O, P extends Part & Executable> List<O> list(P tail) throws OrmException {
-                return SqlOrm.this.list(tail);
-            }
-
-            @Override
-            public <O, P extends Part & Executable> Stream<O> stream(P tail) throws OrmException {
-                return SqlOrm.this.stream(tail);
-            }
-
-            @Override
-            public <O, P extends Part & Executable> Optional<O> optional(P tail) throws OrmException {
-                return SqlOrm.this.optional(tail);
-            }
-
-            @Override
-            public <O, P extends Part & Executable> O one(P tail) throws OrmException {
-                return SqlOrm.this.one(tail);
-            }
-        });
+        return new SelectPart<>(null, table, selector());
     }
 
     @Override
@@ -132,6 +133,11 @@ public final class SqlOrm implements Orm {
         }
         return (Table<O>) table;
     }
+
+    @Override
+    public final Selector selector() {
+        return selector;
+     }
 
     private <O, P extends Part & Executable> List<O> list(P tail) throws OrmException {
         try (Stream<O> stream = stream(tail)) {

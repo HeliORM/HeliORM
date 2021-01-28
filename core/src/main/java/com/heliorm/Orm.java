@@ -1,6 +1,7 @@
 package com.heliorm;
 
 import com.heliorm.def.Select;
+import com.heliorm.impl.Selector;
 
 public interface Orm extends AutoCloseable {
     /**
@@ -72,5 +73,7 @@ public interface Orm extends AutoCloseable {
      * @throws OrmException Thrown if there is an finding the table the POJO
      */
     <O> Table<O> tableFor(Class<O> type) throws OrmException;
+
+    Selector selector();
     
 }

@@ -4,10 +4,6 @@ import com.heliorm.Orm;
 import com.heliorm.OrmException;
 import com.heliorm.Table;
 import com.heliorm.def.Field;
-import com.heliorm.sql.PojoOperations;
-import com.heliorm.sql.SqlDriver;
-import com.heliorm.sql.SqlOrmBuilder;
-import com.heliorm.sql.UnsafePojoOperations;
 import com.heliorm.sql.mysql.MySqlDriver;
 import com.heliorm.sql.postgresql.PostgreSqlDriver;
 import com.zaxxer.hikari.HikariConfig;
@@ -74,7 +70,7 @@ abstract class AbstractOrmTest {
         deleteAll(Province.class);
     }
 
-    protected final Orm orm() {
+    protected Orm orm() {
         return orm;
     }
 

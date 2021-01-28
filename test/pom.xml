@@ -61,6 +61,12 @@
             <version>0.84</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.heliorm</groupId>
+            <artifactId>json</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <properties>
