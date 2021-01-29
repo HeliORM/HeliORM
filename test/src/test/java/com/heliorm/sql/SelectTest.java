@@ -61,7 +61,7 @@ public class SelectTest extends AbstractOrmTest {
     @Test
     public void testSelect() throws Exception {
         say("Testing simple select");
-        List<Cat> all = orm().select(CAT).list();
+            List<Cat> all = orm().select(CAT).list();
         assertNotNull(all, "The list returned by list() should be non-null");
         assertFalse(all.isEmpty(), "The list returned by list() should be non-empty");
         assertTrue(all.size() == cats.size(), format("The amount of loaded data should match the number of the items (%d vs %s)", all.size(), cats.size()));

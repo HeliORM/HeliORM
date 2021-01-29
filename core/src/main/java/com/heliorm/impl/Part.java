@@ -67,12 +67,11 @@ public abstract class Part<T extends Table<O>, O, RT extends Table<RO>, RO> {
         return this;
     }
 
-    protected void setRight(Part right) {
+    protected final void setRight(Part right) {
         this.right = right;
     }
 
     @Override
     public abstract String toString();
-
 
 }

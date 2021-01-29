@@ -1,12 +1,7 @@
 package com.heliorm.impl;
 
-import com.heliorm.OrmException;
 import com.heliorm.Table;
-import com.heliorm.def.Continuation;
-import com.heliorm.def.ExpressionContinuation;
-import com.heliorm.def.Field;
-import com.heliorm.def.Join;
-import com.heliorm.def.Ordered;
+import com.heliorm.def.*;
 
 import static java.lang.String.format;
 
@@ -16,7 +11,7 @@ public class ContinuationPart<LT extends Table<LO>, LO, RT extends Table<RO>, RO
 
     ContinuationPart(Part left, Type type, ExpressionContinuation expr) {
         super(type, left);
-        this.expression = ((Part) expr).head();
+        this.expression = (Part) expr;
     }
 
     @Override
@@ -45,13 +40,13 @@ public class ContinuationPart<LT extends Table<LO>, LO, RT extends Table<RO>, RO
     }
 
 
-    public Part getExpression() throws OrmException {
-        return expression;
+    public Part getExpression() {
+        return expression.head();
     }
 
     @Override
     public String toString() {
-        return format("%s %s", getType().name(), expression);
+        return format("%s %s", getType().name(), getExpression());
     }
 
 }

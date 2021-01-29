@@ -20,7 +20,9 @@ public class SelectTypeAdapterFactory implements TypeAdapterFactory {
     private final ClassTypeAdapter classAdapter = new ClassTypeAdapter();
     private final TableTypeAdapter tableAdapter;
     private final SelectorAdapter selectorAdapter;
-   private final Orm orm;
+    private final Map<Class<?>, SelectTypeAdapter> partAdapters = new HashMap();
+    private final Orm orm;
+
     public SelectTypeAdapterFactory(Orm orm) {
         this.orm = orm;
         this.tableAdapter = new TableTypeAdapter(orm);
@@ -29,9 +31,10 @@ public class SelectTypeAdapterFactory implements TypeAdapterFactory {
 
     @Override
     public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> typeToken) {
-        System.out.printf("create %s\n", typeToken.getRawType().getSimpleName());
+        System.out.printf("Checking: %s\n", typeToken.getRawType().getSimpleName());
+
         if (Part.class.isAssignableFrom(typeToken.getRawType())) {
-            return findTypeAdapter(gson, (TypeToken<Part>) typeToken);
+            return findPartAdapter(gson, (TypeToken<Part>) typeToken);
         }
         if (Class.class.isAssignableFrom(typeToken.getRawType())) {
             return (TypeAdapter<T>) classAdapter;
@@ -50,22 +53,26 @@ public class SelectTypeAdapterFactory implements TypeAdapterFactory {
     }
 
     boolean hasObject(Object object) {
+        System.out.println("has object " + object.getClass() + "?");
         return objectToId.containsKey(object);
     }
-     String saveObject(Part object) {
-        String id = UUID.randomUUID().toString();
+
+    String saveObject(Part object) {
+        return saveObject(UUID.randomUUID().toString(), object);
+    }
+
+    String saveObject(String id, Part object) {
         objectToId.put(object, id);
         idToObject.put(id, object);
         return id;
     }
 
-
-    private <T> TypeAdapter<T>  findTypeAdapter(Gson gson, TypeToken<Part> typeToken) {
-        return (TypeAdapter<T>) new SelectTypeAdapter(this, gson, typeToken);
+    private <T> TypeAdapter<T> findPartAdapter(Gson gson, TypeToken<Part> typeToken) {
+        return (TypeAdapter<T>) partAdapters.computeIfAbsent(typeToken.getRawType(), key -> new SelectTypeAdapter(this, gson, typeToken));
     }
 
 
-     Object getObject(String id) {
+    Object getObject(String id) {
         return idToObject.get(id);
     }
 }

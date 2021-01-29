@@ -1,29 +1,21 @@
 package com.heliorm.sql;
 
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.heliorm.Orm;
 import com.heliorm.OrmException;
-import com.heliorm.OrmTransaction;
-import com.heliorm.Table;
-import com.heliorm.def.Executable;
-import com.heliorm.def.Select;
-import com.heliorm.impl.Part;
-import com.heliorm.impl.SelectPart;
-import com.heliorm.impl.Selector;
-import com.heliorm.json.SelectTypeAdapterFactory;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import test.persons.Person;
 import test.pets.Bird;
 import test.pets.Cat;
+import test.pets.CatType;
 import test.pets.Dog;
 import test.place.Province;
 import test.place.Town;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.heliorm.sql.TestData.*;
 import static java.lang.String.format;
@@ -38,16 +30,9 @@ public class JsonSelectTest extends AbstractOrmTest {
     private static List<Cat> cats;
     private static List<Dog> dogs;
     private static List<Bird> birds;
-    private Gson gson;
 
     public JsonSelectTest() {
-        gson = new GsonBuilder()
-                .setPrettyPrinting()
-                .serializeNulls()
-                .registerTypeAdapterFactory(new SelectTypeAdapterFactory(orm()))
-//                .setExclusionStrategies(new PartExclusionStrategy())
-//                .enableComplexMapKeySerialization()
-                .create();
+
     }
 
     protected Orm orm() {
@@ -69,53 +54,45 @@ public class JsonSelectTest extends AbstractOrmTest {
     @Test
     public void testSelect() throws Exception {
         say("Testing simple select");
-        String s = toJson(orm().select(CAT));
-        Part part = fromJson(s);
-        List<Cat> all = orm().selector().list((Part & Executable) part);
+        List<Cat> all = orm().select(CAT).list();
         assertNotNull(all, "The list returned by list() should be non-null");
         assertFalse(all.isEmpty(), "The list returned by list() should be non-empty");
         assertTrue(all.size() == cats.size(), format("The amount of loaded data should match the number of the items (%d vs %s)", all.size(), cats.size()));
         assertTrue(listCompareOrdered(all, cats), "The items loaded are exactly the same as the ones we expected");
     }
 
-    private String toJson(Executable part) {
-        return gson.toJson(((Part)part).head());
+
+
+    @Test
+    public void testSelectWhere() throws Exception {
+        say("Testing select with a simple where clause");
+        List<Cat> wanted = cats.stream()
+                .filter(cat -> cat.getAge() < 5)
+                .collect(Collectors.toList());
+        List<Cat> all = orm().select(CAT)
+                .where(CAT.age.lt(5))
+                .list();
+        assertNotNull(all, "The list returned by list() should be non-null");
+        assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
+        assertTrue(listCompareOrdered(all, wanted), "The items loaded are exactly the same as the ones we expected");
     }
 
-    private Part fromJson(String json) {
-        return gson.fromJson(json, SelectPart.class);
+
+    @Test
+    public void testSelectWhereAnd() throws Exception {
+        say("Testing select with a simple where clause with and");
+        List<Cat> wanted = cats.stream()
+                .filter(cat -> cat.getAge() < 5)
+                .filter(cat -> cat.getType().equals(CatType.INDOOR))
+                .collect(Collectors.toList());
+        List<Cat> all = orm().select(CAT)
+                .where(CAT.age.lt(5)).and(CAT.type.eq(CatType.INDOOR))
+                .list();
+        assertNotNull(all, "The list returned by list() should be non-null");
+        assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
+        assertTrue(listCompareOrdered(all, wanted), "The items loaded are exactly the same as the ones we expected");
     }
-//
-//    @Test
-//    public void testSelectWhere() throws Exception {
-//        say("Testing select with a simple where clause");
-//        List<Cat> wanted = cats.stream()
-//                .filter(cat -> cat.getAge() < 5)
-//                .collect(Collectors.toList());
-//        List<Cat> all = orm().select(CAT)
-//                .where(CAT.age.lt(5))
-//                .list();
-//        assertNotNull(all, "The list returned by list() should be non-null");
-//        assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
-//        assertTrue(listCompareOrdered(all, wanted), "The items loaded are exactly the same as the ones we expected");
-//    }
-//
-//
-//    @Test
-//    public void testSelectWhereAnd() throws Exception {
-//        say("Testing select with a simple where clause with and");
-//        List<Cat> wanted = cats.stream()
-//                .filter(cat -> cat.getAge() < 5)
-//                .filter(cat -> cat.getType().equals(CatType.INDOOR))
-//                .collect(Collectors.toList());
-//        List<Cat> all = orm().select(CAT)
-//                .where(CAT.age.lt(5)).and(CAT.type.eq(CatType.INDOOR))
-//                .list();
-//        assertNotNull(all, "The list returned by list() should be non-null");
-//        assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
-//        assertTrue(listCompareOrdered(all, wanted), "The items loaded are exactly the same as the ones we expected");
-//    }
-//
+
 //    @Test
 //    public void testSelectWhereOr() throws Exception {
 //        say("Testing select with a where clause with or");
