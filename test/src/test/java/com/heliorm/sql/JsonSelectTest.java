@@ -5,6 +5,7 @@ import com.heliorm.Orm;
 import com.heliorm.OrmException;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import test.persons.Person;
 import test.pets.Bird;

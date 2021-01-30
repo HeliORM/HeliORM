@@ -10,6 +10,7 @@ import static java.lang.String.format;
 
 public class FieldBuilder<P extends FieldPart> {
 
+    private final Table<?> table;
     private final Field.FieldType fieldType;
     private final Class<?> javaType;
     private final String javaName;
@@ -21,7 +22,8 @@ public class FieldBuilder<P extends FieldPart> {
     private Optional<Table<?>> foreignTable = Optional.empty();
     private Optional<Integer> length = Optional.empty();
 
-    public FieldBuilder(Field.FieldType fieldType, Class<?> javaType, String javaName) {
+    public FieldBuilder(Table<?> table, Field.FieldType fieldType, Class<?> javaType, String javaName) {
+        this.table = table;
         this.fieldType = fieldType;
         this.javaType = javaType;
         this.javaName = javaName;
@@ -64,40 +66,40 @@ public class FieldBuilder<P extends FieldPart> {
         P  part = null;
         switch (fieldType) {
             case STRING:
-                part = (P) new StringFieldPart(javaName);
+                part = (P) new StringFieldPart(table, javaName);
                 break;
             case BOOLEAN:
-                part = (P) new BooleanFieldPart(javaName);
+                part = (P) new BooleanFieldPart(table, javaName);
                 break;
             case BYTE:
-                part = (P) new ByteFieldPart(javaName);
+                part = (P) new ByteFieldPart(table, javaName);
                 break;
             case SHORT:
-                part = (P) new ShortFieldPart(javaName);
+                part = (P) new ShortFieldPart(table, javaName);
                 break;
             case INTEGER:
-                part = (P) new IntegerFieldPart(javaName);
+                part = (P) new IntegerFieldPart(table, javaName);
                 break;
             case LONG:
-                part = (P) new LongFieldPart(javaName);
+                part = (P) new LongFieldPart(table, javaName);
                 break;
             case FLOAT:
-                part = (P) new FloatFieldPart(javaName);
+                part = (P) new FloatFieldPart(table, javaName);
                 break;
             case DOUBLE:
-                part = (P) new DoubleFieldPart(javaName);
+                part = (P) new DoubleFieldPart(table, javaName);
                 break;
             case ENUM:
-                part = (P) new EnumFieldPart(javaType, javaName);
+                part = (P) new EnumFieldPart(table, javaType, javaName);
                 break;
             case DATE:
-                part = (P) new DateFieldPart(javaName);
+                part = (P) new DateFieldPart(table, javaName);
                 break;
             case TIMESTAMP:
-                part = (P) new TimestampFieldPart(javaName);
+                part = (P) new TimestampFieldPart(table, javaName);
                 break;
             case DURATION:
-                part = (P) new DurationFieldPart(javaName);
+                part = (P) new DurationFieldPart(table, javaName);
                 break;
             default:
                 throw new UncaughtOrmException(format("Unexpected field type %s. BUG!", fieldType));

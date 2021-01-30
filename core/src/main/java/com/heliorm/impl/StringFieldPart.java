@@ -14,8 +14,8 @@ public class StringFieldPart<T extends Table<O>, O> extends FieldPart<T, O, Stri
         WithLikePart<T, O, String>,
         WithIsPart<T, O, String> {
 
-    public StringFieldPart(String javaName) {
-        super(FieldType.STRING, String.class, javaName);
+    public StringFieldPart(T table, String javaName) {
+        super(table, FieldType.STRING, String.class, javaName);
     }
 
 }

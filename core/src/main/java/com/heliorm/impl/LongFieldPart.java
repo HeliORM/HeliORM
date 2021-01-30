@@ -9,8 +9,8 @@ import com.heliorm.Table;
  */
 public class LongFieldPart<T extends Table<O>, O> extends NumberFieldPart<T, O, Long> implements LongField<T, O> {
 
-    public LongFieldPart(String javaName) {
-        super(FieldType.LONG, Long.class, javaName);
+    public LongFieldPart(T table, String javaName) {
+        super(table, FieldType.LONG, Long.class, javaName);
     }
 
 }

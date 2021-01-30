@@ -4,10 +4,14 @@ import com.heliorm.impl.Part;
 
 public final class FakePart extends Part {
 
-    public static FakePart TEMP = new FakePart(null, null);
+    private final String id;
+    public FakePart(String id) {
+        super(null, null);
+        this.id  = id;
+    }
 
-    private FakePart(Type type, Part left) {
-        super(type, left);
+    public String getId() {
+        return id;
     }
 
     @Override

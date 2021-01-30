@@ -12,7 +12,7 @@ import com.heliorm.Table;
  */
 public abstract class ExpressionPart<T extends Table<O>, O, C> extends Part<T, O, T, O> implements ExpressionContinuation<T, O> {
 
-    public ExpressionPart(Type type, Part left) {
+    public ExpressionPart(Type type, FieldPart left) {
         super(type, left);
     }
 

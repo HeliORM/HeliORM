@@ -9,8 +9,8 @@ import com.heliorm.Table;
  */
 public class IntegerFieldPart<T extends Table<O>, O> extends NumberFieldPart<T, O, Integer> implements IntegerField<T, O> {
 
-    public IntegerFieldPart(String javaName) {
-        super(FieldType.INTEGER, Integer.class, javaName);
+    public IntegerFieldPart(T table, String javaName) {
+        super(table, FieldType.INTEGER, Integer.class, javaName);
     }
 
 }

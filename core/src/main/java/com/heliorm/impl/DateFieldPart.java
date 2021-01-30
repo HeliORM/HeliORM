@@ -15,8 +15,8 @@ public class DateFieldPart<T extends Table<O>, O> extends FieldPart<T, O, Date> 
         WithEqualsPart<T, O, Date>,
         WithInPart<T, O, Date>, WithIsPart<T, O, Date> {
 
-    public DateFieldPart(String javaName) {
-        super(FieldType.DATE, Date.class, javaName);
+    public DateFieldPart(T table, String javaName) {
+        super(table, FieldType.DATE, Date.class, javaName);
     }
 
 }

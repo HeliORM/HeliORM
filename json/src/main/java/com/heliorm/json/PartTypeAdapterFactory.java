@@ -6,41 +6,31 @@ import com.google.gson.TypeAdapterFactory;
 import com.google.gson.reflect.TypeToken;
 import com.heliorm.Orm;
 import com.heliorm.Table;
+import com.heliorm.def.Field;
 import com.heliorm.impl.Part;
 import com.heliorm.impl.Selector;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
-public class SelectTypeAdapterFactory implements TypeAdapterFactory {
+import static java.lang.String.format;
 
-    private final Map<Object, String> objectToId = new HashMap();
+public class PartTypeAdapterFactory extends OrmTypeAdapterFactory {
+
+    private final Map<Part, String> objectToId = new HashMap();
     private final Map<String, Part> idToObject = new HashMap();
-    private final ClassTypeAdapter classAdapter = new ClassTypeAdapter();
-    private final TableTypeAdapter tableAdapter;
+    private final Set< Part> patched = new HashSet();
     private final SelectorAdapter selectorAdapter;
-    private final Map<Class<?>, SelectTypeAdapter> partAdapters = new HashMap();
-    private final Orm orm;
+    private final Map<Class<?>, PartTypeAdapter> partAdapters = new HashMap();
 
-    public SelectTypeAdapterFactory(Orm orm) {
-        this.orm = orm;
-        this.tableAdapter = new TableTypeAdapter(orm);
+    public PartTypeAdapterFactory(Orm orm) {
+        super(orm);
         this.selectorAdapter = new SelectorAdapter(orm);
     }
 
     @Override
     public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> typeToken) {
-        System.out.printf("Checking: %s\n", typeToken.getRawType().getSimpleName());
-
         if (Part.class.isAssignableFrom(typeToken.getRawType())) {
             return findPartAdapter(gson, (TypeToken<Part>) typeToken);
-        }
-        if (Class.class.isAssignableFrom(typeToken.getRawType())) {
-            return (TypeAdapter<T>) classAdapter;
-        }
-        if (Table.class.isAssignableFrom(typeToken.getRawType())) {
-            return (TypeAdapter<T>) tableAdapter;
         }
         if (Selector.class.isAssignableFrom(typeToken.getRawType())) {
             return (TypeAdapter<T>) selectorAdapter;
@@ -48,12 +38,11 @@ public class SelectTypeAdapterFactory implements TypeAdapterFactory {
         return null;
     }
 
-    String getObjectId(Object object) {
+    String getObjectId(Part object) {
         return objectToId.get(object);
     }
 
-    boolean hasObject(Object object) {
-        System.out.println("has object " + object.getClass() + "?");
+    boolean hasObject(Part object) {
         return objectToId.containsKey(object);
     }
 
@@ -68,11 +57,20 @@ public class SelectTypeAdapterFactory implements TypeAdapterFactory {
     }
 
     private <T> TypeAdapter<T> findPartAdapter(Gson gson, TypeToken<Part> typeToken) {
-        return (TypeAdapter<T>) partAdapters.computeIfAbsent(typeToken.getRawType(), key -> new SelectTypeAdapter(this, gson, typeToken));
+        return (TypeAdapter<T>) partAdapters.computeIfAbsent(typeToken.getRawType(), key -> new PartTypeAdapter(this, gson, orm, typeToken));
     }
 
 
-    Object getObject(String id) {
+    Part getObject(String id) {
         return idToObject.get(id);
     }
+
+     void markPatched(Part part) {
+        patched.add(part);
+    }
+
+    boolean isPatched(Part part) {
+        return patched.contains(part);
+    }
+
 }

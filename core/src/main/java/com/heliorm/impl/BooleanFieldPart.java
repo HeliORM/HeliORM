@@ -11,8 +11,8 @@ public class BooleanFieldPart<T extends Table<O>, O> extends FieldPart<T, O, Boo
         BooleanField<T, O>,
         WithEqualsPart<T, O, Boolean>, WithIsPart<T, O, Boolean> {
 
-    public BooleanFieldPart(String javaName) {
-        super(FieldType.BOOLEAN, Boolean.class, javaName);
+    public BooleanFieldPart(T table, String javaName) {
+        super(table, FieldType.BOOLEAN, Boolean.class, javaName);
     }
 
 }

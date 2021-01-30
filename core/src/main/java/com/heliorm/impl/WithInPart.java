@@ -14,7 +14,7 @@ import com.heliorm.def.WithIn;
  */
 public interface WithInPart<T extends Table<O>, O, C> extends WithIn<T, O, C> {
 
-    Part<T, O, T, O> getThis() throws OrmException;
+    FieldPart<T, O, C> getThis() throws OrmException;
 
     @Override
     public default ExpressionContinuation<T, O> in(List<C> values) throws OrmException {

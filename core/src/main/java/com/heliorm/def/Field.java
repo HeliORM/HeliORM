@@ -29,6 +29,8 @@ public interface Field<T extends Table<O>, O, C> {
         DURATION;
     }
 
+    Table<?> getTable();
+
     /**
      * Get the type of the field.
      *

@@ -28,6 +28,11 @@ public class AnnotatedPojoField implements Field {
     }
 
     @Override
+    public Table<?> getTable() {
+        return table;
+    }
+
+    @Override
     public String getSqlName() {
         Optional<Column> col = getAnnotation(Column.class);
         if (col.isPresent()) {

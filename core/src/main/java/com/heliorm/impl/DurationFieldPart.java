@@ -15,8 +15,8 @@ public class DurationFieldPart<T extends Table<O>, O> extends FieldPart<T, O, Du
         WithEqualsPart<T, O, Duration>,
         WithInPart<T, O, Duration>, WithIsPart<T, O, Duration> {
 
-    public DurationFieldPart(String javaName) {
-        super(FieldType.DURATION, Duration.class, javaName);
+    public DurationFieldPart(T table, String javaName) {
+        super(table, FieldType.DURATION, Duration.class, javaName);
     }
 
 }

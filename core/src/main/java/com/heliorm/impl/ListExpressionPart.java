@@ -19,7 +19,7 @@ public class ListExpressionPart<T extends Table<O>, O, C> extends ExpressionPart
         IN, NOT_IN;
     }
 
-    public ListExpressionPart(Part left, Operator op, List<C> values) {
+    public ListExpressionPart(FieldPart left, Operator op, List<C> values) {
         super(Type.LIST_EXPRESSION, left);
         this.operator = op;
         this.values = values;

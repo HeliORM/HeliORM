@@ -17,6 +17,7 @@ import static java.lang.String.format;
  */
 public abstract class FieldPart<T extends Table<O>, O, C> extends Part<T, O, T, O> implements Field<T, O, C>, Cloneable {
 
+    private final Table table;
     private final FieldType fieldType;
     private final Class<C> javaType;
     private final String javaName;
@@ -28,12 +29,18 @@ public abstract class FieldPart<T extends Table<O>, O, C> extends Part<T, O, T, 
     private Optional<Table<?>> foreignTable = Optional.empty();
     private final Optional<Integer> length = Optional.empty();
 
-    public FieldPart(FieldType fieldType, Class<C> javaType, String javaName) {
+    public FieldPart(Table table, FieldType fieldType, Class<C> javaType, String javaName) {
         super(Part.Type.FIELD, null);
+        this.table = table;
         this.fieldType = fieldType;
         this.javaType = javaType;
         this.javaName = javaName;
         this.sqlName = javaName;
+    }
+
+    @Override
+    public final T getTable() {
+        return (T) table;
     }
 
     @Override

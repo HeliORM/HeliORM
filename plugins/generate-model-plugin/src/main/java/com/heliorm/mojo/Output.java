@@ -171,7 +171,7 @@ class Output {
         StringJoiner fieldNames = new StringJoiner(",");
         impt(TableBuilder.class);
         impt(FieldBuilder.class);
-        emit("private transient TableBuilder<%s,%s> builder = TableBuilder.create(%s.class);",  tableName(cm), getJavaName(cm), getJavaName(cm));
+        emit("private transient TableBuilder<%s,%s> builder = TableBuilder.create(this, %s.class);",  tableName(cm), getJavaName(cm), getJavaName(cm));
         emit("");
         for (Field fm : cm.getFields()) {
             addFieldModel(cm, fm);

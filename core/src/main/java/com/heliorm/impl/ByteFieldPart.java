@@ -9,8 +9,8 @@ import com.heliorm.Table;
  */
 public class ByteFieldPart<T extends Table<O>, O> extends NumberFieldPart<T, O, Byte> implements ByteField<T, O> {
 
-    public ByteFieldPart(String javaName) {
-        super(FieldType.BYTE, Byte.class, javaName);
+    public ByteFieldPart(T table, String javaName) {
+        super(table, FieldType.BYTE, Byte.class, javaName);
     }
 
 

@@ -13,8 +13,8 @@ public abstract class NumberFieldPart<T extends Table<O>, O, N extends Number> e
         WithRangePart<T, O, N>,
         WithInPart<T, O, N>, WithIsPart<T,O,N> {
 
-    public NumberFieldPart(FieldType fieldType, Class<N> javaType, String javaName) {
-        super(fieldType, javaType, javaName);
+    public NumberFieldPart(T table, FieldType fieldType, Class<N> javaType, String javaName) {
+        super(table, fieldType, javaType, javaName);
     }
 
 }
