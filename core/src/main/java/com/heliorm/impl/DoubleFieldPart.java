@@ -9,13 +9,8 @@ import com.heliorm.Table;
  */
 public class DoubleFieldPart<T extends Table<O>, O> extends NumberFieldPart<T, O, Double> implements DoubleField<T, O> {
 
-    public DoubleFieldPart(String javaName, String sqlName) {
-        super(Double.class, javaName, sqlName);
-    }
-
-    @Override
-    public FieldType getFieldType() {
-        return FieldType.DOUBLE;
+    public DoubleFieldPart(String javaName) {
+        super(FieldType.DOUBLE, Double.class, javaName);
     }
 
 }

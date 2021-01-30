@@ -15,8 +15,8 @@ public class TimestampFieldPart<T extends Table<O>, O> extends FieldPart<T, O, I
         WithEqualsPart<T, O, Instant>,
         WithInPart<T, O, Instant>, WithIsPart<T,O,Instant> {
 
-    public TimestampFieldPart(String javaName, String sqlName) {
-        super(Instant.class, javaName, sqlName);
+    public TimestampFieldPart(String javaName) {
+        super(FieldType.TIMESTAMP, Instant.class, javaName);
     }
 
 }

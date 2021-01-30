@@ -9,13 +9,8 @@ import com.heliorm.Table;
  */
 public class ShortFieldPart<T extends Table<O>, O> extends NumberFieldPart<T, O, Short> implements ShortField<T, O> {
 
-    public ShortFieldPart(String javaName, String sqlName) {
-        super(Short.class, javaName, sqlName);
-    }
-
-    @Override
-    public FieldType getFieldType() {
-        return FieldType.SHORT;
+    public ShortFieldPart(String javaName) {
+        super(FieldType.SHORT, Short.class, javaName);
     }
 
 }

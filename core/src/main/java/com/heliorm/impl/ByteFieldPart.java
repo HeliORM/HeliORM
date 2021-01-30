@@ -9,13 +9,9 @@ import com.heliorm.Table;
  */
 public class ByteFieldPart<T extends Table<O>, O> extends NumberFieldPart<T, O, Byte> implements ByteField<T, O> {
 
-    public ByteFieldPart(String javaName, String sqlName) {
-        super(Byte.class, javaName, sqlName);
+    public ByteFieldPart(String javaName) {
+        super(FieldType.BYTE, Byte.class, javaName);
     }
 
-    @Override
-    public FieldType getFieldType() {
-        return FieldType.BYTE;
-    }
 
 }

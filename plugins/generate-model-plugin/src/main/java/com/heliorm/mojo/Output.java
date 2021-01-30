@@ -7,14 +7,7 @@ import com.heliorm.def.DoubleField;
 import com.heliorm.def.DurationField;
 import com.heliorm.def.IntegerField;
 import com.heliorm.def.TimestampField;
-import com.heliorm.impl.BooleanFieldPart;
-import com.heliorm.impl.DateFieldPart;
-import com.heliorm.impl.DoubleFieldPart;
-import com.heliorm.impl.DurationFieldPart;
-import com.heliorm.impl.EnumFieldPart;
-import com.heliorm.impl.FieldPart;
-import com.heliorm.impl.LongFieldPart;
-import com.heliorm.impl.ShortFieldPart;
+import com.heliorm.impl.*;
 import com.heliorm.Database;
 import com.heliorm.Table;
 import com.heliorm.def.EnumField;
@@ -23,16 +16,13 @@ import com.heliorm.def.FloatField;
 import com.heliorm.def.LongField;
 import com.heliorm.def.ShortField;
 import com.heliorm.def.StringField;
-import com.heliorm.impl.ByteFieldPart;
-import com.heliorm.impl.FloatFieldPart;
-import com.heliorm.impl.IntegerFieldPart;
-import com.heliorm.impl.StringFieldPart;
-import com.heliorm.impl.TimestampFieldPart;
+import sun.tools.jconsole.Tab;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -179,6 +169,10 @@ class Output {
         emit("}");
         emit("");
         StringJoiner fieldNames = new StringJoiner(",");
+        impt(TableBuilder.class);
+        impt(FieldBuilder.class);
+        emit("private transient TableBuilder<%s,%s> builder = TableBuilder.create(%s.class);",  tableName(cm), getJavaName(cm), getJavaName(cm));
+        emit("");
         for (Field fm : cm.getFields()) {
             addFieldModel(cm, fm);
             fieldNames.add(fm.getJavaName());
@@ -329,171 +323,102 @@ class Output {
 
     }
 
-    private void addType2Field(Class<? extends Field> fieldClass, Class<? extends FieldPart> partClass, Table cm, Field<?,?,?> fm) throws GeneratorException {
-        try {
-            impt(fieldClass);
-            impt(partClass);
-            boolean isKey = fm.isPrimaryKey();
-            if (isKey) {
-                emit("public final %s<%s, %s> %s = new %s(\"%s\", \"%s\", %b) {",
-                        fieldClass.getSimpleName(),
-                        tableName(cm),
-                        cm.getObjectClass().getSimpleName(),
-                        fm.getJavaName(),
-                        partClass.getSimpleName(),
-                        fm.getJavaName(),
-                        fm.getSqlName(),
-                        fm.isPrimaryKey());
-                if (fm.isAutoNumber()) {
-                    push();
-                    emit("@Override");
-                    emit("public boolean isAutoNumber() {");
-                    push();
-                    emit("return true;");
-                    pop();
-                    emit("}");
-                    pop();
-                }
-            } else {
-                emit("public final %s<%s, %s> %s = new %s(\"%s\", \"%s\") {",
-                        fieldClass.getSimpleName(),
-                        tableName(cm),
-                        cm.getObjectClass().getSimpleName(),
-                        fm.getJavaName(),
-                        partClass.getSimpleName(),
-                        fm.getJavaName(),
-                        fm.getSqlName());
-            }
-            if (fm.getFieldType() == Field.FieldType.STRING) {
-                if (fm.getLength().isPresent()) {
-                    impt(Optional.class);
-                    push();
-                    emit("@Override");
-                    emit("public Optional<Integer> getLength() {");
-                    push();
-                    emit("return Optional.of(%d);", fm.getLength().get());
-                    pop();
-                    emit("}");
-                    pop();
-                }
-            }
-            if (fm.isNullable()) {
-                push();
-                emit("@Override");
-                emit("public boolean isNullable() {");
-                push();
-                emit("return true;");
-                pop();
-                emit("}");
-                pop();
-            }
-            if (fm.isForeignKey()) {
-                Table<?> table = fm.getForeignTable().get();
-                push();
-                emit("@Override");
-                emit("public boolean isForeignKey() {");
-                push();
-                emit("return true;");
-                pop();
-                emit("}");
-                emit("");
-                emit("@Override");
-                emit("public Optional<Table<?>> getForeignTable() {");
-                push();
-                emit("return Optional.of(%s);", shortFieldName(table));
-                pop();
-                emit("}");
-                pop();
-            }
-            emit("};");
-        }
-        catch (Exception ex) {
-                throw new GeneratorException(format("Error generating code for field %s for %s (%s)", fm.getJavaName(), cm.getObjectClass().getSimpleName(), ex.getMessage()));
-        }
-    }
-
-    private void addType3Field(Class<? extends Field> fieldClass, Class<? extends FieldPart> partClass, Table cm, Field<?, ?, ?> fm) throws GeneratorException {
-        impt(fieldClass);
-        impt(partClass);
-        impt(fm.getJavaType());
-        emit("public final %s<%s, %s, %s> %s = new %s(%s.class, \"%s\", \"%s\") {",
-                fieldClass.getSimpleName(),
-                tableName(cm),
-                cm.getObjectClass().getSimpleName(),
-                fm.getJavaType().getSimpleName(),
-                fm.getJavaName(),
-                partClass.getSimpleName(),
-                fm.getJavaType().getSimpleName(),
-                fm.getJavaName(), fm.getSqlName());
-        emit("};");
-    }
-
     private void addLongField(Table cm, Field fm) throws GeneratorException {
-        addType2Field(LongField.class, LongFieldPart.class, cm, fm);
+        addField(cm, fm, LongField.class, "longField");
     }
 
     private void addIntegerField(Table cm, Field fm) throws GeneratorException {
-        addType2Field(IntegerField.class, IntegerFieldPart.class, cm, fm);
+        addField(cm, fm, IntegerField.class, "integerField");
+
     }
 
     private void addShortField(Table cm, Field fm) throws GeneratorException {
-        addType2Field(ShortField.class, ShortFieldPart.class, cm, fm);
+        addField(cm, fm, ShortField.class, "shortField");
     }
 
     private void addByteField(Table cm, Field fm) throws GeneratorException {
-        addType2Field(ByteField.class, ByteFieldPart.class, cm, fm);
+        addField(cm, fm, ByteField.class, "byteField");
     }
 
+
     private void addDoubleField(Table cm, Field fm) throws GeneratorException {
-        addType2Field(DoubleField.class, DoubleFieldPart.class, cm, fm);
+        addField(cm, fm, DoubleField.class, "doubleField");
     }
 
     private void addFloatField(Table cm, Field fm) throws GeneratorException {
-        addType2Field(FloatField.class, FloatFieldPart.class, cm, fm);
+        addField(cm, fm, FloatField.class, "floatField");
     }
 
     private void addBooleanField(Table cm, Field fm) throws GeneratorException {
-        addType2Field(BooleanField.class, BooleanFieldPart.class, cm, fm);
+        addField(cm, fm, BooleanField.class, "booleanField");
     }
 
     private void addEnumField(Table cm, Field fm) throws GeneratorException {
         impt(EnumField.class);
-        impt(EnumFieldPart.class);
-        impt(fm.getJavaType());
         String enumTypeName;
         if (fm.getJavaType().getEnclosingClass() == null) {
-            enumTypeName = fm.getJavaType().getSimpleName();
-        }
-        else {
+            enumTypeName = fm.getJavaType().getCanonicalName()  ;
+        } else {
             enumTypeName = format("%s.%s", cm.getObjectClass().getSimpleName(), fm.getJavaType().getSimpleName());
         }
-        emit("public final %s<%s, %s, %s> %s = new %s(%s.class, \"%s\", \"%s\") {",
-                EnumFieldPart.class.getSimpleName(),
+        emit("public final %s<%s, %s, %s> %s = builder.enumField(\"%s\", %s.class)",
+                EnumField.class.getSimpleName(),
                 tableName(cm),
                 cm.getObjectClass().getSimpleName(),
                 enumTypeName,
                 fm.getJavaName(),
-                EnumFieldPart.class.getSimpleName(),
-                enumTypeName,
-                fm.getJavaName(), fm.getSqlName());
-        emit("};");
+                fm.getJavaName(),
+                enumTypeName);
+        completeField(fm);
     }
 
     private void addDateField(Table cm, Field fm) throws GeneratorException {
-        addType2Field(DateField.class, DateFieldPart.class, cm, fm);
+        addField(cm, fm, DateField.class, "dateField");
     }
 
     private void addTimestampField(Table cm, Field fm) throws GeneratorException {
-        addType2Field(TimestampField.class, TimestampFieldPart.class, cm, fm);
+        addField(cm, fm, TimestampField.class, "timestampField");
     }
 
     private void addDurationField(Table cm, Field fm) throws GeneratorException {
-        addType2Field(DurationField.class, DurationFieldPart.class, cm, fm);
+        addField(cm, fm, DurationField.class, "durationField");
+
     }
 
     private void addStringField(Table cm, Field fm) throws GeneratorException {
-        addType2Field(StringField.class, StringFieldPart.class, cm, fm);
+        addField(cm, fm, StringField.class, "stringField");
     }
+
+    private void addField(Table<?> cm, Field<?,?,?> fm, Class<? extends Field> fieldType, String buildMethod) {
+        impt(fieldType);
+        emit("public final %s<%s, %s> %s = builder.%s(\"%s\")",
+                fieldType.getSimpleName(),
+                tableName(cm),
+                cm.getObjectClass().getSimpleName(),
+                fm.getJavaName(),
+                buildMethod,
+                fm.getJavaName());
+        completeField(fm);
+    }
+
+    private void completeField(Field<?,?,?> fm) {
+        push();
+        emit(".withPrimaryKey(%b)", fm.isPrimaryKey());
+        emit(".withAutoNumber(%b)", fm.isAutoNumber());
+        emit(".withForeignKey(%b)", fm.isForeignKey());
+        emit(".withNullable(%b)", fm.isNullable());
+        emit(".withSqlName(\"%s\")", fm.getSqlName());
+        if (fm.getLength().isPresent()) {
+            emit(".withLength(%s)", fm.getLength().get());
+
+        }
+        if (fm.getForeignTable().isPresent()) {
+            emit(".withForeignTable(%s)",  shortFieldName(fm.getForeignTable().get()));
+        }
+        emit(".build();");
+        pop();
+    }
+
 
     private String tableName(Table table) {
         return table.getObjectClass().getSimpleName() + "Table";

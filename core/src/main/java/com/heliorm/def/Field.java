@@ -68,9 +68,7 @@ public interface Field<T extends Table<O>, O, C> {
      *
      * @return True if it is
      */
-    default boolean isForeignKey() {
-        return false;
-    }
+     boolean isForeignKey();
 
     /**
      * Return true if this is an auto-number key
@@ -83,24 +81,18 @@ public interface Field<T extends Table<O>, O, C> {
      * Return the table to which this field links if it is a foreign key.
      * @return The linked table
      */
-    default Optional<Table<?>> getForeignTable() {
-        return Optional.empty();
-    }
+     Optional<Table<?>> getForeignTable();
 
     /**
      * Return the field length, if a specific length is known.
      *
      * @return The length, if known
      */
-    default Optional<Integer> getLength() {
-        return Optional.empty();
-    }
+     Optional<Integer> getLength() ;
 
     /** Return true if the field can be null.
      *
      * @return True if it can be null
      */
-    default boolean isNullable() {
-        return false;
-    }
+     boolean isNullable() ;
 }

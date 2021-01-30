@@ -15,8 +15,8 @@ public class EnumFieldPart<T extends Table<O>, O, E extends Enum> extends FieldP
         WithEqualsPart<T, O, E>,
         WithInPart<T, O, E>, WithIsPart<T, O, E> {
 
-    public EnumFieldPart(Class<E> fieldType, String javaName, String sqlName) {
-        super(fieldType, javaName, sqlName);
+    public EnumFieldPart(Class<E> javaType, String javaName) {
+        super(FieldType.ENUM, javaType, javaName);
     }
 
 }
