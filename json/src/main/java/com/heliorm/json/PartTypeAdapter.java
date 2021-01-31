@@ -53,7 +53,10 @@ public class PartTypeAdapter extends TypeAdapter<Part> {
             String typeName = job.get("type").getAsString();
             TypeToken typeToken = getTypeToken(typeName);
             if (FieldPart.class.isAssignableFrom(typeToken.getRawType())) {
-                typeToken = getTypeTokenFromFieldType(job.get("fieldType").getAsString());
+                typeToken = getFieldPartTypeToken(job.get("fieldType").getAsString());
+            }
+            else if (ValueExpressionPart.class.isAssignableFrom(typeToken.getRawType())) {
+                typeToken = getValuePartTypeToken(job.get("dataType").getAsString());
             }
             String id = job.get("serial-ref").getAsString();
             System.out.println("Reading: " + typeToken.getRawType().getSimpleName());
@@ -72,6 +75,7 @@ public class PartTypeAdapter extends TypeAdapter<Part> {
             throw new IOException("Dog show");
         }
     }
+
 
     private Part replaceFakes(Part part) throws IOException {
         if (part != null) {
@@ -130,7 +134,7 @@ public class PartTypeAdapter extends TypeAdapter<Part> {
     }
 
 
-    private TypeToken getTypeTokenFromFieldType(String typeName) throws IOException {
+    private TypeToken getFieldPartTypeToken(String typeName) throws IOException {
         Field.FieldType type = Field.FieldType.valueOf(typeName);
         switch (type) {
             case BYTE:
@@ -149,14 +153,47 @@ public class PartTypeAdapter extends TypeAdapter<Part> {
                 return TypeToken.get(BooleanFieldPart.class);
             case DATE:
                 return TypeToken.get(DateFieldPart.class);
-            case TIMESTAMP:
-                return TypeToken.get(TimestampFieldPart.class);
+            case INSTANT:
+                return TypeToken.get(InstantFieldPart.class);
             case DURATION:
                 return TypeToken.get(DurationFieldPart.class);
             case STRING:
                 return TypeToken.get(StringFieldPart.class);
             case ENUM:
                 return TypeToken.get(EnumFieldPart.class);
+            default:
+                throw new IOException(format("Unsupported field type '%s'.BUG!", type));
+        }
+
+    }
+
+    private TypeToken getValuePartTypeToken(String typeName) throws IOException {
+        Field.FieldType type = Field.FieldType.valueOf(typeName);
+        switch (type) {
+            case BYTE:
+                return TypeToken.get(ByteValueExpressionPart.class);
+            case SHORT:
+                return TypeToken.get(ShortValueExpressionPart.class);
+            case INTEGER:
+                return TypeToken.get(IntegerValueExpressionPart.class);
+            case LONG:
+                return TypeToken.get(LongValueExpressionPart.class);
+            case FLOAT:
+                return TypeToken.get(FloatValueExpressionPart.class);
+            case DOUBLE:
+                return TypeToken.get(DoubleValueExpressionPart.class);
+            case BOOLEAN:
+                return TypeToken.get(BooleanValueExpressionPart.class);
+            case DATE:
+                return TypeToken.get(DateValueExpressionPart.class);
+            case INSTANT:
+                return TypeToken.get(InstantValueExpressionPart.class);
+            case DURATION:
+                return TypeToken.get(DurationValueExpressionPart.class);
+            case STRING:
+                return TypeToken.get(StringValueExpressionPart.class);
+            case ENUM:
+                return TypeToken.get(EnumValueExpressionPart.class);
             default:
                 throw new IOException(format("Unsupported field type '%s'.BUG!", type));
         }

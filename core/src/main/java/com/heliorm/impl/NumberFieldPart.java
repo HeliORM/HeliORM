@@ -17,4 +17,6 @@ public abstract class NumberFieldPart<T extends Table<O>, O, N extends Number> e
         super(table, fieldType, javaType, javaName);
     }
 
+
+
 }

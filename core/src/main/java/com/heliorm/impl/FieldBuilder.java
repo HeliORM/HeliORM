@@ -95,8 +95,8 @@ public class FieldBuilder<P extends FieldPart> {
             case DATE:
                 part = (P) new DateFieldPart(table, javaName);
                 break;
-            case TIMESTAMP:
-                part = (P) new TimestampFieldPart(table, javaName);
+            case INSTANT:
+                part = (P) new InstantFieldPart(table, javaName);
                 break;
             case DURATION:
                 part = (P) new DurationFieldPart(table, javaName);

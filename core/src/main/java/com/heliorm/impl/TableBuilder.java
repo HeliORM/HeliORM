@@ -1,7 +1,6 @@
 package com.heliorm.impl;
 
 import com.heliorm.Table;
-import com.heliorm.def.ByteField;
 import com.heliorm.def.Field;
 
 import java.time.Duration;
@@ -48,8 +47,8 @@ public final class TableBuilder<T extends Table<O>, O> {
         return new FieldBuilder<>(table, Field.FieldType.DURATION, Duration.class, javaName);
     }
 
-    public FieldBuilder<TimestampFieldPart<T,O>> timestampField(String javaName) {
-        return new FieldBuilder<>(table, Field.FieldType.TIMESTAMP, Instant.class, javaName);
+    public FieldBuilder<InstantFieldPart<T,O>> timestampField(String javaName) {
+        return new FieldBuilder<>(table, Field.FieldType.INSTANT, Instant.class, javaName);
     }
 
     public FieldBuilder<StringFieldPart<T,O>> stringField(String javaName) {

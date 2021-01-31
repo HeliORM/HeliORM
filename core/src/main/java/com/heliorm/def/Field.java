@@ -25,7 +25,7 @@ public interface Field<T extends Table<O>, O, C> {
         ENUM,
         STRING,
         DATE,
-        TIMESTAMP,
+        INSTANT,
         DURATION;
     }
 

@@ -1,37 +1,16 @@
 package com.heliorm.mojo;
 
-import com.heliorm.def.BooleanField;
-import com.heliorm.def.ByteField;
-import com.heliorm.def.DateField;
-import com.heliorm.def.DoubleField;
-import com.heliorm.def.DurationField;
-import com.heliorm.def.IntegerField;
-import com.heliorm.def.TimestampField;
-import com.heliorm.impl.*;
 import com.heliorm.Database;
 import com.heliorm.Table;
-import com.heliorm.def.EnumField;
-import com.heliorm.def.Field;
-import com.heliorm.def.FloatField;
-import com.heliorm.def.LongField;
-import com.heliorm.def.ShortField;
-import com.heliorm.def.StringField;
-import sun.tools.jconsole.Tab;
+import com.heliorm.def.*;
+import com.heliorm.impl.FieldBuilder;
+import com.heliorm.impl.TableBuilder;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.time.Duration;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.StringJoiner;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
@@ -305,7 +284,7 @@ class Output {
             case DATE:
                 addDateField(cm, fm);
                 break;
-            case TIMESTAMP:
+            case INSTANT:
                 addTimestampField(cm, fm);
                 break;
             case DURATION:
@@ -377,7 +356,7 @@ class Output {
     }
 
     private void addTimestampField(Table cm, Field fm) throws GeneratorException {
-        addField(cm, fm, TimestampField.class, "timestampField");
+        addField(cm, fm, InstantField.class, "timestampField");
     }
 
     private void addDurationField(Table cm, Field fm) throws GeneratorException {

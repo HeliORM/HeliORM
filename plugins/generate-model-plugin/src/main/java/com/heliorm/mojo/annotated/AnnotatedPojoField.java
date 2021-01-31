@@ -96,7 +96,7 @@ public class AnnotatedPojoField implements Field {
         } else if (Date.class.isAssignableFrom(type)) {
             return FieldType.DATE;
         } else if (Instant.class.isAssignableFrom(type)) {
-            return FieldType.TIMESTAMP;
+            return FieldType.INSTANT;
         } else if (Duration.class.isAssignableFrom(type)) {
             return FieldType.DURATION;
         } else if (Enum.class.isAssignableFrom(type)) {

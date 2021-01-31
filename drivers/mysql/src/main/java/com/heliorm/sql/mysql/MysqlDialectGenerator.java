@@ -70,7 +70,7 @@ public class MysqlDialectGenerator implements TableGenerator {
             }
             case DATE:
                 return "DATE";
-            case TIMESTAMP:
+            case INSTANT:
                 return "DATETIME";
             case DURATION:
                 return "VARCHAR(32)";

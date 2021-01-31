@@ -83,7 +83,7 @@ public class PostgresDialectGenerator implements TableGenerator {
             }
             case DATE:
                 return "DATE";
-            case TIMESTAMP:
+            case INSTANT:
                 return "TIMESTAMP";
             case DURATION:
                 return "VARCHAR(32)";

@@ -633,7 +633,7 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
             case DATE:
                 pops.setValue(pojo, field, getValueFromResultSet(rs, field));
                 break;
-            case TIMESTAMP:
+            case INSTANT:
                 pops.setValue(pojo, field, getTimestampFromSql(rs, column));
                 break;
             case DURATION:
@@ -675,7 +675,7 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
                 case DATE:
                     stmt.setDate(par, getDateFromPojo(pojo, field));
                     break;
-                case TIMESTAMP:
+                case INSTANT:
                     stmt.setTimestamp(par, getTimestampFromPojo(pojo, field));
                     break;
                 case DURATION:
@@ -788,7 +788,7 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
                     return rs.getString(column);
                 case DATE:
                     return rs.getDate(column);
-                case TIMESTAMP:
+                case INSTANT:
                     return rs.getTimestamp(column);
                 case DURATION: {
                     Class javaType = field.getJavaType();

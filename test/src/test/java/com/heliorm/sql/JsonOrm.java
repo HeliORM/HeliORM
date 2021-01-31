@@ -12,7 +12,6 @@ import com.heliorm.impl.Part;
 import com.heliorm.impl.SelectPart;
 import com.heliorm.impl.Selector;
 import com.heliorm.json.ClassTypeAdapterFactory;
-import com.heliorm.json.NumberTypeAdapterFactory;
 import com.heliorm.json.PartTypeAdapterFactory;
 import com.heliorm.json.TableTypeAdapterFactory;
 
@@ -34,7 +33,7 @@ public class JsonOrm implements Orm {
                 .registerTypeAdapterFactory(new PartTypeAdapterFactory(orm))
                 .registerTypeAdapterFactory(new TableTypeAdapterFactory(orm))
                 .registerTypeAdapterFactory(new ClassTypeAdapterFactory())
-                .registerTypeAdapterFactory(new NumberTypeAdapterFactory())
+//                .registerTypeAdapterFactory(new NumberTypeAdapterFactory())
                 .create();
         deSerialiser = new GsonBuilder()
                 .setPrettyPrinting()
@@ -42,7 +41,7 @@ public class JsonOrm implements Orm {
                 .registerTypeAdapterFactory(new PartTypeAdapterFactory(orm))
                 .registerTypeAdapterFactory(new TableTypeAdapterFactory(orm))
                 .registerTypeAdapterFactory(new ClassTypeAdapterFactory())
-                .registerTypeAdapterFactory(new NumberTypeAdapterFactory())
+ //               .registerTypeAdapterFactory(new NumberTypeAdapterFactory())
                 .create();
     }
 
