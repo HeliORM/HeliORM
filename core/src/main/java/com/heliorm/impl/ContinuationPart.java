@@ -11,7 +11,7 @@ public class ContinuationPart<LT extends Table<LO>, LO, RT extends Table<RO>, RO
 
     ContinuationPart(Part left, Type type, ExpressionContinuation expr) {
         super(type, left);
-        this.expression = (Part) expr;
+        this.expression = ((Part) expr).head();
     }
 
     @Override
@@ -41,7 +41,7 @@ public class ContinuationPart<LT extends Table<LO>, LO, RT extends Table<RO>, RO
 
 
     public Part getExpression() {
-        return expression.head();
+        return expression;
     }
 
     @Override
