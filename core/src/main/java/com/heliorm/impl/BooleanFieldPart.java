@@ -17,13 +17,13 @@ public class BooleanFieldPart<T extends Table<O>, O> extends FieldPart<T, O, Boo
     }
 
     @Override
-    public ExpressionContinuation<T, O> eq(Boolean value) {
-        return new BooleanValueExpressionPart(this, ValueExpressionPart.Operator.EQ, value);
+    public ExpressionContinuation<T, O> eq(Boolean value) throws OrmException {
+        return new BooleanValueExpressionPart(getThis(), ValueExpressionPart.Operator.EQ, value);
     }
 
     @Override
-    public ExpressionContinuation<T, O> notEq(Boolean value) {
-        return new BooleanValueExpressionPart(this, ValueExpressionPart.Operator.NOT_EQ, value);
+    public ExpressionContinuation<T, O> notEq(Boolean value) throws OrmException {
+        return new BooleanValueExpressionPart(getThis(), ValueExpressionPart.Operator.NOT_EQ, value);
     }
 
     @Override

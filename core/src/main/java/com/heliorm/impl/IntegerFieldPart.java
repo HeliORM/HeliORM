@@ -17,34 +17,34 @@ public class IntegerFieldPart<T extends Table<O>, O> extends NumberFieldPart<T, 
 
 
     @Override
-    public ExpressionContinuation<T, O> eq(Integer value) {
-        return new IntegerValueExpressionPart(this, ValueExpressionPart.Operator.EQ, value);
+    public ExpressionContinuation<T, O> eq(Integer value) throws OrmException {
+        return new IntegerValueExpressionPart((IntegerFieldPart) getThis(), ValueExpressionPart.Operator.EQ, value);
     }
 
     @Override
-    public ExpressionContinuation<T, O> notEq(Integer value) {
-        return new IntegerValueExpressionPart(this, ValueExpressionPart.Operator.NOT_EQ, value);
+    public ExpressionContinuation<T, O> notEq(Integer value) throws OrmException {
+        return new IntegerValueExpressionPart((IntegerFieldPart) getThis(), ValueExpressionPart.Operator.NOT_EQ, value);
     }
 
 
     @Override
     public ExpressionContinuation<T, O> lt(Integer value) throws OrmException {
-        return new IntegerValueExpressionPart(this, ValueExpressionPart.Operator.LT, value);
+        return new IntegerValueExpressionPart((IntegerFieldPart) getThis(), ValueExpressionPart.Operator.LT, value);
     }
 
     @Override
     public ExpressionContinuation<T, O> le(Integer value) throws OrmException {
-        return new IntegerValueExpressionPart(this, ValueExpressionPart.Operator.LE, value);
+        return new IntegerValueExpressionPart((IntegerFieldPart) getThis(), ValueExpressionPart.Operator.LE, value);
     }
 
     @Override
     public ExpressionContinuation<T, O> gt(Integer value) throws OrmException {
-        return new IntegerValueExpressionPart(this, ValueExpressionPart.Operator.GT, value);
+        return new IntegerValueExpressionPart((IntegerFieldPart) getThis(), ValueExpressionPart.Operator.GT, value);
     }
 
     @Override
     public ExpressionContinuation<T, O> ge(Integer value) throws OrmException {
-        return new IntegerValueExpressionPart(this, ValueExpressionPart.Operator.GE, value);
+        return new IntegerValueExpressionPart((IntegerFieldPart) getThis(), ValueExpressionPart.Operator.GE, value);
     }
 
     @Override

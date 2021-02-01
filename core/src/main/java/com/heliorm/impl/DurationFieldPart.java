@@ -23,34 +23,34 @@ public class DurationFieldPart<T extends Table<O>, O> extends FieldPart<T, O, Du
 
 
     @Override
-    public ExpressionContinuation<T, O> eq(Duration value) {
-        return new DurationValueExpressionPart(this, ValueExpressionPart.Operator.EQ, value);
+    public ExpressionContinuation<T, O> eq(Duration value) throws OrmException {
+        return new DurationValueExpressionPart(getThis(), ValueExpressionPart.Operator.EQ, value);
     }
 
     @Override
-    public ExpressionContinuation<T, O> notEq(Duration value) {
-        return new DurationValueExpressionPart(this, ValueExpressionPart.Operator.NOT_EQ, value);
+    public ExpressionContinuation<T, O> notEq(Duration value) throws OrmException {
+        return new DurationValueExpressionPart(getThis(), ValueExpressionPart.Operator.NOT_EQ, value);
     }
 
 
     @Override
     public ExpressionContinuation<T, O> lt(Duration value) throws OrmException {
-        return new DurationValueExpressionPart(this, ValueExpressionPart.Operator.LT, value);
+        return new DurationValueExpressionPart(getThis(), ValueExpressionPart.Operator.LT, value);
     }
 
     @Override
     public ExpressionContinuation<T, O> le(Duration value) throws OrmException {
-        return new DurationValueExpressionPart(this, ValueExpressionPart.Operator.LE, value);
+        return new DurationValueExpressionPart(getThis(), ValueExpressionPart.Operator.LE, value);
     }
 
     @Override
     public ExpressionContinuation<T, O> gt(Duration value) throws OrmException {
-        return new DurationValueExpressionPart(this, ValueExpressionPart.Operator.GT, value);
+        return new DurationValueExpressionPart(getThis(), ValueExpressionPart.Operator.GT, value);
     }
 
     @Override
     public ExpressionContinuation<T, O> ge(Duration value) throws OrmException {
-        return new DurationValueExpressionPart(this, ValueExpressionPart.Operator.GE, value);
+        return new DurationValueExpressionPart(getThis(), ValueExpressionPart.Operator.GE, value);
     }
 
     @Override

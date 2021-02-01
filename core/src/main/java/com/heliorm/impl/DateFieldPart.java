@@ -23,34 +23,34 @@ public final class DateFieldPart<T extends Table<O>, O> extends FieldPart<T, O, 
 
 
     @Override
-    public ExpressionContinuation<T, O> eq(Date value) {
-        return new DateValueExpressionPart(this, ValueExpressionPart.Operator.EQ, value);
+    public ExpressionContinuation<T, O> eq(Date value) throws OrmException {
+        return new DateValueExpressionPart(getThis(), ValueExpressionPart.Operator.EQ, value);
     }
 
     @Override
-    public ExpressionContinuation<T, O> notEq(Date value) {
-        return new DateValueExpressionPart(this, ValueExpressionPart.Operator.NOT_EQ, value);
+    public ExpressionContinuation<T, O> notEq(Date value) throws OrmException {
+        return new DateValueExpressionPart(getThis(), ValueExpressionPart.Operator.NOT_EQ, value);
     }
 
 
     @Override
     public ExpressionContinuation<T, O> lt(Date value) throws OrmException {
-        return new DateValueExpressionPart(this, ValueExpressionPart.Operator.LT, value);
+        return new DateValueExpressionPart(getThis(), ValueExpressionPart.Operator.LT, value);
     }
 
     @Override
     public ExpressionContinuation<T, O> le(Date value) throws OrmException {
-        return new DateValueExpressionPart(this, ValueExpressionPart.Operator.LE, value);
+        return new DateValueExpressionPart(getThis(), ValueExpressionPart.Operator.LE, value);
     }
 
     @Override
     public ExpressionContinuation<T, O> gt(Date value) throws OrmException {
-        return new DateValueExpressionPart(this, ValueExpressionPart.Operator.GT, value);
+        return new DateValueExpressionPart(getThis(), ValueExpressionPart.Operator.GT, value);
     }
 
     @Override
     public ExpressionContinuation<T, O> ge(Date value) throws OrmException {
-        return new DateValueExpressionPart(this, ValueExpressionPart.Operator.GE, value);
+        return new DateValueExpressionPart(getThis(), ValueExpressionPart.Operator.GE, value);
     }
     @Override
     public ExpressionContinuation<T, O> isNull() throws OrmException {

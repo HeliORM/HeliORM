@@ -8,9 +8,7 @@ import test.Tables;
 import test.pets.Cat;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import static test.Tables.CAT;
 
@@ -21,29 +19,15 @@ public class Dumper extends AbstractOrmTest {
         Continuation<Tables.CatTable, Cat, Tables.CatTable, Cat> query = orm().select(CAT)
                 .where(CAT.age.gt(5))
                 .and(CAT.age.lt(10));
-        dump(0, "root", ((Part) query).head());
+        dump(((Part) query).head());
     }
 
     private Map<Part, String> visit = new HashMap<>();
 
-    private void dump(int depth, String side, Part part) {
-        indent(depth);
-        System.out.printf("%s: ", side);
-        if (part != null) {
-            if (visit.containsKey(part)) {
-                System.out.printf("%s\n", visit.get(part));
-            }
-            else {
-                String id = UUID.randomUUID().toString();
-                visit.put(part, id);
-                visit.put(part, id);
-                System.out.printf("%s: (%s)\n", part, id);
-                dump(depth + 1,"left", part.left());
-                dump(depth + 1, "right", part.right());
-            }
-        }
-        else {
-            System.out.printf("null\n");
+    private void dump(Part part) {
+        System.out.printf("%s ", part);
+        if (part.right() != null) {
+            dump(part.right());
         }
     }
 

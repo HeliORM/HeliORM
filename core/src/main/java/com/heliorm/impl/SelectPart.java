@@ -25,6 +25,7 @@ public class SelectPart<LT extends Table<LO>, LO, RT extends Table<RO>, RO> exte
         this.selector = null;
         this.table = table;
     }
+
     public SelectPart(Part left, Table table) {
         this(left, table, null);
     }

@@ -68,6 +68,7 @@ public abstract class Part<T extends Table<O>, O, RT extends Table<RO>, RO> {
     }
 
     protected final void setRight(Part right) {
+
         this.right = right;
     }
 

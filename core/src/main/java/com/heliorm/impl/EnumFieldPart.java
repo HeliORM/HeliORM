@@ -22,13 +22,13 @@ public class EnumFieldPart<T extends Table<O>, O, E extends Enum> extends FieldP
     }
 
     @Override
-    public ExpressionContinuation<T, O> eq(E value) {
-        return new  EnumValueExpressionPart(this, ValueExpressionPart.Operator.EQ, value);
+    public ExpressionContinuation<T, O> eq(E value) throws OrmException {
+        return new  EnumValueExpressionPart(getThis(), ValueExpressionPart.Operator.EQ, value);
     }
 
     @Override
-    public ExpressionContinuation<T, O> notEq(E value) {
-        return new EnumValueExpressionPart(this, ValueExpressionPart.Operator.NOT_EQ, value);
+    public ExpressionContinuation<T, O> notEq(E value) throws OrmException {
+        return new EnumValueExpressionPart(getThis(), ValueExpressionPart.Operator.NOT_EQ, value);
     }
 
     @Override

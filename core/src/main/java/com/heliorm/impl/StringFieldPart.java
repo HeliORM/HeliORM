@@ -21,44 +21,44 @@ public class StringFieldPart<T extends Table<O>, O> extends FieldPart<T, O, Stri
     }
 
     @Override
-    public ExpressionContinuation<T, O> eq(String value) {
-        return new StringValueExpressionPart(this, ValueExpressionPart.Operator.EQ, value);
+    public ExpressionContinuation<T, O> eq(String value) throws OrmException {
+        return new StringValueExpressionPart(getThis(), ValueExpressionPart.Operator.EQ, value);
     }
 
     @Override
-    public ExpressionContinuation<T, O> notEq(String value) {
-        return new StringValueExpressionPart(this, ValueExpressionPart.Operator.NOT_EQ, value);
+    public ExpressionContinuation<T, O> notEq(String value) throws OrmException {
+        return new StringValueExpressionPart(getThis(), ValueExpressionPart.Operator.NOT_EQ, value);
     }
 
 
     @Override
     public ExpressionContinuation<T, O> lt(String value) throws OrmException {
-        return new StringValueExpressionPart(this, ValueExpressionPart.Operator.LT, value);
+        return new StringValueExpressionPart(getThis(), ValueExpressionPart.Operator.LT, value);
     }
 
     @Override
     public ExpressionContinuation<T, O> le(String value) throws OrmException {
-        return new StringValueExpressionPart(this, ValueExpressionPart.Operator.LE, value);
+        return new StringValueExpressionPart(getThis(), ValueExpressionPart.Operator.LE, value);
     }
 
     @Override
     public ExpressionContinuation<T, O> gt(String value) throws OrmException {
-        return new StringValueExpressionPart(this, ValueExpressionPart.Operator.GT, value);
+        return new StringValueExpressionPart(getThis(), ValueExpressionPart.Operator.GT, value);
     }
 
     @Override
     public ExpressionContinuation<T, O> ge(String value) throws OrmException {
-        return new StringValueExpressionPart(this, ValueExpressionPart.Operator.GE, value);
+        return new StringValueExpressionPart(getThis(), ValueExpressionPart.Operator.GE, value);
     }
 
     @Override
     public ExpressionContinuation<T, O> like(String value) throws OrmException {
-        return new StringValueExpressionPart(this, ValueExpressionPart.Operator.LIKE, value);
+        return new StringValueExpressionPart(getThis(), ValueExpressionPart.Operator.LIKE, value);
     }
 
     @Override
     public ExpressionContinuation<T, O> notLike(String value) throws OrmException {
-        return new StringValueExpressionPart(this, ValueExpressionPart.Operator.NOT_LIKE, value);
+        return new StringValueExpressionPart(getThis(), ValueExpressionPart.Operator.NOT_LIKE, value);
     }
 
     @Override

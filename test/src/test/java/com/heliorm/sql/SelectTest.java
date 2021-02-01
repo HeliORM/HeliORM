@@ -14,10 +14,7 @@ import test.pets.Pet;
 import test.place.Province;
 import test.place.Town;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -46,6 +43,12 @@ public class SelectTest extends AbstractOrmTest {
     private static List<Dog> dogs;
     private static List<Bird> birds;
 
+    private <O> void check(List<O> have, List<O> want) throws OrmException {
+        assertNotNull(have, "The list returned by list() should be non-null");
+        assertFalse(have.isEmpty(), "The list returned by list() should be non-empty");
+        assertTrue(have.size() == want.size(), format("The amount of loaded data should match the number of the items (%d vs %s)", have.size(), want.size()));
+        assertTrue(listCompareOrdered(have, want), "The items loaded are exactly the same as the ones we expected");
+    }
 
     @BeforeAll
     public static void setupData() throws OrmException {
@@ -61,27 +64,107 @@ public class SelectTest extends AbstractOrmTest {
     @Test
     public void testSelect() throws Exception {
         say("Testing simple select");
-            List<Cat> all = orm().select(CAT).list();
-        assertNotNull(all, "The list returned by list() should be non-null");
-        assertFalse(all.isEmpty(), "The list returned by list() should be non-empty");
-        assertTrue(all.size() == cats.size(), format("The amount of loaded data should match the number of the items (%d vs %s)", all.size(), cats.size()));
-        assertTrue(listCompareOrdered(all, cats), "The items loaded are exactly the same as the ones we expected");
+        List<Cat> all = orm().select(CAT).list();
+        check(all, cats);
     }
 
     @Test
-    public void testSelectWhere() throws Exception {
-        say("Testing select with a simple where clause");
+    public void testSelectWhereEq() throws Exception {
+        say("Testing select with a simple where x = y clause");
+        List<Cat> wanted = cats.stream()
+                .filter(cat -> cat.getAge() == 5)
+                .collect(Collectors.toList());
+        List<Cat> all = orm().select(CAT)
+                .where(CAT.age.eq(5))
+                .list();
+        check(all, wanted);
+    }
+
+    @Test
+    public void testSelectWhereNotEq() throws Exception {
+        say("Testing select with a simple where x != y clause");
+        List<Cat> wanted = cats.stream()
+                .filter(cat -> cat.getAge() != 5)
+                .collect(Collectors.toList());
+        List<Cat> all = orm().select(CAT)
+                .where(CAT.age.notEq(5))
+                .list();
+        check(all, wanted);
+    }
+
+    @Test
+    public void testSelectWhereLt() throws Exception {
+        say("Testing select with a simple where x < y clause");
         List<Cat> wanted = cats.stream()
                 .filter(cat -> cat.getAge() < 5)
                 .collect(Collectors.toList());
         List<Cat> all = orm().select(CAT)
                 .where(CAT.age.lt(5))
                 .list();
-        assertNotNull(all, "The list returned by list() should be non-null");
-        assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
-        assertTrue(listCompareOrdered(all, wanted), "The items loaded are exactly the same as the ones we expected");
+        check(all, wanted);
     }
 
+    @Test
+    public void testSelectWhereGt() throws Exception {
+        say("Testing select with a simple where x > y clause");
+        List<Cat> wanted = cats.stream()
+                .filter(cat -> cat.getAge() > 5)
+                .collect(Collectors.toList());
+        List<Cat> all = orm().select(CAT)
+                .where(CAT.age.gt(5))
+                .list();
+        check(all, wanted);
+    }
+
+    @Test
+    public void testSelectWhereLe() throws Exception {
+        say("Testing select with a simple where x <= y clause");
+        List<Cat> wanted = cats.stream()
+                .filter(cat -> cat.getAge() <=5)
+                .collect(Collectors.toList());
+        List<Cat> all = orm().select(CAT)
+                .where(CAT.age.le(5))
+                .list();
+        check(all, wanted);
+    }
+
+    @Test
+    public void testSelectWhereGe() throws Exception {
+        say("Testing select with a simple where x >= y clause");
+        List<Cat> wanted = cats.stream()
+                .filter(cat -> cat.getAge() >= 5)
+                .collect(Collectors.toList());
+        List<Cat> all = orm().select(CAT)
+                .where(CAT.age.ge(5))
+                .list();
+        check(all, wanted);
+    }
+
+    @Test
+    public void testSelectWhereIn() throws Exception {
+        say("Testing select with a simple where x in (a,b,c) clause");
+        List<Integer> ages = Arrays.asList(4,5,6);
+        List<Cat> wanted = cats.stream()
+                .filter(cat -> ages.contains(cat.getAge()))
+                .collect(Collectors.toList());
+        List<Cat> all = orm().select(CAT)
+                .where(CAT.age.in(ages))
+                .list();
+        check(all, wanted);
+    }
+
+    @Test
+    public void testSelectWhereNotIn() throws Exception {
+        say("Testing select with a simple where x not in (a,b,c) clause");
+        List<Integer> ages = Arrays.asList(4,5,6);
+        List<Cat> wanted = cats.stream()
+                .filter(cat -> !ages.contains(cat.getAge()))
+                .collect(Collectors.toList());
+        List<Cat> all = orm().select(CAT)
+                .where(CAT.age.notIn(ages))
+                .list();
+        check(all, wanted);
+    }
 
     @Test
     public void testSelectWhereOrWithOneField() throws Exception {
@@ -93,9 +176,7 @@ public class SelectTest extends AbstractOrmTest {
                 .where(CAT.age.eq(5))
                 .or(CAT.age.eq(10))
                 .list();
-        assertNotNull(all, "The list returned by list() should be non-null");
-        assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
-        assertTrue(listCompareOrdered(all, wanted), "The items loaded are exactly the same as the ones we expected");
+        check(all, wanted);
     }
 
     @Test
@@ -157,6 +238,7 @@ public class SelectTest extends AbstractOrmTest {
         assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
         assertTrue(listCompareOrdered(all, wanted), "The items loaded are exactly the same as the ones we expected");
     }
+
 
     @Test
     public void testSelectOrder() throws Exception {

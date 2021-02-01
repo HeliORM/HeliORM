@@ -17,34 +17,34 @@ public class LongFieldPart<T extends Table<O>, O> extends NumberFieldPart<T, O, 
 
 
     @Override
-    public ExpressionContinuation<T, O> eq(Long value) {
-        return new LongValueExpressionPart(this, ValueExpressionPart.Operator.EQ, value);
+    public ExpressionContinuation<T, O> eq(Long value) throws OrmException {
+        return new LongValueExpressionPart((LongFieldPart) getThis(), ValueExpressionPart.Operator.EQ, value);
     }
 
     @Override
-    public ExpressionContinuation<T, O> notEq(Long value) {
-        return new LongValueExpressionPart(this, ValueExpressionPart.Operator.NOT_EQ, value);
+    public ExpressionContinuation<T, O> notEq(Long value) throws OrmException {
+        return new LongValueExpressionPart((LongFieldPart) getThis(), ValueExpressionPart.Operator.NOT_EQ, value);
     }
 
 
     @Override
     public ExpressionContinuation<T, O> lt(Long value) throws OrmException {
-        return new LongValueExpressionPart(this, ValueExpressionPart.Operator.LT, value);
+        return new LongValueExpressionPart((LongFieldPart) getThis(), ValueExpressionPart.Operator.LT, value);
     }
 
     @Override
     public ExpressionContinuation<T, O> le(Long value) throws OrmException {
-        return new LongValueExpressionPart(this, ValueExpressionPart.Operator.LE, value);
+        return new LongValueExpressionPart((LongFieldPart) getThis(), ValueExpressionPart.Operator.LE, value);
     }
 
     @Override
     public ExpressionContinuation<T, O> gt(Long value) throws OrmException {
-        return new LongValueExpressionPart(this, ValueExpressionPart.Operator.GT, value);
+        return new LongValueExpressionPart((LongFieldPart) getThis(), ValueExpressionPart.Operator.GT, value);
     }
 
     @Override
     public ExpressionContinuation<T, O> ge(Long value) throws OrmException {
-        return new LongValueExpressionPart(this, ValueExpressionPart.Operator.GE, value);
+        return new LongValueExpressionPart((LongFieldPart) getThis(), ValueExpressionPart.Operator.GE, value);
     }
 
     @Override

@@ -16,34 +16,34 @@ public class ShortFieldPart<T extends Table<O>, O> extends NumberFieldPart<T, O,
     }
 
     @Override
-    public ExpressionContinuation<T, O> eq(Short value) {
-        return new ShortValueExpressionPart(this, ValueExpressionPart.Operator.EQ, value);
+    public ExpressionContinuation<T, O> eq(Short value) throws OrmException {
+        return new ShortValueExpressionPart((ShortFieldPart) getThis(), ValueExpressionPart.Operator.EQ, value);
     }
 
     @Override
-    public ExpressionContinuation<T, O> notEq(Short value) {
-        return new ShortValueExpressionPart(this, ValueExpressionPart.Operator.NOT_EQ, value);
+    public ExpressionContinuation<T, O> notEq(Short value) throws OrmException {
+        return new ShortValueExpressionPart((ShortFieldPart) getThis(), ValueExpressionPart.Operator.NOT_EQ, value);
     }
 
 
     @Override
     public ExpressionContinuation<T, O> lt(Short value) throws OrmException {
-        return new ShortValueExpressionPart(this, ValueExpressionPart.Operator.LT, value);
+        return new ShortValueExpressionPart((ShortFieldPart) getThis(), ValueExpressionPart.Operator.LT, value);
     }
 
     @Override
     public ExpressionContinuation<T, O> le(Short value) throws OrmException {
-        return new ShortValueExpressionPart(this, ValueExpressionPart.Operator.LE, value);
+        return new ShortValueExpressionPart((ShortFieldPart) getThis(), ValueExpressionPart.Operator.LE, value);
     }
 
     @Override
     public ExpressionContinuation<T, O> gt(Short value) throws OrmException {
-        return new ShortValueExpressionPart(this, ValueExpressionPart.Operator.GT, value);
+        return new ShortValueExpressionPart((ShortFieldPart) getThis(), ValueExpressionPart.Operator.GT, value);
     }
 
     @Override
     public ExpressionContinuation<T, O> ge(Short value) throws OrmException {
-        return new ShortValueExpressionPart(this, ValueExpressionPart.Operator.GE, value);
+        return new ShortValueExpressionPart((ShortFieldPart) getThis(), ValueExpressionPart.Operator.GE, value);
     }
     @Override
     public ExpressionContinuation<T, O> isNull() throws OrmException {

@@ -3,8 +3,6 @@ package com.heliorm.impl;
 import com.heliorm.Table;
 import com.heliorm.def.Field;
 
-import static java.lang.String.format;
-
 public final class ByteValueExpressionPart<T extends Table<O>, O> extends NumberValueExpressionPart<T,O, Byte> {
 
     private Byte value;
@@ -19,9 +17,5 @@ public final class ByteValueExpressionPart<T extends Table<O>, O> extends Number
         return value;
     }
 
-    @Override
-    public String toString() {
-        return format("%s %s", getOperator(), getValue());
-    }
 }
 

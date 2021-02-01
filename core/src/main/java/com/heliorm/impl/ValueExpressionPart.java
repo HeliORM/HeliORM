@@ -37,7 +37,7 @@ public abstract class ValueExpressionPart<T extends Table<O>, O, C> extends Expr
     public abstract C getValue();
 
     @Override
-    public String toString() {
+    public final String toString() {
         return format("%s '%s'", operator.name(), getValue());
     }
 
