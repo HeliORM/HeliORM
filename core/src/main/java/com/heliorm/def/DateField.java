@@ -13,7 +13,7 @@ import com.heliorm.Table;
 public interface DateField<T extends Table<O>, O> extends Field<T, O, Date>, DateExpression<T, O> {
 
     @Override
-    public default FieldType getFieldType() {
+   default FieldType getFieldType() {
         return FieldType.DATE;
     }
 }

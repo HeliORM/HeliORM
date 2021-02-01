@@ -14,7 +14,7 @@ import java.time.Instant;
 public interface InstantField<T extends Table<O>, O> extends Field<T, O, Instant>, TimeExpresssion<T, O> {
 
     @Override
-    public default FieldType getFieldType() {
+   default FieldType getFieldType() {
         return FieldType.INSTANT;
     }
 }

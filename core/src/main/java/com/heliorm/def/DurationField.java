@@ -13,7 +13,7 @@ import com.heliorm.Table;
 public interface DurationField<T extends Table<O>, O> extends Field<T, O, Duration>, DurationExpression<T, O> {
 
     @Override
-    public default FieldType getFieldType() {
+   default FieldType getFieldType() {
         return FieldType.DURATION;
     }
 }

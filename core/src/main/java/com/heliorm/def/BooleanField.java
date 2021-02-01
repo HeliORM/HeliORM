@@ -12,7 +12,7 @@ import com.heliorm.Table;
 public interface BooleanField<T extends Table<O>, O> extends Field<T, O, Boolean>, BooleanExpression<T, O> {
 
     @Override
-    public default FieldType getFieldType() {
+   default FieldType getFieldType() {
         return FieldType.BOOLEAN;
     }
 }
