@@ -2,10 +2,10 @@ package com.heliorm.json;
 
 import com.heliorm.impl.Part;
 
-public final class FakePart extends Part {
+public final class PlaceHolderPart extends Part {
 
     private final String id;
-    public FakePart(String id) {
+    public PlaceHolderPart(String id) {
         super(null, null);
         this.id  = id;
     }
