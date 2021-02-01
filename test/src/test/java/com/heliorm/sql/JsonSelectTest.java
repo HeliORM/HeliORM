@@ -8,20 +8,21 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import test.persons.Person;
-import test.pets.Bird;
-import test.pets.Cat;
-import test.pets.CatType;
-import test.pets.Dog;
+import test.pets.*;
 import test.place.Province;
 import test.place.Town;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.heliorm.sql.TestData.*;
 import static java.lang.String.format;
 import static org.junit.jupiter.api.Assertions.*;
-import static test.Tables.CAT;
+import static test.Tables.*;
 
 public class JsonSelectTest extends AbstractOrmTest {
 
@@ -94,173 +95,173 @@ public class JsonSelectTest extends AbstractOrmTest {
         assertTrue(listCompareOrdered(all, wanted), "The items loaded are exactly the same as the ones we expected");
     }
 
-//    @Test
-//    public void testSelectWhereOr() throws Exception {
-//        say("Testing select with a where clause with or");
-//        List<Cat> wanted = cats.stream()
-//                .filter(cat -> cat.getAge() < 5 || cat.getAge() > 10)
-//                .collect(Collectors.toList());
-//        List<Cat> all = orm().select(CAT)
-//                .where(CAT.age.lt(5)).or(CAT.age.gt(10))
-//                .list();
-//        assertNotNull(all, "The list returned by list() should be non-null");
-//        assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
-//        assertTrue(listCompareOrdered(all, wanted), "The items loaded are exactly the same as the ones we expected");
-//    }
-//
-//    @Test
-//    public void testSelectOrder() throws Exception {
-//        say("Testing select with a simple ordering");
-//        List<Town> wanted = towns.stream()
-//                .sorted(Comparator.comparing(Town::getName))
-//                .collect(Collectors.toList());
-//        List<Town> all = orm().select(TOWN)
-//                .orderBy(TOWN.name)
-//                .list();
-//        assertNotNull(all, "The list returned by list() should be non-null");
-//        assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
-//        assertTrue(listCompareAsIs(all, wanted), "The items loaded are exactly the same as the ones we expected");
-//    }
-//
-//    @Test
-//    public void testSelectOrderDesc() throws Exception {
-//        say("Testing select with a descending ordering");
-//        List<Cat> wanted = cats.stream()
-//                .sorted(Comparator.comparing(Cat::getName)
-//                        .thenComparing(Cat::getAge)
-//                        .thenComparing(Cat::getType)
-//                        .thenComparing(Cat::getPersonId)
-//                        .reversed())
-//                .collect(Collectors.toList());
-//        List<Cat> all = orm().select(CAT)
-//                .orderByDesc(CAT.name)
-//                .thenByDesc(CAT.age)
-//                .thenByDesc(CAT.type)
-//                .thenByDesc(CAT.personId)
-//                .list();
-//        assertNotNull(all, "The list returned by list() should be non-null");
-//        assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
-//        assertTrue(listCompareAsIs(all, wanted), "The items loaded are exactly the same as the ones we expected");
-//    }
-//
-//
-//    @Test
-//    public void testSelectOrderThen() throws Exception {
-//        say("Testing select with a complex ordering");
-//        List<Cat> wanted = cats.stream()
-//                .sorted(Comparator.comparing(Cat::getAge)
-//                        .thenComparing(Cat::getName)
-//                        .thenComparing(Cat::getPersonId)
-//                        .thenComparing(Cat::getId))
-//                .collect(Collectors.toList());
-//        List<Cat> all = orm().select(CAT)
-//                .orderBy(CAT.age)
-//                .thenBy(CAT.name)
-//                .thenBy(CAT.personId)
-//                .thenBy(CAT.id)
-//                .list();
-//        assertNotNull(all, "The list returned by list() should be non-null");
-//        assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
-//        assertTrue(listCompareAsIs(all, wanted), "The items loaded are exactly the same as the ones we expected");
-//    }
-//
-//    @Test
-//    public void testSelectOnAbstract() throws Exception {
-//        say("Testing select on an abstract object");
-//        List<Pet> all = orm().select(PET).list();
-//        List<Pet> wanted = new ArrayList<>();
-//        wanted.addAll(cats);
-//        wanted.addAll(dogs);
-//        wanted.addAll(birds);
-//        assertNotNull(all, "The list returned by list() should be non-null");
-//        assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
-//        assertTrue(listCompareOrdered(all, wanted), "The items loaded are exactly the same as the ones we expected");
-//    }
-//
-//    @Test
-//    public void testJoin() throws Exception {
-//        say("Testing select with a join");
-//        Person person = persons.get(0);
-//        List<Cat> wanted = cats.stream()
-//                .filter(cat -> cat.getPersonId() == person.getId())
-//                .collect(Collectors.toList());
-//        List<Cat> all = orm().select(CAT)
-//                .join(PERSON).on(CAT.personId, PERSON.id)
-//                .where(PERSON.emailAddress.eq(person.getEmailAddress()))
-//                .list();
-//        assertNotNull(all, "The list returned by list() should be non-null");
-//        assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
-//        assertTrue(listCompareOrdered(all, wanted), "The items loaded are exactly the same as the ones we expected");
-//    }
-//
-//    @Test
-//    public void testSelectJoinWithSameKeys() throws Exception {
-//        say("Testing select with a join with same key names");
-//        List<Town> selected = orm().select(TOWN)
-//                .join(PROVINCE).on(TOWN.provinceId, PROVINCE.provinceId)
-//                .where(PROVINCE.name.eq(provinces.get(0).getName()))
-//                .list();
-//
-//        List<Town> wanted = towns.stream()
-//                .filter(town -> town.getProvinceId().equals(provinces.get(0).getProvinceId()))
-//                .collect(Collectors.toList());
-//
-//        assertNotNull(selected, "The list returned by list() should be non-null");
-//        assertTrue(selected.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", selected.size(), wanted.size()));
-//        assertTrue(listCompareOrdered(selected, wanted), "The items loaded are exactly the same as the ones we expected");
-//    }
-//
-//    @Test
-//    public void testSelectAbstractJoinWithSameKeys() throws Exception {
-//        say("Testing select of abstract type with a join with same key names");
-//        List<Pet> selected = orm().select(PET)
-//                .join(PERSON).on(PET.personId, PERSON.id)
-//                .where(PERSON.firstName.eq(persons.get(0).getFirstName()))
-//                .list();
-//
-//        Map<Long, Person> personMap = persons.stream()
-//                .filter(person -> person.getFirstName().equals(persons.get(0).getFirstName()))
-//                .collect(Collectors.toMap(person -> person.getId(), person -> person));
-//
-//        List<Pet> wanted = Stream.concat(Stream.concat(cats.stream(), dogs.stream()), birds.stream())
-//                .filter(pet -> personMap.containsKey(pet.getPersonId()))
-//                .collect(Collectors.toList());
-//
-//        assertNotNull(selected, "The list returned by list() should be non-null");
-//        assertTrue(selected.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", selected.size(), wanted.size()));
-//        assertTrue(listCompareOrdered(selected, wanted), "The items loaded are exactly the same as the ones we expected");
-//    }
-//
-//
-//    @Test
-//    public void testSelectIsNull() throws Exception {
-//        say("Testing select of data on is null");
-//        List<Person> selected = orm().select(PERSON)
-//                .where(PERSON.lastName.isNull())
-//                .list();
-//        List<Person> wanted = persons.stream()
-//                .filter(person ->  person.getLastName() == null)
-//                .collect(Collectors.toList());
-//        assertNotNull(selected, "The list returned by list() should be non-null");
-//        assertTrue(selected.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", selected.size(), wanted.size()));
-//        assertNotNull(selected, "The list returned by list() should be non-null");
-//        assertTrue(listCompareOrdered(selected, wanted), "The items loaded are exactly the same as the ones we expected");
-//    }
-//
-//    @Test
-//    public void testSelectIsNotNull() throws Exception {
-//        say("Testing select of data on is not null");
-//        List<Person> selected = orm().select(PERSON)
-//                .where(PERSON.lastName.isNotNull())
-//                .list();
-//        List<Person> wanted = persons.stream()
-//                .filter(person ->  person.getLastName() != null)
-//                .collect(Collectors.toList());
-//        assertNotNull(selected, "The list returned by list() should be non-null");
-//        assertTrue(selected.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", selected.size(), wanted.size()));
-//        assertNotNull(selected, "The list returned by list() should be non-null");
-//        assertTrue(listCompareOrdered(selected, wanted), "The items loaded are exactly the same as the ones we expected");
-//    }
+    @Test
+    public void testSelectWhereOr() throws Exception {
+        say("Testing select with a where clause with or");
+        List<Cat> wanted = cats.stream()
+                .filter(cat -> cat.getAge() < 5 || cat.getAge() > 10)
+                .collect(Collectors.toList());
+        List<Cat> all = orm().select(CAT)
+                .where(CAT.age.lt(5)).or(CAT.age.gt(10))
+                .list();
+        assertNotNull(all, "The list returned by list() should be non-null");
+        assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
+        assertTrue(listCompareOrdered(all, wanted), "The items loaded are exactly the same as the ones we expected");
+    }
+
+    @Test
+    public void testSelectOrder() throws Exception {
+        say("Testing select with a simple ordering");
+        List<Town> wanted = towns.stream()
+                .sorted(Comparator.comparing(Town::getName))
+                .collect(Collectors.toList());
+        List<Town> all = orm().select(TOWN)
+                .orderBy(TOWN.name)
+                .list();
+        assertNotNull(all, "The list returned by list() should be non-null");
+        assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
+        assertTrue(listCompareAsIs(all, wanted), "The items loaded are exactly the same as the ones we expected");
+    }
+
+    @Test
+    public void testSelectOrderDesc() throws Exception {
+        say("Testing select with a descending ordering");
+        List<Cat> wanted = cats.stream()
+                .sorted(Comparator.comparing(Cat::getName)
+                        .thenComparing(Cat::getAge)
+                        .thenComparing(Cat::getType)
+                        .thenComparing(Cat::getPersonId)
+                        .reversed())
+                .collect(Collectors.toList());
+        List<Cat> all = orm().select(CAT)
+                .orderByDesc(CAT.name)
+                .thenByDesc(CAT.age)
+                .thenByDesc(CAT.type)
+                .thenByDesc(CAT.personId)
+                .list();
+        assertNotNull(all, "The list returned by list() should be non-null");
+        assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
+        assertTrue(listCompareAsIs(all, wanted), "The items loaded are exactly the same as the ones we expected");
+    }
+
+
+    @Test
+    public void testSelectOrderThen() throws Exception {
+        say("Testing select with a complex ordering");
+        List<Cat> wanted = cats.stream()
+                .sorted(Comparator.comparing(Cat::getAge)
+                        .thenComparing(Cat::getName)
+                        .thenComparing(Cat::getPersonId)
+                        .thenComparing(Cat::getId))
+                .collect(Collectors.toList());
+        List<Cat> all = orm().select(CAT)
+                .orderBy(CAT.age)
+                .thenBy(CAT.name)
+                .thenBy(CAT.personId)
+                .thenBy(CAT.id)
+                .list();
+        assertNotNull(all, "The list returned by list() should be non-null");
+        assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
+        assertTrue(listCompareAsIs(all, wanted), "The items loaded are exactly the same as the ones we expected");
+    }
+
+    @Test
+    public void testSelectOnAbstract() throws Exception {
+        say("Testing select on an abstract object");
+        List<Pet> all = orm().select(PET).list();
+        List<Pet> wanted = new ArrayList<>();
+        wanted.addAll(cats);
+        wanted.addAll(dogs);
+        wanted.addAll(birds);
+        assertNotNull(all, "The list returned by list() should be non-null");
+        assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
+        assertTrue(listCompareOrdered(all, wanted), "The items loaded are exactly the same as the ones we expected");
+    }
+
+    @Test
+    public void testJoin() throws Exception {
+        say("Testing select with a join");
+        Person person = persons.get(0);
+        List<Cat> wanted = cats.stream()
+                .filter(cat -> cat.getPersonId() == person.getId())
+                .collect(Collectors.toList());
+        List<Cat> all = orm().select(CAT)
+                .join(PERSON).on(CAT.personId, PERSON.id)
+                .where(PERSON.emailAddress.eq(person.getEmailAddress()))
+                .list();
+        assertNotNull(all, "The list returned by list() should be non-null");
+        assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
+        assertTrue(listCompareOrdered(all, wanted), "The items loaded are exactly the same as the ones we expected");
+    }
+
+    @Test
+    public void testSelectJoinWithSameKeys() throws Exception {
+        say("Testing select with a join with same key names");
+        List<Town> selected = orm().select(TOWN)
+                .join(PROVINCE).on(TOWN.provinceId, PROVINCE.provinceId)
+                .where(PROVINCE.name.eq(provinces.get(0).getName()))
+                .list();
+
+        List<Town> wanted = towns.stream()
+                .filter(town -> town.getProvinceId().equals(provinces.get(0).getProvinceId()))
+                .collect(Collectors.toList());
+
+        assertNotNull(selected, "The list returned by list() should be non-null");
+        assertTrue(selected.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", selected.size(), wanted.size()));
+        assertTrue(listCompareOrdered(selected, wanted), "The items loaded are exactly the same as the ones we expected");
+    }
+
+    @Test
+    public void testSelectAbstractJoinWithSameKeys() throws Exception {
+        say("Testing select of abstract type with a join with same key names");
+        List<Pet> selected = orm().select(PET)
+                .join(PERSON).on(PET.personId, PERSON.id)
+                .where(PERSON.firstName.eq(persons.get(0).getFirstName()))
+                .list();
+
+        Map<Long, Person> personMap = persons.stream()
+                .filter(person -> person.getFirstName().equals(persons.get(0).getFirstName()))
+                .collect(Collectors.toMap(person -> person.getId(), person -> person));
+
+        List<Pet> wanted = Stream.concat(Stream.concat(cats.stream(), dogs.stream()), birds.stream())
+                .filter(pet -> personMap.containsKey(pet.getPersonId()))
+                .collect(Collectors.toList());
+
+        assertNotNull(selected, "The list returned by list() should be non-null");
+        assertTrue(selected.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", selected.size(), wanted.size()));
+        assertTrue(listCompareOrdered(selected, wanted), "The items loaded are exactly the same as the ones we expected");
+    }
+
+
+    @Test
+    public void testSelectIsNull() throws Exception {
+        say("Testing select of data on is null");
+        List<Person> selected = orm().select(PERSON)
+                .where(PERSON.lastName.isNull())
+                .list();
+        List<Person> wanted = persons.stream()
+                .filter(person ->  person.getLastName() == null)
+                .collect(Collectors.toList());
+        assertNotNull(selected, "The list returned by list() should be non-null");
+        assertTrue(selected.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", selected.size(), wanted.size()));
+        assertNotNull(selected, "The list returned by list() should be non-null");
+        assertTrue(listCompareOrdered(selected, wanted), "The items loaded are exactly the same as the ones we expected");
+    }
+
+    @Test
+    public void testSelectIsNotNull() throws Exception {
+        say("Testing select of data on is not null");
+        List<Person> selected = orm().select(PERSON)
+                .where(PERSON.lastName.isNotNull())
+                .list();
+        List<Person> wanted = persons.stream()
+                .filter(person ->  person.getLastName() != null)
+                .collect(Collectors.toList());
+        assertNotNull(selected, "The list returned by list() should be non-null");
+        assertTrue(selected.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", selected.size(), wanted.size()));
+        assertNotNull(selected, "The list returned by list() should be non-null");
+        assertTrue(listCompareOrdered(selected, wanted), "The items loaded are exactly the same as the ones we expected");
+    }
 
 
     @AfterAll
