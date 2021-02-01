@@ -84,14 +84,14 @@ public class SelectTest extends AbstractOrmTest {
 
 
     @Test
-    public void testSelectWhereAndWithOneField() throws Exception {
+    public void testSelectWhereOrWithOneField() throws Exception {
         say("Testing select with a simple where clause with and over one field");
         List<Cat> wanted = cats.stream()
                 .filter(cat -> (cat.getAge() == 5) || (cat.getAge() == 10))
                 .collect(Collectors.toList());
         List<Cat> all = orm().select(CAT)
                 .where(CAT.age.eq(5))
-                .and(CAT.age.eq(10))
+                .or(CAT.age.eq(10))
                 .list();
         assertNotNull(all, "The list returned by list() should be non-null");
         assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
@@ -131,7 +131,7 @@ public class SelectTest extends AbstractOrmTest {
     }
 
     @Test
-    public void testSelectWhereOrWithOneField() throws Exception {
+    public void testSelectWhereOrWithOneFieldRange() throws Exception {
         say("Testing select with a where clause with or");
         List<Cat> wanted = cats.stream()
                 .filter(cat -> cat.getAge() < 5 || cat.getAge() > 10)
