@@ -23,7 +23,7 @@ public class EnumFieldPart<T extends Table<O>, O, E extends Enum> extends FieldP
 
     @Override
     public ExpressionContinuation<T, O> eq(E value) {
-        return new EnumValueExpressionPart(this, ValueExpressionPart.Operator.EQ, value);
+        return new  EnumValueExpressionPart(this, ValueExpressionPart.Operator.EQ, value);
     }
 
     @Override

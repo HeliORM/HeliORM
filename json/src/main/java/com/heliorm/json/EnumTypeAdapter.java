@@ -26,7 +26,7 @@ public class EnumTypeAdapter extends TypeAdapter<Enum> {
         }
         else {
             JsonObject job = new JsonObject();
-            job.addProperty("class", value.getClass().getCanonicalName());
+            job.addProperty("class", value.getClass().getName());
             job.addProperty("value", value.name());
             gson.getAdapter(JsonElement.class).write(out, job);
         }

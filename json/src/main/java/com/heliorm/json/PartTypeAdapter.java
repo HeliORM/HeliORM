@@ -1,12 +1,13 @@
 package com.heliorm.json;
 
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.TypeAdapter;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import com.heliorm.Orm;
-import com.heliorm.OrmException;
-import com.heliorm.Table;
 import com.heliorm.def.Field;
 import com.heliorm.impl.*;
 
@@ -50,14 +51,8 @@ public class PartTypeAdapter extends TypeAdapter<Part> {
         JsonElement jel = gson.getAdapter(JsonElement.class).read(in);
         if (jel.isJsonObject()) {
             JsonObject job = (JsonObject) jel;
-            String typeName = job.get("type").getAsString();
-            TypeToken typeToken = getTypeToken(typeName);
-            if (FieldPart.class.isAssignableFrom(typeToken.getRawType())) {
-                typeToken = getFieldPartTypeToken(job.get("fieldType").getAsString());
-            }
-            else if (ValueExpressionPart.class.isAssignableFrom(typeToken.getRawType())) {
-                typeToken = getValuePartTypeToken(job.get("dataType").getAsString());
-            }
+            String typeName = getTypeName(job);
+            TypeToken typeToken = getPartTypeToken(job);
             String id = job.get("serial-ref").getAsString();
             System.out.println("Reading: " + typeToken.getRawType().getSimpleName());
             factory.saveObject(id, new FakePart(id));
@@ -76,6 +71,10 @@ public class PartTypeAdapter extends TypeAdapter<Part> {
         }
     }
 
+    private String getTypeName(JsonObject job) {
+        JsonObject tJob = job.get("type").getAsJsonObject();
+        return tJob.get("value").getAsString();
+    }
 
     private Part replaceFakes(Part part) throws IOException {
         if (part != null) {
@@ -200,7 +199,9 @@ public class PartTypeAdapter extends TypeAdapter<Part> {
 
     }
 
-    private TypeToken getTypeToken(String typeName) throws IOException {
+    private TypeToken getPartTypeToken(JsonObject job) throws IOException {
+        JsonObject tJob = job.get("type").getAsJsonObject();
+        String typeName = tJob.get("value").getAsString();
         Part.Type type = Part.Type.valueOf(typeName);
         Class<?> javaType = null;
         switch (type) {
@@ -217,11 +218,11 @@ public class PartTypeAdapter extends TypeAdapter<Part> {
                 javaType = ExpressionContinuationPart.class;
                 break;
             case FIELD:
-                javaType = FieldPart.class;
-                break;
+                JsonObject fJob = job.get("fieldType").getAsJsonObject();
+                return getFieldPartTypeToken(fJob.get("value").getAsString());
             case VALUE_EXPRESSION:
-                javaType = ValueExpressionPart.class;
-                break;
+                JsonObject dJob = job.get("dataType").getAsJsonObject();
+                return getValuePartTypeToken(dJob.get("value").getAsString());
             case LIST_EXPRESSION:
                 javaType = ListExpressionPart.class;
                 break;
@@ -243,24 +244,4 @@ public class PartTypeAdapter extends TypeAdapter<Part> {
         return TypeToken.get(javaType);
     }
 
-
-    private Field findField(String type, String field) throws IOException {
-        Class pojoType = null;
-        try {
-            pojoType = Class.forName(type);
-        } catch (ClassNotFoundException e) {
-            throw new IOException(format("Cannot find class of type %s", type), e);
-        }
-        Table<?> table = null;
-        try {
-            table = orm.tableFor(pojoType);
-        } catch (OrmException e) {
-            throw new IOException(format("Cannot table for POJO type %s", pojoType.getSimpleName()), e);
-        }
-        Optional<Field> opt = table.getFields().stream().filter(f -> f.getJavaName().equals(field)).findFirst();
-        if (opt.isPresent()) {
-            return opt.get();
-        }
-        throw new IOException(format("Cannot find field %s on table for %s", field, pojoType.getSimpleName()));
-    }
 }

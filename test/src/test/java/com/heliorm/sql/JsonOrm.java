@@ -31,8 +31,7 @@ public class JsonOrm implements Orm {
                 .registerTypeAdapterFactory(new PartTypeAdapterFactory(orm))
                 .registerTypeAdapterFactory(new TableTypeAdapterFactory(orm))
                 .registerTypeAdapterFactory(new ClassTypeAdapterFactory())
-//                .registerTypeAdapterFactory(new EnumTypeAdapterFactory())
-//                .registerTypeAdapterFactory(new NumberTypeAdapterFactory())
+                .registerTypeAdapterFactory(new EnumTypeAdapterFactory())
                 .create();
         deSerialiser = new GsonBuilder()
                 .setPrettyPrinting()
@@ -40,8 +39,7 @@ public class JsonOrm implements Orm {
                 .registerTypeAdapterFactory(new PartTypeAdapterFactory(orm))
                 .registerTypeAdapterFactory(new TableTypeAdapterFactory(orm))
                 .registerTypeAdapterFactory(new ClassTypeAdapterFactory())
- //             .registerTypeAdapterFactory(new EnumTypeAdapterFactory())
- //               .registerTypeAdapterFactory(new NumberTypeAdapterFactory())
+                .registerTypeAdapterFactory(new EnumTypeAdapterFactory())
                 .create();
     }
 

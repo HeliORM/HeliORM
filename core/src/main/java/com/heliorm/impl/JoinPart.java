@@ -13,7 +13,7 @@ import static java.lang.String.format;
  */
 public class JoinPart<LT extends Table<LO>, LO, RT extends Table<RO>, RO> extends Part<LT, LO, RT, RO> implements Join<LT, LO, RT, RO> {
 
-    private final RT table;
+    private final Table table;
 
     public JoinPart(Part left, RT table) {
         super(Type.JOIN, left);
