@@ -68,12 +68,12 @@ public class SelectPart<LT extends Table<LO>, LO, RT extends Table<RO>, RO> exte
 
     @Override
     public <F extends Field<LT, LO, C>, C> Ordered<LT, LO> orderBy(F field) {
-        return new OrderedPart(this, OrderedPart.Direction.ASCENDING, field);
+        return new OrderedPart(this, OrderedPart.Direction.ASCENDING, (FieldPart) field);
     }
 
     @Override
     public <F extends Field<LT, LO, C>, C> Ordered<LT, LO> orderByDesc(F field) {
-        return new OrderedPart(this, OrderedPart.Direction.DESCENDING, field);
+        return new OrderedPart(this, OrderedPart.Direction.DESCENDING, (FieldPart) field);
     }
 
     @Override

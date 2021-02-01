@@ -16,9 +16,9 @@ public class OrderedPart<T extends Table<O>, O> extends ExecutablePart<T, O> imp
     }
 
     private final Direction direction;
-    private final Field<T, O, ?> field;
+    private final FieldPart<T, O, ?> field;
 
-    public OrderedPart(Part left, Direction direction, Field<T, O, ?> field) {
+    public OrderedPart(Part left, Direction direction, FieldPart<T, O, ?> field) {
         super(Type.ORDER, left);
         this.direction = direction;
         this.field = field;
@@ -26,12 +26,12 @@ public class OrderedPart<T extends Table<O>, O> extends ExecutablePart<T, O> imp
 
     @Override
     public <F extends Field<T, O, C>, C> Ordered<T, O> thenBy(F field) {
-        return new OrderedPart(this, Direction.ASCENDING, field);
+        return new OrderedPart(this, Direction.ASCENDING, (FieldPart) field);
     }
 
     @Override
     public <F extends Field<T, O, C>, C> Ordered<T, O> thenByDesc(F field) {
-        return new OrderedPart(this, Direction.DESCENDING, field);
+        return new OrderedPart(this, Direction.DESCENDING, (FieldPart) field);
     }
 
     public Direction getDirection() {

@@ -113,6 +113,20 @@ public class SelectTest extends AbstractOrmTest {
     }
 
     @Test
+    public void testSelectWhereOrTwoFields() throws Exception {
+        say("Testing select with a where clause with or on two fields");
+        List<Cat> wanted = cats.stream()
+                .filter(cat -> cat.getAge() < 5 || cat.getType().equals(CatType.OUTDOOR))
+                .collect(Collectors.toList());
+        List<Cat> all = orm().select(CAT)
+                .where(CAT.age.lt(5)).or(CAT.type.eq(CatType.OUTDOOR))
+                .list();
+        assertNotNull(all, "The list returned by list() should be non-null");
+        assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
+        assertTrue(listCompareOrdered(all, wanted), "The items loaded are exactly the same as the ones we expected");
+    }
+
+    @Test
     public void testSelectOrder() throws Exception {
         say("Testing select with a simple ordering");
         List<Town> wanted = towns.stream()
