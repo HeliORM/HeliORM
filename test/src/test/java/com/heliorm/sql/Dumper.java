@@ -37,7 +37,7 @@ public class Dumper extends AbstractOrmTest {
                 String id = UUID.randomUUID().toString();
                 visit.put(part, id);
                 visit.put(part, id);
-                System.out.printf("%s: (%s)\n", part.getType(), id);
+                System.out.printf("%s: (%s)\n", part, id);
                 dump(depth + 1,"left", part.left());
                 dump(depth + 1, "right", part.right());
             }

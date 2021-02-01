@@ -127,7 +127,7 @@ public abstract class FieldPart<T extends Table<O>, O, C> extends Part<T, O, T, 
 
     @Override
     public String toString() {
-        return format("%s", getJavaName());
+        return format("%s : %s", getJavaName(), getFieldType());
     }
 
 }

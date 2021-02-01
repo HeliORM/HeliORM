@@ -5,7 +5,7 @@ import com.heliorm.def.*;
 
 import static java.lang.String.format;
 
-public class ContinuationPart<LT extends Table<LO>, LO, RT extends Table<RO>, RO> extends ExecutablePart<LT, LO> implements Continuation<LT, LO, RT, RO> {
+public final class ContinuationPart<LT extends Table<LO>, LO, RT extends Table<RO>, RO> extends ExecutablePart<LT, LO> implements Continuation<LT, LO, RT, RO> {
 
     private final Part expression;
 

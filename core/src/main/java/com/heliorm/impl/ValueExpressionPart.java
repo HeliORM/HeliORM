@@ -26,7 +26,6 @@ public abstract class ValueExpressionPart<T extends Table<O>, O, C> extends Expr
         this.operator = op;
     }
 
-
     public final Operator getOperator() {
         return operator;
     }
