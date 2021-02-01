@@ -55,7 +55,7 @@ public class PartTypeAdapter extends TypeAdapter<Part> {
             TypeToken typeToken = getPartTypeToken(job);
             String id = job.get("serial-ref").getAsString();
             System.out.println("Reading: " + typeToken.getRawType().getSimpleName());
-            factory.saveObject(id, new FakePart(id));
+            factory.saveObject(id, new PlaceHolderPart(id));
             Part part = (Part) gson.getDelegateAdapter(factory, typeToken).fromJsonTree(jel);
             factory.saveObject(id, part);
             return replaceFakes(part);
@@ -80,10 +80,10 @@ public class PartTypeAdapter extends TypeAdapter<Part> {
         if (part != null) {
             if (!factory.isPatched(part)) {
                 if (canReplace(part.left())) {
-                    replace(part, "left", ((FakePart) part.left()).getId());
+                    replace(part, "left", ((PlaceHolderPart) part.left()).getId());
                 }
                 if (canReplace(part.right())) {
-                    replace(part, "right", ((FakePart) part.right()).getId());
+                    replace(part, "right", ((PlaceHolderPart) part.right()).getId());
                 }
                 replaceFakes(part.left());
                 replaceFakes(part.right());
@@ -97,7 +97,7 @@ public class PartTypeAdapter extends TypeAdapter<Part> {
             java.lang.reflect.Field field = getField(part.getClass(), name);
             field.setAccessible(true);
             field.set(part, factory.getObject(id));
-            if (!FakePart.class.isAssignableFrom(part.getClass())) {
+            if (!PlaceHolderPart.class.isAssignableFrom(part.getClass())) {
                 factory.markPatched(part);
             }
         } catch (IllegalAccessException e) {
@@ -107,10 +107,10 @@ public class PartTypeAdapter extends TypeAdapter<Part> {
 
     private boolean canReplace(Part part) {
         if (part != null) {
-            if (FakePart.class.isAssignableFrom(part.getClass())) {
-                String id = ((FakePart) part).getId();
+            if (PlaceHolderPart.class.isAssignableFrom(part.getClass())) {
+                String id = ((PlaceHolderPart) part).getId();
                 Part stored = factory.getObject(id);
-                if (!FakePart.class.isAssignableFrom(stored.getClass())) {
+                if (!PlaceHolderPart.class.isAssignableFrom(stored.getClass())) {
                     return true;
                 }
             }
