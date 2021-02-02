@@ -11,7 +11,7 @@ import com.heliorm.OrmException;
  * @author gideon
  * @param <T> Type of the table
  */
-public interface LongField<T extends Table<O>, O> extends NumberField<T, O, Long> {
+public interface LongField<T extends Table<O>, O> extends Field<T, O, Long>, Expression<T, O, Long>, WithRange<T, O, Long>, WithEquals<T, O, Long>, WithIn<T, O, Long>, WithIs<T, O, Long> {
 
     default ExpressionContinuation<T, O> lt(Integer value) throws OrmException {
         return lt(value.longValue());

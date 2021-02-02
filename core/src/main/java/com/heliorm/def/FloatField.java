@@ -10,7 +10,7 @@ import com.heliorm.Table;
  *
  * @author gideon
  */
-public interface FloatField<T extends Table<O>, O> extends NumberField<T, O, Float> {
+public interface FloatField<T extends Table<O>, O> extends Field<T, O, Float>, Expression<T, O, Float>, WithRange<T, O, Float>, WithEquals<T, O, Float>, WithIn<T, O, Float>, WithIs<T, O, Float> {
 
    default ExpressionContinuation<T, O> lt(Integer value) throws OrmException {
         return lt(value.floatValue());

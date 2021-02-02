@@ -9,7 +9,7 @@ import com.heliorm.Table;
  *
  * @author gideon
  */
-public interface DoubleField<T extends Table<O>, O> extends NumberField<T, O, Double> {
+public interface DoubleField<T extends Table<O>, O> extends Field<T, O, Double>, Expression<T, O, Double>, WithRange<T, O, Double>, WithEquals<T, O, Double>, WithIn<T, O, Double>, WithIs<T, O, Double> {
 
    default ExpressionContinuation<T, O> lt(Integer value) throws OrmException {
         return lt(value.doubleValue());

@@ -11,7 +11,7 @@ import java.time.Instant;
  *
  * @author gideon
  */
-public interface InstantField<T extends Table<O>, O> extends Field<T, O, Instant>, TimeExpresssion<T, O> {
+public interface InstantField<T extends Table<O>, O> extends Field<T, O, Instant>, Expression<T, O, Instant>, WithRange<T, O, Instant>, WithEquals<T, O, Instant>, WithIn<T, O, Instant>, WithIs<T, O, Instant> {
 
     @Override
    default FieldType getFieldType() {

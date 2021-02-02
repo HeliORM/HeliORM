@@ -9,7 +9,7 @@ import com.heliorm.Table;
  *
  * @author gideon
  */
-public interface BooleanField<T extends Table<O>, O> extends Field<T, O, Boolean>, BooleanExpression<T, O> {
+public interface BooleanField<T extends Table<O>, O> extends Field<T, O, Boolean>, Expression<T, O, Boolean>, WithEquals<T, O, Boolean>, WithIs<T, O, Boolean> {
 
     @Override
    default FieldType getFieldType() {

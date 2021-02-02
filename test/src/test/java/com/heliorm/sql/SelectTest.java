@@ -167,6 +167,30 @@ public class SelectTest extends AbstractOrmTest {
     }
 
     @Test
+    public void testSelectWhereLike() throws Exception {
+        say("Testing select with a simple where x like a clause");
+        List<Cat> wanted = cats.stream()
+                .filter(cat -> cat.getName().startsWith("M"))
+                .collect(Collectors.toList());
+        List<Cat> all = orm().select(CAT)
+                .where(CAT.name.like("M%"))
+                .list();
+        check(all, wanted);
+    }
+
+    @Test
+    public void testSelectWhereNotLike() throws Exception {
+        say("Testing select with a simple where x not like a clause");
+        List<Cat> wanted = cats.stream()
+                .filter(cat -> !cat.getName().startsWith("M"))
+                .collect(Collectors.toList());
+        List<Cat> all = orm().select(CAT)
+                .where(CAT.name.notLike("M%"))
+                .list();
+        check(all, wanted);
+    }
+
+    @Test
     public void testSelectWhereOrWithOneField() throws Exception {
         say("Testing select with a simple where clause with and over one field");
         List<Cat> wanted = cats.stream()
