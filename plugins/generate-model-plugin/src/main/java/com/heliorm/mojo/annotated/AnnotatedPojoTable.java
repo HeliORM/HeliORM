@@ -98,7 +98,7 @@ public final class AnnotatedPojoTable implements Table {
     public List<Index> getIndexes() {
         if (indexes == null) {
             indexes = new ArrayList<>();
-            com.heliorm.annotation.Index[] anns = pojoClass.getAnnotationsByType(com.heliorm.annotation.Index.class);
+            List<com.heliorm.annotation.Index> anns = getAnnotations(com.heliorm.annotation.Index.class);
             for (com.heliorm.annotation.Index ann : anns) {
                 indexes.add(new AnnotatedPojoIndex(this, ann));
             }
@@ -147,6 +147,18 @@ public final class AnnotatedPojoTable implements Table {
      */
     private <T extends Annotation> Optional<T> getAnnotation(Class<T> annotationClass) {
         return Optional.ofNullable(pojoClass.getAnnotation(annotationClass));
+    }
+
+
+    private <T extends Annotation> List<T> getAnnotations(Class<T> annotationClass) {
+        Class<?> target = pojoClass;
+        List<T> annotations = new ArrayList<>();
+        while (!Object.class.equals(target)) {
+            T[] found = target.getAnnotationsByType(annotationClass);
+            annotations.addAll(Arrays.asList(found));
+            target = target.getSuperclass();
+        }
+        return annotations;
     }
 
     /**

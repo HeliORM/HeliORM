@@ -1,11 +1,9 @@
 package com.heliorm.sql.mysql;
 
+import com.heliorm.Table;
 import com.heliorm.def.Field;
 import com.heliorm.def.Index;
 import com.heliorm.sql.OrmSqlException;
-import com.heliorm.sql.TableGenerator;
-import com.heliorm.sql.OrmSqlException;
-import com.heliorm.Table;
 import com.heliorm.sql.TableGenerator;
 
 import java.util.Optional;
@@ -14,6 +12,7 @@ import java.util.StringJoiner;
 import static java.lang.String.format;
 
 public class MysqlDialectGenerator implements TableGenerator {
+
     @Override
     public String generateSchema(Table<?> table) throws OrmSqlException {
         StringBuilder sql = new StringBuilder();
@@ -40,19 +39,20 @@ public class MysqlDialectGenerator implements TableGenerator {
             sql.append(format("PRIMARY KEY (`%s`)", key.get().getSqlName()));
         }
 
-        int num = 1;
+        int num = 0;
         for (Index<?,?> index : table.getIndexes()) {
-            sql.append("\n");
+            sql.append(",\n");
             if (index.isUnique()) {
                 sql.append("UNIQUE ");
             }
-            sql.append(format("INDEX %s(",  format("idx%d", num)));
+            sql.append(format("INDEX %s(",  format("%s_idx%d",table.getSqlTable(), num)));
             Optional<String> fields = index.getFields().stream()
-                    .map(field -> "'" + field + "'")
+                    .map(field -> "`" + field.getSqlName() + "`")
                     .reduce((s1, s2) -> s1 + "," + s2);
             if (fields.isPresent()) {
                 sql.append(fields.get());
             }
+            sql.append(")");
             num++;
         }
 
