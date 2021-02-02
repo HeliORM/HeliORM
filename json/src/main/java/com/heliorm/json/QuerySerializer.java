@@ -8,10 +8,12 @@ import com.heliorm.impl.Part;
 
 public final class QuerySerializer {
 
-    private final Gson gson;
 
-    public QuerySerializer(Orm orm) {
-        gson = new GsonBuilder()
+    private QuerySerializer() {
+    }
+
+    private static Gson gson(Orm orm) {
+        return  new GsonBuilder()
                 .setPrettyPrinting()
                 .serializeNulls()
                 .registerTypeAdapterFactory(new PartTypeAdapterFactory(orm))
@@ -24,8 +26,8 @@ public final class QuerySerializer {
      * @param <Q> The query type
      * @return The JSON text
      */
-    public <Q extends Part & Executable> String toJson(Q query)  {
-        return gson.toJson(query.head());
+    public static  <Q extends Part & Executable> String toJson(Orm orm, Q query)  {
+        return gson(orm).toJson(query.head());
     }
 
     /** Create a query structure from JSON text
@@ -34,8 +36,8 @@ public final class QuerySerializer {
      * @param <Q> The query type
      * @return The query structure
      */
-    public <Q extends Part & Executable> Q fromJson(String json)  {
-        return (Q) gson.fromJson(json, Part.class);
+    public static <Q extends Part & Executable> Q fromJson(Orm orm, String json)  {
+        return (Q) gson(orm).fromJson(json, Part.class);
     }
 
 }

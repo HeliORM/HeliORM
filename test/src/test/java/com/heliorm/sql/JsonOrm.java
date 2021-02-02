@@ -1,7 +1,5 @@
 package com.heliorm.sql;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.heliorm.Orm;
 import com.heliorm.OrmException;
 import com.heliorm.OrmTransaction;
@@ -11,7 +9,7 @@ import com.heliorm.def.Select;
 import com.heliorm.impl.Part;
 import com.heliorm.impl.SelectPart;
 import com.heliorm.impl.Selector;
-import com.heliorm.json.*;
+import com.heliorm.json.QuerySerializer;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,22 +17,10 @@ import java.util.stream.Stream;
 
 public class JsonOrm implements Orm {
 
-    private final Gson serialiser;
-    private final Gson deSerialiser;
     private final Orm orm;
 
     public JsonOrm(Orm orm) {
         this.orm = orm;
-        serialiser = new GsonBuilder()
-                .setPrettyPrinting()
-                .serializeNulls()
-                .registerTypeAdapterFactory(new PartTypeAdapterFactory(orm))
-                .create();
-        deSerialiser = new GsonBuilder()
-                .setPrettyPrinting()
-                .serializeNulls()
-                .registerTypeAdapterFactory(new PartTypeAdapterFactory(orm))
-                .create();
     }
 
     @Override
@@ -103,8 +89,8 @@ public class JsonOrm implements Orm {
     }
 
     private <O, P extends Part & Executable> P viaJson(P tail) {
-        String json = serialiser.toJson(tail.head());
-        P res = (P) deSerialiser.fromJson(json, SelectPart.class);
+        String json = QuerySerializer.toJson(orm, tail);
+        P res = (P) QuerySerializer.fromJson(orm, json);
         return res;
     }
 
