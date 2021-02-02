@@ -8,7 +8,7 @@
         <version>0.84</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-
+    <name>[HeliORM] JSON Serialization and de-serialization</name>
     <artifactId>json</artifactId>
     <dependencies>
         <dependency>

@@ -2,8 +2,10 @@ package com.heliorm.json;
 
 import com.google.gson.Gson;
 import com.google.gson.TypeAdapter;
+import com.google.gson.TypeAdapterFactory;
 import com.google.gson.reflect.TypeToken;
 import com.heliorm.Orm;
+import com.heliorm.Table;
 import com.heliorm.impl.Part;
 import com.heliorm.impl.Selector;
 
@@ -11,8 +13,8 @@ import java.util.*;
 
 import static java.lang.String.format;
 
-public class PartTypeAdapterFactory extends OrmTypeAdapterFactory {
-
+public class PartTypeAdapterFactory implements TypeAdapterFactory {
+    protected final Orm orm;
     private final Map<Part, String> objectToId = new HashMap();
     private final Map<String, Part> idToObject = new HashMap();
     private final Set< Part> patched = new HashSet();
@@ -20,17 +22,28 @@ public class PartTypeAdapterFactory extends OrmTypeAdapterFactory {
     private final Map<Class<?>, PartTypeAdapter> partAdapters = new HashMap();
 
     public PartTypeAdapterFactory(Orm orm) {
-        super(orm);
+        this.orm = orm;
         this.selectorAdapter = new SelectorAdapter(orm);
     }
 
     @Override
     public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> typeToken) {
-        if (Part.class.isAssignableFrom(typeToken.getRawType())) {
+        Class<? super T> rawType = typeToken.getRawType();
+        if (Part.class.isAssignableFrom(rawType)) {
             return findPartAdapter(gson, (TypeToken<Part>) typeToken);
         }
-        if (Selector.class.isAssignableFrom(typeToken.getRawType())) {
+        if (Selector.class.isAssignableFrom(rawType)) {
             return (TypeAdapter<T>) selectorAdapter;
+        }
+        if (Enum.class.isAssignableFrom(rawType)) {
+            return (TypeAdapter<T>) new EnumTypeAdapter(gson);
+        }
+        if (Table.class.isAssignableFrom(rawType)) {
+            return (TypeAdapter<T>) new TableTypeAdapter(gson, orm);
+        }
+        if (Class.class.isAssignableFrom(rawType)) {
+            return (TypeAdapter<T>) new ClassTypeAdapter(gson);
+
         }
         return null;
     }

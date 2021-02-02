@@ -54,11 +54,10 @@ public class PartTypeAdapter extends TypeAdapter<Part> {
             String typeName = getTypeName(job);
             TypeToken typeToken = getPartTypeToken(job);
             String id = job.get("serial-ref").getAsString();
-            System.out.println("Reading: " + typeToken.getRawType().getSimpleName());
             factory.saveObject(id, new PlaceHolderPart(id));
             Part part = (Part) gson.getDelegateAdapter(factory, typeToken).fromJsonTree(jel);
             factory.saveObject(id, part);
-            return replaceFakes(part);
+            return replacePlaceHolders(part);
         }
         if (jel.isJsonPrimitive()) {
             String id = jel.getAsString();
@@ -67,7 +66,7 @@ public class PartTypeAdapter extends TypeAdapter<Part> {
         if (jel.isJsonNull()) {
             return null;
         } else {
-            throw new IOException("Dog show");
+            throw new IOException(format("Cannot de-serialize part type from %s", jel));
         }
     }
 
@@ -76,7 +75,7 @@ public class PartTypeAdapter extends TypeAdapter<Part> {
         return tJob.get("value").getAsString();
     }
 
-    private Part replaceFakes(Part part) throws IOException {
+    private Part replacePlaceHolders(Part part) throws IOException {
         if (part != null) {
             if (!factory.isPatched(part)) {
                 if (canReplace(part.left())) {
@@ -85,8 +84,8 @@ public class PartTypeAdapter extends TypeAdapter<Part> {
                 if (canReplace(part.right())) {
                     replace(part, "right", ((PlaceHolderPart) part.right()).getId());
                 }
-                replaceFakes(part.left());
-                replaceFakes(part.right());
+                replacePlaceHolders(part.left());
+                replacePlaceHolders(part.right());
             }
         }
         return part;
@@ -163,7 +162,6 @@ public class PartTypeAdapter extends TypeAdapter<Part> {
             default:
                 throw new IOException(format("Unsupported field type '%s'.BUG!", type));
         }
-
     }
 
     private TypeToken getValuePartTypeToken(String typeName) throws IOException {
@@ -229,7 +227,6 @@ public class PartTypeAdapter extends TypeAdapter<Part> {
                 throw new IOException(format("Unsupported field type '%s'.BUG!", type));
         }
     }
-
 
     private TypeToken getPartTypeToken(JsonObject job) throws IOException {
         JsonObject tJob = job.get("type").getAsJsonObject();

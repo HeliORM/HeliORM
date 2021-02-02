@@ -29,17 +29,11 @@ public class JsonOrm implements Orm {
                 .setPrettyPrinting()
                 .serializeNulls()
                 .registerTypeAdapterFactory(new PartTypeAdapterFactory(orm))
-                .registerTypeAdapterFactory(new TableTypeAdapterFactory(orm))
-                .registerTypeAdapterFactory(new ClassTypeAdapterFactory())
-                .registerTypeAdapterFactory(new EnumTypeAdapterFactory())
                 .create();
         deSerialiser = new GsonBuilder()
                 .setPrettyPrinting()
                 .serializeNulls()
                 .registerTypeAdapterFactory(new PartTypeAdapterFactory(orm))
-                .registerTypeAdapterFactory(new TableTypeAdapterFactory(orm))
-                .registerTypeAdapterFactory(new ClassTypeAdapterFactory())
-                .registerTypeAdapterFactory(new EnumTypeAdapterFactory())
                 .create();
     }
 
