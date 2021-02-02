@@ -1,46 +1,44 @@
 package com.heliorm.impl;
 
-import static java.lang.String.format;
 import com.heliorm.Table;
+import com.heliorm.def.Field;
+
+import static java.lang.String.format;
 
 /**
- *
- * @author gideon
  * @param <T> Type of table
  * @param <O> Type of POJO
  * @param <C> Type of the field
- * */
-public class ValueExpressionPart<T extends Table<O>, O, C> extends ExpressionPart<T, O, C> {
+ * @author gideon
+ */
+public abstract class ValueExpressionPart<T extends Table<O>, O, C> extends ExpressionPart<T, O, C> {
 
+    private final Field.FieldType dataType;
     private final Operator operator;
-    private final C value;
 
     public enum Operator {
         EQ, NOT_EQ, LT, LE, GT, GE, LIKE, NOT_LIKE;
     }
 
-    public ValueExpressionPart(FieldPart left, Operator op, C value) {
-        super(left);
+    protected ValueExpressionPart(Field.FieldType dataType, FieldPart left, Operator op) {
+        super(Type.VALUE_EXPRESSION, left);
+        this.dataType = dataType;
         this.operator = op;
-        this.value = value;
     }
 
-    @Override
-    public Type getType() {
-        return Type.VALUE_EXPRESSION;
-    }
-
-    public Operator getOperator() {
+    public final Operator getOperator() {
         return operator;
     }
 
-    public C getValue() {
-        return value;
+    public final Field.FieldType getDataType() {
+        return dataType;
     }
 
+    public abstract C getValue();
+
     @Override
-    public String toString() {
-        return format("%s '%s'", operator.name(), value);
+    public final String toString() {
+        return format("%s '%s'", operator.name(), getValue());
     }
 
 }

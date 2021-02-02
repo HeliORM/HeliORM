@@ -12,8 +12,8 @@ import com.heliorm.Table;
  */
 public abstract class ExpressionPart<T extends Table<O>, O, C> extends Part<T, O, T, O> implements ExpressionContinuation<T, O> {
 
-    public ExpressionPart(Part left) {
-        super(left);
+    public ExpressionPart(Type type, FieldPart left) {
+        super(type, left);
     }
 
     @Override

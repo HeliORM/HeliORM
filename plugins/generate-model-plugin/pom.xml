@@ -5,8 +5,9 @@
     <parent>
         <groupId>com.heliorm</groupId>
         <artifactId>plugins</artifactId>
-        <version>0.83</version>
+        <version>0.85</version>
     </parent>
+
     <groupId>com.heliorm</groupId>
     <artifactId>generate-model-plugin</artifactId>
     <packaging>maven-plugin</packaging>

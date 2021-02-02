@@ -5,13 +5,14 @@
     <groupId>com.heliorm</groupId>
     <artifactId>orm</artifactId>
     <name>[HeliORM]</name>
-    <version>0.83</version>
+    <version>0.85</version>
     <packaging>pom</packaging>
     <modules>
         <module>core</module>
         <module>drivers</module>
         <module>plugins</module>
         <module>test</module>
+        <module>json</module>
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

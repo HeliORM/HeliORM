@@ -1,10 +1,10 @@
 package com.heliorm.mojo.annotated;
 
-import com.heliorm.Table;
 import com.heliorm.annotation.Column;
 import com.heliorm.annotation.ForeignKey;
 import com.heliorm.annotation.PrimaryKey;
 import com.heliorm.def.Field;
+import com.heliorm.Table;
 
 import java.lang.annotation.Annotation;
 import java.time.Duration;
@@ -25,6 +25,11 @@ public class AnnotatedPojoField implements Field {
     public AnnotatedPojoField(Table table, java.lang.reflect.Field pojoField) {
         this.table = table;
         this.pojoField = pojoField;
+    }
+
+    @Override
+    public Table<?> getTable() {
+        return table;
     }
 
     @Override
@@ -91,7 +96,7 @@ public class AnnotatedPojoField implements Field {
         } else if (Date.class.isAssignableFrom(type)) {
             return FieldType.DATE;
         } else if (Instant.class.isAssignableFrom(type)) {
-            return FieldType.TIMESTAMP;
+            return FieldType.INSTANT;
         } else if (Duration.class.isAssignableFrom(type)) {
             return FieldType.DURATION;
         } else if (Enum.class.isAssignableFrom(type)) {

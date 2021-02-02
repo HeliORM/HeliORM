@@ -5,11 +5,12 @@
     <parent>
         <groupId>com.heliorm</groupId>
         <artifactId>orm</artifactId>
-        <version>0.83</version>
+        <version>0.85</version>
     </parent>
     <artifactId>test</artifactId>
     <name>[HeliORM] Test</name>
-    <version>0.83</version>
+    <version>0.85</version>
+
     <packaging>jar</packaging>
 
     <dependencies>
@@ -58,7 +59,13 @@
         <dependency>
             <groupId>com.heliorm</groupId>
             <artifactId>postgresql</artifactId>
-            <version>0.83</version>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.heliorm</groupId>
+            <artifactId>json</artifactId>
+            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

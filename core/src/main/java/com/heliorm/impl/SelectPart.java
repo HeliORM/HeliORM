@@ -1,14 +1,14 @@
 package com.heliorm.impl;
 
-import static java.lang.String.format;
+import com.heliorm.Table;
 import com.heliorm.def.Continuation;
 import com.heliorm.def.ExpressionContinuation;
 import com.heliorm.def.Field;
 import com.heliorm.def.Join;
 import com.heliorm.def.Ordered;
-import com.heliorm.Orm;
 import com.heliorm.def.Select;
-import com.heliorm.Table;
+
+import static java.lang.String.format;
 
 /**
  *
@@ -17,25 +17,31 @@ import com.heliorm.Table;
 public class SelectPart<LT extends Table<LO>, LO, RT extends Table<RO>, RO> extends ExecutablePart<LT, LO>
         implements Select<LT, LO, RT, RO> {
 
-    private final Orm orm;
+    private final Selector selector;
     private final Table table;
+
+    public SelectPart(Type type, Part left, Table table) {
+        super(type, left);
+        this.selector = null;
+        this.table = table;
+    }
 
     public SelectPart(Part left, Table table) {
         this(left, table, null);
     }
 
-    public SelectPart(Part left, Table table, Orm orm) {
-        super(left);
+    public SelectPart(Part left, Table table, Selector orm) {
+        super(Type.SELECT, left);
         this.table = table;
-        this.orm = orm;
+        this.selector = orm;
     }
 
     @Override
-    protected Orm getOrm() {
+    protected Selector getSelector() {
         if (left() != null) {
-            return left().getOrm();
+            return left().getSelector();
         }
-        return orm;
+        return selector;
     }
 
     @Override
@@ -63,17 +69,12 @@ public class SelectPart<LT extends Table<LO>, LO, RT extends Table<RO>, RO> exte
 
     @Override
     public <F extends Field<LT, LO, C>, C> Ordered<LT, LO> orderBy(F field) {
-        return new OrderedPart(this, OrderedPart.Direction.ASCENDING, field);
+        return new OrderedPart(this, OrderedPart.Direction.ASCENDING, (FieldPart) field);
     }
 
     @Override
     public <F extends Field<LT, LO, C>, C> Ordered<LT, LO> orderByDesc(F field) {
-        return new OrderedPart(this, OrderedPart.Direction.DESCENDING, field);
-    }
-
-    @Override
-    public Type getType() {
-        return Type.SELECT;
+        return new OrderedPart(this, OrderedPart.Direction.DESCENDING, (FieldPart) field);
     }
 
     @Override

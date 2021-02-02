@@ -1,24 +1,20 @@
 package com.heliorm.impl;
 
-import static java.lang.String.format;
+import com.heliorm.Table;
 import com.heliorm.def.Field;
 import com.heliorm.def.OnClause;
-import com.heliorm.Table;
+
+import static java.lang.String.format;
 
 public final class OnClausePart<LT extends Table<LO>, LO, RT extends Table<RO>, RO> extends SelectPart<LT, LO, RT, RO> implements OnClause<LT, LO, RT, RO> {
 
-    private final Field<LT, LO, ?> leftField;
-    private final Field<RT, RO, ?> rightField;
+    private final FieldPart<LT, LO, ?> leftField;
+    private final FieldPart<RT, RO, ?> rightField;
 
-    <C> OnClausePart(Part left, Field<LT, LO, C> leftField, Field<RT, RO, C> rightField) {
-        super(left, left.getSelectTable());
+    <C> OnClausePart(Part left, FieldPart<LT, LO, C> leftField, FieldPart<RT, RO, C> rightField) {
+        super(Type.ON_CLAUSE, left, left.getSelectTable());
         this.leftField = leftField;
         this.rightField = rightField;
-    }
-
-    @Override
-    public Type getType() {
-        return Type.ON_CLAUSE;
     }
 
     public Field<LT, LO, ?> getLeftField() {
