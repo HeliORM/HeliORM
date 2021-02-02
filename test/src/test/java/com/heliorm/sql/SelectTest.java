@@ -275,7 +275,6 @@ public class SelectTest extends AbstractOrmTest {
         assertTrue(listCompareAsIs(all, wanted), "The items loaded are exactly the same as the ones we expected");
     }
 
-
     @Test
     public void testSelectOrderThen() throws Exception {
         say("Testing select with a complex ordering");
@@ -393,7 +392,6 @@ public class SelectTest extends AbstractOrmTest {
         assertNotNull(selected, "The list returned by list() should be non-null");
         assertTrue(listCompareOrdered(selected, wanted), "The items loaded are exactly the same as the ones we expected");
     }
-
 
     @AfterAll
     public static void removeData() throws OrmException {

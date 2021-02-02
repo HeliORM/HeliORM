@@ -104,7 +104,6 @@ public class JsonOrm implements Orm {
 
     private <O, P extends Part & Executable> P viaJson(P tail) {
         String json = serialiser.toJson(tail.head());
-        System.out.println(json);
         P res = (P) deSerialiser.fromJson(json, SelectPart.class);
         return res;
     }
