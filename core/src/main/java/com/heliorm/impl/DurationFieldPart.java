@@ -6,6 +6,8 @@ import com.heliorm.Table;
 import com.heliorm.def.ExpressionContinuation;
 
 import java.time.Duration;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  *
@@ -63,4 +65,23 @@ public class DurationFieldPart<T extends Table<O>, O> extends FieldPart<T, O, Du
         return new IsExpressionPart(getThis(), IsExpressionPart.Operator.IS_NOT_NULL);
     }
 
+    @Override
+    public ExpressionContinuation<T, O> in(List<Duration> values) throws OrmException {
+        return new DurationListExpressionPart((DurationFieldPart) getThis(), ListExpressionPart.Operator.IN, values);
+    }
+
+    @Override
+    public ExpressionContinuation<T, O> notIn(List<Duration> values) throws OrmException {
+        return new DurationListExpressionPart((DurationFieldPart) getThis(), ListExpressionPart.Operator.NOT_IN, values);
+    }
+
+    @Override
+    public ExpressionContinuation<T, O> in(Duration... values) throws OrmException {
+        return new DurationListExpressionPart((DurationFieldPart) getThis(), ListExpressionPart.Operator.IN, Arrays.asList(values));
+    }
+
+    @Override
+    public ExpressionContinuation<T, O> notIn(Duration... values) throws OrmException {
+        return new DurationListExpressionPart((DurationFieldPart) getThis(), ListExpressionPart.Operator.NOT_IN, Arrays.asList(values));
+    }
 }

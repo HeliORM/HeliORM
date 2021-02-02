@@ -5,6 +5,9 @@ import com.heliorm.def.ExpressionContinuation;
 import com.heliorm.def.LongField;
 import com.heliorm.Table;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  *
  * @author gideon
@@ -56,5 +59,23 @@ public class LongFieldPart<T extends Table<O>, O> extends NumberFieldPart<T, O, 
     public ExpressionContinuation<T, O> isNotNull() throws OrmException {
         return new IsExpressionPart(getThis(), IsExpressionPart.Operator.IS_NOT_NULL);
     }
+    @Override
+    public ExpressionContinuation<T, O> in(List<Long> values) throws OrmException {
+        return new LongListExpressionPart((LongFieldPart) getThis(), ListExpressionPart.Operator.IN, values);
+    }
 
+    @Override
+    public ExpressionContinuation<T, O> notIn(List<Long> values) throws OrmException {
+        return new LongListExpressionPart((LongFieldPart) getThis(), ListExpressionPart.Operator.NOT_IN, values);
+    }
+
+    @Override
+    public ExpressionContinuation<T, O> in(Long... values) throws OrmException {
+        return new LongListExpressionPart((LongFieldPart) getThis(), ListExpressionPart.Operator.IN, Arrays.asList(values));
+    }
+
+    @Override
+    public ExpressionContinuation<T, O> notIn(Long... values) throws OrmException {
+        return new LongListExpressionPart((LongFieldPart) getThis(), ListExpressionPart.Operator.NOT_IN, Arrays.asList(values));
+    }
 }

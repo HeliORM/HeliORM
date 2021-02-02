@@ -196,8 +196,40 @@ public class PartTypeAdapter extends TypeAdapter<Part> {
             default:
                 throw new IOException(format("Unsupported field type '%s'.BUG!", type));
         }
-
     }
+
+    private TypeToken getListPartTypeToken(String typeName) throws IOException {
+        Field.FieldType type = Field.FieldType.valueOf(typeName);
+        switch (type) {
+            case BYTE:
+                return TypeToken.get(ByteListExpressionPart.class);
+            case SHORT:
+                return TypeToken.get(ShortListExpressionPart.class);
+            case INTEGER:
+                return TypeToken.get(IntegerListExpressionPart.class);
+            case LONG:
+                return TypeToken.get(LongListExpressionPart.class);
+            case FLOAT:
+                return TypeToken.get(FloatListExpressionPart.class);
+            case DOUBLE:
+                return TypeToken.get(DoubleListExpressionPart.class);
+            case BOOLEAN:
+                throw new IOException(format("Cannot have list expression for boolean"));
+            case DATE:
+                return TypeToken.get(DateListExpressionPart.class);
+            case INSTANT:
+                return TypeToken.get(InstantListExpressionPart.class);
+            case DURATION:
+                return TypeToken.get(DurationListExpressionPart.class);
+            case STRING:
+                return TypeToken.get(StringListExpressionPart.class);
+            case ENUM:
+                return TypeToken.get(EnumListExpressionPart.class);
+            default:
+                throw new IOException(format("Unsupported field type '%s'.BUG!", type));
+        }
+    }
+
 
     private TypeToken getPartTypeToken(JsonObject job) throws IOException {
         JsonObject tJob = job.get("type").getAsJsonObject();
@@ -220,12 +252,14 @@ public class PartTypeAdapter extends TypeAdapter<Part> {
             case FIELD:
                 JsonObject fJob = job.get("fieldType").getAsJsonObject();
                 return getFieldPartTypeToken(fJob.get("value").getAsString());
-            case VALUE_EXPRESSION:
+            case VALUE_EXPRESSION: {
                 JsonObject dJob = job.get("dataType").getAsJsonObject();
                 return getValuePartTypeToken(dJob.get("value").getAsString());
-            case LIST_EXPRESSION:
-                javaType = ListExpressionPart.class;
-                break;
+            }
+            case LIST_EXPRESSION: {
+                JsonObject dJob = job.get("dataType").getAsJsonObject();
+                return getListPartTypeToken(dJob.get("value").getAsString());
+            }
             case IS_EXPRESSION:
                 javaType = IsExpressionPart.class;
                 break;

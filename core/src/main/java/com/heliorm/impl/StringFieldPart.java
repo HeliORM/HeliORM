@@ -5,6 +5,9 @@ import com.heliorm.def.ExpressionContinuation;
 import com.heliorm.def.StringField;
 import com.heliorm.Table;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * @author gideon
  */
@@ -70,5 +73,23 @@ public class StringFieldPart<T extends Table<O>, O> extends FieldPart<T, O, Stri
     public ExpressionContinuation<T, O> isNotNull() throws OrmException {
         return new IsExpressionPart(getThis(), IsExpressionPart.Operator.IS_NOT_NULL);
     }
+    @Override
+    public ExpressionContinuation<T, O> in(List<String> values) throws OrmException {
+        return new StringListExpressionPart((StringFieldPart) getThis(), ListExpressionPart.Operator.IN, values);
+    }
 
+    @Override
+    public ExpressionContinuation<T, O> notIn(List<String> values) throws OrmException {
+        return new StringListExpressionPart((StringFieldPart) getThis(), ListExpressionPart.Operator.NOT_IN, values);
+    }
+
+    @Override
+    public ExpressionContinuation<T, O> in(String... values) throws OrmException {
+        return new StringListExpressionPart((StringFieldPart) getThis(), ListExpressionPart.Operator.IN, Arrays.asList(values));
+    }
+
+    @Override
+    public ExpressionContinuation<T, O> notIn(String... values) throws OrmException {
+        return new StringListExpressionPart((StringFieldPart) getThis(), ListExpressionPart.Operator.NOT_IN, Arrays.asList(values));
+    }
 }

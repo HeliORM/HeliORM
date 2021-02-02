@@ -6,6 +6,8 @@ import com.heliorm.def.InstantField;
 import com.heliorm.Table;
 
 import java.time.Instant;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  *
@@ -60,6 +62,26 @@ public final class InstantFieldPart<T extends Table<O>, O> extends FieldPart<T, 
     @Override
     public ExpressionContinuation<T, O> isNotNull() throws OrmException {
         return new IsExpressionPart(getThis(), IsExpressionPart.Operator.IS_NOT_NULL);
+    }
+
+    @Override
+    public ExpressionContinuation<T, O> in(List<Instant> values) throws OrmException {
+        return new InstantListExpressionPart((InstantFieldPart) getThis(), ListExpressionPart.Operator.IN, values);
+    }
+
+    @Override
+    public ExpressionContinuation<T, O> notIn(List<Instant> values) throws OrmException {
+        return new InstantListExpressionPart((InstantFieldPart) getThis(), ListExpressionPart.Operator.NOT_IN, values);
+    }
+
+    @Override
+    public ExpressionContinuation<T, O> in(Instant... values) throws OrmException {
+        return new InstantListExpressionPart((InstantFieldPart) getThis(), ListExpressionPart.Operator.IN, Arrays.asList(values));
+    }
+
+    @Override
+    public ExpressionContinuation<T, O> notIn(Instant... values) throws OrmException {
+        return new InstantListExpressionPart((InstantFieldPart) getThis(), ListExpressionPart.Operator.NOT_IN, Arrays.asList(values));
     }
 
 }

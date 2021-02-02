@@ -17,22 +17,15 @@ public interface WithInPart<T extends Table<O>, O, C> extends WithIn<T, O, C> {
     FieldPart<T, O, C> getThis() throws OrmException;
 
     @Override
-   default ExpressionContinuation<T, O> in(List<C> values) throws OrmException {
-        return new ListExpressionPart(getThis(), ListExpressionPart.Operator.IN, values);
-    }
+    ExpressionContinuation<T, O> in(List<C> values) throws OrmException;
 
     @Override
-   default ExpressionContinuation<T, O> notIn(List<C> values) throws OrmException {
-        return new ListExpressionPart(getThis(), ListExpressionPart.Operator.NOT_IN, values);
-    }
+    ExpressionContinuation<T, O> notIn(List<C> values) throws OrmException;
 
     @Override
-   default ExpressionContinuation<T, O> in(C... values) throws OrmException {
-        return new ListExpressionPart(getThis(), ListExpressionPart.Operator.IN, Arrays.asList(values));
-    }
+    ExpressionContinuation<T, O> in(C... values) throws OrmException;
 
     @Override
-   default ExpressionContinuation<T, O> notIn(C... values) throws OrmException {
-        return new ListExpressionPart(getThis(), ListExpressionPart.Operator.NOT_IN, Arrays.asList(values));
-    }
+    ExpressionContinuation<T, O> notIn(C... values) throws OrmException;
+
 }

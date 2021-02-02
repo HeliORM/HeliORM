@@ -5,6 +5,9 @@ import com.heliorm.def.ExpressionContinuation;
 import com.heliorm.def.ShortField;
 import com.heliorm.Table;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  *
  * @author gideon
@@ -24,7 +27,6 @@ public class ShortFieldPart<T extends Table<O>, O> extends NumberFieldPart<T, O,
     public ExpressionContinuation<T, O> notEq(Short value) throws OrmException {
         return new ShortValueExpressionPart((ShortFieldPart) getThis(), ValueExpressionPart.Operator.NOT_EQ, value);
     }
-
 
     @Override
     public ExpressionContinuation<T, O> lt(Short value) throws OrmException {
@@ -54,6 +56,24 @@ public class ShortFieldPart<T extends Table<O>, O> extends NumberFieldPart<T, O,
     public ExpressionContinuation<T, O> isNotNull() throws OrmException {
         return new IsExpressionPart(getThis(), IsExpressionPart.Operator.IS_NOT_NULL);
     }
+    @Override
+    public ExpressionContinuation<T, O> in(List<Short> values) throws OrmException {
+        return new ShortListExpressionPart((ShortFieldPart) getThis(), ListExpressionPart.Operator.IN, values);
+    }
 
+    @Override
+    public ExpressionContinuation<T, O> notIn(List<Short> values) throws OrmException {
+        return new ShortListExpressionPart((ShortFieldPart) getThis(), ListExpressionPart.Operator.NOT_IN, values);
+    }
+
+    @Override
+    public ExpressionContinuation<T, O> in(Short... values) throws OrmException {
+        return new ShortListExpressionPart((ShortFieldPart) getThis(), ListExpressionPart.Operator.IN, Arrays.asList(values));
+    }
+
+    @Override
+    public ExpressionContinuation<T, O> notIn(Short... values) throws OrmException {
+        return new ShortListExpressionPart((ShortFieldPart) getThis(), ListExpressionPart.Operator.NOT_IN, Arrays.asList(values));
+    }
 
 }

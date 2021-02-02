@@ -5,7 +5,9 @@ import com.heliorm.def.DateField;
 import com.heliorm.Table;
 import com.heliorm.def.ExpressionContinuation;
 
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 /**
  *
@@ -60,6 +62,26 @@ public final class DateFieldPart<T extends Table<O>, O> extends FieldPart<T, O, 
     @Override
     public ExpressionContinuation<T, O> isNotNull() throws OrmException {
         return new IsExpressionPart(getThis(), IsExpressionPart.Operator.IS_NOT_NULL);
+    }
+
+    @Override
+    public ExpressionContinuation<T, O> in(List<Date> values) throws OrmException {
+        return new DateListExpressionPart((DateFieldPart) getThis(), ListExpressionPart.Operator.IN, values);
+    }
+
+    @Override
+    public ExpressionContinuation<T, O> notIn(List<Date> values) throws OrmException {
+        return new DateListExpressionPart((DateFieldPart) getThis(), ListExpressionPart.Operator.NOT_IN, values);
+    }
+
+    @Override
+    public ExpressionContinuation<T, O> in(Date... values) throws OrmException {
+        return new DateListExpressionPart((DateFieldPart) getThis(), ListExpressionPart.Operator.IN, Arrays.asList(values));
+    }
+
+    @Override
+    public ExpressionContinuation<T, O> notIn(Date... values) throws OrmException {
+        return new DateListExpressionPart((DateFieldPart) getThis(), ListExpressionPart.Operator.NOT_IN, Arrays.asList(values));
     }
 
 }

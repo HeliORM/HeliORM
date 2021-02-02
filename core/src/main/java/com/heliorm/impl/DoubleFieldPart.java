@@ -5,6 +5,9 @@ import com.heliorm.Table;
 import com.heliorm.def.DoubleField;
 import com.heliorm.def.ExpressionContinuation;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  *
  * @author gideon
@@ -56,4 +59,23 @@ public final class DoubleFieldPart<T extends Table<O>, O> extends NumberFieldPar
         return new IsExpressionPart(getThis(), IsExpressionPart.Operator.IS_NOT_NULL);
     }
 
+    @Override
+    public ExpressionContinuation<T, O> in(List<Double> values) throws OrmException {
+        return new DoubleListExpressionPart((DoubleFieldPart) getThis(), ListExpressionPart.Operator.IN, values);
+    }
+
+    @Override
+    public ExpressionContinuation<T, O> notIn(List<Double> values) throws OrmException {
+        return new DoubleListExpressionPart((DoubleFieldPart) getThis(), ListExpressionPart.Operator.NOT_IN, values);
+    }
+
+    @Override
+    public ExpressionContinuation<T, O> in(Double... values) throws OrmException {
+        return new DoubleListExpressionPart((DoubleFieldPart) getThis(), ListExpressionPart.Operator.IN, Arrays.asList(values));
+    }
+
+    @Override
+    public ExpressionContinuation<T, O> notIn(Double... values) throws OrmException {
+        return new DoubleListExpressionPart((DoubleFieldPart) getThis(), ListExpressionPart.Operator.NOT_IN, Arrays.asList(values));
+    }
 }
