@@ -93,6 +93,8 @@ class Output {
     }
 
     void output(String directory) throws GeneratorException, OrmMetaDataException {
+        String databaseClass = gen.getDatabaseClassFor(database);
+        String packageName = databaseClass.substring(0,  databaseClass.lastIndexOf('.'));
         String path = directory + "/" + packageName.replace(".", "/");
         File pathFile = new File(path);
         if (!pathFile.exists()) {

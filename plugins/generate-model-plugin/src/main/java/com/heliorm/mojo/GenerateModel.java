@@ -7,11 +7,7 @@ import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugins.annotations.Component;
-import org.apache.maven.plugins.annotations.LifecyclePhase;
-import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.Parameter;
-import org.apache.maven.plugins.annotations.ResolutionScope;
+import org.apache.maven.plugins.annotations.*;
 import org.apache.maven.project.MavenProject;
 
 import java.io.File;
@@ -42,6 +38,8 @@ public class GenerateModel extends AbstractMojo {
     private String resourceDir;
     @Parameter(property = "database", required = true)
     private String database;
+    @Parameter(property = "databaseClass", required = false)
+    private String databaseClass;
     @Component
     private MavenProject project;
     private ClassLoader localClassLoader;
@@ -82,7 +80,7 @@ public class GenerateModel extends AbstractMojo {
                     output.addTable(table);
                 }
                 outputs.add(output);
-                svc.println(output.getPackageName() + ".Tables");
+                svc.println(getDatabaseClassFor(database));
 
             }
             svc.close();
@@ -105,6 +103,19 @@ public class GenerateModel extends AbstractMojo {
     String getTablesPackageFor(Table table) {
         return modeller.getPackageDatabase(table.getObjectClass().getCanonicalName()).getPackageName();
     }
+
+    String getDatabaseClassFor(Table table) {
+        if (databaseClass == null) {
+            return getTablesPackageFor(table) + ".Tables";
+        }
+        return databaseClass;
+    }
+
+
+    String getDatabaseClassFor(Database db) {
+        return getDatabaseClassFor(db.getTables().get(0));
+    }
+
     /**
      * Get a class loader that will load classes compiled during the build
      *
