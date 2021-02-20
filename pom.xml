@@ -5,7 +5,7 @@
     <groupId>com.heliorm</groupId>
     <artifactId>orm</artifactId>
     <name>[HeliORM]</name>
-    <version>0.86</version>
+    <version>0.87</version>
     <packaging>pom</packaging>
     <modules>
         <module>core</module>
