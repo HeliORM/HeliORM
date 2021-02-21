@@ -52,6 +52,35 @@ public class CrudTest extends AbstractOrmTest {
     }
 
     @Test
+    public void testUpdate() throws Exception {
+        say("Testing update with auto-number Long key");
+        Long id = persons.get(0).getId();
+        Person person = orm().select(PERSON).where(PERSON.id.eq(id)).one();
+        String tmp = person.getFirstName();
+        person.setFirstName(person.getLastName());
+        person.setLastName(tmp);
+        Person updated = orm().update(person);
+        Person loaded = orm().select(PERSON).where(PERSON.id.eq(id)).one();
+        assertNotNull(updated, "The object returned by update should not be null");
+        assertTrue(pojoCompare(updated, loaded), "The updated and loaded objects must be the same");
+        assertTrue(pojoCompare(updated, person), "The updated and modified objects must be the same");
+        assertTrue(pojoCompare(loaded, person), "The loaded and modified objects must be the same");
+    }
+
+    @Test
+    public void testUpdateWithNoChange() throws Exception {
+        say("Testing update with auto-number Long key where nothing changes");
+        Long id = persons.get(0).getId();
+        Person person = orm().select(PERSON).where(PERSON.id.eq(id)).one();
+        Person updated = orm().update(person);
+        Person loaded = orm().select(PERSON).where(PERSON.id.eq(id)).one();
+        assertNotNull(updated, "The object returned by update should not be null");
+        assertTrue(pojoCompare(updated, loaded), "The updated and loaded objects must be the same");
+        assertTrue(pojoCompare(updated, person), "The updated and modified objects must be the same");
+        assertTrue(pojoCompare(loaded, person), "The loaded and modified objects must be the same");
+    }
+
+    @Test
     public void testUpdateWithNullKey() throws Exception {
         say("Testing update with null key");
         Long id = persons.get(0).getId();
@@ -67,7 +96,23 @@ public class CrudTest extends AbstractOrmTest {
         assertTrue(failed, "The update must fail");
     }
 
-
+    @Test
+    public void testUpdateWithBadKey() throws Exception {
+        say("Testing update with bad key");
+        Long id = persons.get(0).getId();
+        Person person = orm().select(PERSON).where(PERSON.id.eq(id)).one();
+        Long newKey = 10000000L;
+        person.setId(newKey);
+        boolean failed = false;
+        try {
+            Person updated = orm().update(person);
+            Person loaded  = orm().select(PERSON).where(PERSON.id.eq(newKey)).one();
+        }
+        catch (OrmException ex) {
+            failed  = true;
+        }
+        assertTrue(failed, "The update must fail");
+    }
 
 
     @Test

@@ -399,7 +399,10 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
             else {
                 throw new OrmException(format("No primary key for %s in update", table.getObjectClass().getSimpleName()));
             }
-            stmt.executeUpdate();
+            int modified = stmt.executeUpdate();
+            if (modified == 0) {
+                throw new OrmException("The update did not modify any data");
+            }
             return pojo;
         } catch (SQLException ex) {
             throw new OrmSqlException(ex.getMessage(), ex);
