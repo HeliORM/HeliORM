@@ -388,7 +388,17 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
                     par++;
                 }
             }
-            setValueInStatement(stmt, pojo, table.getPrimaryKey().get(), par);
+            Optional<Field> primaryKey = table.getPrimaryKey();
+            if (primaryKey.isPresent()) {
+                Object val = getValueFromPojo(pojo, primaryKey.get());
+                if (val == null) {
+                    throw new OrmException(format("No value for key %s for %s in update", primaryKey.get().getJavaName(),  table.getObjectClass().getSimpleName()));
+                }
+                setValueInStatement(stmt, pojo, table.getPrimaryKey().get(), par);
+            }
+            else {
+                throw new OrmException(format("No primary key for %s in update", table.getObjectClass().getSimpleName()));
+            }
             stmt.executeUpdate();
             return pojo;
         } catch (SQLException ex) {

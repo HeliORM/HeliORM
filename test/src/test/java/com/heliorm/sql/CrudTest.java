@@ -52,6 +52,25 @@ public class CrudTest extends AbstractOrmTest {
     }
 
     @Test
+    public void testUpdateWithNullKey() throws Exception {
+        say("Testing update with null key");
+        Long id = persons.get(0).getId();
+        Person person = orm().select(PERSON).where(PERSON.id.eq(id)).one();
+        person.setId(null);
+        boolean failed = false;
+        try {
+            Person updated = orm().update(person);
+        }
+        catch (OrmException ex) {
+            failed  = true;
+        }
+        assertTrue(failed, "The update must fail");
+    }
+
+
+
+
+    @Test
     public void testDelete() throws Exception {
         say("Testing delete with Long key");
         Cat cat = cats.remove(0);
