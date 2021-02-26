@@ -31,7 +31,6 @@ import static java.lang.String.format;
  */
 public final class SqlOrm implements Orm {
 
-
     private final SqlDriver driver;
     private final Selector selector;
     private final Map<Class<?>, Table<?>> tables = new ConcurrentHashMap<>();

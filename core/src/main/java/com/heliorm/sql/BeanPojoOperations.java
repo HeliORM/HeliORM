@@ -109,7 +109,7 @@ public final class BeanPojoOperations extends AbstractPojoOperations {
         }
         try {
             if (method.isPresent()) {
-                return method.get().invoke(pojo, new Object[]{});
+                return method.get().invoke(pojo);
             } else {
                 throw new OrmException(format("Could not find get method '%s' for field '%s' on %s", name, field.getName(), pojo.getClass().getCanonicalName()));
             }
@@ -209,7 +209,7 @@ public final class BeanPojoOperations extends AbstractPojoOperations {
         Optional<Method> method = findMethod(pojo.getClass(), name, new Class[]{type});
         try {
             if (method.isPresent()) {
-                method.get().invoke(pojo, new Object[]{value});
+                method.get().invoke(pojo, value);
             } else {
                 throw new OrmException(format("Could not find set method '%s' for field '%s' on %s", name, field.getName(), pojo.getClass().getCanonicalName()));
             }

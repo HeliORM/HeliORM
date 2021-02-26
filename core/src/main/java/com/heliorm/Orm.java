@@ -4,6 +4,7 @@ import com.heliorm.def.Select;
 import com.heliorm.impl.Selector;
 
 public interface Orm extends AutoCloseable {
+
     /**
      * Persist a new POJO to the database.
      *
@@ -74,6 +75,10 @@ public interface Orm extends AutoCloseable {
      */
     <O> Table<O> tableFor(Class<O> type) throws OrmException;
 
+    /** Return the selector that is used to select data.
+     *
+     * @return The selector
+     */
     Selector selector();
     
 }
