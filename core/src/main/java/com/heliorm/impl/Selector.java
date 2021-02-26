@@ -7,6 +7,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+/** This interface defines what an ORM implementation should provide to allow for the querying of data using
+ * a structured query. This allows the implementation to deal with stream, list and optional in a way that
+ * makes sense within the context of a specific implementation.
+ *
+ * @author gideon
+ */
 public interface Selector {
 
     /**

@@ -25,9 +25,7 @@ import java.util.stream.Stream;
 import static java.lang.String.format;
 
 /**
- * The object relational mapper. This is the class that provides the user
- * functionality. It provides methods to query the database to return POJOs, as
- * well as to create update and delete POJOs.
+ * A SQL implementation of the ORM.
  *
  * @author gideon
  */
@@ -35,28 +33,8 @@ public final class SqlOrm implements Orm {
 
 
     private final OrmDriver driver;
+    private final Selector selector;
     private final Map<Class<?>, Table<?>> tables = new ConcurrentHashMap<>();
-    private final Selector selector =  new Selector() {
-        @Override
-        public <O, P extends Part & Executable> List<O> list(P tail) throws OrmException {
-            return SqlOrm.this.list(tail);
-        }
-
-        @Override
-        public <O, P extends Part & Executable> Stream<O> stream(P tail) throws OrmException {
-            return SqlOrm.this.stream(tail);
-        }
-
-        @Override
-        public <O, P extends Part & Executable> Optional<O> optional(P tail) throws OrmException {
-            return SqlOrm.this.optional(tail);
-        }
-
-        @Override
-        public <O, P extends Part & Executable> O one(P tail) throws OrmException {
-            return SqlOrm.this.one(tail);
-        }
-    };
 
     /**
      * Create an ORM mapper using the supplied driver instance. This is meant to
@@ -66,6 +44,27 @@ public final class SqlOrm implements Orm {
      */
      SqlOrm(OrmDriver driver) {
         this.driver = driver;
+        selector =  new Selector() {
+            @Override
+            public <O, P extends Part & Executable> List<O> list(P tail) throws OrmException {
+                return SqlOrm.this.list(tail);
+            }
+
+            @Override
+            public <O, P extends Part & Executable> Stream<O> stream(P tail) throws OrmException {
+                return SqlOrm.this.stream(tail);
+            }
+
+            @Override
+            public <O, P extends Part & Executable> Optional<O> optional(P tail) throws OrmException {
+                return SqlOrm.this.optional(tail);
+            }
+
+            @Override
+            public <O, P extends Part & Executable> O one(P tail) throws OrmException {
+                return SqlOrm.this.one(tail);
+            }
+        };
     }
 
     @Override
