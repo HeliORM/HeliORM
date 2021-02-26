@@ -32,7 +32,7 @@ import static java.lang.String.format;
 public final class SqlOrm implements Orm {
 
 
-    private final OrmDriver driver;
+    private final SqlDriver driver;
     private final Selector selector;
     private final Map<Class<?>, Table<?>> tables = new ConcurrentHashMap<>();
 
@@ -42,7 +42,7 @@ public final class SqlOrm implements Orm {
      *
      * @param driver The driver used to access data.
      */
-     SqlOrm(OrmDriver driver) {
+     SqlOrm(SqlDriver driver) {
         this.driver = driver;
         selector =  new Selector() {
             @Override

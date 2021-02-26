@@ -59,7 +59,7 @@ import static java.lang.String.format;
 /**
  * @author gideon
  */
-public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
+public abstract class SqlDriver implements OrmTransactionDriver {
 
     private static final String POJO_NAME_FIELD = "pojo_field_name";
     private final Supplier<Connection> connectionSupplier;
@@ -85,7 +85,6 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
         this.aliases = aliases;
     }
 
-    @Override
     public final <O, P extends Part & Executable> Stream<O> stream(P tail) throws OrmException {
         List<List<Part>> queries = explodeAbstractions(tailToList(tail));
         if (queries.isEmpty()) {
@@ -318,8 +317,7 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
         }
     }
 
-    @Override
-    public <T extends Table<O>, O> O create(T table, O pojo) throws OrmException {
+    public final <T extends Table<O>, O> O create(T table, O pojo) throws OrmException {
         String query = inserts.get(table);
         if (query == null) {
             query = buildInsertQuery(table);
@@ -412,8 +410,7 @@ public abstract class SqlDriver implements OrmDriver, OrmTransactionDriver {
 
     }
 
-    @Override
-    public <T extends Table<O>, O> void delete(T table, O pojo) throws OrmException {
+    public final <T extends Table<O>, O> void delete(T table, O pojo) throws OrmException {
         String query = deletes.get(table);
         if (query == null) {
             query = buildDeleteQuery(table);
