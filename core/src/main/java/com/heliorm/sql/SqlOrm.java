@@ -1,6 +1,7 @@
 package com.heliorm.sql;
 
 import com.heliorm.Orm;
+import com.heliorm.def.Field;
 import com.heliorm.def.Select;
 import com.heliorm.impl.SelectPart;
 import com.heliorm.Database;
@@ -13,12 +14,10 @@ import com.heliorm.def.Executable;
 import com.heliorm.impl.Part;
 import com.heliorm.impl.Selector;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.ServiceLoader;
+import java.sql.*;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -32,8 +31,16 @@ import static java.lang.String.format;
 public final class SqlOrm implements Orm {
 
     private final SqlDriver driver;
+    private final Supplier<Connection> connectionSupplier;
+    private final PojoOperations pops;
+
     private final Selector selector;
     private final Map<Class<?>, Table<?>> tables = new ConcurrentHashMap<>();
+    private final Map<Table, String> inserts = new ConcurrentHashMap<>();
+    private final QueryHelper queryHelper;
+    private final PojoHelper pojoHelper;
+    private final PreparedStatementHelper preparedStatementHelper;
+    private SqlTransaction currentTransaction;
 
     /**
      * Create an ORM mapper using the supplied driver instance. This is meant to
@@ -41,8 +48,13 @@ public final class SqlOrm implements Orm {
      *
      * @param driver The driver used to access data.
      */
-     SqlOrm(SqlDriver driver) {
+     SqlOrm(SqlDriver driver, Supplier<Connection> connectionSupplier, PojoOperations pops) {
         this.driver = driver;
+        this.connectionSupplier = connectionSupplier;
+        this.pops = pops;
+        this.queryHelper = new QueryHelper(driver);
+        this.pojoHelper = new PojoHelper(pops);
+        this.preparedStatementHelper = new PreparedStatementHelper(pojoHelper, driver::setEnum);
         selector =  new Selector() {
             @Override
             public <O, P extends Part & Executable> List<O> list(P tail) throws OrmException {
@@ -71,7 +83,58 @@ public final class SqlOrm implements Orm {
         if (pojo == null) {
             throw new OrmException("Attempt to create a null POJO");
         }
-        return driver.create(tableFor(pojo), pojo);
+        Table<O> table = tableFor(pojo);
+        String query = inserts.get(table);
+        if (query == null) {
+            query = queryHelper.buildInsertQuery(table);
+            inserts.put(table, query);
+        }
+        Connection con = getConnection();
+        O popo = (O) pops.newPojoInstance(table);
+        for (Field field : table.getFields()) {
+            pops.setValue(popo, field, pops.getValue(pojo, field));
+        }
+        try (PreparedStatement stmt = con.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+            int par = 1;
+            for (Field field : table.getFields()) {
+                if (field.isPrimaryKey()) {
+                    if (field.isAutoNumber()) {
+                        if (field.getFieldType() == Field.FieldType.STRING) {
+                            if (pops.getValue(popo, field) == null) {
+                                pops.setValue(popo, field, UUID.randomUUID().toString());
+                            }
+                            preparedStatementHelper.setValueInStatement(stmt, popo, field, par);
+                            par++;
+                        }
+                    } else {
+                        preparedStatementHelper.setValueInStatement(stmt, popo, field, par);
+                        par++;
+                    }
+                } else {
+                    preparedStatementHelper.setValueInStatement(stmt, popo, field, par);
+                    par++;
+                }
+            }
+            stmt.executeUpdate();
+            Optional<Field> opt = table.getPrimaryKey();
+            if (opt.isPresent()) {
+                Field keyField = opt.get();
+                if (keyField.isAutoNumber()) {
+                    if (keyField.getFieldType() != Field.FieldType.STRING) {
+                        try (ResultSet rs = stmt.getGeneratedKeys()) {
+                            if (rs.next()) {
+                                pops.setValue(popo, keyField, driver.getKeyValueFromResultSet(rs, opt.get()));
+                            }
+                        }
+                    }
+                }
+            }
+            return popo;
+        } catch (SQLException ex) {
+            throw new OrmSqlException(ex.getMessage(), ex);
+        } finally {
+            closeConnection(con);
+        }
     }
 
     @Override
@@ -176,6 +239,36 @@ public final class SqlOrm implements Orm {
                 throw new OrmException(format("Required exactly one %s but found more than one", tail.getReturnTable().getObjectClass().getSimpleName()));
             }
             return one;
+        }
+    }
+
+    /**
+     * Obtain the SQL connection to use
+     *
+     * @return The connection
+     */
+    private Connection getConnection() {
+        if (currentTransaction != null) {
+            if (currentTransaction.isOpen()) {
+                return currentTransaction.getConnection();
+            }
+            currentTransaction = null;
+        }
+        return connectionSupplier.get();
+    }
+
+    /** Close a SQL Connection in a way that properly deals with transactions.
+     *
+     * @param con
+     * @throws OrmException
+     */
+    private void closeConnection(Connection con) throws OrmException {
+        if ((currentTransaction == null) || (currentTransaction.getConnection() != con)) {
+            try {
+                con.close();
+            } catch (SQLException ex) {
+                throw new OrmException(ex.getMessage(), ex);
+            }
         }
     }
 

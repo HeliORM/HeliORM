@@ -30,7 +30,6 @@ public abstract class SqlDriver implements OrmTransactionDriver {
     private boolean createTables = false;
     private boolean rollbackOnUncommittedClose = false;
     private boolean useUnionAll = false;
-    private final Map<Table, String> inserts = new ConcurrentHashMap<>();
     private final Map<Table, String> updates = new ConcurrentHashMap();
     private final Map<Table, String> deletes = new ConcurrentHashMap();
     private final Map<Table, Boolean> exists = new ConcurrentHashMap();
@@ -102,7 +101,6 @@ public abstract class SqlDriver implements OrmTransactionDriver {
         return currentTransaction;
     }
 
-
     @Override
     public final void setRollbackOnUncommittedClose(boolean rollback) {
         rollbackOnUncommittedClose = rollback;
@@ -111,7 +109,6 @@ public abstract class SqlDriver implements OrmTransactionDriver {
     public final void setUseUnionAll(boolean useUnionAll) {
         this.useUnionAll = useUnionAll;
     }
-
 
     /**
      * Configure driver to create missing SQL tables.
@@ -234,7 +231,7 @@ public abstract class SqlDriver implements OrmTransactionDriver {
                                                             @Override
                                                             public PojoCompare<O> next() {
                                                                 try {
-                                                                    return new PojoCompare(pops, table, makePojoFromResultSet(rs, table));
+                                                                    return new PojoCompare(pops, table, resultSetHelper.makePojoFromResultSet(rs, table));
                                                                 } catch (OrmException ex) {
                                                                     throw new UncaughtOrmException(ex.getMessage(), ex);
                                                                 }
@@ -270,7 +267,7 @@ public abstract class SqlDriver implements OrmTransactionDriver {
                         @Override
                         public O next() {
                             try {
-                                return makePojoFromResultSet(rs, tables.get(rs.getString(POJO_NAME_FIELD)));
+                                return resultSetHelper.makePojoFromResultSet(rs, tables.get(rs.getString(POJO_NAME_FIELD)));
                             } catch (OrmException | SQLException ex) {
                                 throw new UncaughtOrmException(ex.getMessage(), ex);
                             }
@@ -283,60 +280,6 @@ public abstract class SqlDriver implements OrmTransactionDriver {
         } catch (SQLException | UncaughtOrmException ex) {
             cleanup(con, null, null);
             throw new OrmSqlException(ex.getMessage(), ex);
-        }
-    }
-
-    public final <T extends Table<O>, O> O create(T table, O pojo) throws OrmException {
-        String query = inserts.get(table);
-        if (query == null) {
-            query = buildInsertQuery(table);
-            inserts.put(table, query);
-        }
-        Connection con = getConnection();
-        O popo = (O) pops.newPojoInstance(table);
-        for (Field field : table.getFields()) {
-            pops.setValue(popo, field, pops.getValue(pojo, field));
-        }
-        try (PreparedStatement stmt = con.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
-            int par = 1;
-            for (Field field : table.getFields()) {
-                if (field.isPrimaryKey()) {
-                    if (field.isAutoNumber()) {
-                        if (field.getFieldType() == Field.FieldType.STRING) {
-                            if (pops.getValue(popo, field) == null) {
-                                pops.setValue(popo, field, UUID.randomUUID().toString());
-                            }
-                            preparedStatementHelper.setValueInStatement(stmt, popo, field, par);
-                            par++;
-                        }
-                    } else {
-                        preparedStatementHelper.setValueInStatement(stmt, popo, field, par);
-                        par++;
-                    }
-                } else {
-                    preparedStatementHelper.setValueInStatement(stmt, popo, field, par);
-                    par++;
-                }
-            }
-            stmt.executeUpdate();
-            Optional<Field> opt = table.getPrimaryKey();
-            if (opt.isPresent()) {
-                Field keyField = opt.get();
-                if (keyField.isAutoNumber()) {
-                    if (keyField.getFieldType() != Field.FieldType.STRING) {
-                        try (ResultSet rs = stmt.getGeneratedKeys()) {
-                            if (rs.next()) {
-                                pops.setValue(popo, keyField, getKeyValueFromResultSet(rs, opt.get()));
-                            }
-                        }
-                    }
-                }
-            }
-            return popo;
-        } catch (SQLException ex) {
-            throw new OrmSqlException(ex.getMessage(), ex);
-        } finally {
-            close(con);
         }
     }
 
@@ -402,28 +345,6 @@ public abstract class SqlDriver implements OrmTransactionDriver {
 
     protected abstract boolean supportsUnionAll();
 
-    private String buildInsertQuery(Table<?> table) throws OrmException {
-        StringBuilder query = new StringBuilder();
-        query.append(format("INSERT INTO %s(", fullTableName(table)));
-        StringJoiner fields = new StringJoiner(",");
-        StringJoiner values = new StringJoiner(",");
-        for (Field field : table.getFields()) {
-            if (field.isPrimaryKey()) {
-                if (field.isAutoNumber()) {
-                    if (field.getFieldType() != Field.FieldType.STRING) {
-                        continue;
-                    }
-                }
-            }
-            fields.add(format("%s", fieldName(table, field)));
-            values.add("?");
-        }
-        query.append(fields.toString());
-        query.append(") VALUES(");
-        query.append(values.toString());
-        query.append(")");
-        return query.toString();
-    }
 
     private String buildUpdateQuery(Table<?> table) throws OrmException {
         if (!table.getPrimaryKey().isPresent()) {
@@ -574,21 +495,6 @@ public abstract class SqlDriver implements OrmTransactionDriver {
         return query.toString();
     }
 
-    /**
-     * Creates a Pojo for the given table from the element currently at the
-     * result set cursor.
-     *
-     * @param <O>   The type of Pojo
-     * @param rs    The result set
-     * @param table The table
-     * @return The pojo
-     * @throws OrmException Thrown if there is an error building the Pojo.
-     */
-    private <O> O makePojoFromResultSet(ResultSet rs, Table<O> table) throws OrmException {
-        return resultSetHelper.makePojoFromResultSet(rs,table);
-    }
-
-
     private String sqlValue(Object object) {
         return object.toString();
     }
@@ -664,9 +570,6 @@ public abstract class SqlDriver implements OrmTransactionDriver {
      */
     protected abstract Object getKeyValueFromResultSet(ResultSet rs, Field field) throws OrmException;
 
-
-
-
     /**
      * Obtain the SQL connection to use
      *
@@ -681,7 +584,6 @@ public abstract class SqlDriver implements OrmTransactionDriver {
         }
         return connectionSupplier.get();
     }
-
 
     /**
      * Create a comparator based on the tail of the query that will compare

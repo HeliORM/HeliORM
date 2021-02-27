@@ -131,7 +131,7 @@ public class SqlOrmBuilder {
         if (driver instanceof OrmTransactionDriver) {
             ((OrmTransactionDriver) driver).setRollbackOnUncommittedClose(rollbackOnUncommittedClose);
         }
-        return new SqlOrm(driver);
+        return new SqlOrm(driver, con, pops);
     }
 
 }
