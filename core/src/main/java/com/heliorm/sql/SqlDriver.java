@@ -10,8 +10,6 @@ import com.heliorm.impl.SelectPart;
 import com.heliorm.query.*;
 
 import java.sql.*;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
@@ -40,6 +38,8 @@ public abstract class SqlDriver implements OrmTransactionDriver {
     private final Map<Database, Database> aliases;
     private final Map<Field, String> fieldIds = new ConcurrentHashMap<>();
     private final ResultSetHelper resultSetHelper;
+    private final PojoHelper pojoHelper;
+    private final PreparedStatementHelper preparedStatementHelper;
 
     public SqlDriver(Supplier<Connection> connectionSupplier, PojoOperations pops) {
         this(connectionSupplier, pops, Collections.EMPTY_MAP);
@@ -50,6 +50,8 @@ public abstract class SqlDriver implements OrmTransactionDriver {
         this.pops = pops;
         this.aliases = aliases;
         this.resultSetHelper = new ResultSetHelper(pops, this::getFieldId);
+        this.pojoHelper = new PojoHelper(pops);
+        this.preparedStatementHelper = new PreparedStatementHelper(pojoHelper, this::setEnum);
     }
 
     public final <O, P extends Part & Executable> Stream<O> stream(P tail) throws OrmException {
@@ -355,7 +357,7 @@ public abstract class SqlDriver implements OrmTransactionDriver {
             }
             Optional<Field> primaryKey = table.getPrimaryKey();
             if (primaryKey.isPresent()) {
-                Object val = getValueFromPojo(pojo, primaryKey.get());
+                Object val = pojoHelper.getValueFromPojo(pojo, primaryKey.get());
                 if (val == null) {
                     throw new OrmException(format("No value for key %s for %s in update", primaryKey.get().getJavaName(),  table.getObjectClass().getSimpleName()));
                 }
@@ -606,22 +608,22 @@ public abstract class SqlDriver implements OrmTransactionDriver {
                 case DOUBLE:
                 case FLOAT:
                 case BOOLEAN:
-                    stmt.setObject(par, getValueFromPojo(pojo, field));
+                    stmt.setObject(par, pojoHelper.getValueFromPojo(pojo, field));
                     break;
                 case ENUM:
-                    setEnum(stmt, par, getStringFromPojo(pojo, field));
+                    setEnum(stmt, par, pojoHelper.getStringFromPojo(pojo, field));
                     break;
                 case STRING:
-                    stmt.setString(par, getStringFromPojo(pojo, field));
+                    stmt.setString(par, pojoHelper.getStringFromPojo(pojo, field));
                     break;
                 case DATE:
-                    stmt.setDate(par, getDateFromPojo(pojo, field));
+                    stmt.setDate(par, pojoHelper.getDateFromPojo(pojo, field));
                     break;
                 case INSTANT:
-                    stmt.setTimestamp(par, getTimestampFromPojo(pojo, field));
+                    stmt.setTimestamp(par, pojoHelper.getTimestampFromPojo(pojo, field));
                     break;
                 case DURATION:
-                    stmt.setString(par, getDurationFromPojo(pojo, field));
+                    stmt.setString(par, pojoHelper.getDurationFromPojo(pojo, field));
                     break;
                 default:
                     throw new OrmException(format("Field type '%s' is unsupported. BUG!", field.getFieldType()));
@@ -706,96 +708,8 @@ public abstract class SqlDriver implements OrmTransactionDriver {
      */
     protected abstract Object getKeyValueFromResultSet(ResultSet rs, Field field) throws OrmException;
 
-    /**
-     * Get a value from the given POJO for the given field as an object
-     *
-     * @param pojo  The POJO from which to read the object.
-     * @param field The field to read.
-     * @return The object value.
-     * @throws OrmException
-     */
-    private Object getValueFromPojo(Object pojo, Field field) throws OrmException {
-        return pops.getValue(pojo, field);
-    }
 
-    /**
-     * Get a string value from the given POJO for the given field.
-     *
-     * @param pojo  The POJO from which to read the string.
-     * @param field The field to read.
-     * @return The string value.
-     * @throws OrmException
-     */
-    private String getStringFromPojo(Object pojo, Field field) throws OrmException {
-        Object value = getValueFromPojo(pojo, field);
-        if (value == null) {
-            return null;
-        }
-        if (!(value instanceof String)) {
-            throw new OrmException(format("Could not read String value for field type '%s'.", field.getFieldType()));
-        }
-        return (String) value;
-    }
 
-    /**
-     * Get a date value from the given POJO for the given field.
-     *
-     * @param pojo  The POJO from which to read the date.
-     * @param field The field to read.
-     * @return The date value.
-     * @throws OrmException
-     */
-    private java.sql.Date getDateFromPojo(Object pojo, Field field) throws OrmException {
-        Object value = getValueFromPojo(pojo, field);
-        if (value == null) {
-            return null;
-        }
-        if (!(value instanceof java.util.Date)) {
-            throw new OrmException(format("Could not read Date value for field '%s' with type '%s'.", field.getJavaName(), field.getFieldType()));
-        }
-        return new java.sql.Date(((java.util.Date) value).getTime());
-    }
-
-    /**
-     * Get a timestamp value from the given POJO for the given field.
-     *
-     * @param pojo  The POJO from which to read the timestamp.
-     * @param field The field to read.
-     * @return The timestamp value.
-     * @throws OrmException
-     */
-    private java.sql.Timestamp getTimestampFromPojo(Object pojo, Field field) throws OrmException {
-        Object value = getValueFromPojo(pojo, field);
-        if (value == null) {
-            return null;
-        }
-        if (value instanceof Instant) {
-            return new java.sql.Timestamp(((Instant) value).toEpochMilli());
-        }
-        if (value instanceof java.util.Date) {
-            return new java.sql.Timestamp(((java.util.Date) value).getTime());
-        }
-        throw new OrmException(format("Could not read Instant value for field '%s' with type '%s'.", field.getJavaName(), field.getFieldType()));
-    }
-
-    /**
-     * Get a duration value from the given POJO for the given field.
-     *
-     * @param pojo  The POJO from which to read the timestamp.
-     * @param field The field to read.
-     * @return The duration string value.
-     * @throws OrmException
-     */
-    private String getDurationFromPojo(Object pojo, Field field) throws OrmException {
-        Object value = getValueFromPojo(pojo, field);
-        if (value == null) {
-            return null;
-        }
-        if (value instanceof Duration) {
-            return ((Duration) value).toString();
-        }
-        throw new OrmException(format("Could not read Duration value for field '%s' with type '%s'.", field.getJavaName(), field.getFieldType()));
-    }
 
     /**
      * Obtain the SQL connection to use
