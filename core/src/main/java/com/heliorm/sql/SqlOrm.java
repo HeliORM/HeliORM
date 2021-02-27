@@ -480,6 +480,11 @@ public final class SqlOrm implements Orm {
         }
     }
 
+    /** Check if a table exists, and create if if it does not
+     *
+     * @param table
+     * @throws OrmException
+     */
     private void checkTable(Table table) throws OrmException {
         if (driver.isCreateTables()) {
             if (!exists.containsKey(table)) {
@@ -498,6 +503,12 @@ public final class SqlOrm implements Orm {
         }
     }
 
+    /** Get the full table name for a table.
+     *
+     * @param table The table
+     * @return The table name
+     * @throws OrmException
+     */
     private String fullTableName(Table table) throws OrmException {
         checkTable(table);
         return driver.fullTableName(table);
@@ -524,18 +535,20 @@ public final class SqlOrm implements Orm {
         }
     }
 
+    /** Get the unique field ID for a field
+     *
+     * @param field The field
+     * @return The ID
+     */
     private String getFieldId(Field field) {
-        return fieldIds.computeIfAbsent(field, k -> makeFieldId(k));
+        return fieldIds.computeIfAbsent(field, k -> {
+            String uuid;
+            do { // very simple collison avoidance
+                uuid = UUID.randomUUID().toString().substring(0, 8);
+            }
+            while (fieldIds.containsKey(uuid));
+            return uuid;
+        });
     }
-
-    private String makeFieldId(Field field) {
-        String uuid;
-        do { // very simple collison avoidance
-            uuid = UUID.randomUUID().toString().substring(0, 8);
-        }
-        while (fieldIds.containsKey(uuid));
-        return uuid;
-    }
-
 
 }
