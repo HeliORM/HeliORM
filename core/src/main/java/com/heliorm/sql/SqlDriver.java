@@ -1,53 +1,18 @@
 package com.heliorm.sql;
 
+import com.heliorm.*;
+import com.heliorm.def.Executable;
 import com.heliorm.def.Field;
 import com.heliorm.impl.JoinPart;
 import com.heliorm.impl.OrderedPart;
 import com.heliorm.impl.Part;
 import com.heliorm.impl.SelectPart;
-import com.heliorm.query.AndCriteria;
-import com.heliorm.query.Criteria;
-import com.heliorm.query.Link;
-import com.heliorm.query.ListCriteria;
-import com.heliorm.query.OrCriteria;
-import com.heliorm.query.Order;
-import com.heliorm.query.Parser;
-import com.heliorm.query.Query;
-import com.heliorm.query.TableSpec;
-import com.heliorm.query.ValueCriteria;
-import com.heliorm.Database;
-import com.heliorm.OrmException;
-import com.heliorm.OrmTransaction;
-import com.heliorm.OrmTransactionDriver;
-import com.heliorm.OrmTransactionException;
-import com.heliorm.Table;
-import com.heliorm.UncaughtOrmException;
-import com.heliorm.def.Executable;
-import com.heliorm.query.IsCriteria;
+import com.heliorm.query.*;
 
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Timestamp;
+import java.sql.*;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.Spliterator;
-import java.util.Spliterators;
-import java.util.StringJoiner;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -74,6 +39,7 @@ public abstract class SqlDriver implements OrmTransactionDriver {
     private final PojoOperations pops;
     private final Map<Database, Database> aliases;
     private final Map<Field, String> fieldIds = new ConcurrentHashMap<>();
+    private final ResultSetHelper resultSetHelper;
 
     public SqlDriver(Supplier<Connection> connectionSupplier, PojoOperations pops) {
         this(connectionSupplier, pops, Collections.EMPTY_MAP);
@@ -83,6 +49,7 @@ public abstract class SqlDriver implements OrmTransactionDriver {
         this.connectionSupplier = connectionSupplier;
         this.pops = pops;
         this.aliases = aliases;
+        this.resultSetHelper = new ResultSetHelper(pops, this::getFieldId);
     }
 
     public final <O, P extends Part & Executable> Stream<O> stream(P tail) throws OrmException {
@@ -595,7 +562,6 @@ public abstract class SqlDriver implements OrmTransactionDriver {
     private String expandOrder(TableSpec table, Order order) throws OrmException {
         StringBuilder query = new StringBuilder();
         query.append(format("%s", fieldName(table.getTable(), order.getField())));
-//        query.append(format("%s", fullFieldName(table.getTable(), order.getField())));
         if (order.getDirection() == Order.Direction.DESCENDING) {
             query.append(" DESC");
         }
@@ -617,41 +583,7 @@ public abstract class SqlDriver implements OrmTransactionDriver {
      * @throws OrmException Thrown if there is an error building the Pojo.
      */
     private <O> O makePojoFromResultSet(ResultSet rs, Table<O> table) throws OrmException {
-        try {
-            O pojo = (O) pops.newPojoInstance(table);
-            for (Field field : table.getFields()) {
-                setValueInPojo(pojo, field, rs);
-            }
-            return pojo;
-        } catch (OrmException ex) {
-            throw new OrmException(format("Error reading table %s (%s)", table.getSqlTable(), ex.getMessage()), ex);
-        }
-    }
-
-    private void setValueInPojo(Object pojo, Field field, ResultSet rs) throws OrmException {
-        String column = getFieldId(field);
-        switch (field.getFieldType()) {
-            case LONG:
-            case INTEGER:
-            case SHORT:
-            case BYTE:
-            case DOUBLE:
-            case FLOAT:
-            case BOOLEAN:
-            case ENUM:
-            case STRING:
-            case DATE:
-                pops.setValue(pojo, field, getValueFromResultSet(rs, field));
-                break;
-            case INSTANT:
-                pops.setValue(pojo, field, getTimestampFromSql(rs, column));
-                break;
-            case DURATION:
-                pops.setValue(pojo, field, getDurationFromSql(rs, column));
-                break;
-            default:
-                throw new OrmException(format("Field type '%s' is unsupported. BUG!", field.getFieldType()));
-        }
+        return resultSetHelper.makePojoFromResultSet(rs,table);
     }
 
     /**
@@ -759,67 +691,6 @@ public abstract class SqlDriver implements OrmTransactionDriver {
                 return " IS NOT NULL";
             default:
                 throw new OrmException(format("Unsupported operator '%s'. BUG!", part.getOperator()));
-        }
-    }
-
-    /**
-     * Extract the value for the given field from a SQL result set.
-     *
-     * @param rs    The result set
-     * @param field The field for which we're reading data
-     * @return The data
-     * @throws OrmException Thrown if we cannot work out how to extract the
-     *                      data.
-     */
-    private Object getValueFromResultSet(ResultSet rs, Field field) throws OrmException {
-        String column = getFieldId(field);
-        try {
-            switch (field.getFieldType()) {
-                case LONG:
-                case INTEGER:
-                case SHORT:
-                case BYTE:
-                case DOUBLE:
-                case FLOAT:
-                case BOOLEAN:
-                    return rs.getObject(column);
-                case ENUM: {
-                    Class javaType = field.getJavaType();
-                    if (!javaType.isEnum()) {
-                        throw new OrmException(format("Field %s is not an enum. BUG!", field.getJavaName()));
-                    }
-                    String val = rs.getString(column);
-                    if (val != null) {
-                        return Enum.valueOf(javaType, val);
-                    }
-                    return null;
-                }
-                case STRING:
-                    return rs.getString(column);
-                case DATE:
-                    return rs.getDate(column);
-                case INSTANT:
-                    return rs.getTimestamp(column);
-                case DURATION: {
-                    Class javaType = field.getJavaType();
-                    if (!Duration.class.isAssignableFrom(javaType)) {
-                        throw new OrmException(format("Field %s is not a duration. BUG!", field.getJavaName()));
-                    }
-                    String val = rs.getString(column);
-                    if (val != null) {
-                        try {
-                            return Duration.parse(val);
-                        } catch (DateTimeParseException ex) {
-                            throw new OrmException(format("Cannot parse text to a duration (%s)", ex.getMessage()), ex);
-                        }
-                    }
-                    return null;
-                }
-                default:
-                    throw new OrmException(format("Field type '%s' is unsupported. BUG!", field.getFieldType()));
-            }
-        } catch (SQLException ex) {
-            throw new OrmSqlException(format("Error reading field value from SQL for '%s' (%s)", field.getJavaName(), ex.getMessage()), ex);
         }
     }
 
@@ -1030,7 +901,7 @@ public abstract class SqlDriver implements OrmTransactionDriver {
         return parts;
     }
 
-    /* Expand the query parts in the list so that the query branches into
+    /** Expand the query parts in the list so that the query branches into
      * multiple table queries when a select or join with a table which has
      * sub-tables is encountered.
      * @param parts the query parts
