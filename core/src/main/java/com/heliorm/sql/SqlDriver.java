@@ -19,7 +19,7 @@ public abstract class SqlDriver {
 
     private boolean rollbackOnUncommittedClose = false;
     private boolean useUnionAll = false;
-    private boolean createTables;
+    private boolean createTables  = false;
     private final Map<Database, Database> aliases;
 
     public SqlDriver(Map<Database, Database> aliases) {
@@ -34,7 +34,7 @@ public abstract class SqlDriver {
         this.useUnionAll = useUnionAll;
     }
 
-    public boolean isCreateTables() {
+    public boolean createTables() {
         return createTables;
     }
 

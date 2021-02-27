@@ -486,7 +486,7 @@ public final class SqlOrm implements Orm {
      * @throws OrmException
      */
     private void checkTable(Table table) throws OrmException {
-        if (driver.isCreateTables()) {
+        if (driver.createTables()) {
             if (!exists.containsKey(table)) {
                 if (!tableExists(table)) {
                     Connection con = getConnection();
