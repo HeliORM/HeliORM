@@ -11,6 +11,7 @@ import java.util.StringJoiner;
 import static java.lang.String.format;
 
 public class PostgresDialectGenerator implements TableGenerator {
+
     @Override
     public String generateSchema(Table<?> table) throws OrmSqlException {
         StringBuilder sql = new StringBuilder();

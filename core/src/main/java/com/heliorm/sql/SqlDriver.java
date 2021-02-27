@@ -64,6 +64,8 @@ public abstract class SqlDriver {
 
     protected abstract boolean supportsTransactions();
 
+    protected abstract String castNull(Field field) throws OrmException;
+
     /**
      * Retrieve the returned key value from a result set (used for updating
      * auto-increment keys).
@@ -96,6 +98,8 @@ public abstract class SqlDriver {
      */
     protected abstract String fullFieldName(Table table, Field field) throws OrmException;
 
+    protected abstract String fieldType(Table table, Field field) throws OrmException;
+
     /**
      * Work out the short field name to use.
      *
@@ -121,6 +125,7 @@ public abstract class SqlDriver {
      * @return The correctly quoted field name
      */
     protected abstract String virtualValue(String name);
+
 
     /**
      * Get the table generator for this driver

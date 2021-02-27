@@ -62,6 +62,56 @@ public final class PostgreSqlDriver extends SqlDriver {
         return new PostgresDialectGenerator();
     }
 
+    @Override
+    protected String castNull(Field field) throws OrmException {
+        return format("CAST(NULL AS %s)", fieldType(field.getTable(), field));
+    }
+
+    @Override
+    protected String fieldType(Table table, Field field) throws OrmException {
+        switch (field.getFieldType()) {
+            case BOOLEAN:
+                return "BIT";
+            case BYTE:
+                return "TINYINT";
+            case SHORT:
+                return "SMALLINT";
+            case INTEGER:
+                return "INTEGER";
+            case LONG:
+                return "BIGINT";
+            case DOUBLE:
+                return "DOUBLE PRECISION";
+            case FLOAT:
+                return "DOUBLE PRECISION";
+            case ENUM:
+                return format("%s", enumTypeName(table, field));
+            case STRING: {
+                int length = 255;
+                if (field.isPrimaryKey()) {
+                    length = 36;
+                }
+                if (field.getLength().isPresent()) {
+                    length = (int) field.getLength().get();
+                }
+                return format("VARCHAR(%d)", length);
+            }
+            case DATE:
+                return "DATE";
+            case INSTANT:
+                return "TIMESTAMP";
+            case DURATION:
+                return "VARCHAR(32)";
+            default:
+                throw new OrmSqlException(format("Unkown field type '%s'. BUG!", field.getFieldType()));
+        }
+    }
+
+    private String enumTypeName(Table table, Field field) {
+        return format("%s_%s", table.getSqlTable(), field.getSqlName());
+    }
+
+
     protected Object getKeyValueFromResultSet(ResultSet rs, Field field) throws OrmException {
         try {
             switch (field.getFieldType()) {
@@ -91,7 +141,7 @@ public final class PostgreSqlDriver extends SqlDriver {
 
     @Override
     protected boolean supportsUnionAll() {
-        return false;
+        return true;
     }
 
     @Override

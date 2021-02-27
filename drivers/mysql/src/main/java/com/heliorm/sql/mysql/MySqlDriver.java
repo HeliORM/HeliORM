@@ -12,6 +12,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.Map;
+import java.util.StringJoiner;
 
 import static java.lang.String.format;
 
@@ -58,6 +59,11 @@ public final class MySqlDriver extends SqlDriver {
         return new MysqlDialectGenerator();
     }
 
+    @Override
+    protected String castNull(Field field) throws OrmException {
+        return "";
+    }
+
     /**
      * Retrieve the returned key value from a result set (used for updating
      * auto-increment keys).
@@ -95,6 +101,55 @@ public final class MySqlDriver extends SqlDriver {
         } catch (SQLException ex) {
             throw new OrmSqlException(ex.getMessage(), ex);
         }
+    }
+
+    @Override
+    protected String fieldType(Table table, Field field) throws OrmException {
+        switch (field.getFieldType()) {
+            case BOOLEAN:
+                return "TINYINT(1)";
+            case BYTE:
+                return "TINYINT";
+            case SHORT:
+                return "SMALLINT";
+            case INTEGER:
+                return "INTEGER";
+            case LONG:
+                return "BIGINT";
+            case DOUBLE:
+                return "DOUBLE";
+            case FLOAT:
+                return "REAL";
+            case ENUM:
+                return format("ENUM(%s)", getEnumValues(table, field));
+            case STRING: {
+                int length = 255;
+                if (field.isPrimaryKey()) {
+                    length = 36;
+                }
+                if (field.getLength().isPresent()) {
+                    length = (int) field.getLength().get();
+                }
+                return format("VARCHAR(%d)", length);
+            }
+            case DATE:
+                return "DATE";
+            case INSTANT:
+                return "DATETIME";
+            case DURATION:
+                return "VARCHAR(32)";
+            default:
+                throw new OrmSqlException(format("Unkown field type '%s'. BUG!", field.getFieldType()));
+        }
+    }
+
+    private String getEnumValues(Table table, Field<?, ?, ?> field) {
+        StringJoiner sql = new StringJoiner(",");
+        Class<?> javaType = field.getJavaType();
+        for (Object v : javaType.getEnumConstants()) {
+            sql.add(format("'%s'", ((Enum) v).name()));
+        }
+        return sql.toString();
     }
 
     @Override

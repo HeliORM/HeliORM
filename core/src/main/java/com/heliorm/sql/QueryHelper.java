@@ -134,7 +134,7 @@ final class QueryHelper {
                 if (tableFields.contains(field)) {
                     fieldsQuery.add(format("%s AS %s", driver.fullFieldName(root.getTable(), field), driver.virtualFieldName(fieldId)));
                 } else {
-                    String empty = "NULL";
+                    String empty = driver.castNull(field);
                     fieldsQuery.add(format("%s AS %s", empty, driver.virtualFieldName(fieldId)));
                 }
             }
