@@ -30,7 +30,6 @@ public abstract class SqlDriver implements OrmTransactionDriver {
     private boolean createTables = false;
     private boolean rollbackOnUncommittedClose = false;
     private boolean useUnionAll = false;
-    private final Map<Table, String> deletes = new ConcurrentHashMap();
     private final Map<Table, Boolean> exists = new ConcurrentHashMap();
     private final PojoOperations pops;
     private final Map<Database, Database> aliases;
@@ -282,39 +281,12 @@ public abstract class SqlDriver implements OrmTransactionDriver {
         }
     }
 
-    public final <T extends Table<O>, O> void delete(T table, O pojo) throws OrmException {
-        String query = deletes.get(table);
-        if (query == null) {
-            query = buildDeleteQuery(table);
-            deletes.put(table, query);
-        }
-        Connection con = getConnection();
-        try (PreparedStatement stmt = con.prepareStatement(query)) {
-            preparedStatementHelper.setValueInStatement(stmt, pojo, table.getPrimaryKey().get(), 1);
-            stmt.executeUpdate();
-        } catch (SQLException ex) {
-            throw new OrmSqlException(ex.getMessage(), ex);
-        } finally {
-            close(con);
-        }
-    }
-
     protected void setEnum(PreparedStatement stmt, int par, String value) throws SQLException {
         stmt.setString(par, value);
     }
 
     protected abstract boolean supportsUnionAll();
 
-
-
-
-    private String buildDeleteQuery(Table<?> table) throws OrmException {
-        if (table.getPrimaryKey().isPresent()) {
-            return format("DELETE FROM %s WHERE %s=?", fullTableName(table), fieldName(table, table.getPrimaryKey().get()));
-        } else {
-            throw new OrmException("A table needs primary key for objects to be deleted");
-        }
-    }
 
     private String buildSelectQuery(Query root) throws OrmException {
         StringBuilder tablesQuery = new StringBuilder();

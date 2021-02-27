@@ -38,6 +38,7 @@ public final class SqlOrm implements Orm {
     private final Map<Class<?>, Table<?>> tables = new ConcurrentHashMap<>();
     private final Map<Table, String> inserts = new ConcurrentHashMap<>();
     private final Map<Table, String> updates = new ConcurrentHashMap();
+    private final Map<Table, String> deletes = new ConcurrentHashMap();
     private final QueryHelper queryHelper;
     private final PojoHelper pojoHelper;
     private final PreparedStatementHelper preparedStatementHelper;
@@ -187,7 +188,21 @@ public final class SqlOrm implements Orm {
         if (pojo == null) {
             throw new OrmException("Attempt to delete a null POJO");
         }
-        driver.delete(tableFor(pojo), pojo);
+        Table<O> table = tableFor(pojo);
+        String query = deletes.get(table);
+        if (query == null) {
+            query = queryHelper.buildDeleteQuery(table);
+            deletes.put(table, query);
+        }
+        Connection con = getConnection();
+        try (PreparedStatement stmt = con.prepareStatement(query)) {
+            preparedStatementHelper.setValueInStatement(stmt, pojo, table.getPrimaryKey().get(), 1);
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            throw new OrmSqlException(ex.getMessage(), ex);
+        } finally {
+            closeConnection(con);
+        }
     }
 
     @Override

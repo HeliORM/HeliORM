@@ -57,4 +57,12 @@ final class QueryHelper {
         return query.toString();
     }
 
+     String buildDeleteQuery(Table<?> table) throws OrmException {
+        if (table.getPrimaryKey().isPresent()) {
+            return format("DELETE FROM %s WHERE %s=?", driver.fullTableName(table), driver.fieldName(table, table.getPrimaryKey().get()));
+        } else {
+            throw new OrmException("A table needs primary key for objects to be deleted");
+        }
+    }
+
 }
