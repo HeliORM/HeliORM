@@ -2,18 +2,16 @@ package com.heliorm.sql.mysql;
 
 import com.heliorm.Database;
 import com.heliorm.OrmException;
-import com.heliorm.sql.OrmSqlException;
-import com.heliorm.sql.TableGenerator;
-import com.heliorm.sql.PojoOperations;
 import com.heliorm.Table;
 import com.heliorm.def.Field;
+import com.heliorm.sql.OrmSqlException;
 import com.heliorm.sql.SqlDriver;
+import com.heliorm.sql.TableGenerator;
 
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.Map;
-import java.util.function.Supplier;
 
 import static java.lang.String.format;
 
@@ -22,12 +20,12 @@ import static java.lang.String.format;
  */
 public final class MySqlDriver extends SqlDriver {
 
-    public MySqlDriver(Supplier<Connection> connectionSupplier, PojoOperations pops) {
-        super(connectionSupplier, pops);
+    public MySqlDriver(Map<Database, Database> aliases) {
+        super(aliases);
     }
 
-    public MySqlDriver(Supplier<Connection> connectionSupplier, PojoOperations pops, Map<Database, Database> aliases) {
-        super(connectionSupplier, pops, aliases);
+    public MySqlDriver() {
+        super(Collections.EMPTY_MAP);
     }
 
     @Override
@@ -101,6 +99,12 @@ public final class MySqlDriver extends SqlDriver {
 
     @Override
     protected boolean supportsUnionAll() {
+        return true;
+    }
+
+
+    @Override
+    protected boolean supportsTransactions() {
         return true;
     }
 }

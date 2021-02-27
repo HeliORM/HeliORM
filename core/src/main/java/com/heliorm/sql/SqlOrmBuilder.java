@@ -4,7 +4,6 @@ import com.heliorm.Orm;
 import com.heliorm.OrmException;
 import com.heliorm.impl.AliasDatabase;
 import com.heliorm.Database;
-import com.heliorm.OrmTransactionDriver;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -121,15 +120,15 @@ public class SqlOrmBuilder {
         }
         SqlDriver driver;
         try {
-            Constructor<? extends  SqlDriver> constructor = driverClass.getConstructor(Supplier.class, PojoOperations.class, Map.class);
-            driver = constructor.newInstance(con, pops, aliases);
+            Constructor<? extends  SqlDriver> constructor = driverClass.getConstructor(Map.class);
+            driver = constructor.newInstance(aliases);
             driver.setCreateTables(createMissingTables);
             driver.setUseUnionAll(useUnionAll);
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException e) {
             throw new OrmException(format("Cannot start driver of type '%s' (%s)", driverClass.getSimpleName(), e.getMessage()),e);
         }
-        if (driver instanceof OrmTransactionDriver) {
-            ((OrmTransactionDriver) driver).setRollbackOnUncommittedClose(rollbackOnUncommittedClose);
+        if (driver.supportsTransactions()) {
+            driver.setRollbackOnUncommittedClose(rollbackOnUncommittedClose);
         }
         return new SqlOrm(driver, con, pops);
     }

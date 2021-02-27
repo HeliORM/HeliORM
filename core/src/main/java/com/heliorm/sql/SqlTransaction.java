@@ -23,9 +23,9 @@ final class SqlTransaction implements OrmTransaction, AutoCloseable {
      * @param driver The driver to use
      * @throws OrmTransactionException
      */
-    SqlTransaction(SqlDriver driver) throws OrmTransactionException {
+    SqlTransaction(SqlDriver driver,Connection connection) throws OrmTransactionException {
         this.driver = driver;
-        this.connection = driver.getConnection();
+        this.connection = connection;
         try {
             connection.setAutoCommit(false);
         } catch (SQLException e) {

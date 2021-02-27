@@ -1,28 +1,30 @@
 package com.heliorm.sql.postgresql;
 
-import com.heliorm.def.Field;
 import com.heliorm.Database;
 import com.heliorm.OrmException;
-import com.heliorm.sql.OrmSqlException;
-import com.heliorm.sql.TableGenerator;
-import com.heliorm.sql.PojoOperations;
 import com.heliorm.Table;
+import com.heliorm.def.Field;
+import com.heliorm.sql.OrmSqlException;
 import com.heliorm.sql.SqlDriver;
+import com.heliorm.sql.TableGenerator;
 
-import java.sql.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Types;
+import java.util.Collections;
 import java.util.Map;
-import java.util.function.Supplier;
 
 import static java.lang.String.format;
 
 public final class PostgreSqlDriver extends SqlDriver {
 
-    public PostgreSqlDriver(Supplier<Connection> connectionSupplier, PojoOperations pops) {
-        super(connectionSupplier, pops);
+    public PostgreSqlDriver(Map<Database, Database> aliases) {
+        super(aliases);
     }
 
-    public PostgreSqlDriver(Supplier<Connection> connectionSupplier, PojoOperations pops, Map<Database, Database> aliases) {
-        super(connectionSupplier, pops, aliases);
+    public PostgreSqlDriver() {
+        super(Collections.EMPTY_MAP);
     }
 
     @Override
@@ -90,5 +92,10 @@ public final class PostgreSqlDriver extends SqlDriver {
     @Override
     protected boolean supportsUnionAll() {
         return false;
+    }
+
+    @Override
+    protected boolean supportsTransactions() {
+        return true;
     }
 }

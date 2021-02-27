@@ -35,12 +35,14 @@ public final class SqlOrm implements Orm {
     private final Map<Table, String> inserts = new ConcurrentHashMap<>();
     private final Map<Table, String> updates = new ConcurrentHashMap();
     private final Map<Table, String> deletes = new ConcurrentHashMap();
+    private final Map<Table, Boolean> exists = new ConcurrentHashMap();
     private final QueryHelper queryHelper;
     private final AbstractionHelper abstractionHelper;
     private final PojoHelper pojoHelper;
     private final PreparedStatementHelper preparedStatementHelper;
     private final ResultSetHelper resultSetHelper;
     private SqlTransaction currentTransaction;
+
 
     /**
      * Create an ORM mapper using the supplied driver instance. This is meant to
@@ -52,7 +54,7 @@ public final class SqlOrm implements Orm {
         this.driver = driver;
         this.connectionSupplier = connectionSupplier;
         this.pops = pops;
-        this.queryHelper = new QueryHelper(driver, driver::getFieldId);
+        this.queryHelper = new QueryHelper(driver, driver::getFieldId, this::fullTableName);
         this.pojoHelper = new PojoHelper(pops);
         this.abstractionHelper = new AbstractionHelper();
         this.preparedStatementHelper = new PreparedStatementHelper(pojoHelper, driver::setEnum);
@@ -212,10 +214,16 @@ public final class SqlOrm implements Orm {
 
     @Override
     public OrmTransaction openTransaction() throws OrmException {
-        if (!(driver instanceof OrmTransactionDriver)) {
+         if (!driver.supportsTransactions()) {
             throw new OrmTransactionException("The ORM driver does not support transactions");
         }
-        return ((OrmTransactionDriver) driver).openTransaction();
+        if (currentTransaction != null) {
+            if (currentTransaction.isOpen()) {
+                throw new OrmTransactionException(format("A transaction is already open"));
+            }
+        }
+        currentTransaction = new SqlTransaction(driver, getConnection());
+        return currentTransaction;
     }
 
     @Override
@@ -470,4 +478,49 @@ public final class SqlOrm implements Orm {
             throw new UncaughtOrmException(error.getMessage(), error);
         }
     }
+
+    private void checkTable(Table table) throws OrmException {
+        if (driver.isCreateTables()) {
+            if (!exists.containsKey(table)) {
+                if (!tableExists(table)) {
+                    Connection con = getConnection();
+                    try (Statement stmt = con.createStatement()) {
+                        stmt.executeUpdate(driver.getTableGenerator().generateSchema(table));
+                    } catch (SQLException ex) {
+                        throw new OrmSqlException(format("Error creating table (%s)", ex.getMessage()), ex);
+                    } finally {
+                        closeConnection(con);
+                    }
+                }
+                exists.put(table, Boolean.TRUE);
+            }
+        }
+    }
+
+    private String fullTableName(Table table) throws OrmException {
+        checkTable(table);
+        return driver.fullTableName(table);
+    }
+
+    /**
+     * Determine if the SQL table exists for a table structure
+     *
+     * @param table The Table
+     * @return True if it exsits in the database
+     * @throws OrmException
+     */
+    private final boolean tableExists(Table table) throws OrmException {
+        Connection con = getConnection();
+        try {
+            DatabaseMetaData dbm = con.getMetaData();
+            try (ResultSet tables = dbm.getTables(driver.databaseName(table), null, driver.makeTableName(table), null)) {
+                return tables.next();
+            }
+        } catch (SQLException ex) {
+            throw new OrmSqlException(format("Error checking table existance (%s)", ex.getMessage()), ex);
+        } finally {
+            closeConnection(con);
+        }
+    }
+
 }

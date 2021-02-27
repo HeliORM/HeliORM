@@ -21,15 +21,17 @@ final class QueryHelper {
     static final String POJO_NAME_FIELD = "pojo_field_name";
     private final SqlDriver driver;
     private final Function<Field, String> getFieldId;
+    private final FullTableName fullTableName;
 
-    QueryHelper(SqlDriver driver, Function<Field, String> getFieldId) {
+    QueryHelper(SqlDriver driver, Function<Field, String> getFieldId, FullTableName fullTableName) {
         this.driver = driver;
         this.getFieldId = getFieldId;
+        this.fullTableName = fullTableName;
     }
 
     String buildInsertQuery(Table<?> table) throws OrmException {
         StringBuilder query = new StringBuilder();
-        query.append(format("INSERT INTO %s(", driver.fullTableName(table)));
+        query.append(format("INSERT INTO %s(", fullTableName.apply(table)));
         StringJoiner fields = new StringJoiner(",");
         StringJoiner values = new StringJoiner(",");
         for (Field field : table.getFields()) {
@@ -55,7 +57,7 @@ final class QueryHelper {
             throw new OrmException("A table needs primary key for objects to be updated");
         }
         StringBuilder query = new StringBuilder();
-        query.append(format("UPDATE %s SET ", driver.fullTableName(table)));
+        query.append(format("UPDATE %s SET ", fullTableName.apply(table)));
         StringJoiner fields = new StringJoiner(",");
         StringJoiner values = new StringJoiner(",");
         for (Field field : table.getFields()) {
@@ -70,7 +72,7 @@ final class QueryHelper {
 
     String buildDeleteQuery(Table<?> table) throws OrmException {
         if (table.getPrimaryKey().isPresent()) {
-            return format("DELETE FROM %s WHERE %s=?", driver.fullTableName(table), driver.fieldName(table, table.getPrimaryKey().get()));
+            return format("DELETE FROM %s WHERE %s=?", fullTableName.apply(table), driver.fieldName(table, table.getPrimaryKey().get()));
         } else {
             throw new OrmException("A table needs primary key for objects to be deleted");
         }
@@ -84,7 +86,7 @@ final class QueryHelper {
             fieldList.add(format("%s AS %s", driver.fullFieldName(root.getTable(), field), driver.virtualFieldName(getFieldId(field))));
         }
         tablesQuery.append(fieldList.toString());
-        tablesQuery.append(format(" FROM %s", driver.fullTableName(root.getTable()), driver.fullTableName(root.getTable())));
+        tablesQuery.append(format(" FROM %s", fullTableName.apply(root.getTable()), fullTableName.apply(root.getTable())));
         StringBuilder whereQuery = new StringBuilder();
         Optional<Criteria> optCrit = root.getCriteria();
         if (optCrit.isPresent()) {
@@ -137,7 +139,7 @@ final class QueryHelper {
             }
             tablesQuery.append(format("SELECT %s", fieldsQuery.toString()));
             tablesQuery.append(format(",%s AS %s", driver.virtualValue(root.getTable().getObjectClass().getName()), driver.virtualFieldName(POJO_NAME_FIELD)));
-            tablesQuery.append(format(" FROM %s", driver.fullTableName(root.getTable()), driver.fullTableName(root.getTable())));
+            tablesQuery.append(format(" FROM %s", fullTableName.apply(root.getTable()), fullTableName.apply(root.getTable())));
             StringBuilder whereQuery = new StringBuilder();
             Optional<Criteria> optCrit = root.getCriteria();
             if (optCrit.isPresent()) {
@@ -172,7 +174,7 @@ final class QueryHelper {
     private String expandLinkTables(TableSpec left, Link right) throws OrmException {
         StringBuilder query = new StringBuilder();
         query.append(format(" JOIN %s ON %s=%s ",
-                driver.fullTableName(right.getTable()),
+                fullTableName.apply(right.getTable()),
                 driver.fullFieldName(left.getTable(), right.getLeftField()),
                 driver.fullFieldName(right.getTable(), right.getField())));
         if (right.getLink().isPresent()) {

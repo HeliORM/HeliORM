@@ -1,69 +1,44 @@
 package com.heliorm.sql;
 
-import com.heliorm.*;
+import com.heliorm.Database;
+import com.heliorm.OrmException;
+import com.heliorm.Table;
 import com.heliorm.def.Field;
-import com.heliorm.query.Order;
-import com.heliorm.query.TableSpec;
 
-import java.sql.*;
-import java.util.Collections;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Supplier;
 
 import static java.lang.String.format;
 
 /**
  * @author gideon
  */
-public abstract class SqlDriver implements OrmTransactionDriver {
+public abstract class SqlDriver {
 
-    private final Supplier<Connection> connectionSupplier;
-    private SqlTransaction currentTransaction;
-    private boolean createTables = false;
     private boolean rollbackOnUncommittedClose = false;
     private boolean useUnionAll = false;
-    private final Map<Table, Boolean> exists = new ConcurrentHashMap();
-    private final PojoOperations pops;
+    private boolean createTables;
     private final Map<Database, Database> aliases;
     private final Map<Field, String> fieldIds = new ConcurrentHashMap<>();
-    private final ResultSetHelper resultSetHelper;
-    private final PojoHelper pojoHelper;
-    private final PreparedStatementHelper preparedStatementHelper;
 
-    public SqlDriver(Supplier<Connection> connectionSupplier, PojoOperations pops) {
-        this(connectionSupplier, pops, Collections.EMPTY_MAP);
-    }
-
-    public SqlDriver(Supplier<Connection> connectionSupplier, PojoOperations pops, Map<Database, Database> aliases) {
-        this.connectionSupplier = connectionSupplier;
-        this.pops = pops;
+    public SqlDriver(Map<Database, Database> aliases) {
         this.aliases = aliases;
-        this.resultSetHelper = new ResultSetHelper(pops, this::getFieldId);
-        this.pojoHelper = new PojoHelper(pops);
-        this.preparedStatementHelper = new PreparedStatementHelper(pojoHelper, this::setEnum);
     }
 
-
-    @Override
-    public OrmTransaction openTransaction() throws OrmException {
-        if (currentTransaction != null) {
-            if (currentTransaction.isOpen()) {
-                throw new OrmTransactionException(format("A transaction is already open"));
-            }
-        }
-        currentTransaction = new SqlTransaction(this);
-        return currentTransaction;
-    }
-
-    @Override
     public final void setRollbackOnUncommittedClose(boolean rollback) {
         rollbackOnUncommittedClose = rollback;
     }
 
     public final void setUseUnionAll(boolean useUnionAll) {
         this.useUnionAll = useUnionAll;
+    }
+
+    public boolean isCreateTables() {
+        return createTables;
     }
 
     /**
@@ -75,6 +50,7 @@ public abstract class SqlDriver implements OrmTransactionDriver {
         this.createTables = createTables;
     }
 
+
     final boolean getRollbackOnUncommittedClose() {
         return rollbackOnUncommittedClose;
     }
@@ -83,55 +59,13 @@ public abstract class SqlDriver implements OrmTransactionDriver {
         return useUnionAll && supportsUnionAll();
     }
 
-
-
-    /**
-     * Determine if the SQL table exists for a table structure
-     *
-     * @param table The Table
-     * @return True if it exsits in the database
-     * @throws OrmException
-     */
-    private final boolean tableExists(Table table) throws OrmException {
-        Connection con = getConnection();
-        try {
-            DatabaseMetaData dbm = con.getMetaData();
-            try (ResultSet tables = dbm.getTables(databaseName(table), null, makeTableName(table), null)) {
-                return tables.next();
-            }
-        } catch (SQLException ex) {
-            throw new OrmSqlException(format("Error checking table existance (%s)", ex.getMessage()), ex);
-        } finally {
-            close(con);
-        }
-    }
-
-
     protected void setEnum(PreparedStatement stmt, int par, String value) throws SQLException {
         stmt.setString(par, value);
     }
 
     protected abstract boolean supportsUnionAll();
 
-    /**
-     * Expand the given order part into the fields of a SQL order clause.
-     *
-     * @param table The table spec to which the ordering applies
-     * @param order The order part
-     * @return The partial SQL query string
-     */
-    private String expandOrder(TableSpec table, Order order) throws OrmException {
-        StringBuilder query = new StringBuilder();
-        query.append(format("%s", fieldName(table.getTable(), order.getField())));
-        if (order.getDirection() == Order.Direction.DESCENDING) {
-            query.append(" DESC");
-        }
-        if (order.getThenBy().isPresent()) {
-            query.append(", ");
-            query.append(expandOrder(table, order.getThenBy().get()));
-        }
-        return query.toString();
-    }
+    protected abstract boolean supportsTransactions();
 
     /**
      * Retrieve the returned key value from a result set (used for updating
@@ -144,22 +78,6 @@ public abstract class SqlDriver implements OrmTransactionDriver {
      *                      data.
      */
     protected abstract Object getKeyValueFromResultSet(ResultSet rs, Field field) throws OrmException;
-
-    /**
-     * Obtain the SQL connection to use
-     *
-     * @return The connection
-     */
-    Connection getConnection() {
-        if (currentTransaction != null) {
-            if (currentTransaction.isOpen()) {
-                return currentTransaction.getConnection();
-            }
-            currentTransaction = null;
-        }
-        return connectionSupplier.get();
-    }
-
 
 
     /**
@@ -222,11 +140,10 @@ public abstract class SqlDriver implements OrmTransactionDriver {
      * @return The SQL table name
      */
     protected final String tableName(Table table) throws OrmException {
-        checkTable(table);
         return makeTableName(table);
     }
 
-    private final String makeTableName(Table table) throws OrmException {
+    final String makeTableName(Table table) {
         return format("%s", table.getSqlTable());
     }
 
@@ -245,23 +162,7 @@ public abstract class SqlDriver implements OrmTransactionDriver {
         return format("%s", alias.getSqlDatabase());
     }
 
-    private void checkTable(Table table) throws OrmException {
-        if (createTables) {
-            if (!exists.containsKey(table)) {
-                if (!tableExists(table)) {
-                    Connection con = getConnection();
-                    try (Statement stmt = con.createStatement()) {
-                        stmt.executeUpdate(getTableGenerator().generateSchema(table));
-                    } catch (SQLException ex) {
-                        throw new OrmSqlException(format("Error creating table (%s)", ex.getMessage()), ex);
-                    } finally {
-                        close(con);
-                    }
-                }
-                exists.put(table, Boolean.TRUE);
-            }
-        }
-    }
+
 
     String getFieldId(Field field) {
         return fieldIds.computeIfAbsent(field, k -> makeFieldId(k));
@@ -275,23 +176,6 @@ public abstract class SqlDriver implements OrmTransactionDriver {
         while (fieldIds.containsKey(uuid));
         return uuid;
     }
-
-
-    /** Close a SQL Connection in a way that properly deals with transactions.
-     *
-     * @param con
-     * @throws OrmException
-     */
-    private void close(Connection con) throws OrmException {
-        if ((currentTransaction == null) || (currentTransaction.getConnection() != con)) {
-            try {
-                con.close();
-            } catch (SQLException ex) {
-                throw new OrmException(ex.getMessage(), ex);
-            }
-        }
-    }
-
 
 
 }
