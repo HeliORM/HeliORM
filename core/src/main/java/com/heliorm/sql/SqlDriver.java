@@ -306,15 +306,15 @@ public abstract class SqlDriver implements OrmTransactionDriver {
                             if (pops.getValue(popo, field) == null) {
                                 pops.setValue(popo, field, UUID.randomUUID().toString());
                             }
-                            setValueInStatement(stmt, popo, field, par);
+                            preparedStatementHelper.setValueInStatement(stmt, popo, field, par);
                             par++;
                         }
                     } else {
-                        setValueInStatement(stmt, popo, field, par);
+                        preparedStatementHelper.setValueInStatement(stmt, popo, field, par);
                         par++;
                     }
                 } else {
-                    setValueInStatement(stmt, popo, field, par);
+                    preparedStatementHelper.setValueInStatement(stmt, popo, field, par);
                     par++;
                 }
             }
@@ -351,7 +351,7 @@ public abstract class SqlDriver implements OrmTransactionDriver {
             int par = 1;
             for (Field field : table.getFields()) {
                 if (!field.isPrimaryKey()) {
-                    setValueInStatement(stmt, pojo, field, par);
+                    preparedStatementHelper.setValueInStatement(stmt, pojo, field, par);
                     par++;
                 }
             }
@@ -361,7 +361,7 @@ public abstract class SqlDriver implements OrmTransactionDriver {
                 if (val == null) {
                     throw new OrmException(format("No value for key %s for %s in update", primaryKey.get().getJavaName(),  table.getObjectClass().getSimpleName()));
                 }
-                setValueInStatement(stmt, pojo, table.getPrimaryKey().get(), par);
+                preparedStatementHelper.setValueInStatement(stmt, pojo, table.getPrimaryKey().get(), par);
             }
             else {
                 throw new OrmException(format("No primary key for %s in update", table.getObjectClass().getSimpleName()));
@@ -387,7 +387,7 @@ public abstract class SqlDriver implements OrmTransactionDriver {
         }
         Connection con = getConnection();
         try (PreparedStatement stmt = con.prepareStatement(query)) {
-            setValueInStatement(stmt, pojo, table.getPrimaryKey().get(), 1);
+            preparedStatementHelper.setValueInStatement(stmt, pojo, table.getPrimaryKey().get(), 1);
             stmt.executeUpdate();
         } catch (SQLException ex) {
             throw new OrmSqlException(ex.getMessage(), ex);
@@ -588,50 +588,6 @@ public abstract class SqlDriver implements OrmTransactionDriver {
         return resultSetHelper.makePojoFromResultSet(rs,table);
     }
 
-    /**
-     * Set the value in a prepared statement to the value of the given field
-     * from the given POJO
-     *
-     * @param stmt  The prepared statement in which to set the value
-     * @param pojo  The POJO from which to obtain the value
-     * @param field The field for which to get the value from the POJO
-     * @param par   The position in the prepared statement for the value
-     * @throws OrmException
-     */
-    private void setValueInStatement(PreparedStatement stmt, Object pojo, Field field, int par) throws OrmException {
-        try {
-            switch (field.getFieldType()) {
-                case LONG:
-                case INTEGER:
-                case SHORT:
-                case BYTE:
-                case DOUBLE:
-                case FLOAT:
-                case BOOLEAN:
-                    stmt.setObject(par, pojoHelper.getValueFromPojo(pojo, field));
-                    break;
-                case ENUM:
-                    setEnum(stmt, par, pojoHelper.getStringFromPojo(pojo, field));
-                    break;
-                case STRING:
-                    stmt.setString(par, pojoHelper.getStringFromPojo(pojo, field));
-                    break;
-                case DATE:
-                    stmt.setDate(par, pojoHelper.getDateFromPojo(pojo, field));
-                    break;
-                case INSTANT:
-                    stmt.setTimestamp(par, pojoHelper.getTimestampFromPojo(pojo, field));
-                    break;
-                case DURATION:
-                    stmt.setString(par, pojoHelper.getDurationFromPojo(pojo, field));
-                    break;
-                default:
-                    throw new OrmException(format("Field type '%s' is unsupported. BUG!", field.getFieldType()));
-            }
-        } catch (SQLException ex) {
-            throw new OrmSqlException(ex.getMessage(), ex);
-        }
-    }
 
     private String sqlValue(Object object) {
         return object.toString();

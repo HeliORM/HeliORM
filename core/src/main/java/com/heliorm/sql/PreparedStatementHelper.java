@@ -28,7 +28,7 @@ class PreparedStatementHelper {
      * @param par   The position in the prepared statement for the value
      * @throws OrmException
      */
-    private void setValueInStatement(PreparedStatement stmt, Object pojo, Field field, int par) throws OrmException {
+     void setValueInStatement(PreparedStatement stmt, Object pojo, Field field, int par) throws OrmException {
         try {
             switch (field.getFieldType()) {
                 case LONG:
