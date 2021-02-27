@@ -9,7 +9,7 @@
     </parent>
     <artifactId>test</artifactId>
     <name>[HeliORM] Test</name>
-    <version>0.88</version>
+    <version>0.87</version>
 
     <packaging>jar</packaging>
 
