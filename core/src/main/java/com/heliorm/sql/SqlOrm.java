@@ -42,6 +42,7 @@ public final class SqlOrm implements Orm {
     private final PreparedStatementHelper preparedStatementHelper;
     private final ResultSetHelper resultSetHelper;
     private SqlTransaction currentTransaction;
+    private final Map<Field, String> fieldIds = new ConcurrentHashMap<>();
 
 
     /**
@@ -54,11 +55,11 @@ public final class SqlOrm implements Orm {
         this.driver = driver;
         this.connectionSupplier = connectionSupplier;
         this.pops = pops;
-        this.queryHelper = new QueryHelper(driver, driver::getFieldId, this::fullTableName);
+        this.queryHelper = new QueryHelper(driver, this::getFieldId, this::fullTableName);
         this.pojoHelper = new PojoHelper(pops);
         this.abstractionHelper = new AbstractionHelper();
         this.preparedStatementHelper = new PreparedStatementHelper(pojoHelper, driver::setEnum);
-        this.resultSetHelper = new ResultSetHelper(pops, driver::getFieldId);
+        this.resultSetHelper = new ResultSetHelper(pops, this::getFieldId);
         selector =  new Selector() {
             @Override
             public <O, P extends Part & Executable> List<O> list(P tail) throws OrmException {
@@ -522,5 +523,19 @@ public final class SqlOrm implements Orm {
             closeConnection(con);
         }
     }
+
+    private String getFieldId(Field field) {
+        return fieldIds.computeIfAbsent(field, k -> makeFieldId(k));
+    }
+
+    private String makeFieldId(Field field) {
+        String uuid;
+        do { // very simple collison avoidance
+            uuid = UUID.randomUUID().toString().substring(0, 8);
+        }
+        while (fieldIds.containsKey(uuid));
+        return uuid;
+    }
+
 
 }

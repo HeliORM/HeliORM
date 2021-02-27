@@ -9,8 +9,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 import static java.lang.String.format;
 
@@ -23,7 +21,6 @@ public abstract class SqlDriver {
     private boolean useUnionAll = false;
     private boolean createTables;
     private final Map<Database, Database> aliases;
-    private final Map<Field, String> fieldIds = new ConcurrentHashMap<>();
 
     public SqlDriver(Map<Database, Database> aliases) {
         this.aliases = aliases;
@@ -161,21 +158,5 @@ public abstract class SqlDriver {
         }
         return format("%s", alias.getSqlDatabase());
     }
-
-
-
-    String getFieldId(Field field) {
-        return fieldIds.computeIfAbsent(field, k -> makeFieldId(k));
-    }
-
-    private String makeFieldId(Field field) {
-        String uuid;
-        do { // very simple collison avoidance
-            uuid = UUID.randomUUID().toString().substring(0, 8);
-        }
-        while (fieldIds.containsKey(uuid));
-        return uuid;
-    }
-
 
 }
