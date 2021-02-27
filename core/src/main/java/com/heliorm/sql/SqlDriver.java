@@ -738,47 +738,6 @@ public abstract class SqlDriver implements OrmTransactionDriver {
     }
 
     /**
-     * Get a timestamp value from SQL for the given POJO and field
-     *
-     * @param rs     The ResultSet
-     * @param column The SQL column
-     * @return The correct value
-     */
-    private Instant getTimestampFromSql(ResultSet rs, String column) throws OrmException {
-        try {
-            Timestamp value = rs.getTimestamp(column);
-            if (value == null) {
-                return null;
-            }
-            if (!(value instanceof Timestamp)) {
-                throw new OrmException(format("Could not read Timestamp value from SQL for field '%s'", column));
-            }
-            return ((Timestamp) value).toInstant();
-        } catch (SQLException ex) {
-            throw new OrmException(format("Could not read timestamp value from SQL (%s)", ex.getMessage()), ex);
-        }
-    }
-
-    /**
-     * Get a duration value from SQL for the given POJO and field
-     *
-     * @param rs     The ResultSet
-     * @param column The SQL column field
-     * @return The correct value
-     */
-    private Duration getDurationFromSql(ResultSet rs, String column) throws OrmException {
-        try {
-            String value = rs.getString(column);
-            if (value == null) {
-                return null;
-            }
-            return Duration.parse(value);
-        } catch (SQLException ex) {
-            throw new OrmException(format("Could not read duration value from SQL (%s)", ex.getMessage()), ex);
-        }
-    }
-
-    /**
      * Get a date value from the given POJO for the given field.
      *
      * @param pojo  The POJO from which to read the date.
