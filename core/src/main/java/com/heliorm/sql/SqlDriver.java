@@ -30,7 +30,6 @@ public abstract class SqlDriver implements OrmTransactionDriver {
     private boolean createTables = false;
     private boolean rollbackOnUncommittedClose = false;
     private boolean useUnionAll = false;
-    private final Map<Table, String> updates = new ConcurrentHashMap();
     private final Map<Table, String> deletes = new ConcurrentHashMap();
     private final Map<Table, Boolean> exists = new ConcurrentHashMap();
     private final PojoOperations pops;
@@ -283,45 +282,6 @@ public abstract class SqlDriver implements OrmTransactionDriver {
         }
     }
 
-    public <T extends Table<O>, O> O update(T table, O pojo) throws OrmException {
-        String query = updates.get(table);
-        if (query == null) {
-            query = buildUpdateQuery(table);
-            updates.put(table, query);
-        }
-        Connection con = getConnection();
-        try (PreparedStatement stmt = con.prepareStatement(query)) {
-            int par = 1;
-            for (Field field : table.getFields()) {
-                if (!field.isPrimaryKey()) {
-                    preparedStatementHelper.setValueInStatement(stmt, pojo, field, par);
-                    par++;
-                }
-            }
-            Optional<Field> primaryKey = table.getPrimaryKey();
-            if (primaryKey.isPresent()) {
-                Object val = pojoHelper.getValueFromPojo(pojo, primaryKey.get());
-                if (val == null) {
-                    throw new OrmException(format("No value for key %s for %s in update", primaryKey.get().getJavaName(),  table.getObjectClass().getSimpleName()));
-                }
-                preparedStatementHelper.setValueInStatement(stmt, pojo, table.getPrimaryKey().get(), par);
-            }
-            else {
-                throw new OrmException(format("No primary key for %s in update", table.getObjectClass().getSimpleName()));
-            }
-            int modified = stmt.executeUpdate();
-            if (modified == 0) {
-                throw new OrmException("The update did not modify any data");
-            }
-            return pojo;
-        } catch (SQLException ex) {
-            throw new OrmSqlException(ex.getMessage(), ex);
-        } finally {
-            close(con);
-        }
-
-    }
-
     public final <T extends Table<O>, O> void delete(T table, O pojo) throws OrmException {
         String query = deletes.get(table);
         if (query == null) {
@@ -346,23 +306,7 @@ public abstract class SqlDriver implements OrmTransactionDriver {
     protected abstract boolean supportsUnionAll();
 
 
-    private String buildUpdateQuery(Table<?> table) throws OrmException {
-        if (!table.getPrimaryKey().isPresent()) {
-            throw new OrmException("A table needs primary key for objects to be updated");
-        }
-        StringBuilder query = new StringBuilder();
-        query.append(format("UPDATE %s SET ", fullTableName(table)));
-        StringJoiner fields = new StringJoiner(",");
-        StringJoiner values = new StringJoiner(",");
-        for (Field field : table.getFields()) {
-            if (!field.isPrimaryKey()) {
-                fields.add(format("%s=?", fieldName(table, field)));
-            }
-        }
-        query.append(fields.toString());
-        query.append(format(" WHERE %s=?", fieldName(table, table.getPrimaryKey().get())));
-        return query.toString();
-    }
+
 
     private String buildDeleteQuery(Table<?> table) throws OrmException {
         if (table.getPrimaryKey().isPresent()) {

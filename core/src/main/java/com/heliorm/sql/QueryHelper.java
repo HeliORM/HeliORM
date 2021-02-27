@@ -39,4 +39,22 @@ final class QueryHelper {
         return query.toString();
     }
 
+     String buildUpdateQuery(Table<?> table) throws OrmException {
+        if (!table.getPrimaryKey().isPresent()) {
+            throw new OrmException("A table needs primary key for objects to be updated");
+        }
+        StringBuilder query = new StringBuilder();
+        query.append(format("UPDATE %s SET ", driver.fullTableName(table)));
+        StringJoiner fields = new StringJoiner(",");
+        StringJoiner values = new StringJoiner(",");
+        for (Field field : table.getFields()) {
+            if (!field.isPrimaryKey()) {
+                fields.add(format("%s=?", driver.fieldName(table, field)));
+            }
+        }
+        query.append(fields.toString());
+        query.append(format(" WHERE %s=?", driver.fieldName(table, table.getPrimaryKey().get())));
+        return query.toString();
+    }
+
 }

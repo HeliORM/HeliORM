@@ -37,6 +37,7 @@ public final class SqlOrm implements Orm {
     private final Selector selector;
     private final Map<Class<?>, Table<?>> tables = new ConcurrentHashMap<>();
     private final Map<Table, String> inserts = new ConcurrentHashMap<>();
+    private final Map<Table, String> updates = new ConcurrentHashMap();
     private final QueryHelper queryHelper;
     private final PojoHelper pojoHelper;
     private final PreparedStatementHelper preparedStatementHelper;
@@ -142,7 +143,43 @@ public final class SqlOrm implements Orm {
         if (pojo == null) {
             throw new OrmException("Attempt to update a null POJO");
         }
-        return driver.update(tableFor(pojo), pojo);
+        Table<O> table = tableFor(pojo);
+        String query = updates.get(table);
+        if (query == null) {
+            query = queryHelper.buildUpdateQuery(table);
+            updates.put(table, query);
+        }
+        Connection con = getConnection();
+        try (PreparedStatement stmt = con.prepareStatement(query)) {
+            int par = 1;
+            for (Field field : table.getFields()) {
+                if (!field.isPrimaryKey()) {
+                    preparedStatementHelper.setValueInStatement(stmt, pojo, field, par);
+                    par++;
+                }
+            }
+            Optional<Field> primaryKey = table.getPrimaryKey();
+            if (primaryKey.isPresent()) {
+                Object val = pojoHelper.getValueFromPojo(pojo, primaryKey.get());
+                if (val == null) {
+                    throw new OrmException(format("No value for key %s for %s in update", primaryKey.get().getJavaName(),  table.getObjectClass().getSimpleName()));
+                }
+                preparedStatementHelper.setValueInStatement(stmt, pojo, table.getPrimaryKey().get(), par);
+            }
+            else {
+                throw new OrmException(format("No primary key for %s in update", table.getObjectClass().getSimpleName()));
+            }
+            int modified = stmt.executeUpdate();
+            if (modified == 0) {
+                throw new OrmException("The update did not modify any data");
+            }
+            return pojo;
+        } catch (SQLException ex) {
+            throw new OrmSqlException(ex.getMessage(), ex);
+        } finally {
+            closeConnection(con);
+        }
+
     }
 
     @Override
