@@ -16,6 +16,7 @@ import java.util.stream.Stream;
 
 import static java.lang.String.format;
 
+/** Helper class that builds SQL queries. */
 final class QueryHelper {
 
     static final String POJO_NAME_FIELD = "pojo_field_name";
