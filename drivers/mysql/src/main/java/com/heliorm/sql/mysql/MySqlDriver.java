@@ -61,7 +61,7 @@ public final class MySqlDriver extends SqlDriver {
 
     @Override
     protected String castNull(Field field) throws OrmException {
-        return "";
+        return "NULL";
     }
 
     /**
