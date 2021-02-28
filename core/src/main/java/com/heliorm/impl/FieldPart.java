@@ -25,10 +25,10 @@ public abstract class FieldPart<T extends Table<O>, O, C> extends Part<T, O, T, 
     private boolean autoNumber = false;
     private boolean foreignKey = false;
     private boolean nullable = false;
-    private Optional<Table<?>> foreignTable = Optional.empty();
+    private Optional<String> foreignTable = Optional.empty();
     private final Optional<Integer> length = Optional.empty();
     private boolean collection = false;
-    private Optional<Table<?>> collectionTable = Optional.empty();
+    private Optional<String> collectionTable = Optional.empty();
 
     public FieldPart(Table table, FieldType fieldType, Class<C> javaType, String javaName) {
         super(Part.Type.FIELD, null);
@@ -89,7 +89,12 @@ public abstract class FieldPart<T extends Table<O>, O, C> extends Part<T, O, T, 
 
     @Override
     public final Optional<Table<?>> getForeignTable() {
-        return foreignTable;
+        if (foreignTable.isPresent()) {
+            return getTable().getDatabase().getTables().stream()
+                    .filter(table -> table.getSqlTable().equals(foreignTable.get()))
+                    .findFirst();
+        }
+        return Optional.empty();
     }
 
     @Override
@@ -104,13 +109,17 @@ public abstract class FieldPart<T extends Table<O>, O, C> extends Part<T, O, T, 
 
     @Override
     public boolean isCollection() {
-        return false;
+        return collection;
     }
 
     @Override
     public Optional<Table<?>> getCollectionTable() {
-        return Optional.empty();
-    }
+        if (collectionTable.isPresent()) {
+            return getTable().getDatabase().getTables().stream()
+                    .filter(table -> table.getSqlTable().equals(collectionTable.get()))
+                    .findFirst();
+        }
+        return Optional.empty();    }
 
     void setSqlName(String sqlName) {
         this.sqlName = sqlName;
@@ -132,16 +141,16 @@ public abstract class FieldPart<T extends Table<O>, O, C> extends Part<T, O, T, 
         this.nullable = nullable;
     }
 
-    void setForeignTable(Optional<Table<?>> foreignTable) {
-        this.foreignTable = foreignTable;
+    void setForeignTable(Optional<String> name) {
+        this.foreignTable = name;
     }
 
     void setCollection(boolean collection) {
         this.collection = collection;
     }
 
-    void setCollectionTable(Optional<Table<?>> collectionTable) {
-        this.collectionTable = collectionTable;
+    void setCollectionTableName(Optional<String> name) {
+        this.collectionTable = name;
     }
 
     @Override

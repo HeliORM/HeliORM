@@ -38,6 +38,9 @@ class ResultSetHelper {
         try {
             O pojo = (O) pops.newPojoInstance(table);
             for (Field field : table.getFields()) {
+                if (field.isCollection()) {
+                    continue;
+                }
                 setValueInPojo(pojo, field, rs);
             }
             return pojo;
