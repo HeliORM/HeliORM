@@ -94,6 +94,8 @@ public final class MySqlDriver extends SqlDriver {
                 case DATE:
                 case INSTANT:
                 case DURATION:
+                case SET:
+                case LIST:
                     throw new OrmException(format("Field type '%s' is not a supported primary key type", field.getFieldType()));
                 default:
                     throw new OrmException(format("Field type '%s' is unsupported. BUG!", field.getFieldType()));
@@ -138,6 +140,9 @@ public final class MySqlDriver extends SqlDriver {
                 return "DATETIME";
             case DURATION:
                 return "VARCHAR(32)";
+            case SET:
+            case LIST:
+                throw new OrmSqlException(format("Cannot query SQL for field type '%s'. BUG!", field.getFieldType()));
             default:
                 throw new OrmSqlException(format("Unkown field type '%s'. BUG!", field.getFieldType()));
         }

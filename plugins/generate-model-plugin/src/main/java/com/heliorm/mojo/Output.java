@@ -330,6 +330,12 @@ class Output {
             case ENUM:
                 addEnumField(cm, fm);
                 break;
+            case SET :
+                addSetField(cm, fm);
+                break;
+            case LIST :
+                addListField(cm, fm);
+                break;
             default:
                 throw new OrmMetaDataException(format("Unsupported Pojo field type %s for field '%s' on class %s", fm.getFieldType(), fm.getJavaName(), getJavaName(cm)));
         }
@@ -402,6 +408,30 @@ class Output {
         addField(cm, fm, StringField.class, "stringField");
     }
 
+
+    private void addSetField(Table cm, Field fm) throws GeneratorException {
+        addCollectionField(cm, fm, SetField.class, "setField");
+    }
+
+    private void addListField(Table cm, Field fm) throws GeneratorException {
+        addCollectionField(cm, fm, ListField.class, "listField");
+    }
+
+    private void addCollectionField(Table<?> cm, Field<?,?,?> fm,  Class<? extends Field> fieldType,  String buildMethod) throws GeneratorException {
+        impt(fieldType);
+        impt(fm.getCollectionTable().get().getObjectClass());
+        emit("public final %s<%s, %s, %s> %s = builder.%s(\"%s\", %s.class)",
+                fieldType.getSimpleName(),
+                tableName(cm),
+                cm.getObjectClass().getSimpleName(),
+                fm.getCollectionTable().get().getObjectClass().getSimpleName(),
+                fm.getJavaName(),
+                buildMethod,
+                fm.getJavaName(),
+                fm.getCollectionTable().get().getObjectClass().getSimpleName());
+        completeField(fm);
+    }
+
     private String addIndexModel(Table tm, Index<?, ?> im) {
         impt(IndexPart.class);
         StringJoiner sj = new StringJoiner(",");
@@ -452,6 +482,9 @@ class Output {
         }
         if (fm.getForeignTable().isPresent()) {
             emit(".withForeignTable(%s)",  shortFieldName(fm.getForeignTable().get()));
+        }
+        if (fm.isCollection()) {
+            emit(".withCollection(%s)", shortFieldName(fm.getCollectionTable().get()));
         }
         emit(".build();");
         pop();

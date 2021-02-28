@@ -1,16 +1,19 @@
 package com.heliorm.mojo.annotated;
 
+import com.heliorm.Table;
+import com.heliorm.annotation.Collection;
 import com.heliorm.annotation.Column;
 import com.heliorm.annotation.ForeignKey;
 import com.heliorm.annotation.PrimaryKey;
 import com.heliorm.def.Field;
-import com.heliorm.Table;
 
 import java.lang.annotation.Annotation;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static java.lang.String.format;
 
@@ -102,7 +105,13 @@ public class AnnotatedPojoField implements Field {
         } else if (Enum.class.isAssignableFrom(type)) {
             return FieldType.ENUM;
         }
-        throw new AnnotatedPojoException(format("Unsuppored field type %s for field '%s' on %s",
+        else if (Set.class.isAssignableFrom(type)) {
+            return FieldType.SET;
+        }
+        else if (List.class.isAssignableFrom(type)) {
+            return FieldType.LIST;
+        }
+        throw new AnnotatedPojoException(format("Unsupported field type %s for field '%s' on %s",
                 type.getSimpleName(), pojoField.getName(), pojoField.getDeclaringClass().getCanonicalName()));
     }
 
@@ -149,11 +158,23 @@ public class AnnotatedPojoField implements Field {
     public Optional<Table<?>> getForeignTable() {
         Optional<ForeignKey> fk = getAnnotation(ForeignKey.class);
         if (fk.isPresent()) {
-            Class<?> type = fk.get().pojo();
-            if (type != null)  {
-                return table.getDatabase().getTables().stream()
-                        .filter(table -> table.getObjectClass().equals(type))
-                        .findFirst();
+            return getTable(fk.get().pojo());
+        }
+        return Optional.empty();
+    }
+
+
+    @Override
+    public boolean isCollection() {
+        return getFieldType() == FieldType.SET || getFieldType() == FieldType.LIST;
+    }
+
+    @Override
+    public Optional<Table<?>> getCollectionTable() {
+        if (isCollection()) {
+            Optional<Collection> col = getAnnotation(Collection.class);
+            if (col.isPresent()) {
+                return getTable(col.get().pojo());
             }
         }
         return Optional.empty();
@@ -170,4 +191,14 @@ public class AnnotatedPojoField implements Field {
     private <T extends Annotation> Optional<T> getAnnotation(Class<T> annotationClass) {
         return Optional.ofNullable(pojoField.getAnnotation(annotationClass));
     }
+
+    private Optional<Table<?>> getTable(Class<?> type) {
+        if (type != null)  {
+            return table.getDatabase().getTables().stream()
+                    .filter(table -> table.getObjectClass().equals(type))
+                    .findFirst();
+        }
+        return Optional.empty();
+    }
+
 }

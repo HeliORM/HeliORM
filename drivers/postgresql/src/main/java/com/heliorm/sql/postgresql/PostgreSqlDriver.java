@@ -102,6 +102,9 @@ public final class PostgreSqlDriver extends SqlDriver {
                 return "TIMESTAMP";
             case DURATION:
                 return "VARCHAR(32)";
+            case SET:
+            case LIST:
+                throw new OrmSqlException(format("Cannot generate SQL for field type '%s'. BUG!", field.getFieldType()));
             default:
                 throw new OrmSqlException(format("Unkown field type '%s'. BUG!", field.getFieldType()));
         }
@@ -130,6 +133,8 @@ public final class PostgreSqlDriver extends SqlDriver {
                 case DATE:
                 case INSTANT:
                 case DURATION:
+                case SET:
+                case LIST:
                     throw new OrmException(format("Field type '%s' is not a supported primary key type", field.getFieldType()));
                 default:
                     throw new OrmException(format("Field type '%s' is unsupported. BUG!", field.getFieldType()));

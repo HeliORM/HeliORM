@@ -63,6 +63,14 @@ public final class TableBuilder<T extends Table<O>, O> {
         return new FieldBuilder<>(table, Field.FieldType.ENUM,  enumType, javaName);
     }
 
+    public <P> FieldBuilder<SetFieldPart<T,O, P>> setField(String javaName,Class<P> pojoType) {
+        return new FieldBuilder<>(table, Field.FieldType.SET,  pojoType, javaName);
+    }
+
+    public <P> FieldBuilder<ListFieldPart<T,O, P>> listField(String javaName,Class<P> pojoType) {
+        return new FieldBuilder<>(table, Field.FieldType.LIST,  pojoType, javaName);
+    }
+
     private TableBuilder(T table) {
         this.table = table;
     }

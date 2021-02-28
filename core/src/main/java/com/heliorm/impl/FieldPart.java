@@ -6,7 +6,6 @@ import com.heliorm.def.Field;
 
 import java.util.Optional;
 
-import static com.heliorm.impl.Part.Type.FIELD;
 import static java.lang.String.format;
 
 /**
@@ -28,6 +27,8 @@ public abstract class FieldPart<T extends Table<O>, O, C> extends Part<T, O, T, 
     private boolean nullable = false;
     private Optional<Table<?>> foreignTable = Optional.empty();
     private final Optional<Integer> length = Optional.empty();
+    private boolean collection = false;
+    private Optional<Table<?>> collectionTable = Optional.empty();
 
     public FieldPart(Table table, FieldType fieldType, Class<C> javaType, String javaName) {
         super(Part.Type.FIELD, null);
@@ -101,6 +102,16 @@ public abstract class FieldPart<T extends Table<O>, O, C> extends Part<T, O, T, 
         return nullable;
     }
 
+    @Override
+    public boolean isCollection() {
+        return false;
+    }
+
+    @Override
+    public Optional<Table<?>> getCollectionTable() {
+        return Optional.empty();
+    }
+
     void setSqlName(String sqlName) {
         this.sqlName = sqlName;
     }
@@ -123,6 +134,14 @@ public abstract class FieldPart<T extends Table<O>, O, C> extends Part<T, O, T, 
 
     void setForeignTable(Optional<Table<?>> foreignTable) {
         this.foreignTable = foreignTable;
+    }
+
+    void setCollection(boolean collection) {
+        this.collection = collection;
+    }
+
+    void setCollectionTable(Optional<Table<?>> collectionTable) {
+        this.collectionTable = collectionTable;
     }
 
     @Override

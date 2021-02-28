@@ -21,6 +21,8 @@ public class FieldBuilder<P extends FieldPart> {
     private boolean nullable = false;
     private Optional<Table<?>> foreignTable = Optional.empty();
     private Optional<Integer> length = Optional.empty();
+    private boolean collection  = false;
+    private Optional<Table<?>> collectionTable = Optional.empty();
 
     public FieldBuilder(Table<?> table, Field.FieldType fieldType, Class<?> javaType, String javaName) {
         this.table = table;
@@ -59,6 +61,12 @@ public class FieldBuilder<P extends FieldPart> {
 
     public FieldBuilder<P> withLength(int value) {
         this.length = Optional.of(value);
+        return this;
+    }
+
+    public FieldBuilder<P> withCollection(Table<?> table) {
+        collectionTable = Optional.of(table);
+        collection = true;
         return this;
     }
 
@@ -101,6 +109,12 @@ public class FieldBuilder<P extends FieldPart> {
             case DURATION:
                 part = (P) new DurationFieldPart(table, javaName);
                 break;
+            case SET :
+                part = (P) new SetFieldPart(table, javaName, javaType);
+                break;
+            case LIST :
+                part = (P) new ListFieldPart<>(table, javaName, javaType);
+                break;
             default:
                 throw new UncaughtOrmException(format("Unexpected field type %s. BUG!", fieldType));
         }
@@ -110,6 +124,8 @@ public class FieldBuilder<P extends FieldPart> {
         part.setNullable(nullable);
         part.setPrimaryKey(primaryKey);
         part.setSqlName(sqlName);
+        part.setCollection(collection);
+        part.setCollectionTable(collectionTable);
         return part;
     }
 

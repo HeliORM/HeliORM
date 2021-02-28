@@ -19,6 +19,9 @@ public class PostgresDialectGenerator implements TableGenerator {
         boolean first = true;
         StringBuilder enums = new StringBuilder();
         for (Field field : table.getFields()) {
+            if (field.isCollection()) {
+                continue;
+            }
             if (first) {
                 first = false;
             } else {
@@ -88,6 +91,9 @@ public class PostgresDialectGenerator implements TableGenerator {
                 return "TIMESTAMP";
             case DURATION:
                 return "VARCHAR(32)";
+            case SET :
+            case LIST:
+                throw new OrmSqlException(format("Cannot generate SQL for field type '%s'. BUG!", field.getFieldType()));
             default:
                 throw new OrmSqlException(format("Unkown field type '%s'. BUG!", field.getFieldType()));
         }

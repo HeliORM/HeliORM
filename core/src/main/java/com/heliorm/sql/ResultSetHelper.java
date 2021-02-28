@@ -67,6 +67,9 @@ class ResultSetHelper {
             case DURATION:
                 pops.setValue(pojo, field, getDuration(rs, column));
                 break;
+            case SET :
+            case LIST : // ignore set and list cause they are dealt with in separate queries
+                break;
             default:
                 throw new OrmException(format("Field type '%s' is unsupported. BUG!", field.getFieldType()));
         }
@@ -126,6 +129,9 @@ class ResultSetHelper {
                     }
                     return null;
                 }
+                case SET :
+                case LIST:  // return null in case this is called since set and list should be populated elsewhere
+                    return null;
                 default:
                     throw new OrmException(format("Field type '%s' is unsupported. BUG!", field.getFieldType()));
             }

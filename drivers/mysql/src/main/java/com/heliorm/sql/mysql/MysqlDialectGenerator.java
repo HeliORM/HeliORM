@@ -19,6 +19,9 @@ public class MysqlDialectGenerator implements TableGenerator {
         sql.append(format("CREATE TABLE %s (\n", fullTableName(table)));
         boolean first = true;
         for (Field field : table.getFields()) {
+            if (field.isCollection()) {
+                continue;
+            }
             if (first) {
                 first = false;
             } else {
@@ -94,6 +97,9 @@ public class MysqlDialectGenerator implements TableGenerator {
                 return "DATETIME";
             case DURATION:
                 return "VARCHAR(32)";
+            case SET:
+            case LIST:
+                throw new OrmSqlException(format("Cannot generate SQL for field type '%s'. BUG!", field.getFieldType()));
             default:
                 throw new OrmSqlException(format("Unkown field type '%s'. BUG!", field.getFieldType()));
         }

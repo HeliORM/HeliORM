@@ -26,7 +26,9 @@ public interface Field<T extends Table<O>, O, C> {
         STRING,
         DATE,
         INSTANT,
-        DURATION;
+        DURATION,
+        LIST,
+        SET;
     }
 
     Table<?> getTable();
@@ -97,4 +99,17 @@ public interface Field<T extends Table<O>, O, C> {
      * @return True if it can be null
      */
      boolean isNullable() ;
+
+    /** Return true if this field represents a collection of POJOs
+     *
+     * @return True if it is a collection
+     */
+     boolean isCollection();
+
+    /** Return the table for collection data
+     *
+     * @return The table for the collection data
+     */
+     Optional<Table<?>> getCollectionTable();
+
 }

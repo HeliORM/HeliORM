@@ -6,6 +6,7 @@ import com.heliorm.def.Field;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
 
 import static java.lang.String.format;
 
@@ -76,6 +77,8 @@ abstract class AbstractPojoOperations implements PojoOperations {
             case INSTANT:
             case DURATION:
             case STRING:
+            case SET:
+            case LIST:
                 setObject(pojo, refField, value);
                 break;
             default:
@@ -110,6 +113,8 @@ abstract class AbstractPojoOperations implements PojoOperations {
             case INSTANT:
             case DURATION:
             case STRING:
+            case SET :
+            case LIST:
                 return getObject(pojo, refField);
             default:
                 throw new OrmException(format("Unsupported field type '%s'. BUG!", field.getFieldType()));
@@ -154,6 +159,11 @@ abstract class AbstractPojoOperations implements PojoOperations {
 
     @Override
     public final int compareTo(Object pojo1, Object pojo2, Field field) throws OrmException {
+        Object val1 = getValue(pojo1, field);
+        Object val2 = getValue(pojo2, field);
+        if (val1 == val2) return 0;
+        if (val1 == null) return -1;
+        if (val2 == null) return 1;
         switch (field.getFieldType()) {
             case LONG:
             case INTEGER:
@@ -167,20 +177,27 @@ abstract class AbstractPojoOperations implements PojoOperations {
             case DATE:
             case INSTANT:
             case DURATION:
-                Object val1 = getValue(pojo1, field);
-                Object val2 = getValue(pojo2, field);
-                if (val1 == val2) return 0;
-                if (val1 == null) return -1;
-                if (val2 == null) return 1;
                 if (val1 instanceof Comparable) {
                     return ((Comparable) val1).compareTo(val2);
                 } else {
                     throw new OrmException(format("Non-comparable type %s for field %s", field.getJavaType(), field.getJavaName()));
                 }
+            case SET :
+            case LIST:
+                if (val1 instanceof Collection) {
+                    Collection c1 = (Collection) val1;
+                    Collection c2 = (Collection) val2;
+                    if (c1.size() < c2.size()) {
+                        return  -1;
+                    }
+                    if (c1.size() > c2.size()) {
+                        return 1;
+                    }
+                    return 0;
+                }
             default:
                 throw new OrmException(format("Unsupported field type '%s'. BUG!", field.getFieldType()));
         }
-
     }
 
     protected abstract Object newPojoInstance(Class<?> type) throws OrmException;

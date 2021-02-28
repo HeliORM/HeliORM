@@ -55,6 +55,9 @@ class PreparedStatementHelper {
                 case DURATION:
                     stmt.setString(par, pojoHelper.getDurationFromPojo(pojo, field));
                     break;
+                case SET:
+                case LIST: // we do nothing here since nested POJOs are dealt with as seperate updates.
+                    break;
                 default:
                     throw new OrmException(format("Field type '%s' is unsupported. BUG!", field.getFieldType()));
             }
