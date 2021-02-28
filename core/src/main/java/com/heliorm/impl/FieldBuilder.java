@@ -19,7 +19,7 @@ public class FieldBuilder<P extends FieldPart> {
     private boolean autoNumber = false;
     private boolean foreignKey = false;
     private boolean nullable = false;
-    private Optional<Table<?>> foreignTable = Optional.empty();
+    private Optional<String> foreignTable = Optional.empty();
     private Optional<Integer> length = Optional.empty();
     private boolean collection  = false;
     private Optional<String> collectionTable = Optional.empty();
@@ -54,8 +54,8 @@ public class FieldBuilder<P extends FieldPart> {
         return this;
     }
 
-    public FieldBuilder<P> withForeignTable(Table<?> value) {
-        this.foreignTable = Optional.ofNullable(value);
+    public FieldBuilder<P> withForeignTable(String tableName) {
+        this.foreignTable = Optional.ofNullable(tableName);
         return this;
     }
 
