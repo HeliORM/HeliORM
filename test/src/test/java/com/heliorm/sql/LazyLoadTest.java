@@ -2,9 +2,6 @@ package com.heliorm.sql;
 
 
 import com.heliorm.OrmException;
-import com.heliorm.collection.LazyLoadedList;
-import com.heliorm.collection.LazyLoadedSet;
-import com.heliorm.impl.Part;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -22,9 +19,8 @@ import java.util.List;
 import java.util.Set;
 
 import static com.heliorm.sql.TestData.*;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static test.Tables.PET;
+import static test.Tables.*;
 
 public class LazyLoadTest extends AbstractOrmTest {
 
@@ -47,21 +43,27 @@ public class LazyLoadTest extends AbstractOrmTest {
     }
 
     @Test
-    public void lazyLoadListTest() throws Exception {
-        Person person = persons.get(0);
-        List<Pet> control = orm().select(PET).where(PET.personId.eq(person.getId())).list();
-        List<Pet> petz = new LazyLoadedList((Part) orm().select(PET).where(PET.personId.eq(person.getId())), orm().selector());
-        assertFalse(petz.isEmpty(), "Pets list should not be empty");
-        assertTrue(listCompareAsIs(petz, control), "Lazy loaded data should be the same as normally loaded");
+    public void loadWithNestedList() throws Exception {
+        say("Testing load of nested list");
+        Long id =  persons.get(0).getId();
+        Person person = orm().select(PERSON).where(PERSON.id.eq(id)).one();
+        List<Pet> nested = person.getPets();
+        List<Pet> loaded = orm().select(PET).where(PET.personId.eq(id)).list();
+        assertTrue(nested != null, "Nested data should not be null");
+        assertTrue(!nested.isEmpty(), "Nested data should not be empty");
+        assertTrue(listCompareOrdered(nested, loaded), "Nested data should be same as loaded data");
     }
 
     @Test
-    public void lazyLoadSetTest() throws Exception {
-        Person person = persons.get(0);
-        Set<Pet> control = new HashSet(orm().select(PET).where(PET.personId.eq(person.getId())).list());
-        Set<Pet> petz = new LazyLoadedSet((Part) orm().select(PET).where(PET.personId.eq(person.getId())), orm().selector());
-        assertFalse(petz.isEmpty(), "Pets list should not be empty");
-        assertTrue(setCompareAsIs(petz, control), "Lazy loaded data should be the same as normally loaded");
+    public void loadWithNestedSet() throws Exception {
+        say("Testing load of nested set");
+        Long id =  provinces.get(0).getProvinceId();
+        Province province = orm().select(PROVINCE).where(PROVINCE.provinceId.eq(id)).one();
+        Set<Town> nested = province.getTowns();
+        Set<Town> loaded = new HashSet(orm().select(TOWN).where(TOWN.provinceId.eq(id)).list());
+        assertTrue(nested != null, "Nested data should not be null");
+        assertTrue(!nested.isEmpty(), "Nested data should not be empty");
+        assertTrue(setCompareAsIs(nested, loaded), "Nested data should be same as loaded data");
     }
 
     @AfterAll

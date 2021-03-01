@@ -12,7 +12,7 @@ import com.heliorm.def.ListField;
 public class ListFieldPart<T extends Table<O>, O, P> extends FieldPart<T, O, P> implements ListField<T, O, P> {
 
     public ListFieldPart(T table, String javaName, Class<P> javaType) {
-        super(table, FieldType.SET, javaType, javaName);
+        super(table, FieldType.LIST, javaType, javaName);
     }
 
 }

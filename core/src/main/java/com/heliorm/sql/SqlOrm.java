@@ -1,12 +1,13 @@
 package com.heliorm.sql;
 
 import com.heliorm.*;
+import com.heliorm.collection.LazyLoadedList;
+import com.heliorm.collection.LazyLoadedSet;
+import com.heliorm.def.Executable;
+import com.heliorm.def.ExpressionContinuation;
 import com.heliorm.def.Field;
 import com.heliorm.def.Select;
-import com.heliorm.impl.SelectPart;
-import com.heliorm.def.Executable;
-import com.heliorm.impl.Part;
-import com.heliorm.impl.Selector;
+import com.heliorm.impl.*;
 import com.heliorm.query.Parser;
 
 import java.sql.*;
@@ -51,7 +52,7 @@ public final class SqlOrm implements Orm {
      *
      * @param driver The driver used to access data.
      */
-     SqlOrm(SqlDriver driver, Supplier<Connection> connectionSupplier, PojoOperations pops) {
+    SqlOrm(SqlDriver driver, Supplier<Connection> connectionSupplier, PojoOperations pops) {
         this.driver = driver;
         this.connectionSupplier = connectionSupplier;
         this.pops = pops;
@@ -60,7 +61,7 @@ public final class SqlOrm implements Orm {
         this.abstractionHelper = new AbstractionHelper();
         this.preparedStatementHelper = new PreparedStatementHelper(pojoHelper, driver::setEnum);
         this.resultSetHelper = new ResultSetHelper(pops, this::getFieldId);
-        selector =  new Selector() {
+        selector = new Selector() {
             @Override
             public <O, P extends Part & Executable> List<O> list(P tail) throws OrmException {
                 return SqlOrm.this.list(tail);
@@ -172,11 +173,10 @@ public final class SqlOrm implements Orm {
             if (primaryKey.isPresent()) {
                 Object val = pojoHelper.getValueFromPojo(pojo, primaryKey.get());
                 if (val == null) {
-                    throw new OrmException(format("No value for key %s for %s in update", primaryKey.get().getJavaName(),  table.getObjectClass().getSimpleName()));
+                    throw new OrmException(format("No value for key %s for %s in update", primaryKey.get().getJavaName(), table.getObjectClass().getSimpleName()));
                 }
                 preparedStatementHelper.setValueInStatement(stmt, pojo, table.getPrimaryKey().get(), par);
-            }
-            else {
+            } else {
                 throw new OrmException(format("No primary key for %s in update", table.getObjectClass().getSimpleName()));
             }
             int modified = stmt.executeUpdate();
@@ -221,7 +221,7 @@ public final class SqlOrm implements Orm {
 
     @Override
     public OrmTransaction openTransaction() throws OrmException {
-         if (!driver.supportsTransactions()) {
+        if (!driver.supportsTransactions()) {
             throw new OrmTransactionException("The ORM driver does not support transactions");
         }
         if (currentTransaction != null) {
@@ -239,7 +239,7 @@ public final class SqlOrm implements Orm {
 
     @Override
     public <O> Table<O> tableFor(O pojo) throws OrmException {
-        return tableFor((Class<O>)pojo.getClass());
+        return tableFor((Class<O>) pojo.getClass());
     }
 
     @Override
@@ -265,7 +265,7 @@ public final class SqlOrm implements Orm {
     @Override
     public final Selector selector() {
         return selector;
-     }
+    }
 
     private <O, P extends Part & Executable> List<O> list(P tail) throws OrmException {
         try (Stream<O> stream = stream(tail)) {
@@ -280,8 +280,9 @@ public final class SqlOrm implements Orm {
         }
         if (queries.size() == 1) {
             List<Part> parts = queries.get(0);
-            Stream<PojoCompare<O>> res = streamSingle(parts.get(0).getReturnTable(), queryHelper.buildSelectQuery(Parser.parse(parts)));
-            return res.map(pojoCompare -> pojoCompare.getPojo());
+            Table<O> table = parts.get(0).getReturnTable();
+            Stream<PojoCompare<O>> res = streamSingle(table, queryHelper.buildSelectQuery(Parser.parse(parts)));
+            return addNested(table, res.map(pojoCompare -> pojoCompare.getPojo()));
         } else {
             if (driver.useUnionAll()) {
                 Map<String, Table<O>> tableMap = queries.stream()
@@ -292,7 +293,8 @@ public final class SqlOrm implements Orm {
                 Stream<PojoCompare<O>> res = queries.stream()
                         .flatMap(parts -> {
                             try {
-                                return streamSingle(parts.get(0).getReturnTable(), queryHelper.buildSelectQuery(Parser.parse(parts)));
+                                Table table = parts.get(0).getReturnTable();
+                                return addNestedX(table, streamSingle(table, queryHelper.buildSelectQuery(Parser.parse(parts))));
                             } catch (OrmException ex) {
                                 throw new UncaughtOrmException(ex.getMessage(), ex);
                             }
@@ -392,6 +394,107 @@ public final class SqlOrm implements Orm {
         }
     }
 
+    private <O> Stream<PojoCompare<O>> addNestedX(Table<O> table, Stream<PojoCompare<O>> data) throws OrmException {
+        List<Field> cfields = table.getFields().stream()
+                .filter(field -> field.isCollection())
+                .collect(Collectors.toList());
+        if (cfields.isEmpty()) {
+            return data;
+        }
+        Optional<Field> opt = table.getPrimaryKey();
+        if (!opt.isPresent()) {
+            throw new OrmException(format("No primary key for %s with nested data",
+                    table.getObjectClass().getSimpleName()));
+        }
+        Field keyField = opt.get();
+        return data.map(comp -> {
+            for (Field<?, ?, ?> field : cfields) {
+                try {
+                    pops.setValue(comp.getPojo(), field, makeLazyCollection(table, field, pops.getValue(comp.getPojo(), keyField)));
+                } catch (OrmException e) {
+                    throw new UncaughtOrmException(e.getMessage(), e);
+                }
+            }
+            return comp;
+        });
+    }
+
+    private <O> Stream<O> addNested(Table<O> table, Stream<O> data) throws OrmException {
+        List<Field> cfields = table.getFields().stream()
+                .filter(field -> field.isCollection())
+                .collect(Collectors.toList());
+        if (cfields.isEmpty()) {
+            return data;
+        }
+        Optional<Field> opt = table.getPrimaryKey();
+        if (!opt.isPresent()) {
+            throw new OrmException(format("No primary key for %s with nested data",
+                    table.getObjectClass().getSimpleName()));
+        }
+        Field keyField = opt.get();
+        return data.map(pojo -> {
+            for (Field<?, ?, ?> field : cfields) {
+                try {
+                    pops.setValue(pojo, field, makeLazyCollection(table, field, pops.getValue(pojo, keyField)));
+                } catch (OrmException e) {
+                    throw new UncaughtOrmException(e.getMessage(), e);
+                }
+            }
+            return pojo;
+        });
+    }
+
+    private Collection<?> makeLazyCollection(Table<?> table, Field<?, ?, ?> field, Object value) throws OrmException {
+        Object val;
+        Optional<Table<?>> opt = field.getCollectionTable();
+        if (!opt.isPresent()) {
+            throw new UncaughtOrmException(format("No table for collection field '%s'", field.getJavaName()));
+        }
+        Table<?> cTable = opt.get();
+        Optional<Field> oField = cTable.getFields().stream().filter(f -> f.isForeignKey())
+                .filter(f -> f.getForeignTable().get().equals(table))
+                .findFirst();
+        if (!oField.isPresent()) {
+            throw new UncaughtOrmException(format("No key found linking %s to %s for field '%s'",
+                    table.getObjectClass().getSimpleName(),
+                    cTable.getObjectClass().getSimpleName(),
+                    field.getJavaName()));
+        }
+        Part query = buildNestedPart(oField.get(), value);
+        switch (field.getFieldType()) {
+            case SET:
+                return new LazyLoadedSet(query, selector());
+            case LIST:
+                return new LazyLoadedList(query, selector());
+            default:
+                throw new UncaughtOrmException(format("Unsupported collection type %s. BUG", field.getFieldType()));
+        }
+    }
+
+    private Part buildNestedPart(Field<?, ?, ?> field, Object value) throws OrmException {
+        Table<?> table = field.getTable();
+        SelectPart select = new SelectPart(null, table, selector());
+        ExpressionContinuation eq;
+        switch (field.getFieldType()) {
+            case STRING: {
+                StringFieldPart keyField = (StringFieldPart) field;
+                eq = keyField.eq((String) value);
+            }
+            break;
+            case BYTE:
+            case SHORT:
+            case INTEGER:
+            case LONG: {
+                NumberFieldPart keyField = (NumberFieldPart) field;
+                eq = keyField.eq(value);
+            }
+            break;
+            default:
+                throw new OrmException(format("Unsupported field type %s in key field %s", field.getFieldType(), field.getJavaName()));
+        }
+        return (Part) select.where(eq);
+    }
+
     private <O, P extends Part & Executable> Optional<O> optional(P tail) throws OrmException {
         try (Stream<O> stream = stream(tail)) {
             O one;
@@ -439,7 +542,8 @@ public final class SqlOrm implements Orm {
         return connectionSupplier.get();
     }
 
-    /** Close a SQL Connection in a way that properly deals with transactions.
+    /**
+     * Close a SQL Connection in a way that properly deals with transactions.
      *
      * @param con
      * @throws OrmException
@@ -453,7 +557,9 @@ public final class SqlOrm implements Orm {
             }
         }
     }
-    /** Cleanup SQL Connection, Statement and ResultSet insuring that
+
+    /**
+     * Cleanup SQL Connection, Statement and ResultSet insuring that
      * errors will not result in aborted cleanup.
      *
      * @param con
@@ -486,7 +592,8 @@ public final class SqlOrm implements Orm {
         }
     }
 
-    /** Check if a table exists, and create if if it does not
+    /**
+     * Check if a table exists, and create if if it does not
      *
      * @param table
      * @throws OrmException
@@ -509,7 +616,8 @@ public final class SqlOrm implements Orm {
         }
     }
 
-    /** Get the full table name for a table.
+    /**
+     * Get the full table name for a table.
      *
      * @param table The table
      * @return The table name
@@ -541,7 +649,8 @@ public final class SqlOrm implements Orm {
         }
     }
 
-    /** Get the unique field ID for a field
+    /**
+     * Get the unique field ID for a field
      *
      * @param field The field
      * @return The ID
