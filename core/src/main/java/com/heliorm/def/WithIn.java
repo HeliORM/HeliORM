@@ -1,9 +1,9 @@
 package com.heliorm.def;
 
-import java.util.List;
-
 import com.heliorm.OrmException;
 import com.heliorm.Table;
+
+import java.util.List;
 
 /**
  *
@@ -20,6 +20,6 @@ public interface WithIn<T extends Table<O>, O, C> {
 
     ExpressionContinuation<T, O> in(C... values) throws OrmException;
 
-    ExpressionContinuation<T, O> notIn(C... value) throws OrmException;
+    ExpressionContinuation<T, O> notIn(C... values) throws OrmException;
 
 }
