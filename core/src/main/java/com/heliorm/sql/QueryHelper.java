@@ -36,9 +36,6 @@ final class QueryHelper {
         StringJoiner fields = new StringJoiner(",");
         StringJoiner values = new StringJoiner(",");
         for (Field field : table.getFields()) {
-            if (field.isCollection()) {
-                continue;
-            }
             if (field.isPrimaryKey()) {
                 if (field.isAutoNumber()) {
                     if (field.getFieldType() != Field.FieldType.STRING) {
@@ -65,9 +62,6 @@ final class QueryHelper {
         StringJoiner fields = new StringJoiner(",");
         StringJoiner values = new StringJoiner(",");
         for (Field field : table.getFields()) {
-            if (field.isCollection()) {
-                continue;
-            }
             if (!field.isPrimaryKey()) {
                 fields.add(format("%s=?", driver.fieldName(table, field)));
             }
@@ -90,9 +84,6 @@ final class QueryHelper {
         tablesQuery.append("SELECT DISTINCT  ");
         StringJoiner fieldList = new StringJoiner(",");
         for (Field field : root.getTable().getFields()) {
-            if (field.isCollection()) {
-                continue;
-            }
             fieldList.add(format("%s AS %s", driver.fullFieldName(root.getTable(), field), driver.virtualFieldName(getFieldId(field))));
         }
         tablesQuery.append(fieldList.toString());
@@ -130,7 +121,6 @@ final class QueryHelper {
         Set<Field> allFields = queries.stream()
                 .map(parts -> parts.get(0).getReturnTable())
                 .flatMap(table -> (Stream<Field>) (table.getFields().stream()))
-                .filter(field -> !field.isCollection())
                 .collect(Collectors.toSet());
         StringJoiner buf = new StringJoiner(" UNION ALL ");
         Query root = null;
@@ -140,9 +130,6 @@ final class QueryHelper {
             StringJoiner fieldsQuery = new StringJoiner(",");
             List<Field> tableFields = root.getTable().getFields();
             for (Field field : allFields) {
-                if (field.isCollection()) {
-                    continue;
-                }
                 String fieldId = getFieldId(field);
                 if (tableFields.contains(field)) {
                     fieldsQuery.add(format("%s AS %s", driver.fullFieldName(root.getTable(), field), driver.virtualFieldName(fieldId)));
