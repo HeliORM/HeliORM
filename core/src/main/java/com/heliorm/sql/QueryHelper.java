@@ -36,6 +36,9 @@ final class QueryHelper {
         StringJoiner fields = new StringJoiner(",");
         StringJoiner values = new StringJoiner(",");
         for (Field field : table.getFields()) {
+            if (field.isCollection()) {
+                continue;
+            }
             if (field.isPrimaryKey()) {
                 if (field.isAutoNumber()) {
                     if (field.getFieldType() != Field.FieldType.STRING) {
@@ -62,6 +65,9 @@ final class QueryHelper {
         StringJoiner fields = new StringJoiner(",");
         StringJoiner values = new StringJoiner(",");
         for (Field field : table.getFields()) {
+            if (field.isCollection()) {
+                continue;
+            }
             if (!field.isPrimaryKey()) {
                 fields.add(format("%s=?", driver.fieldName(table, field)));
             }
@@ -84,6 +90,9 @@ final class QueryHelper {
         tablesQuery.append("SELECT DISTINCT  ");
         StringJoiner fieldList = new StringJoiner(",");
         for (Field field : root.getTable().getFields()) {
+            if (field.isCollection()) {
+                continue;
+            }
             fieldList.add(format("%s AS %s", driver.fullFieldName(root.getTable(), field), driver.virtualFieldName(getFieldId(field))));
         }
         tablesQuery.append(fieldList.toString());
@@ -121,6 +130,7 @@ final class QueryHelper {
         Set<Field> allFields = queries.stream()
                 .map(parts -> parts.get(0).getReturnTable())
                 .flatMap(table -> (Stream<Field>) (table.getFields().stream()))
+                .filter(field -> !field.isCollection())
                 .collect(Collectors.toSet());
         StringJoiner buf = new StringJoiner(" UNION ALL ");
         Query root = null;
@@ -130,6 +140,9 @@ final class QueryHelper {
             StringJoiner fieldsQuery = new StringJoiner(",");
             List<Field> tableFields = root.getTable().getFields();
             for (Field field : allFields) {
+                if (field.isCollection()) {
+                    continue;
+                }
                 String fieldId = getFieldId(field);
                 if (tableFields.contains(field)) {
                     fieldsQuery.add(format("%s AS %s", driver.fullFieldName(root.getTable(), field), driver.virtualFieldName(fieldId)));
@@ -218,6 +231,10 @@ final class QueryHelper {
 
     private String expandListFieldCriteria(TableSpec table, ListCriteria crit) throws OrmException {
         StringJoiner list = new StringJoiner(",");
+        if (crit.getValues().isEmpty()) {
+            throw new OrmException(format("Empty %s list for field %s in table %s", crit.getOperator(),
+                    crit.getField().getJavaName(), table.getTable().getObjectClass().getSimpleName()));
+        }
         for (Object val : crit.getValues()) {
             list.add(format("'%s'", sqlValue(val)));
         }
@@ -226,8 +243,11 @@ final class QueryHelper {
 
     private String expandValueFieldCriteria(TableSpec table, ValueCriteria crit) throws OrmException {
         StringBuilder query = new StringBuilder();
-        query.append(format("%s%s'%s'", driver.fullFieldName(table.getTable(), crit.getField()), valueOperator(crit), sqlValue(crit.getValue())
-        ));
+        if (crit.getValue() == null) {
+            throw new OrmException(format("Null %s value for field %s in table %s", crit.getOperator(),
+                    crit.getField().getJavaName(), table.getTable().getObjectClass().getSimpleName()));
+        }
+        query.append(format("%s%s'%s'", driver.fullFieldName(table.getTable(), crit.getField()), valueOperator(crit), sqlValue(crit.getValue())));
         return query.toString();
     }
 
