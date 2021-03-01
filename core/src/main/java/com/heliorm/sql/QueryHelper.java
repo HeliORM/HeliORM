@@ -231,6 +231,10 @@ final class QueryHelper {
 
     private String expandListFieldCriteria(TableSpec table, ListCriteria crit) throws OrmException {
         StringJoiner list = new StringJoiner(",");
+        if (crit.getValues().isEmpty()) {
+            throw new OrmException(format("Empty %s list for field %s in table %s", crit.getOperator(),
+                    crit.getField().getJavaName(), table.getTable().getObjectClass().getSimpleName()));
+        }
         for (Object val : crit.getValues()) {
             list.add(format("'%s'", sqlValue(val)));
         }
@@ -239,8 +243,11 @@ final class QueryHelper {
 
     private String expandValueFieldCriteria(TableSpec table, ValueCriteria crit) throws OrmException {
         StringBuilder query = new StringBuilder();
-        query.append(format("%s%s'%s'", driver.fullFieldName(table.getTable(), crit.getField()), valueOperator(crit), sqlValue(crit.getValue())
-        ));
+        if (crit.getValue() == null) {
+            throw new OrmException(format("Null %s value for field %s in table %s", crit.getOperator(),
+                    crit.getField().getJavaName(), table.getTable().getObjectClass().getSimpleName()));
+        }
+        query.append(format("%s%s'%s'", driver.fullFieldName(table.getTable(), crit.getField()), valueOperator(crit), sqlValue(crit.getValue())));
         return query.toString();
     }
 

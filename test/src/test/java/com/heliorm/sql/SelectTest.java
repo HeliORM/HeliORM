@@ -6,11 +6,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import test.persons.Person;
-import test.pets.Bird;
-import test.pets.Cat;
-import test.pets.CatType;
-import test.pets.Dog;
-import test.pets.Pet;
+import test.pets.*;
 import test.place.Province;
 import test.place.Town;
 
@@ -18,21 +14,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.heliorm.sql.TestData.makeBirds;
-import static com.heliorm.sql.TestData.makeCats;
-import static com.heliorm.sql.TestData.makeDogs;
-import static com.heliorm.sql.TestData.makePersons;
-import static com.heliorm.sql.TestData.makeProvinces;
-import static com.heliorm.sql.TestData.makeTowns;
+import static com.heliorm.sql.TestData.*;
 import static java.lang.String.format;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static test.Tables.CAT;
-import static test.Tables.PERSON;
-import static test.Tables.PET;
-import static test.Tables.PROVINCE;
-import static test.Tables.TOWN;
+import static org.junit.jupiter.api.Assertions.*;
+import static test.Tables.*;
 
 public class SelectTest extends AbstractOrmTest {
 
@@ -416,6 +401,31 @@ public class SelectTest extends AbstractOrmTest {
         assertNotNull(selected, "The list returned by list() should be non-null");
         assertTrue(listCompareOrdered(selected, wanted), "The items loaded are exactly the same as the ones we expected");
     }
+
+
+    @Test
+    public void testSelectWhereInEmpty() throws Exception {
+        say("Testing select with a simple where x in empty list - must fail");
+        assertThrows(OrmException.class, () -> {
+            List<Integer> ages = Arrays.asList();
+            List<Cat> all = orm().select(CAT)
+                    .where(CAT.age.in(ages))
+                    .list();
+        });
+    }
+
+    @Test
+    public void testSelectWhereNotInEmpty() throws Exception {
+        say("Testing select with a simple where x not in empty list - must fail");
+        assertThrows(OrmException.class, () -> {
+            List<Integer> ages = Arrays.asList();
+            List<Cat> all = orm().select(CAT)
+                    .where(CAT.age.notIn(ages))
+                    .list();
+
+        });
+    }
+
 
     @AfterAll
     public static void removeData() throws OrmException {
