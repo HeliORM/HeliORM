@@ -388,11 +388,12 @@ public final class SqlOrm implements Orm {
                                 throw new UncaughtOrmException(ex.getMessage(), ex);
                             }
                         }
-                    }, Spliterator.ORDERED), false);
-            stream.onClose(() -> {
+                    }, Spliterator.ORDERED), false)
+            .onClose(() -> {
                 cleanup(con, stmt, rs);
             });
-            return stream;
+            Map<Table<O>, Function<PojoCompare<O>,PojoCompare<O>>> functions = new HashMap();
+            return stream.map((PojoCompare<O> pc) -> functions.computeIfAbsent(pc.getTable(), table -> makeNestingFunction(table)).apply(pc));
         } catch (SQLException | UncaughtOrmException ex) {
             cleanup(con, null, null);
             throw new OrmSqlException(ex.getMessage(), ex);

@@ -26,6 +26,10 @@ final class PojoCompare<O> implements Comparable<PojoCompare<O>> {
         return pojo;
     }
 
+    public Table<O> getTable() {
+        return table;
+    }
+
     @Override
     public int compareTo(PojoCompare<O> w) {
         if (table.equals(w.table)) {
