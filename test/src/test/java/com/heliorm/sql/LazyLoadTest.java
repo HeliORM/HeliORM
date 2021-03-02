@@ -38,14 +38,14 @@ public class LazyLoadTest extends AbstractOrmTest {
         persons = createAll(makePersons(towns));
         cats = createAll(makeCats(persons.size() * 5, persons));
         dogs = createAll(makeDogs(persons.size() * 4, persons));
-        birds = createAll(makeBirds(persons.size()*2, persons));
+        birds = createAll(makeBirds(persons.size() * 2, persons));
 
     }
 
     @Test
     public void loadWithNestedList() throws Exception {
         say("Testing load of nested list");
-        Long id =  persons.get(0).getId();
+        Long id = persons.get(0).getId();
         Person person = orm().select(PERSON).where(PERSON.id.eq(id)).one();
         List<Pet> nested = person.getPets();
         List<Pet> loaded = orm().select(PET).where(PET.personId.eq(id)).list();
@@ -57,7 +57,7 @@ public class LazyLoadTest extends AbstractOrmTest {
     @Test
     public void loadWithNestedSet() throws Exception {
         say("Testing load of nested set");
-        Long id =  provinces.get(0).getProvinceId();
+        Long id = provinces.get(0).getProvinceId();
         Province province = orm().select(PROVINCE).where(PROVINCE.provinceId.eq(id)).one();
         Set<Town> nested = province.getTowns();
         Set<Town> loaded = new HashSet(orm().select(TOWN).where(TOWN.provinceId.eq(id)).list());
