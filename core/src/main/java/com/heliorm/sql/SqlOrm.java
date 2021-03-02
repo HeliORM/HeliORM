@@ -13,6 +13,7 @@ import com.heliorm.query.Parser;
 import java.sql.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -281,25 +282,29 @@ public final class SqlOrm implements Orm {
         if (queries.size() == 1) {
             List<Part> parts = queries.get(0);
             Table<O> table = parts.get(0).getReturnTable();
-            Stream<PojoCompare<O>> res = streamSingle(table, queryHelper.buildSelectQuery(Parser.parse(parts)));
-            return addNested(table, res.map(pojoCompare -> pojoCompare.getPojo()));
+            Function<PojoCompare<O>, PojoCompare<O>> func = makeNestingFunction(table);
+            return streamSingle(table, queryHelper.buildSelectQuery(Parser.parse(parts)))
+                    .map(func)
+                    .map(pc -> pc.getPojo());
         } else {
             if (driver.useUnionAll()) {
                 Map<String, Table<O>> tableMap = queries.stream()
                         .map(parts -> parts.get(0).getReturnTable())
                         .collect(Collectors.toMap(table -> table.getObjectClass().getName(), table -> table));
-                return streamUnion(queryHelper.buildSelectUnionQuery(queries), tableMap);
+                return streamUnion(queryHelper.buildSelectUnionQuery(queries), tableMap)
+                        .map(pc -> pc.getPojo());
             } else {
                 Stream<PojoCompare<O>> res = queries.stream()
                         .flatMap(parts -> {
                             try {
-                                Table table = parts.get(0).getReturnTable();
-                                return addNestedX(table, streamSingle(table, queryHelper.buildSelectQuery(Parser.parse(parts))));
+                                Table<O> table = parts.get(0).getReturnTable();
+                                Function<PojoCompare<O>, PojoCompare<O>> func = makeNestingFunction(table);
+                                return streamSingle(table, queryHelper.buildSelectQuery(Parser.parse(parts)))
+                                        .map(func);
                             } catch (OrmException ex) {
                                 throw new UncaughtOrmException(ex.getMessage(), ex);
                             }
-                        });
-                res = res.distinct();
+                        }).distinct();
                 if (queries.size() > 1) {
                     if (tail.getType() == Part.Type.ORDER) {
                         res = res.sorted(abstractionHelper.makeComparatorForTail(tail));
@@ -311,7 +316,6 @@ public final class SqlOrm implements Orm {
             }
         }
     }
-
 
     /**
      * Create a stream for the given query on the given table and return a
@@ -359,13 +363,13 @@ public final class SqlOrm implements Orm {
         }
     }
 
-    private <O> Stream<O> streamUnion(String query, Map<String, Table<O>> tables) throws OrmException {
+    private <O> Stream<PojoCompare<O>> streamUnion(String query, Map<String, Table<O>> tables) throws OrmException {
         Connection con = getConnection();
         try {
             Statement stmt = con.createStatement();
             ResultSet rs = stmt.executeQuery(query);
-            Stream<O> stream = StreamSupport.stream(
-                    Spliterators.spliteratorUnknownSize(new Iterator<O>() {
+            Stream<PojoCompare<O>> stream = StreamSupport.stream(
+                    Spliterators.spliteratorUnknownSize(new Iterator<PojoCompare<O>>() {
                         @Override
                         public boolean hasNext() {
                             try {
@@ -376,9 +380,10 @@ public final class SqlOrm implements Orm {
                         }
 
                         @Override
-                        public O next() {
+                        public PojoCompare<O> next() {
                             try {
-                                return resultSetHelper.makePojoFromResultSet(rs, tables.get(rs.getString(queryHelper.POJO_NAME_FIELD)));
+                                Table<O> table = tables.get(rs.getString(queryHelper.POJO_NAME_FIELD));
+                                return new PojoCompare(pops, table, resultSetHelper.makePojoFromResultSet(rs, table));
                             } catch (OrmException | SQLException ex) {
                                 throw new UncaughtOrmException(ex.getMessage(), ex);
                             }
@@ -394,20 +399,20 @@ public final class SqlOrm implements Orm {
         }
     }
 
-    private <O> Stream<PojoCompare<O>> addNestedX(Table<O> table, Stream<PojoCompare<O>> data) throws OrmException {
+    private <O> Function<PojoCompare<O>, PojoCompare<O>> makeNestingFunction(Table<O> table) throws UncaughtOrmException {
         List<Field> cfields = table.getFields().stream()
                 .filter(field -> field.isCollection())
                 .collect(Collectors.toList());
         if (cfields.isEmpty()) {
-            return data;
+            return pc -> pc;
         }
         Optional<Field> opt = table.getPrimaryKey();
         if (!opt.isPresent()) {
-            throw new OrmException(format("No primary key for %s with nested data",
+            throw new UncaughtOrmException(format("No primary key for %s with nested data",
                     table.getObjectClass().getSimpleName()));
         }
         Field keyField = opt.get();
-        return data.map(comp -> {
+        return (comp -> {
             for (Field<?, ?, ?> field : cfields) {
                 try {
                     pops.setValue(comp.getPojo(), field, makeLazyCollection(table, field, pops.getValue(comp.getPojo(), keyField)));
@@ -416,31 +421,6 @@ public final class SqlOrm implements Orm {
                 }
             }
             return comp;
-        });
-    }
-
-    private <O> Stream<O> addNested(Table<O> table, Stream<O> data) throws OrmException {
-        List<Field> cfields = table.getFields().stream()
-                .filter(field -> field.isCollection())
-                .collect(Collectors.toList());
-        if (cfields.isEmpty()) {
-            return data;
-        }
-        Optional<Field> opt = table.getPrimaryKey();
-        if (!opt.isPresent()) {
-            throw new OrmException(format("No primary key for %s with nested data",
-                    table.getObjectClass().getSimpleName()));
-        }
-        Field keyField = opt.get();
-        return data.map(pojo -> {
-            for (Field<?, ?, ?> field : cfields) {
-                try {
-                    pops.setValue(pojo, field, makeLazyCollection(table, field, pops.getValue(pojo, keyField)));
-                } catch (OrmException e) {
-                    throw new UncaughtOrmException(e.getMessage(), e);
-                }
-            }
-            return pojo;
         });
     }
 
