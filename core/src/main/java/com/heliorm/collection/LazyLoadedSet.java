@@ -1,12 +1,11 @@
 package com.heliorm.collection;
 
-import com.heliorm.OrmException;
 import com.heliorm.UncaughtOrmException;
 import com.heliorm.def.Executable;
 import com.heliorm.impl.Part;
-import com.heliorm.impl.Selector;
 
 import java.util.*;
+import java.util.function.Supplier;
 
 /** A set that can lazy-load using the ORM
  *
@@ -17,18 +16,15 @@ public class LazyLoadedSet<T, P extends Part & Executable> extends AbstractSet<T
 
     private boolean loaded = false;
     private Set<T> data;
-    private final Optional<Selector> selector;
-    private final Optional<P> query;
+    private final Optional<Supplier<Collection<T>>> loadFunction;
 
     public LazyLoadedSet() {
         super();
-        query = Optional.empty();
-        selector = Optional.empty();
+        loadFunction = Optional.empty();
     }
 
-    public LazyLoadedSet(P query, Selector selector) {
-        this.query = Optional.of(query);
-        this.selector = Optional.of(selector);
+    public LazyLoadedSet(Supplier<Collection<T>> loadFunction) {
+        this.loadFunction = Optional.of(loadFunction);
     }
 
     @Override
@@ -50,12 +46,8 @@ public class LazyLoadedSet<T, P extends Part & Executable> extends AbstractSet<T
     }
 
     private void load() {
-        if (query.isPresent()) {
-            try {
-               data =  new HashSet(selector.get().list(query.get()));
-            } catch (OrmException e) {
-                throw new UncaughtOrmException(e.getMessage(), e);
-            }
+        if (loadFunction.isPresent()) {
+               data =  new HashSet(loadFunction.get().get());
         }
         else {
             data = new HashSet<>();

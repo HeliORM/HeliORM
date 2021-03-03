@@ -442,11 +442,18 @@ public final class SqlOrm implements Orm {
                     field.getJavaName()));
         }
         Part query = buildNestedPart(oField.get(), value);
+        Supplier<Collection<?>> loadFunction = () -> {
+            try {
+                return selector.list((Part & Executable)query);
+            } catch (OrmException e) {
+                throw new UncaughtOrmException(e.getMessage(), e);
+            }
+        };
         switch (field.getFieldType()) {
             case SET:
-                return new LazyLoadedSet(query, selector());
+                return new LazyLoadedSet(loadFunction);
             case LIST:
-                return new LazyLoadedList(query, selector());
+                return new LazyLoadedList(loadFunction);
             default:
                 throw new UncaughtOrmException(format("Unsupported collection type %s. BUG", field.getFieldType()));
         }

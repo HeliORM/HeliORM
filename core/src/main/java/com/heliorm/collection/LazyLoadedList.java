@@ -1,37 +1,30 @@
 package com.heliorm.collection;
 
-import com.heliorm.OrmException;
 import com.heliorm.UncaughtOrmException;
-import com.heliorm.def.Executable;
-import com.heliorm.impl.Part;
-import com.heliorm.impl.Selector;
 
-import java.util.AbstractList;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Supplier;
 
-/** A list that can lazy-load using the ORM
+/**
+ * A list that can lazy-load using the ORM
  *
  * @param <T> The type of data contained in the list
- * @param <P> The type of query part
  */
-public class LazyLoadedList<T, P extends Part & Executable> extends AbstractList<T> {
+public class LazyLoadedList<T> extends AbstractList<T> {
 
     private boolean loaded = false;
     private List<T> data;
-    private final Optional<Selector> selector;
-    private final Optional<P> query;
+    private final Optional<Supplier<Collection<T>>> loadFunction;
 
+    /**
+     * Construct an empty list with no load function. This is required by the documentation of List
+     */
     public LazyLoadedList() {
-        super();
-        query = Optional.empty();
-        selector = Optional.empty();
+        loadFunction = Optional.empty();
     }
 
-    public LazyLoadedList(P query, Selector selector) {
-        this.query = Optional.of(query);
-        this.selector = Optional.of(selector);
+    public LazyLoadedList(Supplier<Collection<T>> loadFunction) {
+        this.loadFunction = Optional.of(loadFunction);
     }
 
     @Override
@@ -71,14 +64,9 @@ public class LazyLoadedList<T, P extends Part & Executable> extends AbstractList
     }
 
     private void load() {
-        if (query.isPresent()) {
-            try {
-               data =  selector.get().list(query.get());
-            } catch (OrmException e) {
-                throw new UncaughtOrmException(e.getMessage(), e);
-            }
-        }
-        else {
+        if (loadFunction.isPresent()) {
+            data = new ArrayList(loadFunction.get().get());
+        } else {
             data = new ArrayList();
         }
         loaded = true;
