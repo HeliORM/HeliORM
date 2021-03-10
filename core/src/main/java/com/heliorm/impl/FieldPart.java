@@ -6,7 +6,6 @@ import com.heliorm.def.Field;
 
 import java.util.Optional;
 
-import static com.heliorm.impl.Part.Type.FIELD;
 import static java.lang.String.format;
 
 /**
@@ -27,7 +26,7 @@ public abstract class FieldPart<T extends Table<O>, O, C> extends Part<T, O, T, 
     private boolean foreignKey = false;
     private boolean nullable = false;
     private Optional<Table<?>> foreignTable = Optional.empty();
-    private final Optional<Integer> length = Optional.empty();
+    private Optional<Integer> length = Optional.empty();
 
     public FieldPart(Table table, FieldType fieldType, Class<C> javaType, String javaName) {
         super(Part.Type.FIELD, null);
@@ -123,6 +122,10 @@ public abstract class FieldPart<T extends Table<O>, O, C> extends Part<T, O, T, 
 
     void setForeignTable(Optional<Table<?>> foreignTable) {
         this.foreignTable = foreignTable;
+    }
+
+    public void setLength(Optional<Integer> length) {
+        this.length = length;
     }
 
     @Override

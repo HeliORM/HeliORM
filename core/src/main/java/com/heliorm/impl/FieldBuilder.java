@@ -110,6 +110,7 @@ public class FieldBuilder<P extends FieldPart> {
         part.setNullable(nullable);
         part.setPrimaryKey(primaryKey);
         part.setSqlName(sqlName);
+        part.setLength(length);
         return part;
     }
 
