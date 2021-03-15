@@ -171,7 +171,7 @@ public final class SqlOrm implements Orm {
                 preparedStatementHelper.setValueInStatement(stmt, pojo, table.getPrimaryKey().get(), par);
                 int modified = stmt.executeUpdate();
                 if (modified == 0) {
-                    throw new OrmException(format("The update did not modify any data for %s with key field/value %s/%s",
+                    throw new OrmException(format("The update did not modify any data for %s with key field/value %s/%s. (Row does not exist)",
                             table.getObjectClass().getSimpleName(),
                             primaryKey.get().getJavaName(),
                             val));
