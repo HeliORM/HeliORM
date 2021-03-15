@@ -51,7 +51,7 @@ public final class SqlOrm implements Orm {
      *
      * @param driver The driver used to access data.
      */
-     SqlOrm(SqlDriver driver, Supplier<Connection> connectionSupplier, PojoOperations pops) {
+    SqlOrm(SqlDriver driver, Supplier<Connection> connectionSupplier, PojoOperations pops) {
         this.driver = driver;
         this.connectionSupplier = connectionSupplier;
         this.pops = pops;
@@ -60,7 +60,7 @@ public final class SqlOrm implements Orm {
         this.abstractionHelper = new AbstractionHelper();
         this.preparedStatementHelper = new PreparedStatementHelper(pojoHelper, driver::setEnum);
         this.resultSetHelper = new ResultSetHelper(pops, this::getFieldId);
-        selector =  new Selector() {
+        selector = new Selector() {
             @Override
             public <O, P extends Part & Executable> List<O> list(P tail) throws OrmException {
                 return SqlOrm.this.list(tail);
@@ -166,18 +166,20 @@ public final class SqlOrm implements Orm {
             if (primaryKey.isPresent()) {
                 Object val = pojoHelper.getValueFromPojo(pojo, primaryKey.get());
                 if (val == null) {
-                    throw new OrmException(format("No value for key %s for %s in update", primaryKey.get().getJavaName(),  table.getObjectClass().getSimpleName()));
+                    throw new OrmException(format("No value for key %s for %s in update", primaryKey.get().getJavaName(), table.getObjectClass().getSimpleName()));
                 }
                 preparedStatementHelper.setValueInStatement(stmt, pojo, table.getPrimaryKey().get(), par);
-            }
-            else {
+                int modified = stmt.executeUpdate();
+                if (modified == 0) {
+                    throw new OrmException(format("The update did not modify any data for %s with key field/value %s/%s",
+                            table.getObjectClass().getSimpleName(),
+                            primaryKey.get().getJavaName(),
+                            val));
+                }
+                return pojo;
+            } else {
                 throw new OrmException(format("No primary key for %s in update", table.getObjectClass().getSimpleName()));
             }
-            int modified = stmt.executeUpdate();
-            if (modified == 0) {
-                throw new OrmException("The update did not modify any data");
-            }
-            return pojo;
         } catch (SQLException ex) {
             throw new OrmSqlException(ex.getMessage(), ex);
         } finally {
@@ -215,7 +217,7 @@ public final class SqlOrm implements Orm {
 
     @Override
     public OrmTransaction openTransaction() throws OrmException {
-         if (!driver.supportsTransactions()) {
+        if (!driver.supportsTransactions()) {
             throw new OrmTransactionException("The ORM driver does not support transactions");
         }
         if (currentTransaction != null) {
@@ -233,7 +235,7 @@ public final class SqlOrm implements Orm {
 
     @Override
     public <O> Table<O> tableFor(O pojo) throws OrmException {
-        return tableFor((Class<O>)pojo.getClass());
+        return tableFor((Class<O>) pojo.getClass());
     }
 
     @Override
@@ -259,7 +261,7 @@ public final class SqlOrm implements Orm {
     @Override
     public final Selector selector() {
         return selector;
-     }
+    }
 
     private <O, P extends Part & Executable> List<O> list(P tail) throws OrmException {
         try (Stream<O> stream = stream(tail)) {
@@ -433,7 +435,8 @@ public final class SqlOrm implements Orm {
         return connectionSupplier.get();
     }
 
-    /** Close a SQL Connection in a way that properly deals with transactions.
+    /**
+     * Close a SQL Connection in a way that properly deals with transactions.
      *
      * @param con
      * @throws OrmException
@@ -447,7 +450,9 @@ public final class SqlOrm implements Orm {
             }
         }
     }
-    /** Cleanup SQL Connection, Statement and ResultSet insuring that
+
+    /**
+     * Cleanup SQL Connection, Statement and ResultSet insuring that
      * errors will not result in aborted cleanup.
      *
      * @param con
@@ -480,7 +485,8 @@ public final class SqlOrm implements Orm {
         }
     }
 
-    /** Check if a table exists, and create if if it does not
+    /**
+     * Check if a table exists, and create if if it does not
      *
      * @param table
      * @throws OrmException
@@ -503,7 +509,8 @@ public final class SqlOrm implements Orm {
         }
     }
 
-    /** Get the full table name for a table.
+    /**
+     * Get the full table name for a table.
      *
      * @param table The table
      * @return The table name
@@ -535,7 +542,8 @@ public final class SqlOrm implements Orm {
         }
     }
 
-    /** Get the unique field ID for a field
+    /**
+     * Get the unique field ID for a field
      *
      * @param field The field
      * @return The ID
