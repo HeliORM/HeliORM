@@ -24,6 +24,7 @@ final class UnsafePojoOperations extends AbstractPojoOperations {
 
 
     UnsafePojoOperations() throws OrmException {
+        super();
         unsafe = getUnsafe();
     }
 
