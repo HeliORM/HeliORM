@@ -17,10 +17,10 @@ List<Dogs> dogs = orm.select(DOG).list();
 
 
 List<Dog> youngDogs = orm.select(DOG)
-   .where(DOG.age.lt(5))
+   .where(DOG.age.le(2))
    .list();
 
-List<Dog> youngDogs = orm.select(DOG)
+List<Dog> alphaDogs = orm.select(DOG)
    .orderBy(DOG.name)
    .list();
 
