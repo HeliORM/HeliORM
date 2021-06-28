@@ -29,10 +29,10 @@ public class SelectTest extends AbstractOrmTest {
     private static List<Bird> birds;
 
     private <O> void check(List<O> have, List<O> want) throws OrmException {
-        assertNotNull(have, "The list returned by list() should be non-null");
-        assertFalse(have.isEmpty(), "The list returned by list() should be non-empty");
-        assertTrue(have.size() == want.size(), format("The amount of loaded data should match the number of the items (%d vs %s)", have.size(), want.size()));
-        assertTrue(listCompareOrdered(have, want), "The items loaded are exactly the same as the ones we expected");
+        assertNotNull(have, "The first list should be non-null");
+        assertFalse(have.isEmpty(), "The first list should be non-empty");
+        assertTrue(have.size() == want.size(), format("The two lists should be the same size (%d vs %s)", have.size(), want.size()));
+        assertTrue(listCompareOrdered(have, want), "The items in the two lists should be exactly the same");
     }
 
     @BeforeAll
@@ -204,7 +204,6 @@ public class SelectTest extends AbstractOrmTest {
         assertTrue(listCompareOrdered(all, wanted), "The items loaded are exactly the same as the ones we expected");
     }
 
-
     @Test
     public void testSelectWhereAndWithTwoFields() throws Exception {
         say("Testing select with a simple where clause with and over two fields");
@@ -247,7 +246,6 @@ public class SelectTest extends AbstractOrmTest {
         assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
         assertTrue(listCompareOrdered(all, wanted), "The items loaded are exactly the same as the ones we expected");
     }
-
 
     @Test
     public void testSelectOrder() throws Exception {
@@ -371,7 +369,6 @@ public class SelectTest extends AbstractOrmTest {
         assertTrue(listCompareOrdered(selected, wanted), "The items loaded are exactly the same as the ones we expected");
     }
 
-
     @Test
     public void testSelectIsNull() throws Exception {
         say("Testing select of data on is null");
@@ -402,7 +399,6 @@ public class SelectTest extends AbstractOrmTest {
         assertTrue(listCompareOrdered(selected, wanted), "The items loaded are exactly the same as the ones we expected");
     }
 
-
     @Test
     public void testSelectWhereInEmpty() throws Exception {
         say("Testing select with a simple where x in empty list - must fail");
@@ -425,7 +421,6 @@ public class SelectTest extends AbstractOrmTest {
 
         });
     }
-
 
     @AfterAll
     public static void removeData() throws OrmException {
