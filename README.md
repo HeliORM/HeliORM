@@ -14,6 +14,7 @@ Assuming we have POJOs reperesenting Dogs and Persons, this example shows how to
 ```java
 List<Dog> bobsDogs = orm.select(DOG)
     .join(PERSON).on(DOG.personId, PERSON.id)
+    .where(PERSON.name.eq("Bob"))
     .orderBy(DOG.name)
     .list();
 ```
