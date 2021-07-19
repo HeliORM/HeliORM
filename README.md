@@ -95,7 +95,7 @@ public class Dog {
 
 Dog dog = orm.select(DOG)
                 .where(DOG.id.eq(10L)
-                .get();
+                .one();
 ```
 
 #### Get dog with ID 10 if you're not sure it exists
