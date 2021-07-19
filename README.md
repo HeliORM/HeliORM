@@ -133,6 +133,7 @@ List<Dog> youngDogs = orm.select(DOG)
 ```java
 List<Dog> bobsDogs = orm.select(DOG)
     .join(PERSON).on(DOG.personId, PERSON.id)
+    .where(PERSON.name.eq("Bob"))
     .list();
 ```
 
