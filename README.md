@@ -23,7 +23,7 @@ To add a new dog for Bob to the `Dog` table in the database, simply:
 
 ```java
    Dog dog = new Dog();
-   // code ommitted to set valules in dog 
+   // code ommitted to set values in dog 
    dog = orm.create(dog);
 ```
 
