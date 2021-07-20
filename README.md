@@ -5,28 +5,58 @@ HeliORM is a code-first object-relational model for accessing SQL data from Java
 
 The idea is that you write your plain old Java Objects (POJOs), or from Java 16 your Records, and then generate a supporting data model that allows type-safe queries, and then use this model and a very simple API to do Structured Query Language (SQL) queries and updates. It is focussed on working with POJOs and is intended to make create, update, read, delete (CRUD) operations easy. It is not meant to be a complete implementation of SQL in Java. 
 
+HeliORM also supports querying on abstract data types.
+
 :warning: This page is currently **very** incomplete
 
 Here is a quick taste of what it is like to use HeliORM to query:
 
-Assuming we have POJOs reperesenting Dogs and Persons, this example shows how to load all dogs belonging to Bob and order them by name and return them as a `List`: 
 
-```java
-List<Dog> bobsDogs = orm.select(DOG)
-    .join(PERSON).on(DOG.personId, PERSON.id)
-    .where(PERSON.name.eq("Bob"))
-    .orderBy(DOG.name)
-    .list();
-```
+## Quick CRUD examples 
 
-To add a new dog for Bob to the `Dog` table in the database, simply: 
+In these examples we have a POJO class called `Dog` and a running ORM referenced by `orm`. 
+
+### Create 
+
+Create a new 3-year old dog, and call it 'Fido':
 
 ```java
    Dog dog = new Dog();
+   dog.setName("Fido"); // The classics are the best
+   dog.setAge(3);
+   dog.setPersonId(1);
    // code ommitted to set values in dog 
    dog = orm.create(dog);
 ```
 
+### Read 
+
+Read the dog called 'Fido':
+
+```java 
+   Dog dog = orm.select(DOG)
+   .where(DOG.name.eq("Fido"))
+   .one();
+```
+
+### Update
+
+Change a dog's name and save it:
+
+```java 
+   // assume variable dog references a Dog object is loaded 
+   dog.setName("Rex"); // I've renamed a dog IRL once 
+   dog = orm.update(dog);
+```
+
+### Delete
+
+Delete a dog:
+
+```java
+   // assume variable dog references a Dog object is loaded 
+   orm.delete(dog); // Rip Rex 
+```
 
 ## Getting HeliORM
 
@@ -38,7 +68,7 @@ I recommend using Maven or your prefered package management technology to add He
   <dependency>
     <groupId>com.heliorm</groupId>
      <artifactId>core</artifactId>
-     <version>0.9</version>
+     <version>0.91</version>
   </dependency>
 ```
 
