@@ -1,5 +1,6 @@
 package com.heliorm.mojo.annotated;
 
+import com.heliorm.FieldOrder;
 import com.heliorm.annotation.Column;
 import com.heliorm.annotation.ForeignKey;
 import com.heliorm.annotation.PrimaryKey;
@@ -138,6 +139,32 @@ public class AnnotatedPojoField implements Field {
                 return lA.get().nullable();
         }
         return false;
+    }
+
+    @Override
+    public Field getField() {
+        return this;
+    }
+
+    @Override
+    public FieldOrder asc() {
+        return () -> AnnotatedPojoField.this;
+    }
+
+    @Override
+    public FieldOrder desc() {
+        return new FieldOrder() {
+
+            @Override
+            public Direction getDirection() {
+                return Direction.DESC;
+            }
+
+            @Override
+            public Field getField() {
+                return AnnotatedPojoField.this;
+            }
+        };
     }
 
     @Override

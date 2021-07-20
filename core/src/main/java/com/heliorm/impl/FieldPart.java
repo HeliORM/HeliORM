@@ -1,5 +1,6 @@
 package com.heliorm.impl;
 
+import com.heliorm.FieldOrder;
 import com.heliorm.OrmException;
 import com.heliorm.Table;
 import com.heliorm.def.Field;
@@ -27,6 +28,7 @@ public abstract class FieldPart<T extends Table<O>, O, C> extends Part<T, O, T, 
     private boolean nullable = false;
     private Optional<Table<?>> foreignTable = Optional.empty();
     private Optional<Integer> length = Optional.empty();
+
 
     public FieldPart(Table table, FieldType fieldType, Class<C> javaType, String javaName) {
         super(Part.Type.FIELD, null);
@@ -98,6 +100,30 @@ public abstract class FieldPart<T extends Table<O>, O, C> extends Part<T, O, T, 
     @Override
     public final boolean isNullable() {
         return nullable;
+    }
+
+    public FieldOrder<T,O,C> asc() {
+        return () -> FieldPart.this;
+    }
+
+    public FieldOrder<T,O,C> desc() {
+        return new FieldOrder<T, O, C>() {
+
+            @Override
+            public Direction getDirection() {
+                return Direction.DESC;
+            }
+
+            @Override
+            public Field<T, O, C> getField() {
+                return FieldPart.this;
+            }
+        };
+    }
+
+    @Override
+    public Field<T, O, C> getField() {
+        return this;
     }
 
     void setSqlName(String sqlName) {

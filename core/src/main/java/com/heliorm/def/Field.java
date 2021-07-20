@@ -1,5 +1,6 @@
 package com.heliorm.def;
 
+import com.heliorm.FieldOrder;
 import com.heliorm.Table;
 
 import java.util.Optional;
@@ -12,7 +13,7 @@ import java.util.Optional;
  * @param <C> The data type of the field
  * @author gideon
  */
-public interface Field<T extends Table<O>, O, C> {
+public interface Field<T extends Table<O>, O, C>  extends FieldOrder<T,O,C> {
 
     enum FieldType {
         LONG,
@@ -97,4 +98,9 @@ public interface Field<T extends Table<O>, O, C> {
      * @return True if it can be null
      */
      boolean isNullable() ;
+
+     FieldOrder<T,O,C> asc();
+
+     FieldOrder<T,O,C> desc();
+
 }

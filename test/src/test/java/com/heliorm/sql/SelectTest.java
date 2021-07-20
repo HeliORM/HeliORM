@@ -272,10 +272,7 @@ public class SelectTest extends AbstractOrmTest {
                         .reversed())
                 .collect(Collectors.toList());
         List<Cat> all = orm().select(CAT)
-                .orderByDesc(CAT.name)
-                .thenByDesc(CAT.age)
-                .thenByDesc(CAT.type)
-                .thenByDesc(CAT.personId)
+                .orderBy(CAT.name.desc(), CAT.age.desc(), CAT.type.desc(), CAT.personId.desc())
                 .list();
         assertNotNull(all, "The list returned by list() should be non-null");
         assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
@@ -292,10 +289,7 @@ public class SelectTest extends AbstractOrmTest {
                         .thenComparing(Cat::getId))
                 .collect(Collectors.toList());
         List<Cat> all = orm().select(CAT)
-                .orderBy(CAT.age)
-                .thenBy(CAT.name)
-                .thenBy(CAT.personId)
-                .thenBy(CAT.id)
+                .orderBy(CAT.age, CAT.name, CAT.personId.asc(), CAT.id)
                 .list();
         assertNotNull(all, "The list returned by list() should be non-null");
         assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
