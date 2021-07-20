@@ -1,7 +1,20 @@
 # HeliORM 
 ![Java CI with Maven](https://github.com/GideonLeGrange/HeliORM/workflows/Java%20CI%20with%20Maven/badge.svg)
 
-HeliORM is a code-first object-relational model for accessing SQL data from Java. It allows compile time type safe SQL queries from Java code. 
+HeliORM is a **code-first** object-relational model for accessing SQL data from Java. It allows **compile time type safe** SQL queries from Java code. 
+
+Here is an example of a type safe query in Java: 
+
+```java
+        List<Cat> all = orm().select(CAT)
+                .where(CAT.type.eq(CatType.INDOOR))
+                .join(PERSON).on(CAT.personId, PERSON.id)
+                .where(PERSON.emailAddress.eq(person.getEmailAddress()))
+                .orderBy(CAT.name, CAT.age.desc())
+                .list();
+```
+
+If you find this example interesting, read on.
 
 The idea is that you write your plain old Java Objects (POJOs), or from Java 16 your Records, and then generate a supporting data model that allows type-safe queries, and then use this model and a very simple API to do Structured Query Language (SQL) queries and updates. It is focussed on working with POJOs and is intended to make create, update, read, delete (CRUD) operations easy. It is not meant to be a complete implementation of SQL in Java. 
 
