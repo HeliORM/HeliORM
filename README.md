@@ -22,12 +22,63 @@ HeliORM also supports querying on abstract data types.
 
 :warning: This page is currently **very** incomplete
 
-Here is a quick taste of what it is like to use HeliORM to query:
+
+## Getting HeliORM
+
+I recommend using Maven or your prefered package management technology to add HeliORM To your project. You'll need at least the `core` library, and most likely a SQL driver library, and if you wish to use annotations in your POJOs, the annotation library.
+
+### The core library 
+
+```xml
+  <dependency>
+    <groupId>com.heliorm</groupId>
+     <artifactId>core</artifactId>
+     <version>0.91</version>
+  </dependency>
+```
+
+### Annotations to annotate your POJOs
+
+```xml
+  <dependency>
+    <groupId>com.heliorm</groupId>
+     <artifactId>annotation</artifactId>
+     <version>0.9</version>
+  </dependency>
+```
+
+### The MySQL driver 
+
+```xml
+  <dependency>
+    <groupId>com.heliorm</groupId>
+     <artifactId>mysql</artifactId>
+     <version>0.9</version>
+  </dependency>
+```
 
 
 ## Quick CRUD examples 
 
 In these examples we have a POJO class called `Dog` and a running ORM referenced by `orm`. 
+
+Class `Dog` can more or less look like this:
+
+```java
+@Pojo
+public class Dog {
+    @PrimaryKey(autoIncrement = true)
+    private Long id;
+
+    @ForeignKey(pojo = Person.class)
+    private Long personId;
+    @Column(length = 32)
+    private String name;
+    private int age;
+}   
+```
+
+`Dog` is annotated with `@Pojo` and some of it's fields are annotated as well. We'll explain more about annotations later
 
 ### Create 
 
@@ -71,70 +122,15 @@ Delete a dog:
    orm.delete(dog); // Rip Rex 
 ```
 
-## Getting HeliORM
-
-I recommend using Maven or your prefered package management technology to add HeliORM To your project. You'll need at least the `core` library, and most likely a SQL driver library, and if you wish to use annotations in your POJOs, the annotation library.
-
-### The core library 
-
-```xml
-  <dependency>
-    <groupId>com.heliorm</groupId>
-     <artifactId>core</artifactId>
-     <version>0.91</version>
-  </dependency>
-```
-
-### Annotations to annotate your POJOs
-
-```xml
-  <dependency>
-    <groupId>com.heliorm</groupId>
-     <artifactId>annotation</artifactId>
-     <version>0.9</version>
-  </dependency>
-```
-
-### The MySQL driver 
-
-```xml
-  <dependency>
-    <groupId>com.heliorm</groupId>
-     <artifactId>mysql</artifactId>
-     <version>0.9</version>
-  </dependency>
-```
-
 
 ## More exmamples
 
 ### Query using concrete POJOs
 
-Assume there is a Object `Dog` which looks like this:
-
-```java
-@Pojo
-public class Dog {
-    @PrimaryKey(autoIncrement = true)
-    private Long id;
-
-    @ForeignKey(pojo = Person.class)
-    private Long personId;
-    @Column(length = 32)
-    private String name;
-    private int age;
-}
-    
-```
-
-`Dog` is annotated with `@Pojo` and some of it's fields are annotated as well. We'll explain more about annotations later
-
-
 
 #### Get dog with ID 10 if you're sure it exists
 
 ```java
-
 
 Dog dog = orm.select(DOG)
                 .where(DOG.id.eq(10L)
@@ -143,7 +139,6 @@ Dog dog = orm.select(DOG)
 
 #### Get dog with ID 10 if you're not sure it exists
 ```java
-
 Optional<Dog> optDog =  orm.select(DOG)
                 .where(DOG.id.eq(10L)
                 .optional();
@@ -170,11 +165,47 @@ List<Dog> youngDogs = orm.select(DOG)
    .list();
 ```
 
+## Joining data 
 
-#### Get all dogs owned by Bob 
+
+Keep in mind what `Dog` looks like, and take a look at `Person`:
+
+```java
+@Pojo
+public class Person {
+
+
+    @PrimaryKey
+    private Long id;
+    @ForeignKey(pojo = Town.class)
+    private Long townId;
+    @Column
+    private String firstName;
+    @Column(nullable = true)
+    private String lastName;
+    @Column
+    private String emailAddress;
+    @Column(nullable = true)
+    private Double income;
+	
+}
+
+````
+
+### Get all dogs owned by Bob 
 
 ```java
 List<Dog> bobsDogs = orm.select(DOG)
+    .join(PERSON).on(DOG.personId, PERSON.id)
+    .where(PERSON.name.eq("Bob"))
+    .list();
+```
+
+### Get all dogs older than 2 years owned by Bob 
+
+```java
+List<Dog> bobsDogs = orm.select(DOG)
+	.where(DOG.age.gt(2))
     .join(PERSON).on(DOG.personId, PERSON.id)
     .where(PERSON.name.eq("Bob"))
     .list();
