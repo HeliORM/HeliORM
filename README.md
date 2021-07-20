@@ -16,7 +16,7 @@ Here is an example of a type safe query in Java:
 
 If you find this example interesting, read on.
 
-The idea is that you write your plain old Java Objects (POJOs), or from Java 16 your Records, and then generate a supporting data model that allows type-safe queries, and then use this model and a very simple API to do Structured Query Language (SQL) queries and updates. It is focussed on working with POJOs and is intended to make create, update, read, delete (CRUD) operations easy. It is not meant to be a complete implementation of SQL in Java. 
+The idea is that you write your plain old Java Objects (POJOs), and then generate a supporting data model that allows type-safe queries, and then use this model and a very simple API to do Structured Query Language (SQL) queries and updates. It is focussed on working with POJOs and is intended to make create, update, read, delete (CRUD) operations easy. It is not meant to be a complete implementation of SQL in Java. 
 
 HeliORM also supports querying on abstract data types.
 
