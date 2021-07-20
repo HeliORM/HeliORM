@@ -123,12 +123,19 @@ Delete a dog:
 ```
 
 
-## More exmamples
+## Retrieving data as lists, streams, singletons or optionals
 
-### Query using concrete POJOs
+### Retrieve a list of data
 
+Get all dogs in any order as a list:
 
-#### Get dog with ID 10 if you're sure it exists
+```java
+List<Dogs> dogs = orm.select(DOG).list();
+```
+
+### Get a single object
+
+Get dog with ID 10 if you're sure it exists. If it doesn't exist, an exception will be thrown.
 
 ```java
 
@@ -137,33 +144,57 @@ Dog dog = orm.select(DOG)
                 .one();
 ```
 
-#### Get dog with ID 10 if you're not sure it exists
+### Get an optional object 
+
+Get dog with ID 10 if you're not sure it exists. If it doesn't exist, an empty `Optional` is returned.
+
 ```java
 Optional<Dog> optDog =  orm.select(DOG)
                 .where(DOG.id.eq(10L)
                 .optional();
 ```
 
-#### Get all dogs in any order
+### Retrieve data as a stream 
+
+Get all dogs in any order as a stream:
+
 ```java
-List<Dogs> dogs = orm.select(DOG).list();
+Stream<Dogs> dogs = orm.select(DOG).stream();
 ```
 
-#### Get all dogs ordered by name 
-```java
+## Ordering 
 
+
+### Order by sinlge column/field in ascending order 
+
+ Get all dogs ordered by name:
+
+```java
 List<Dog> alphaDogs = orm.select(DOG)
    .orderBy(DOG.name)
    .list();
 ```
 
-#### Get all dogs 2 years in age or younger 
-```java
+### Order by one column/field in descending order
 
-List<Dog> youngDogs = orm.select(DOG)
-   .where(DOG.age.le(2))
+Get all dogs ordered from oldest to youngest:
+
+```java
+List<Dog> dogHierarchy = orm.select(DOG)
+   .orderBy(DOG.age.desc())
    .list();
 ```
+
+### Order by a column/field in descending order, other in ascending 
+
+Get all dogs ordered from oldest to youngest:
+
+```java
+List<Dog> dogHierarchy = orm.select(DOG)
+   .orderBy(DOG.age.desc(), DOG.name)
+   .list();
+```
+
 
 ## Joining data 
 
@@ -192,7 +223,9 @@ public class Person {
 
 ````
 
-### Get all dogs owned by Bob 
+### Select on a joined selection table 
+
+Get all dogs owned by Bob: 
 
 ```java
 List<Dog> bobsDogs = orm.select(DOG)
@@ -201,7 +234,9 @@ List<Dog> bobsDogs = orm.select(DOG)
     .list();
 ```
 
-### Get all dogs older than 2 years owned by Bob 
+###  Select on the result table and joined selection table
+
+Get all dogs older than 2 years owned by Bob 
 
 ```java
 List<Dog> bobsDogs = orm.select(DOG)
