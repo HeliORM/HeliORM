@@ -3,9 +3,9 @@ package com.heliorm.impl;
 import com.heliorm.FieldOrder;
 import com.heliorm.Table;
 import com.heliorm.def.Continuation;
+import com.heliorm.def.Executable;
 import com.heliorm.def.ExpressionContinuation;
 import com.heliorm.def.Join;
-import com.heliorm.def.Ordered;
 import com.heliorm.def.Select;
 
 import static java.lang.String.format;
@@ -68,7 +68,7 @@ public class SelectPart<LT extends Table<LO>, LO, RT extends Table<RO>, RO> exte
     }
 
     @Override
-    public <F extends FieldOrder<LT, LO, ?>> Ordered<LT, LO> orderBy(F order, F...orders) {
+    public <F extends FieldOrder<LT, LO, ?>> Executable<LT, LO> orderBy(F order, F...orders) {
         OrderedPart<LT, LO>  part = order(this, order);
         for (F o : orders) {
             part = order(part, o);

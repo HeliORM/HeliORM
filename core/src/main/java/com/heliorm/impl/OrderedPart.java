@@ -1,6 +1,5 @@
 package com.heliorm.impl;
 
-import com.heliorm.def.Ordered;
 import com.heliorm.def.Executable;
 import com.heliorm.def.Field;
 import com.heliorm.Table;
@@ -9,7 +8,7 @@ import com.heliorm.Table;
  *
  * @author gideon
  */
-public class OrderedPart<T extends Table<O>, O> extends ExecutablePart<T, O> implements Ordered<T, O>, Executable<T, O> {
+public class OrderedPart<T extends Table<O>, O> extends ExecutablePart<T, O> implements  Executable<T, O> {
 
     public enum Direction {
         ASCENDING, DESCENDING;
@@ -22,16 +21,6 @@ public class OrderedPart<T extends Table<O>, O> extends ExecutablePart<T, O> imp
         super(Type.ORDER, left);
         this.direction = direction;
         this.field = field;
-    }
-
-    @Override
-    public <F extends Field<T, O, C>, C> Ordered<T, O> thenBy(F field) {
-        return new OrderedPart(this, Direction.ASCENDING, (FieldPart) field);
-    }
-
-    @Override
-    public <F extends Field<T, O, C>, C> Ordered<T, O> thenByDesc(F field) {
-        return new OrderedPart(this, Direction.DESCENDING, (FieldPart) field);
     }
 
     public Direction getDirection() {
