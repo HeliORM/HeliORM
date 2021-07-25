@@ -6,15 +6,21 @@ import com.heliorm.def.Field;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+<<<<<<< HEAD
 import java.util.Collection;
+=======
+import java.util.Map;
+import java.util.WeakHashMap;
+>>>>>>> master
 
 import static java.lang.String.format;
 
 /**
- *
  * @author gideon
  */
 abstract class AbstractPojoOperations implements PojoOperations {
+
+    private Map<Class<?>, Map<String, java.lang.reflect.Field>> fields = new WeakHashMap( );
 
     @Override
     public final Object newPojoInstance(Table table) throws OrmException {
@@ -120,6 +126,7 @@ abstract class AbstractPojoOperations implements PojoOperations {
                 throw new OrmException(format("Unsupported field type '%s'. BUG!", field.getFieldType()));
         }
     }
+
     protected abstract Object getByte(Object pojo, java.lang.reflect.Field refField) throws OrmException;
 
     protected abstract Object getShort(Object pojo, java.lang.reflect.Field refField) throws OrmException;
@@ -204,16 +211,36 @@ abstract class AbstractPojoOperations implements PojoOperations {
 
     AbstractPojoOperations() throws OrmException {
     }
+
     /**
      * Recursively find the reflected field or the given field name on the given
      * class.
      *
-     * @param clazz The class
+     * @param clazz     The class
      * @param fieldName The field name to find
      * @return The field
      * @throws OrmException Thrown if the field can't be found or accessed
      */
     private java.lang.reflect.Field getDeclaredField(final Class<?> clazz, final String fieldName) throws OrmException {
+        Map<String, java.lang.reflect.Field> forClass = fields.computeIfAbsent(clazz, type -> new WeakHashMap<>());
+        if (forClass.containsKey(fieldName)) {
+            return forClass.get(fieldName);
+        }
+        java.lang.reflect.Field field = findDeclaredField(clazz, fieldName);
+        forClass.put(fieldName, field);
+        return field;
+    }
+
+    /**
+     * Recursively find the reflected field or the given field name on the given
+     * class.
+     *
+     * @param clazz     The class
+     * @param fieldName The field name to find
+     * @return The field
+     * @throws OrmException Thrown if the field can't be found or accessed
+     */
+    private java.lang.reflect.Field findDeclaredField(final Class<?> clazz, final String fieldName) throws OrmException {
         try {
             return clazz.getDeclaredField(fieldName);
         } catch (NoSuchFieldException ex) {
@@ -226,4 +253,6 @@ abstract class AbstractPojoOperations implements PojoOperations {
         }
         throw new OrmException(format("Could not find field '%s' on class '%s'", fieldName, clazz.getName()));
     }
+
+
 }

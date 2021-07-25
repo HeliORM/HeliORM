@@ -1,11 +1,11 @@
 package com.heliorm.impl;
 
+import com.heliorm.FieldOrder;
 import com.heliorm.Table;
 import com.heliorm.def.Continuation;
+import com.heliorm.def.Executable;
 import com.heliorm.def.ExpressionContinuation;
-import com.heliorm.def.Field;
 import com.heliorm.def.Join;
-import com.heliorm.def.Ordered;
 import com.heliorm.def.Select;
 
 import static java.lang.String.format;
@@ -68,13 +68,18 @@ public class SelectPart<LT extends Table<LO>, LO, RT extends Table<RO>, RO> exte
     }
 
     @Override
-    public <F extends Field<LT, LO, C>, C> Ordered<LT, LO> orderBy(F field) {
-        return new OrderedPart(this, OrderedPart.Direction.ASCENDING, (FieldPart) field);
+    public <F extends FieldOrder<LT, LO, ?>> Executable<LT, LO> orderBy(F order, F...orders) {
+        OrderedPart<LT, LO>  part = order(this, order);
+        for (F o : orders) {
+            part = order(part, o);
+        }
+        return part;
     }
 
-    @Override
-    public <F extends Field<LT, LO, C>, C> Ordered<LT, LO> orderByDesc(F field) {
-        return new OrderedPart(this, OrderedPart.Direction.DESCENDING, (FieldPart) field);
+    private <F extends FieldOrder<LT, LO, ?>> OrderedPart<LT, LO> order(Part left, F order) {
+        return new OrderedPart(left,
+                order.getDirection() == FieldOrder.Direction.ASC ?  OrderedPart.Direction.ASCENDING : OrderedPart.Direction.DESCENDING,
+                (FieldPart) (order.getField()));
     }
 
     @Override

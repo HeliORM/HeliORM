@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.heliorm</groupId>
         <artifactId>plugins</artifactId>
-        <version>0.88</version>
+        <version>0.91</version>
     </parent>
 
     <groupId>com.heliorm</groupId>
@@ -45,6 +45,11 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>annotation</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

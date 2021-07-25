@@ -4,6 +4,7 @@ import com.heliorm.OrmException;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Optional;
 
 import static java.lang.String.format;
@@ -242,18 +243,6 @@ public final class BeanPojoOperations extends AbstractPojoOperations {
      * @return The camel case string
      */
     private String toCamel(String... args) {
-        StringBuilder buf = new StringBuilder();
-        for (int i = 0; i < args.length; ++i) {
-            String text = args[i];
-            if (!text.isEmpty()) {
-                if (i == 0) {
-                    buf.append(Character.toLowerCase(text.charAt(0)));
-                } else {
-                    buf.append(Character.toUpperCase(text.charAt(0)));
-                }
-                buf.append(text.substring(1));
-            }
-        }
-        return buf.toString();
+        return Arrays.stream(args).reduce((l,r) -> l + Character.toUpperCase(r.charAt(0)) + r.substring(1)).get();
     }
 }
