@@ -177,8 +177,6 @@ public final class SqlOrm implements Orm {
                     throw new OrmException(format("No value for key %s for %s in update", primaryKey.get().getJavaName(), table.getObjectClass().getSimpleName()));
                 }
                 preparedStatementHelper.setValueInStatement(stmt, pojo, table.getPrimaryKey().get(), par);
-<<<<<<< HEAD
-=======
                 int modified = stmt.executeUpdate();
                 if (modified == 0) {
                     throw new OrmException(format("The update did not modify any data for %s with key field/value %s/%s. (Row does not exist)",
@@ -187,7 +185,6 @@ public final class SqlOrm implements Orm {
                             val));
                 }
                 return pojo;
->>>>>>> master
             } else {
                 throw new OrmException(format("No primary key for %s in update", table.getObjectClass().getSimpleName()));
             }

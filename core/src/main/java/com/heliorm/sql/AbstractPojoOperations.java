@@ -6,12 +6,9 @@ import com.heliorm.def.Field;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-<<<<<<< HEAD
 import java.util.Collection;
-=======
 import java.util.Map;
 import java.util.WeakHashMap;
->>>>>>> master
 
 import static java.lang.String.format;
 

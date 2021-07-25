@@ -7,7 +7,8 @@ import com.heliorm.impl.Part;
 import java.util.*;
 import java.util.function.Supplier;
 
-/** A set that can lazy-load using the ORM
+/**
+ * A set that can lazy-load using the ORM
  *
  * @param <T> The type of data contained in the set
  * @param <P> The type of query part
@@ -47,9 +48,8 @@ public class LazyLoadedSet<T, P extends Part & Executable> extends AbstractSet<T
 
     private void load() {
         if (loadFunction.isPresent()) {
-               data =  new HashSet(loadFunction.get().get());
-        }
-        else {
+            data = new HashSet(loadFunction.get().get());
+        } else {
             data = new HashSet<>();
         }
         loaded = true;

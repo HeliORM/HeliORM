@@ -1,11 +1,8 @@
 package com.heliorm.mojo.annotated;
 
-<<<<<<< HEAD
 import com.heliorm.Table;
 import com.heliorm.annotation.Collection;
-=======
 import com.heliorm.FieldOrder;
->>>>>>> master
 import com.heliorm.annotation.Column;
 import com.heliorm.annotation.ForeignKey;
 import com.heliorm.annotation.PrimaryKey;

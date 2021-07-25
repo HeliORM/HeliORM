@@ -12,7 +12,6 @@ import java.util.List;
 @Pojo
 public class Person {
 
-
     @PrimaryKey
     private Long id;
     @ForeignKey(pojo = Town.class)
@@ -25,7 +24,6 @@ public class Person {
     private String emailAddress;
     @Column(nullable = true)
     private Double income;
-
     @Collection(pojo = Pet.class)
     private List<Pet> pets;
 

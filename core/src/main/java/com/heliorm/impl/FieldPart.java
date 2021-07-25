@@ -26,16 +26,10 @@ public abstract class FieldPart<T extends Table<O>, O, C> extends Part<T, O, T, 
     private boolean autoNumber = false;
     private boolean foreignKey = false;
     private boolean nullable = false;
-<<<<<<< HEAD
     private Optional<String> foreignTable = Optional.empty();
-    private final Optional<Integer> length = Optional.empty();
+    private Optional<Integer> length = Optional.empty();
     private boolean collection = false;
     private Optional<String> collectionTable = Optional.empty();
-=======
-    private Optional<Table<?>> foreignTable = Optional.empty();
-    private Optional<Integer> length = Optional.empty();
-
->>>>>>> master
 
     public FieldPart(Table table, FieldType fieldType, Class<C> javaType, String javaName) {
         super(Part.Type.FIELD, null);
@@ -114,7 +108,6 @@ public abstract class FieldPart<T extends Table<O>, O, C> extends Part<T, O, T, 
         return nullable;
     }
 
-<<<<<<< HEAD
     @Override
     public boolean isCollection() {
         return collection;
@@ -128,7 +121,6 @@ public abstract class FieldPart<T extends Table<O>, O, C> extends Part<T, O, T, 
                     .findFirst();
         }
         return Optional.empty();    }
-=======
     public FieldOrder<T,O,C> asc() {
         return () -> FieldPart.this;
     }
@@ -152,7 +144,6 @@ public abstract class FieldPart<T extends Table<O>, O, C> extends Part<T, O, T, 
     public Field<T, O, C> getField() {
         return this;
     }
->>>>>>> master
 
     void setSqlName(String sqlName) {
         this.sqlName = sqlName;

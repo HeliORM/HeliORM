@@ -101,7 +101,6 @@ public interface Field<T extends Table<O>, O, C>  extends FieldOrder<T,O,C> {
      */
      boolean isNullable() ;
 
-<<<<<<< HEAD
     /** Return true if this field represents a collection of POJOs
      *
      * @return True if it is a collection
@@ -113,10 +112,9 @@ public interface Field<T extends Table<O>, O, C>  extends FieldOrder<T,O,C> {
      * @return The table for the collection data
      */
      Optional<Table<?>> getCollectionTable();
-=======
+
      FieldOrder<T,O,C> asc();
 
      FieldOrder<T,O,C> desc();
->>>>>>> master
 
 }

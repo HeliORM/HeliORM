@@ -124,12 +124,9 @@ public class FieldBuilder<P extends FieldPart> {
         part.setNullable(nullable);
         part.setPrimaryKey(primaryKey);
         part.setSqlName(sqlName);
-<<<<<<< HEAD
         part.setCollection(collection);
         part.setCollectionTableName(collectionTable);
-=======
         part.setLength(length);
->>>>>>> master
         return part;
     }
 
