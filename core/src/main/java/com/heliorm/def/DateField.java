@@ -1,9 +1,11 @@
 package com.heliorm.def;
 
-import java.util.Date;
 import com.heliorm.Table;
 
+import java.util.Date;
+
 /**
+ * A field representing a Date value
  *
  * @param <T> Table type
  * @param <O> Object type

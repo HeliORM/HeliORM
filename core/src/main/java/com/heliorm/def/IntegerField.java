@@ -3,6 +3,10 @@ package com.heliorm.def;
 import com.heliorm.Table;
 
 /**
+ * A field representing an int value
+ *
+ * @param <T> Table type
+ * @param <O> Object type
  *
  * @author gideon
  */

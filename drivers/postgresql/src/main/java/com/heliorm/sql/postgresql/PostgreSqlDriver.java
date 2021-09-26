@@ -81,7 +81,6 @@ public final class PostgreSqlDriver extends SqlDriver {
             case LONG:
                 return "BIGINT";
             case DOUBLE:
-                return "DOUBLE PRECISION";
             case FLOAT:
                 return "DOUBLE PRECISION";
             case ENUM:

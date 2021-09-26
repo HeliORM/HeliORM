@@ -3,6 +3,7 @@ package com.heliorm.def;
 import com.heliorm.Table;
 
 /**
+ * A field representing a boolean value
  *
  * @param <T> Table type
  * @param <O> Object type

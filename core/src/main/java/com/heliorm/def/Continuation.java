@@ -3,12 +3,12 @@ package com.heliorm.def;
 import com.heliorm.Table;
 
 /**
- ** @param <LT> Table type
+ * @param <LT> Table type
  * @param <LO> Object type
+ * @param <RT> The following table's type
+ * @param <RO> The following table's object type
  *
  * @author gideon
- * @param <RT>
- * @param <RO>
  */
 public interface Continuation<LT extends Table<LO>, LO, RT extends Table<RO>, RO> extends Executable<LT, LO>, Order<LT, LO> {
 

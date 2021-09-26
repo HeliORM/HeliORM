@@ -1,12 +1,16 @@
 package com.heliorm.def;
 
-import java.util.Arrays;
-import java.util.stream.Collectors;
-
 import com.heliorm.OrmException;
 import com.heliorm.Table;
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
 /**
+ * A field representing a float value
+ *
+ * @param <T> Table type
+ * @param <O> Object type
  *
  * @author gideon
  */
