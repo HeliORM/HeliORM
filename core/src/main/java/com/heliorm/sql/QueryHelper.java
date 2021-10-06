@@ -125,41 +125,14 @@ final class QueryHelper {
         StringJoiner buf = new StringJoiner(" UNION ALL ");
         Query root = null;
         for (List<Part> parts : queries) {
-            root = Parser.parse(parts);
-            StringBuilder tablesQuery = new StringBuilder();
-            StringJoiner fieldsQuery = new StringJoiner(",");
-            List<Field> tableFields = root.getTable().getFields();
-            for (Field field : allFields) {
-                String fieldId = getFieldId(field);
-                if (tableFields.contains(field)) {
-                    fieldsQuery.add(format("%s AS %s", driver.fullFieldName(root.getTable(), field), driver.virtualFieldName(fieldId)));
-                } else {
-                    String empty = driver.castNull(field);
-                    fieldsQuery.add(format("%s AS %s", empty, driver.virtualFieldName(fieldId)));
-                }
+            Query query = Parser.parse(parts);
+            buf.add(buildPartialUnionQuery(query, allFields));
+            if (root == null) {
+                root = query;
             }
-            tablesQuery.append(format("SELECT %s", fieldsQuery.toString()));
-            tablesQuery.append(format(",%s AS %s", driver.virtualValue(root.getTable().getObjectClass().getName()), driver.virtualFieldName(POJO_NAME_FIELD)));
-            tablesQuery.append(format(" FROM %s", fullTableName.apply(root.getTable()), fullTableName.apply(root.getTable())));
-            StringBuilder whereQuery = new StringBuilder();
-            Optional<Criteria> optCrit = root.getCriteria();
-            if (optCrit.isPresent()) {
-                whereQuery.append(expandCriteria(root, optCrit.get()));
-
-            }
-            Optional<Link> optLink = root.getLink();
-            if (optLink.isPresent()) {
-                tablesQuery.append(expandLinkTables(root, optLink.get()));
-                if (whereQuery.length() > 0) {
-                    whereQuery.append(" AND ");
-                }
-                whereQuery.append(expandLinkWheres(optLink.get()));
-            }
-            if (whereQuery.length() > 0) {
-                tablesQuery.append(" WHERE ");
-                tablesQuery.append(whereQuery);
-            }
-            buf.add(tablesQuery.toString());
+        }
+        if (root == null) {
+            throw new OrmException("Could not find any parts in a union query. BUG!");
         }
         StringBuilder query = new StringBuilder(buf.toString());
         // do ordering
@@ -169,6 +142,43 @@ final class QueryHelper {
             query.append(expandOrder(root, optOrder.get()));
         }
         return query.toString();
+    }
+
+    private String buildPartialUnionQuery(Query query, Set<Field> allFields) throws OrmException {
+        StringBuilder tablesQuery = new StringBuilder();
+        StringJoiner fieldsQuery = new StringJoiner(",");
+        List<Field> tableFields = query.getTable().getFields();
+        for (Field field : allFields) {
+            String fieldId = getFieldId(field);
+            if (tableFields.contains(field)) {
+                fieldsQuery.add(format("%s AS %s", driver.fullFieldName(query.getTable(), field), driver.virtualFieldName(fieldId)));
+            } else {
+                String empty = driver.castNull(field);
+                fieldsQuery.add(format("%s AS %s", empty, driver.virtualFieldName(fieldId)));
+            }
+        }
+        tablesQuery.append(format("SELECT %s", fieldsQuery.toString()));
+        tablesQuery.append(format(",%s AS %s", driver.virtualValue(query.getTable().getObjectClass().getName()), driver.virtualFieldName(POJO_NAME_FIELD)));
+        tablesQuery.append(format(" FROM %s", fullTableName.apply(query.getTable()), fullTableName.apply(query.getTable())));
+        StringBuilder whereQuery = new StringBuilder();
+        Optional<Criteria> optCrit = query.getCriteria();
+        if (optCrit.isPresent()) {
+            whereQuery.append(expandCriteria(query, optCrit.get()));
+
+        }
+        Optional<Link> optLink = query.getLink();
+        if (optLink.isPresent()) {
+            tablesQuery.append(expandLinkTables(query, optLink.get()));
+            if (whereQuery.length() > 0) {
+                whereQuery.append(" AND ");
+            }
+            whereQuery.append(expandLinkWheres(optLink.get()));
+        }
+        if (whereQuery.length() > 0) {
+            tablesQuery.append(" WHERE ");
+            tablesQuery.append(whereQuery);
+        }
+        return tablesQuery.toString();
     }
 
 
