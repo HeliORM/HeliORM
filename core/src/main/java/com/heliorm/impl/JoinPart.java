@@ -16,7 +16,7 @@ public class JoinPart<DT extends Table<DO>, DO, LT extends Table<LO>, LO, RT ext
 
     private final Table table;
 
-    public JoinPart(Part left, LT table) {
+    public JoinPart(Part left, RT table) {
         super(Type.JOIN, left);
         this.table = table;
     }

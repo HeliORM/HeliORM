@@ -2,6 +2,7 @@ package com.heliorm.impl;
 
 import com.heliorm.Table;
 import com.heliorm.def.Field;
+import com.heliorm.def.Join;
 import com.heliorm.def.OnClause;
 
 import static java.lang.String.format;
@@ -24,6 +25,11 @@ public final class OnClausePart<DT extends Table<DO>, DO, LT extends Table<LO>, 
 
     public Field<LT, LO, ?> getRightField() {
         return rightField;
+    }
+
+    @Override
+    public <NT extends Table<NO>, NO> Join<DT, DO, RT, RO, NT, NO> thenJoin(NT table) {
+        return new JoinPart<DT, DO, RT, RO, NT, NO>(this, table);
     }
 
     @Override
