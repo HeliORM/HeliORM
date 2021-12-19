@@ -29,7 +29,7 @@ public final class ContinuationPart<DT extends Table<DO>, DO, LT extends Table<L
     }
 
     @Override
-    public <RT extends Table<RO>, RO> Join<DT, DO, RT, RO> join(RT table) {
+    public <RT extends Table<RO>, RO> Join<DT, DO, LT, LO, RT, RO> join(RT table) {
         return new JoinPart(this, table);
     }
 

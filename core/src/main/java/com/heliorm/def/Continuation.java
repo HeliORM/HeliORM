@@ -16,6 +16,6 @@ public interface Continuation<DT extends Table<DO>, DO, LT extends Table<LO>, LO
 
     Continuation<DT, DO, LT, LO> or(ExpressionContinuation<LT, LO> cont);
 
-    <RT extends Table<RO>, RO> Join<DT, DO, RT, RO> join(RT table);
+    <RT extends Table<RO>, RO> Join<DT, DO, LT, LO, RT, RO> join(RT table);
 
 }

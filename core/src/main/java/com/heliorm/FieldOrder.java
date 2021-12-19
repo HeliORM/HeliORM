@@ -2,7 +2,7 @@ package com.heliorm;
 
 import com.heliorm.def.Field;
 
-public interface FieldOrder<T extends Table<O>, O, C> {
+public interface FieldOrder<DT extends Table<DO>, DO, C> {
 
     enum Direction {
         ASC, DESC;
@@ -12,6 +12,6 @@ public interface FieldOrder<T extends Table<O>, O, C> {
         return Direction.ASC;
     }
 
-    Field<T,O,C> getField();
+    Field<DT, DO,C> getField();
 
 }

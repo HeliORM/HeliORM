@@ -12,7 +12,7 @@ import com.heliorm.Table;
  */
 public interface Select<DT extends Table<DO>, DO, LT extends Table<LO>, LO> extends Executable<DT, DO>, Order<DT, DO> {
 
-    <RT extends Table<RO>, RO> Join<DT, DO, RT, RO> join(RT table);
+    <RT extends Table<RO>, RO> Join<DT, DO, LT, LO, RT, RO> join(RT table);
 
     Continuation<DT, DO, LT, LO> where(ExpressionContinuation<LT, LO> cont);
 

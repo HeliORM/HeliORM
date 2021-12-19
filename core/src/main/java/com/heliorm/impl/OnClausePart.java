@@ -6,7 +6,8 @@ import com.heliorm.def.OnClause;
 
 import static java.lang.String.format;
 
-public final class OnClausePart<DT extends Table<DO>, DO, LT extends Table<LO>, LO> extends SelectPart<DT, DO, LT, LO> implements OnClause<DT, DO, LT, LO> {
+public final class OnClausePart<DT extends Table<DO>, DO, LT extends Table<LO>, LO, RT extends Table<RO>, RO>
+        extends SelectPart<DT, DO, RT, RO> implements OnClause<DT, DO, LT, LO, RT, RO> {
 
     private final FieldPart<DT, DO, ?> leftField;
     private final FieldPart<LT, LO, ?> rightField;
