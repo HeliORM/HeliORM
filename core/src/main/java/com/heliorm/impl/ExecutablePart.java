@@ -12,30 +12,30 @@ import java.util.stream.Stream;
  *
  * @author gideon
  */
-abstract class ExecutablePart<T extends Table<O>, O> extends Part<T, O, T, O>
-        implements Executable<T, O> {
+abstract class ExecutablePart<DT extends Table<DO>, DO> extends Part<DT, DO, DT, DO>
+        implements Executable<DT, DO> {
 
     public ExecutablePart(Type type, Part left) {
         super(type, left);
     }
 
     @Override
-    public List<O> list() throws OrmException {
+    public List<DO> list() throws OrmException {
         return getSelector().list(this);
     }
 
     @Override
-    public Stream<O> stream() throws OrmException {
+    public Stream<DO> stream() throws OrmException {
         return getSelector().stream(this);
     }
 
     @Override
-    public O one() throws OrmException {
+    public DO one() throws OrmException {
         return getSelector().one(this);
     }
 
     @Override
-    public Optional<O> optional() throws OrmException {
+    public Optional<DO> optional() throws OrmException {
         return getSelector().optional(this);
     }
 

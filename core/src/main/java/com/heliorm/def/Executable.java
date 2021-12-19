@@ -10,17 +10,17 @@ import com.heliorm.Table;
 /**
  *
  * @author gideon
- * @param <T> Table type
- * @param <O> Object type
+ * @param <DT> Table type
+ * @param <DO> Object type
  */
-public interface Executable<T extends Table<O>, O> {
+public interface Executable<DT extends Table<DO>, DO> {
 
-    List<O> list() throws OrmException;
+    List<DO> list() throws OrmException;
 
-    Stream<O> stream() throws OrmException;
+    Stream<DO> stream() throws OrmException;
 
-    O one() throws OrmException;
+    DO one() throws OrmException;
 
-    Optional<O> optional() throws OrmException;
+    Optional<DO> optional() throws OrmException;
 
 }

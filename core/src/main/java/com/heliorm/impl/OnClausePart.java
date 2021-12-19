@@ -6,22 +6,22 @@ import com.heliorm.def.OnClause;
 
 import static java.lang.String.format;
 
-public final class OnClausePart<LT extends Table<LO>, LO, RT extends Table<RO>, RO> extends SelectPart<LT, LO, RT, RO> implements OnClause<LT, LO, RT, RO> {
+public final class OnClausePart<DT extends Table<DO>, DO, LT extends Table<LO>, LO> extends SelectPart<DT, DO, LT, LO> implements OnClause<DT, DO, LT, LO> {
 
-    private final FieldPart<LT, LO, ?> leftField;
-    private final FieldPart<RT, RO, ?> rightField;
+    private final FieldPart<DT, DO, ?> leftField;
+    private final FieldPart<LT, LO, ?> rightField;
 
-    <C> OnClausePart(Part left, FieldPart<LT, LO, C> leftField, FieldPart<RT, RO, C> rightField) {
+    <C> OnClausePart(Part left, FieldPart<DT, DO, C> leftField, FieldPart<LT, LO, C> rightField) {
         super(Type.ON_CLAUSE, left, left.getSelectTable());
         this.leftField = leftField;
         this.rightField = rightField;
     }
 
-    public Field<LT, LO, ?> getLeftField() {
+    public Field<DT, DO, ?> getLeftField() {
         return leftField;
     }
 
-    public Field<RT, RO, ?> getRightField() {
+    public Field<LT, LO, ?> getRightField() {
         return rightField;
     }
 

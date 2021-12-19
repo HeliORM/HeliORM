@@ -9,7 +9,7 @@ import com.heliorm.def.Join;
 
 import static java.lang.String.format;
 
-public final class ContinuationPart<LT extends Table<LO>, LO, RT extends Table<RO>, RO> extends ExecutablePart<LT, LO> implements Continuation<LT, LO, RT, RO> {
+public final class ContinuationPart<DT extends Table<DO>, DO, LT extends Table<LO>, LO> extends ExecutablePart<DT, DO> implements Continuation<DT, DO, LT, LO> {
 
     private final Part expression;
 
@@ -19,23 +19,23 @@ public final class ContinuationPart<LT extends Table<LO>, LO, RT extends Table<R
     }
 
     @Override
-    public Continuation<LT, LO, RT, RO> and(ExpressionContinuation<RT, RO> cont) {
+    public Continuation<DT, DO, LT, LO> and(ExpressionContinuation<LT, LO> cont) {
         return new ContinuationPart(this, Type.AND, cont);
     }
 
     @Override
-    public Continuation<LT, LO, RT, RO> or(ExpressionContinuation<RT, RO> cont) {
+    public Continuation<DT, DO, LT, LO> or(ExpressionContinuation<LT, LO> cont) {
         return new ContinuationPart(this, Type.OR, cont);
     }
 
     @Override
-    public <RT extends Table<RO>, RO> Join<LT, LO, RT, RO> join(RT table) {
+    public <RT extends Table<RO>, RO> Join<DT, DO, RT, RO> join(RT table) {
         return new JoinPart(this, table);
     }
 
     @Override
-    public <F extends FieldOrder<LT, LO, ?>> Executable<LT, LO> orderBy(F order, F...orders) {
-        OrderedPart<LT, LO>  part = order(this, order);
+    public <F extends FieldOrder<DT, DO, ?>> Executable<DT, DO> orderBy(F order, F...orders) {
+        OrderedPart<DT, DO>  part = order(this, order);
         for (F o : orders) {
             part = order(part, o);
         }
@@ -43,7 +43,7 @@ public final class ContinuationPart<LT extends Table<LO>, LO, RT extends Table<R
     }
 
 
-    private <F extends FieldOrder<LT, LO, ?>> OrderedPart<LT, LO> order(Part left, F order) {
+    private <F extends FieldOrder<DT, DO, ?>> OrderedPart<DT, DO> order(Part left, F order) {
        return new OrderedPart(this,
                order.getDirection() == FieldOrder.Direction.ASC ?  OrderedPart.Direction.ASCENDING : OrderedPart.Direction.DESCENDING,
                (FieldPart) (order.getField()));

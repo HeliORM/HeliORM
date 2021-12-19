@@ -6,7 +6,7 @@ import com.heliorm.Table;
  *
  * @author gideon
  */
-public abstract class Part<T extends Table<O>, O, RT extends Table<RO>, RO> {
+public abstract class Part<DT extends Table<DO>, DO, LT extends Table<LO>, LO> {
 
     public enum Type {
         SELECT,

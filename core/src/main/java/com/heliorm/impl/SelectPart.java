@@ -14,8 +14,8 @@ import static java.lang.String.format;
  *
  * @author gideon
  */
-public class SelectPart<LT extends Table<LO>, LO, RT extends Table<RO>, RO> extends ExecutablePart<LT, LO>
-        implements Select<LT, LO, RT, RO> {
+public class SelectPart<DT extends Table<DO>, DO, LT extends Table<LO>, LO> extends ExecutablePart<DT, DO>
+        implements Select<DT, DO, LT, LO> {
 
     private final Selector selector;
     private final Table table;
@@ -45,11 +45,11 @@ public class SelectPart<LT extends Table<LO>, LO, RT extends Table<RO>, RO> exte
     }
 
     @Override
-    public final Table getReturnTable() {
+    public final DT getReturnTable() {
         if (left() != null) {
-            return left().getReturnTable();
+            return (DT) left().getReturnTable();
         }
-        return table;
+        return (DT) table;
     }
 
     @Override
@@ -58,25 +58,25 @@ public class SelectPart<LT extends Table<LO>, LO, RT extends Table<RO>, RO> exte
     }
 
     @Override
-    public <RT extends Table<RO>, RO> Join<LT, LO, RT, RO> join(RT table) {
+    public <RT extends Table<RO>, RO> Join<DT, DO, RT, RO> join(RT table) {
         return new JoinPart(this, table);
     }
 
     @Override
-    public Continuation<LT, LO, RT, RO> where(ExpressionContinuation<RT, RO> cont) {
+    public Continuation<DT, DO, LT, LO> where(ExpressionContinuation<LT, LO> cont) {
         return new ContinuationPart(this, Type.WHERE, cont);
     }
 
     @Override
-    public <F extends FieldOrder<LT, LO, ?>> Executable<LT, LO> orderBy(F order, F...orders) {
-        OrderedPart<LT, LO>  part = order(this, order);
+    public <F extends FieldOrder<DT, DO, ?>> Executable<DT, DO> orderBy(F order, F...orders) {
+        OrderedPart<DT, DO>  part = order(this, order);
         for (F o : orders) {
             part = order(part, o);
         }
         return part;
     }
 
-    private <F extends FieldOrder<LT, LO, ?>> OrderedPart<LT, LO> order(Part left, F order) {
+    private <F extends FieldOrder<DT, DO, ?>> OrderedPart<DT, DO> order(Part left, F order) {
         return new OrderedPart(left,
                 order.getDirection() == FieldOrder.Direction.ASC ?  OrderedPart.Direction.ASCENDING : OrderedPart.Direction.DESCENDING,
                 (FieldPart) (order.getField()));

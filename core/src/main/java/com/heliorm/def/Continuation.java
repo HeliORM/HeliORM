@@ -3,19 +3,19 @@ package com.heliorm.def;
 import com.heliorm.Table;
 
 /**
- * @param <LT> Table type
- * @param <LO> Object type
- * @param <RT> The following table's type
- * @param <RO> The following table's object type
+ * @param <DT> Table type
+ * @param <DO> Object type
+ * @param <LT> The following table's type
+ * @param <LO> The following table's object type
  *
  * @author gideon
  */
-public interface Continuation<LT extends Table<LO>, LO, RT extends Table<RO>, RO> extends Executable<LT, LO>, Order<LT, LO> {
+public interface Continuation<DT extends Table<DO>, DO, LT extends Table<LO>, LO> extends Executable<DT, DO>, Order<DT, DO> {
 
-    Continuation<LT, LO, RT, RO> and(ExpressionContinuation<RT, RO> cont);
+    Continuation<DT, DO, LT, LO> and(ExpressionContinuation<LT, LO> cont);
 
-    Continuation<LT, LO, RT, RO> or(ExpressionContinuation<RT, RO> cont);
+    Continuation<DT, DO, LT, LO> or(ExpressionContinuation<LT, LO> cont);
 
-    <RT extends Table<RO>, RO> Join<LT, LO, RT, RO> join(RT table);
+    <RT extends Table<RO>, RO> Join<DT, DO, RT, RO> join(RT table);
 
 }
