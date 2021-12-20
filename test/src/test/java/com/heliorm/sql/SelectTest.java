@@ -327,6 +327,26 @@ public class SelectTest extends AbstractOrmTest {
         assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
         assertTrue(listCompareOrdered(all, wanted), "The items loaded are exactly the same as the ones we expected");
     }
+//
+//    @Test
+//    public void testJoinThenJoin() throws Exception {
+//        say("Testing select with a join and then join");
+//        Person person = persons.get(0);
+//        List<Cat> wanted = cats.stream()
+//                .filter(cat -> cat.getType() == CatType.INDOOR)
+//                .filter(cat -> cat.getPersonId() == person.getId())
+//                .collect(Collectors.toList());
+//        List<Cat> all = orm().select(CAT)
+//                .where(CAT.type.eq(CatType.INDOOR))
+//                .join(PERSON).on(CAT.personId, PERSON.id)
+//                .where(PERSON.emailAddress.eq(person.getEmailAddress()))
+//                .orderBy(CAT.name, CAT.age.desc())
+//                .list();
+//        assertNotNull(all, "The list returned by list() should be non-null");
+//        assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
+//        assertTrue(listCompareOrdered(all, wanted), "The items loaded are exactly the same as the ones we expected");
+//
+//    }
 
     @Test
     public void testSelectJoinWithSameKeys() throws Exception {

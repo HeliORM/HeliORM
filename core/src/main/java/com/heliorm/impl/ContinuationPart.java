@@ -9,13 +9,10 @@ import com.heliorm.def.Join;
 
 import static java.lang.String.format;
 
-public final class ContinuationPart<DT extends Table<DO>, DO, LT extends Table<LO>, LO> extends ExecutablePart<DT, DO> implements Continuation<DT, DO, LT, LO> {
-
-    private final Part expression;
+public final class ContinuationPart<DT extends Table<DO>, DO, LT extends Table<LO>, LO> extends AbstractContinuationPart<DT, DO> implements Continuation<DT, DO, LT, LO> {
 
     ContinuationPart(Part left, Type type, ExpressionContinuation expr) {
-        super(type, left);
-        this.expression = ((Part) expr).head();
+        super(left, type,expr);
     }
 
     @Override
@@ -47,16 +44,6 @@ public final class ContinuationPart<DT extends Table<DO>, DO, LT extends Table<L
        return new OrderedPart(this,
                order.getDirection() == FieldOrder.Direction.ASC ?  OrderedPart.Direction.ASCENDING : OrderedPart.Direction.DESCENDING,
                (FieldPart) (order.getField()));
-    }
-
-
-    public Part getExpression() {
-        return expression;
-    }
-
-    @Override
-    public String toString() {
-        return format("%s %s", getType().name(), getExpression());
     }
 
 }

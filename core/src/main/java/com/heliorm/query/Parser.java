@@ -1,5 +1,6 @@
 package com.heliorm.query;
 
+import com.heliorm.impl.AbstractContinuationPart;
 import com.heliorm.impl.ExpressionContinuationPart;
 import com.heliorm.impl.FieldPart;
 import com.heliorm.impl.JoinPart;
@@ -87,7 +88,7 @@ public class Parser {
     }
 
     private Criteria continuation() throws OrmException {
-        Part expr = ((ContinuationPart) part).getExpression();
+        Part expr = ((AbstractContinuationPart) part).getExpression();
         push(unroll(expr));
         Criteria crit = expression();
         pop();
