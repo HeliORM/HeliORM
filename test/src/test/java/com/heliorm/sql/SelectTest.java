@@ -409,7 +409,7 @@ public class SelectTest extends AbstractOrmTest {
     public void testSelectAbstractJoinWithSameKeys() throws Exception {
         say("Testing select of abstract type with a join with same key names");
         List<Pet> selected = orm().select(PET)
-                .join(PERSON).on(PET.personId, PERSON.id)
+                .join   (PERSON).on(PET.personId, PERSON.id)
                 .where(PERSON.firstName.eq(persons.get(0).getFirstName()))
                 .list();
 
