@@ -50,18 +50,18 @@ public class AutoNumberTest extends AbstractOrmTest {
         assertTrue(pojoCompareExcludingKey(cat, saved), "The new and created objects must be the same apart from the key");
     }
 
-    @Test
-    public void testCreateWithStringKey() throws Exception {
-        say("Testing create with auto-number String key");
-        Town town = new Town();
-        town.setName("Somerset West");
-        town.setProvinceId(0L);
-        Town saved = orm().create(town);
-        assertNotNull(saved, "The object returned by create should not be null");
-        assertTrue(town.getId() == null, "The id of the new object must be null before create");
-        assertTrue(saved.getId() != null, "The id of the new object must be not-null after create");
-        assertTrue(pojoCompareExcludingKey(town, saved), "The new and created objects must be the same apart from the key");
-    }
+//    @Test
+//    public void testCreateWithStringKey() throws Exception {
+//        say("Testing create with auto-number String key");
+//        Town town = new Town();
+//        town.setName("Somerset West");
+//        town.setProvinceId(0L);
+//        Town saved = orm().create(town);
+//        assertNotNull(saved, "The object returned by create should not be null");
+//        assertTrue(town.getId() == null, "The id of the new object must be null before create");
+//        assertTrue(saved.getId() != null, "The id of the new object must be not-null after create");
+//        assertTrue(pojoCompareExcludingKey(town, saved), "The new and created objects must be the same apart from the key");
+//    }
 
 
     @AfterAll

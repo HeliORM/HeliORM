@@ -212,7 +212,7 @@ class TestData {
                 person.setFirstName(first);
                 person.setLastName(last);
                 person.setEmailAddress(first + "." + last + i + "@gmail.com");
-                person.setTownId(town.getProvinceId());
+                person.setTownId(town.getId());
                 persons.add(person);
             }
 
