@@ -1,5 +1,6 @@
 package test.pets;
 
+import com.heliorm.annotation.ForeignKey;
 import com.heliorm.annotation.Pojo;
 
 /**
@@ -8,8 +9,9 @@ import com.heliorm.annotation.Pojo;
 @Pojo
 public class Cat extends Mamal {
 
-
     private CatType type;
+    @ForeignKey(pojo = CatBreed.class)
+    private Long breedId;
 
     public CatType getType() {
         return type;
@@ -17,5 +19,13 @@ public class Cat extends Mamal {
 
     public void setType(CatType type) {
         this.type = type;
+    }
+
+    public Long getBreedId() {
+        return breedId;
+    }
+
+    public void setBreedId(Long breedId) {
+        this.breedId = breedId;
     }
 }
