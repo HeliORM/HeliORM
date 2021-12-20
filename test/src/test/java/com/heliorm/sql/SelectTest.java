@@ -335,6 +335,7 @@ public class SelectTest extends AbstractOrmTest {
                 .findFirst().get();
         List<Long> fromThere = persons.stream()
                 .filter(p -> p.getTownId() == town.getId())
+                .filter(p -> p.getIncome() > 5000)
                 .map(p -> p.getId())
                 .collect(Collectors.toList());
         List<Cat> wanted = cats.stream()
@@ -344,6 +345,7 @@ public class SelectTest extends AbstractOrmTest {
         List<Cat> all = orm().select(CAT)
                 .where(CAT.type.eq(CatType.INDOOR))
                 .join(PERSON).on(CAT.personId, PERSON.id)
+                .where(PERSON.income.gt(5000))
                 .thenJoin(TOWN).on(PERSON.townId, TOWN.id)
                 .where(TOWN.name.eq("Durban"))
                 .list();

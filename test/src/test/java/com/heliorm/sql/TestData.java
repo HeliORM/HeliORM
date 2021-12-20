@@ -196,6 +196,7 @@ class TestData {
             person.setLastName(PEOPLE_NAMES[random.nextInt(PEOPLE_NAMES.length)]);
         }
         person.setEmailAddress(PEOPLE_NAMES[random.nextInt(PEOPLE_NAMES.length)].toLowerCase() + n + "@gmail.com");
+        person.setIncome(random.nextDouble()*10000);
         return person;
     }
 
@@ -213,6 +214,7 @@ class TestData {
                 person.setLastName(last);
                 person.setEmailAddress(first + "." + last + i + "@gmail.com");
                 person.setTownId(town.getId());
+                person.setIncome(random.nextDouble()*10000);
                 persons.add(person);
             }
 

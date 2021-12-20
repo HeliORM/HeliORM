@@ -46,9 +46,9 @@ final class QueryHelper {
             fields.add(format("%s", driver.fieldName(table, field)));
             values.add("?");
         }
-        query.append(fields.toString());
+        query.append(fields);
         query.append(") VALUES(");
-        query.append(values.toString());
+        query.append(values);
         query.append(")");
         return query.toString();
     }
@@ -60,13 +60,12 @@ final class QueryHelper {
         StringBuilder query = new StringBuilder();
         query.append(format("UPDATE %s SET ", fullTableName.apply(table)));
         StringJoiner fields = new StringJoiner(",");
-        StringJoiner values = new StringJoiner(",");
         for (Field field : table.getFields()) {
             if (!field.isPrimaryKey()) {
                 fields.add(format("%s=?", driver.fieldName(table, field)));
             }
         }
-        query.append(fields.toString());
+        query.append(fields);
         query.append(format(" WHERE %s=?", driver.fieldName(table, table.getPrimaryKey().get())));
         return query.toString();
     }
@@ -195,16 +194,21 @@ final class QueryHelper {
     }
 
     private String expandLinkWheres(Link link) throws OrmException {
-        StringBuilder query = new StringBuilder();
+        String query = "";
         Optional<Criteria> optCrit = link.getCriteria();
         if (optCrit.isPresent()) {
-            query.append(expandCriteria(link, optCrit.get()));
+            query = expandCriteria(link, optCrit.get());
         }
         if (link.getLink().isPresent()) {
-            query.append(expandLinkWheres(link.getLink().get()));
+            String linkWheres = expandLinkWheres(link.getLink().get());
+            if (!linkWheres.isEmpty()) {
+                if (!query.isEmpty()) {
+                    query = query + " AND ";
+                }
+                query = query + linkWheres;
+            }
         }
-        return query.toString();
-
+        return query;
     }
 
     private String expandCriteria(TableSpec table, Criteria crit) throws OrmException {
