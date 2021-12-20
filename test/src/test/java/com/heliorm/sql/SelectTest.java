@@ -356,6 +356,39 @@ public class SelectTest extends AbstractOrmTest {
     }
 
     @Test
+    public void testJoinThenJoinThenJoin() throws Exception {
+        say("Testing select with a join and then join and then join");
+        Province province = provinces.stream()
+                .filter(p -> p.getName().equals("Western Cape"))
+                .findFirst().get();
+        List<Long> towns = SelectTest.towns.stream()
+                .filter(t -> t.getProvinceId().equals(province.getProvinceId()))
+                .map(town -> town.getId())
+                .collect(Collectors.toList());
+        List<Long> fromThere = persons.stream()
+                .filter(p -> towns.contains(p.getTownId()))
+                .filter(p -> p.getIncome() > 5000)
+                .map(p -> p.getId())
+                .collect(Collectors.toList());
+        List<Cat> wanted = cats.stream()
+                .filter(cat -> cat.getType() == CatType.INDOOR)
+                .filter(cat -> fromThere.contains(cat.getPersonId()))
+                .collect(Collectors.toList());
+        List<Cat> all = orm().select(CAT)
+                .where(CAT.type.eq(CatType.INDOOR))
+                .join(PERSON).on(CAT.personId, PERSON.id)
+                .where(PERSON.income.gt(5000))
+                .thenJoin(TOWN).on(PERSON.townId, TOWN.id)
+                .thenJoin(PROVINCE).on(TOWN.provinceId, PROVINCE.provinceId)
+                .where(PROVINCE.name.eq("Western Cape"))
+                .list();
+        assertNotNull(all, "The list returned by list() should be non-null");
+        assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
+        assertTrue(listCompareOrdered(all, wanted), "The items loaded are exactly the same as the ones we expected");
+
+    }
+
+    @Test
     public void testSelectJoinWithSameKeys() throws Exception {
         say("Testing select with a join with same key names");
         List<Town> selected = orm().select(TOWN)
