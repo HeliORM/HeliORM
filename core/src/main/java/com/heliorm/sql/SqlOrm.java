@@ -8,13 +8,11 @@ import com.heliorm.OrmTransactionException;
 import com.heliorm.Table;
 import com.heliorm.UncaughtOrmException;
 import com.heliorm.Where;
-import com.heliorm.def.Executable;
 import com.heliorm.def.Field;
 import com.heliorm.def.Join;
 import com.heliorm.def.Select;
 import com.heliorm.impl.ExecutablePart;
 import com.heliorm.impl.JoinPart;
-import com.heliorm.impl.Part;
 import com.heliorm.impl.SelectPart;
 import com.heliorm.impl.Selector;
 
@@ -362,7 +360,7 @@ public final class SqlOrm implements Orm {
      * @return The stream of results.
      * @throws OrmException
      */
-    private <O, P extends Part & Executable> Stream<PojoCompare<O>> streamSingle(Table<O> table, String query) throws OrmException {
+    private <O> Stream<PojoCompare<O>> streamSingle(Table<O> table, String query) throws OrmException {
         Connection con = getConnection();
         try {
             Statement stmt = con.createStatement();
