@@ -30,13 +30,19 @@ public class SelectPart<DT extends Table<DO>, DO> extends ExecutablePart<DT, DO>
         this(orm, table, Optional.empty(), Collections.EMPTY_LIST);
     }
 
-    public SelectPart(Selector orm, DT table, Optional<Where<DT, DO>> where,  List<JoinPart<?,?,?,?>> joins) {
+    public SelectPart(Selector orm, DT table, Optional<Where<DT, DO>> where,  List<JoinPart<?,?,?,?>> joins, List<OrderPart<DT,DO>> order) {
         super(orm);
         this.table = table;
         this.where = where;
         this.selector = orm;
         this.joins = joins;
+        this.order = order;
     }
+
+    public SelectPart(Selector orm, DT table, Optional<Where<DT, DO>> where,  List<JoinPart<?,?,?,?>> joins) {
+        this(orm,table,where, joins, Collections.EMPTY_LIST);
+    }
+
 
     public Selector getSelector() {
         return selector;

@@ -4,10 +4,11 @@ import com.heliorm.Table;
 import com.heliorm.impl.ExecutablePart;
 import com.heliorm.impl.JoinPart;
 import com.heliorm.impl.OrderPart;
-import com.heliorm.impl.Part;
+import com.heliorm.impl.OrderedPart;
 import com.heliorm.impl.SelectPart;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
@@ -15,14 +16,22 @@ import java.util.Set;
 
 class AbstractionHelper {
 
-    /** Expand the query parts in the list so that the query branches into
+    /**
+     * Expand the query parts in the list so that the query branches into
      * multiple table queries when a select or join with a table which has
      * sub-tables is encountered.
+     *
      * @param tail part
      * @return The expanded query parts lists.
      */
-     List<SelectPart<?,?>> explodeAbstractions(ExecutablePart<?,?> tail) {
-         return explode( tail.getSelect());
+    List<? extends ExecutablePart<?, ?>> explodeAbstractions(ExecutablePart<?, ?> tail) {
+        if (tail instanceof SelectPart<?, ?>) {
+            return explode(tail.getSelect());
+        }
+        if (tail instanceof OrderedPart<?, ?>) {
+            return explode((OrderedPart<?, ?>) tail);
+        }
+        return Collections.EMPTY_LIST;
     }
 
     /**
@@ -32,7 +41,7 @@ class AbstractionHelper {
      * @param <O>
      * @return
      */
-     <T extends Table<O>, O> Comparator<PojoCompare<O>> makeComparatorForTail(List<OrderPart<T,O>> order) {
+    <T extends Table<O>, O> Comparator<PojoCompare<O>> makeComparatorForTail(List<OrderPart<T, O>> order) {
         List<Comparator<PojoCompare<O>>> comps = new LinkedList();
         for (OrderPart op : order) {
             comps.add((PojoCompare<O> w1, PojoCompare<O> w2) -> {
@@ -47,41 +56,41 @@ class AbstractionHelper {
         return new CompoundComparator(comps);
     }
 
-    /**
-     * Convert the supplied part chain to a list of sequenctial parts. This is
-     * required to pass the list of parts to the parser so it can generate a
-     * query strucutre.
-     *
-     * @param tail The tail part
-     * @return The list of parts
-     */
-     private List<Part> tailToList(Part tail) {
-        List<Part> parts = new ArrayList();
-        Part part = tail.head();
-        while (part != null) {
-            parts.add(part);
-            part = part.right();
-        }
-        return parts;
-    }
-
-    private List<SelectPart<?,?>> explode(SelectPart<?,?> select) {
-        List<SelectPart<?, ?>> res = new ArrayList<>();
+    private List<OrderedPart<?, ?>> explode(OrderedPart<?, ?> ordered) {
+        List<OrderedPart<?, ?>> res = new ArrayList<>();
+        SelectPart<?, ?> select = ordered.getSelect();
         Table<?> table = select.getTable();
         Set<Table<?>> subTables = table.getSubTables();
         if (subTables.isEmpty()) {
-            res.add(new SelectPart(select.getSelector(), select.getTable(), select.getWhere(), explode(select.getJoins())));
+            SelectPart selectPart = new SelectPart(select.getSelector(), select.getTable(), select.getWhere(), explode(select.getJoins()));
+            res.add(new OrderedPart<>(select.getSelector(), selectPart,
+                    ordered.getOrder()));
         } else {
             for (Table<?> subTable : subTables) {
-                res.add(new SelectPart(select.getSelector(), subTable, select.getWhere(), explode(select.getJoins())));
+                res.add(new OrderedPart<>(select.getSelector(), new SelectPart(select.getSelector(), subTable, select.getWhere(), explode(select.getJoins())),
+                        ordered.getOrder()));
             }
         }
         return res;
     }
 
-    private List<JoinPart<?,?,?,?>> explode(List<JoinPart<?,?,?,?>> joins) {
-         List<JoinPart<?,?,?,?>> res = new ArrayList<>();
-        for (JoinPart<?,?,?,?> join : joins) {
+    private List<SelectPart<?, ?>> explode(SelectPart<?, ?> select) {
+        List<SelectPart<?, ?>> res = new ArrayList<>();
+        Table<?> table = select.getTable();
+        Set<Table<?>> subTables = table.getSubTables();
+        if (subTables.isEmpty()) {
+            res.add(new SelectPart(select.getSelector(), select.getTable(), select.getWhere(), explode(select.getJoins()), select.getOrder()));
+        } else {
+            for (Table<?> subTable : subTables) {
+                res.add(new SelectPart(select.getSelector(), subTable, select.getWhere(), explode(select.getJoins()), select.getOrder()));
+            }
+        }
+        return res;
+    }
+
+    private List<JoinPart<?, ?, ?, ?>> explode(List<JoinPart<?, ?, ?, ?>> joins) {
+        List<JoinPart<?, ?, ?, ?>> res = new ArrayList<>();
+        for (JoinPart<?, ?, ?, ?> join : joins) {
             Table<?> table = join.getTable();
             Set<Table<?>> subTables = table.getSubTables();
             if (subTables.isEmpty()) {

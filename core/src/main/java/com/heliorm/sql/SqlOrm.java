@@ -312,25 +312,28 @@ public final class SqlOrm implements Orm {
     }
 
     private <T extends Table<O>, O> Stream<O> stream(ExecutablePart<T, O> tail) throws OrmException {
-        List<SelectPart<?, ?>> queries = abstractionHelper.explodeAbstractions(tail);
+        List<? extends ExecutablePart<?, ?>> queries = abstractionHelper.explodeAbstractions(tail);
         if (queries.isEmpty()) {
             throw new OrmException("Could not build query from parts. BUG!");
         }
         if (queries.size() == 1) {
-            SelectPart<?, ?> query = queries.get(0);
+            SelectPart<?, ?> query = queries.get(0).getSelect();
             Stream<PojoCompare<O>> res = streamSingle(query.getTable(), queryHelper.buildSelectQuery(tail));
             return res.map(pojoCompare -> pojoCompare.getPojo());
         } else {
             if (driver.useUnionAll()) {
                 Map<String, Table<O>> tableMap = queries.stream()
-                        .map(query -> query.getTable())
+                        .map(query -> query.getSelect().getTable())
                         .collect(Collectors.toMap(table -> table.getObjectClass().getName(), table -> table));
-                return streamUnion(queryHelper.buildSelectUnionQuery(queries.stream().map(query -> query.getSelect()).collect(Collectors.toList())), tableMap);
+                Stream<PojoCompare<O>> sorted = streamUnion(queryHelper.buildSelectUnionQuery(queries.stream().map(query -> query.getSelect()).collect(Collectors.toList())), tableMap)
+                        .map(pojo -> new PojoCompare<O>(pops, tail.getSelect().getTable(), pojo))
+                        .sorted(abstractionHelper.makeComparatorForTail(tail.getOrder()));
+                return sorted.map(p -> p.getPojo());
             } else {
                 Stream<PojoCompare<O>> res = queries.stream()
                         .flatMap(select -> {
                             try {
-                                return streamSingle(queries.get(0).getTable(), queryHelper.buildSelectQuery(select));
+                                return streamSingle(queries.get(0).getSelect().getTable(), queryHelper.buildSelectQuery(select));
                             } catch (OrmException ex) {
                                 throw new UncaughtOrmException(ex.getMessage(), ex);
                             }

@@ -130,7 +130,7 @@ final class QueryHelper {
                 .flatMap(table -> (Stream<Field>) (table.getFields().stream()))
                 .collect(Collectors.toSet());
         StringJoiner buf = new StringJoiner(" UNION ALL ");
-        ExecutablePart root = null;
+        ExecutablePart<?,?> root = null;
         for (ExecutablePart query : queries) {
             if (root == null) {
                 root = query;
@@ -140,10 +140,7 @@ final class QueryHelper {
         if (root == null) {
             throw new OrmException("Could not find any parts in a union query. BUG!");
         }
-        StringBuilder query = new StringBuilder(buf.toString());
-        // do ordering
-        query.append(expandOrder(root.getSelect().getTable(), root.getOrder()));
-        return query.toString();
+        return buf.toString();
     }
 
     private String buildPartialUnionQuery(SelectPart<?,?> select, Set<Field> allFields) throws OrmException {
