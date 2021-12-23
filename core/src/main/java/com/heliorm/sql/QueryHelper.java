@@ -120,7 +120,7 @@ final class QueryHelper {
             query.append(whereQuery);
         }
         // do ordering
-        query.append(expandOrder(root.getTable(), root.getOrder()));
+        query.append(expandOrder(root.getTable(), exec.getOrder()));
         return query.toString();
     }
 
@@ -135,7 +135,6 @@ final class QueryHelper {
             if (root == null) {
                 root = query;
             }
-//            Query query = Parser.parse(parts);
             buf.add(buildPartialUnionQuery(query.getSelect(), allFields));
         }
         if (root == null) {

@@ -24,6 +24,7 @@ public class SelectPart<DT extends Table<DO>, DO> extends ExecutablePart<DT, DO>
     private final DT table;
     private final Optional<Where<DT,DO>> where;
     private final List<JoinPart<?,?,?,?>> joins;
+    private  List<OrderPart<DT,DO>> order;
 
     public SelectPart(Selector orm, DT table) {
         this(orm, table, Optional.empty(), Collections.EMPTY_LIST);
@@ -53,6 +54,7 @@ public class SelectPart<DT extends Table<DO>, DO> extends ExecutablePart<DT, DO>
         for (F o : orders) {
             list.add(makePart(o));
         }
+        this.order = list;
         return new OrderedPart<>(getSelector(), this, list);
     }
 
@@ -63,7 +65,7 @@ public class SelectPart<DT extends Table<DO>, DO> extends ExecutablePart<DT, DO>
 
     @Override
     public List<OrderPart<DT,DO>> getOrder() {
-        return Collections.EMPTY_LIST;
+        return order == null ? Collections.EMPTY_LIST : order;
     }
 
     @Override
