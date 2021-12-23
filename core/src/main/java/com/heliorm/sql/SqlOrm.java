@@ -91,17 +91,17 @@ public final class SqlOrm implements Orm {
 
             @Override
             public <T extends Table<O>, O> Stream<O> stream(Select<T, O> tail) throws OrmException {
-                return null;
+                return SqlOrm.this.stream((SelectPart<T,O>) tail);
             }
 
             @Override
             public <T extends Table<O>, O> Optional<O> optional(Select<T, O> tail) throws OrmException {
-                return Optional.empty();
+                return  SqlOrm.this.optional((SelectPart<T,O>) tail);
             }
 
             @Override
             public <T extends Table<O>, O> O one(Select<T, O> tail) throws OrmException {
-                return null;
+                return  SqlOrm.this.one((SelectPart<T,O>) tail);
             }
         };
     }
@@ -301,7 +301,7 @@ public final class SqlOrm implements Orm {
     }
 
     @Override
-    public final Selector selector() {
+    public Selector selector() {
         return selector;
     }
 
@@ -429,38 +429,38 @@ public final class SqlOrm implements Orm {
             throw new OrmSqlException(ex.getMessage(), ex);
         }
     }
-//
-//    private <O, P extends Part & Executable> Optional<O> optional(P tail) throws OrmException {
-//        try (Stream<O> stream = stream(tail)) {
-//            O one;
-//            Iterator<O> iterator = stream.iterator();
-//            if (iterator.hasNext()) {
-//                one = iterator.next();
-//            } else {
-//                return Optional.empty();
-//            }
-//            if (iterator.hasNext()) {
-//                throw new OrmException(format("Required one or none %s but found more than one", tail.getReturnTable().getObjectClass().getSimpleName()));
-//            }
-//            return Optional.of(one);
-//        }
-//    }
-//
-//    private <O, P extends Part & Executable> O one(P tail) throws OrmException {
-//        try (Stream<O> stream = stream(tail)) {
-//            Iterator<O> iterator = stream.iterator();
-//            O one;
-//            if (iterator.hasNext()) {
-//                one = iterator.next();
-//            } else {
-//                throw new OrmException(format("Required exactly one %s but found none", tail.getReturnTable().getObjectClass().getSimpleName()));
-//            }
-//            if (iterator.hasNext()) {
-//                throw new OrmException(format("Required exactly one %s but found more than one", tail.getReturnTable().getObjectClass().getSimpleName()));
-//            }
-//            return one;
-//        }
-//    }
+
+    private  <T extends Table<O>, O>  Optional<O> optional(SelectPart<T,O> tail) throws OrmException {
+        try (Stream<O> stream = stream(tail)) {
+            O one;
+            Iterator<O> iterator = stream.iterator();
+            if (iterator.hasNext()) {
+                one = iterator.next();
+            } else {
+                return Optional.empty();
+            }
+            if (iterator.hasNext()) {
+                throw new OrmException(format("Required one or none %s but found more than one", tail.getTable().getObjectClass().getSimpleName()));
+            }
+            return Optional.of(one);
+        }
+    }
+
+    private  <T extends Table<O>, O> O one(SelectPart<T,O> tail) throws OrmException {
+        try (Stream<O> stream = stream(tail)) {
+            Iterator<O> iterator = stream.iterator();
+            O one;
+            if (iterator.hasNext()) {
+                one = iterator.next();
+            } else {
+                throw new OrmException(format("Required exactly one %s but found none", tail.getTable().getObjectClass().getSimpleName()));
+            }
+            if (iterator.hasNext()) {
+                throw new OrmException(format("Required exactly one %s but found more than one", tail.getTable().getObjectClass().getSimpleName()));
+            }
+            return one;
+        }
+    }
 
     /**
      * Obtain the SQL connection to use
