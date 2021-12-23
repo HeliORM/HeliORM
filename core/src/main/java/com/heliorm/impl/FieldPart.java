@@ -15,7 +15,7 @@ import static java.lang.String.format;
  * @param <C> Type of the field
  * @author gideon
  */
-public abstract class FieldPart<T extends Table<O>, O, C> extends Part<T, O, T, O> implements Field<T, O, C>, Cloneable {
+public abstract class FieldPart<T extends Table<O>, O, C> implements Field<T, O, C>, Cloneable {
 
     private final Table table;
     private final FieldType fieldType;
@@ -31,7 +31,6 @@ public abstract class FieldPart<T extends Table<O>, O, C> extends Part<T, O, T, 
 
 
     public FieldPart(Table table, FieldType fieldType, Class<C> javaType, String javaName) {
-        super(Part.Type.FIELD, null);
         this.table = table;
         this.fieldType = fieldType;
         this.javaType = javaType;
