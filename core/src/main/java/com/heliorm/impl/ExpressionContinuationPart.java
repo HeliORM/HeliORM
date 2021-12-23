@@ -12,14 +12,14 @@ import com.heliorm.def.Continuation;
 public class ExpressionContinuationPart<T extends Table<O>, O>  implements Continuation<T, O> {
 
     public enum Type {
-        WHERE, AND, OR;
+         AND, OR;
     }
 
     private final Type type;
     private final ExpressionPart expression;
 
     public ExpressionContinuationPart(Type type, Continuation expr) {
-        expression =  ((ExpressionContinuationPart)expr).getExpression();
+        expression =  (ExpressionPart)expr;
         this.type = type;
     }
 
@@ -33,7 +33,7 @@ public class ExpressionContinuationPart<T extends Table<O>, O>  implements Conti
         return new ExpressionContinuationPart(Type.OR, expr);
     }
 
-    public ExpressionPart getExpression() {
+    public  ExpressionPart<T, O,?> getExpression() {
         return expression;
     }
 

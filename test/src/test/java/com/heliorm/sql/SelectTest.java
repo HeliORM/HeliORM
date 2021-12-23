@@ -409,6 +409,7 @@ public class SelectTest extends AbstractOrmTest {
                 .filter(cat -> cat.getType() == CatType.INDOOR)
                 .filter(cat -> fromThere.contains(cat.getPersonId()))
                 .collect(Collectors.toList());
+
         List<Cat> all = orm().select(CAT,
                         where(CAT.type.eq(CatType.INDOOR)),
                         join(PERSON, on(CAT.personId, PERSON.id),

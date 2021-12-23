@@ -213,24 +213,35 @@ final class QueryHelper {
     }
 
     private String expandCriteria(Table<?> table, WherePart<?,?> where) throws OrmException {
-        ExpressionContinuationPart<?, ?> cont = where.getExpression();
-        ExpressionPart expr = cont.getExpression();
-        switch (expr.getType() ){
+        ExpressionPart<?, ?, ?> expr = where.getExpression();
+        StringBuilder query = new StringBuilder();
+        query.append(expandExpression(table, expr));
+        for (ExpressionContinuationPart<?,?> ec : where.getContinuations()) {
+            switch (ec.getType()) {
+                case AND:
+                    query.append(" AND ");
+                    break;
+                case OR:
+                    query.append(" OR ");
+                    break;
+                default:
+                    throw new OrmException(format("Unknown continuation type '%s'. BUG!", expr.getType()));
+            }
+            query.append(expandExpression(table, ec.getExpression()));
+        }
+        return query.toString();
+    }
+
+    private String expandExpression(Table table, ExpressionPart expr) throws OrmException {
+        switch (expr.getType() ) {
             case LIST_EXPRESSION:
-                return expandListFieldCriteria(table, ((ListExpressionPart)expr));
+              return  expandListFieldCriteria(table, ((ListExpressionPart) expr));
             case VALUE_EXPRESSION:
                 return expandValueFieldCriteria(table, (ValueExpressionPart) expr);
             case IS_EXPRESSION:
                 return expandIsFieldCriteria(table, (IsExpressionPart) expr);
-
-//            case AND:
-//                AndCriteria and = (AndCriteria) crit;
-//                return format("(%s AND %s)", expandCriteria(table, and.getLeft()), expandCriteria(table, and.getRight()));
-//            case OR:
-//                OrCriteria or = (OrCriteria) crit;
-//                return format("(%s OR %s)", expandCriteria(table, or.getLeft()), expandCriteria(table, or.getRight()));
             default:
-                throw new OrmException(format("BUG BUG BUG! I know about this, go and look BUG!"));
+                throw new OrmException(format("Unknown expression type '%s'. BUG!", expr.getType()));
         }
     }
 

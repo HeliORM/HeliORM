@@ -10,6 +10,7 @@ import com.heliorm.impl.WherePart;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Optional;
 
 public class Query {
 
@@ -25,15 +26,15 @@ public class Query {
 
 
     public static <LT extends Table<LO>,LO, RT extends Table<RO>, RO> Join<LT, LO> join(RT table, On<LT,LO, RT, RO> on, Where<RT,RO> where) {
-        return new JoinPart(table, (OnPart)on, (WherePart) where, Collections.EMPTY_LIST);
+        return new JoinPart(table, (OnPart)on, Optional.of((WherePart) where), Collections.EMPTY_LIST);
     }
 
     public static <LT extends Table<LO>,LO, RT extends Table<RO>, RO> Join<LT, LO> join(RT table, On<LT,LO, RT, RO> on, Join<RT,RO> ...joins) {
-        return new JoinPart(table, (OnPart) on, null, Collections.EMPTY_LIST);
+        return new JoinPart(table, (OnPart) on, Optional.empty(), Arrays.asList(joins));
     }
 
     public static <LT extends Table<LO>,LO, RT extends Table<RO>, RO> Join<LT, LO> join(RT table, On<LT,LO, RT, RO> on, Where<RT,RO> where, Join<RT,RO> ...joins) {
-        return new JoinPart(table, (OnPart)on, (WherePart) where, Arrays.asList(joins));
+        return new JoinPart(table, (OnPart)on, Optional.of((WherePart) where), Arrays.asList(joins));
     }
 
 

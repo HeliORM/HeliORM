@@ -15,10 +15,10 @@ public class JoinPart<LT extends Table<LO>, LO, RT extends Table<RO>, RO> implem
 
     private final RT table;
     private final OnPart<LT,LO, RT,RO> on;
-    private final WherePart<RT,RO> where;
+    private final Optional<WherePart<RT,RO>> where;
     private final List<JoinPart<?,?,?,?>> joins;
 
-    public JoinPart(RT table, OnPart<LT,LO,RT,RO> on, WherePart<RT,RO> where, List<JoinPart<RT,RO,?,?>> joins ) {
+    public JoinPart(RT table, OnPart<LT,LO,RT,RO> on, Optional<WherePart<RT,RO>> where, List<JoinPart<RT,RO,?,?>> joins ) {
         this.table = table;
         this.on = on;
         this.where = where;
@@ -34,7 +34,7 @@ public class JoinPart<LT extends Table<LO>, LO, RT extends Table<RO>, RO> implem
     }
 
     public Optional<WherePart<RT, RO>> getWhere() {
-        return Optional.ofNullable(where);
+        return where;
     }
 
     public List<JoinPart<?, ?, ?, ?>> getJoins() {
