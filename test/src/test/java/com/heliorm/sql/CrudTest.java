@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static com.heliorm.Query.where;
 import static com.heliorm.sql.TestData.makeCat;
 import static com.heliorm.sql.TestData.makePersons;
 import static com.heliorm.sql.TestData.makeProvinces;
@@ -41,7 +42,7 @@ public class CrudTest extends AbstractOrmTest {
     @Test
     public void testCreate() throws Exception {
         say("Testing create with auto-number Long key");
-        Person person = orm().select(PERSON).where(PERSON.id.eq(persons.get(0).getId())).one();
+        Person person = orm().select(PERSON, where(PERSON.id.eq(persons.get(0).getId()))).one();
         Cat cat = makeCat(person);
         Cat saved = orm().create(cat);
         cats.add(saved);    
@@ -55,12 +56,12 @@ public class CrudTest extends AbstractOrmTest {
     public void testUpdate() throws Exception {
         say("Testing update with auto-number Long key");
         Long id = persons.get(0).getId();
-        Person person = orm().select(PERSON).where(PERSON.id.eq(id)).one();
+        Person person = orm().select(PERSON, where(PERSON.id.eq(id))).one();
         String tmp = person.getFirstName();
         person.setFirstName(person.getLastName());
         person.setLastName(tmp);
         Person updated = orm().update(person);
-        Person loaded = orm().select(PERSON).where(PERSON.id.eq(id)).one();
+        Person loaded = orm().select(PERSON,where(PERSON.id.eq(id))).one();
         assertNotNull(updated, "The object returned by update should not be null");
         assertTrue(pojoCompare(updated, loaded), "The updated and loaded objects must be the same");
         assertTrue(pojoCompare(updated, person), "The updated and modified objects must be the same");
@@ -71,9 +72,9 @@ public class CrudTest extends AbstractOrmTest {
     public void testUpdateWithNoChange() throws Exception {
         say("Testing update with auto-number Long key where nothing changes");
         Long id = persons.get(0).getId();
-        Person person = orm().select(PERSON).where(PERSON.id.eq(id)).one();
+        Person person = orm().select(PERSON, where(PERSON.id.eq(id))).one();
         Person updated = orm().update(person);
-        Person loaded = orm().select(PERSON).where(PERSON.id.eq(id)).one();
+        Person loaded = orm().select(PERSON, where(PERSON.id.eq(id))).one();
         assertNotNull(updated, "The object returned by update should not be null");
         assertTrue(pojoCompare(updated, loaded), "The updated and loaded objects must be the same");
         assertTrue(pojoCompare(updated, person), "The updated and modified objects must be the same");
@@ -84,7 +85,7 @@ public class CrudTest extends AbstractOrmTest {
     public void testUpdateWithNullKey() throws Exception {
         say("Testing update with null key");
         Long id = persons.get(0).getId();
-        Person person = orm().select(PERSON).where(PERSON.id.eq(id)).one();
+        Person person = orm().select(PERSON, where(PERSON.id.eq(id))).one();
         person.setId(null);
         boolean failed = false;
         try {
@@ -100,13 +101,13 @@ public class CrudTest extends AbstractOrmTest {
     public void testUpdateWithBadKey() throws Exception {
         say("Testing update with bad key");
         Long id = persons.get(0).getId();
-        Person person = orm().select(PERSON).where(PERSON.id.eq(id)).one();
+        Person person = orm().select(PERSON, where(PERSON.id.eq(id))).one();
         Long newKey = 10000000L;
         person.setId(newKey);
         boolean failed = false;
         try {
             Person updated = orm().update(person);
-            Person loaded  = orm().select(PERSON).where(PERSON.id.eq(newKey)).one();
+            Person loaded  = orm().select(PERSON, where(PERSON.id.eq(newKey))).one();
         }
         catch (OrmException ex) {
             failed  = true;
@@ -120,7 +121,7 @@ public class CrudTest extends AbstractOrmTest {
         say("Testing delete with Long key");
         Cat cat = cats.remove(0);
         orm().delete(cat);
-        Optional<Cat> opt = orm().select(CAT).where(CAT.id.eq(cat.getId())).optional();
+        Optional<Cat> opt = orm().select(CAT, where(CAT.id.eq(cat.getId()))).optional();
         assertFalse(opt.isPresent(), "No object for delete id must be in the database");
     }
 

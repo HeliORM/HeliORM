@@ -1,16 +1,39 @@
 package com.heliorm.sql;
 
-import com.heliorm.*;
-import com.heliorm.def.Field;
-import com.heliorm.def.Select;
-import com.heliorm.impl.SelectPart;
+import com.heliorm.Database;
+import com.heliorm.Orm;
+import com.heliorm.OrmException;
+import com.heliorm.OrmTransaction;
+import com.heliorm.OrmTransactionException;
+import com.heliorm.Table;
+import com.heliorm.UncaughtOrmException;
+import com.heliorm.Where;
 import com.heliorm.def.Executable;
+import com.heliorm.def.Field;
+import com.heliorm.def.Join;
+import com.heliorm.def.Select;
+import com.heliorm.impl.ExecutablePart;
+import com.heliorm.impl.JoinPart;
 import com.heliorm.impl.Part;
+import com.heliorm.impl.SelectPart;
 import com.heliorm.impl.Selector;
-import com.heliorm.query.Parser;
 
-import java.sql.*;
-import java.util.*;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.ServiceLoader;
+import java.util.Spliterator;
+import java.util.Spliterators;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -62,23 +85,23 @@ public final class SqlOrm implements Orm {
         this.resultSetHelper = new ResultSetHelper(pops, this::getFieldId);
         selector = new Selector() {
             @Override
-            public <O, P extends Part & Executable> List<O> list(P tail) throws OrmException {
-                return SqlOrm.this.list(tail);
+            public <T extends Table<O>, O> List<O> list(Select<T, O> tail) throws OrmException {
+                return SqlOrm.this.list((SelectPart<T,O>) tail);
             }
 
             @Override
-            public <O, P extends Part & Executable> Stream<O> stream(P tail) throws OrmException {
-                return SqlOrm.this.stream(tail);
+            public <T extends Table<O>, O> Stream<O> stream(Select<T, O> tail) throws OrmException {
+                return null;
             }
 
             @Override
-            public <O, P extends Part & Executable> Optional<O> optional(P tail) throws OrmException {
-                return SqlOrm.this.optional(tail);
+            public <T extends Table<O>, O> Optional<O> optional(Select<T, O> tail) throws OrmException {
+                return Optional.empty();
             }
 
             @Override
-            public <O, P extends Part & Executable> O one(P tail) throws OrmException {
-                return SqlOrm.this.one(tail);
+            public <T extends Table<O>, O> O one(Select<T, O> tail) throws OrmException {
+                return null;
             }
         };
     }
@@ -211,8 +234,27 @@ public final class SqlOrm implements Orm {
     }
 
     @Override
-    public <T extends Table<O>, O> Select<T, O, T, O> select(T table) {
-        return new SelectPart<>(null, table, selector());
+    public <T extends Table<O>, O> Select<T, O> select(T table) {
+        return new SelectPart<>(selector(), table);
+    }
+
+    @Override
+    public <T extends Table<O>, O> Select<T, O> select(T table, Where<T, O> where) {
+        return new SelectPart<>(selector(), table, Optional.of(where), Collections.EMPTY_LIST);
+    }
+
+    @Override
+    public <T extends Table<O>, O> Select<T, O> select(T table, Join<T, O>... joins) {
+        List<JoinPart<?, ?, ?, ?>> list = Arrays.stream(joins)
+                .map(join -> (JoinPart<?, ?, ?, ?>) join).collect(Collectors.toList());
+        return new SelectPart<T,O>(selector(), table, Optional.empty(),list);
+    }
+
+    @Override
+    public <T extends Table<O>, O> Select<T, O> select(T table, Where<T, O> where, Join<T, O>... joins) {
+        List<JoinPart<?, ?, ?, ?>> list = Arrays.stream(joins)
+                .map(join -> (JoinPart<?, ?, ?, ?>) join).collect(Collectors.toList());
+        return new SelectPart<T,O>(selector(), table, Optional.of(where), list);
     }
 
     @Override
@@ -263,40 +305,40 @@ public final class SqlOrm implements Orm {
         return selector;
     }
 
-    private <O, P extends Part & Executable> List<O> list(P tail) throws OrmException {
+    private <T extends Table<O>, O> List<O> list(SelectPart<T,O> tail) throws OrmException {
         try (Stream<O> stream = stream(tail)) {
             return stream.collect(Collectors.toList());
         }
     }
 
-    private <O, P extends Part & Executable> Stream<O> stream(P tail) throws OrmException {
-        List<List<Part>> queries = abstractionHelper.explodeAbstractions(tail);
+    private <T extends Table<O>, O> Stream<O> stream(ExecutablePart<T, O> tail) throws OrmException {
+        List<SelectPart<?, ?>> queries = abstractionHelper.explodeAbstractions(tail);
         if (queries.isEmpty()) {
             throw new OrmException("Could not build query from parts. BUG!");
         }
         if (queries.size() == 1) {
-            List<Part> parts = queries.get(0);
-            Stream<PojoCompare<O>> res = streamSingle(parts.get(0).getReturnTable(), queryHelper.buildSelectQuery(Parser.parse(parts)));
+            SelectPart<?, ?> query = queries.get(0);
+            Stream<PojoCompare<O>> res = streamSingle(query.getTable(), queryHelper.buildSelectQuery(tail));
             return res.map(pojoCompare -> pojoCompare.getPojo());
         } else {
             if (driver.useUnionAll()) {
                 Map<String, Table<O>> tableMap = queries.stream()
-                        .map(parts -> parts.get(0).getReturnTable())
+                        .map(query -> query.getTable())
                         .collect(Collectors.toMap(table -> table.getObjectClass().getName(), table -> table));
-                return streamUnion(queryHelper.buildSelectUnionQuery(queries), tableMap);
+                return streamUnion(queryHelper.buildSelectUnionQuery(queries.stream().map(query -> query.getSelect()).collect(Collectors.toList())), tableMap);
             } else {
                 Stream<PojoCompare<O>> res = queries.stream()
-                        .flatMap(parts -> {
+                        .flatMap(select -> {
                             try {
-                                return streamSingle(parts.get(0).getReturnTable(), queryHelper.buildSelectQuery(Parser.parse(parts)));
+                                return streamSingle(queries.get(0).getTable(), queryHelper.buildSelectQuery(select));
                             } catch (OrmException ex) {
                                 throw new UncaughtOrmException(ex.getMessage(), ex);
                             }
                         });
                 res = res.distinct();
                 if (queries.size() > 1) {
-                    if (tail.getType() == Part.Type.ORDER) {
-                        res = res.sorted(abstractionHelper.makeComparatorForTail(tail));
+                    if (!tail.getOrder().isEmpty()) {
+                        res = res.sorted(abstractionHelper.makeComparatorForTail(tail.getOrder()));
                     } else {
                         res = res.sorted();
                     }
@@ -387,38 +429,38 @@ public final class SqlOrm implements Orm {
             throw new OrmSqlException(ex.getMessage(), ex);
         }
     }
-
-    private <O, P extends Part & Executable> Optional<O> optional(P tail) throws OrmException {
-        try (Stream<O> stream = stream(tail)) {
-            O one;
-            Iterator<O> iterator = stream.iterator();
-            if (iterator.hasNext()) {
-                one = iterator.next();
-            } else {
-                return Optional.empty();
-            }
-            if (iterator.hasNext()) {
-                throw new OrmException(format("Required one or none %s but found more than one", tail.getReturnTable().getObjectClass().getSimpleName()));
-            }
-            return Optional.of(one);
-        }
-    }
-
-    private <O, P extends Part & Executable> O one(P tail) throws OrmException {
-        try (Stream<O> stream = stream(tail)) {
-            Iterator<O> iterator = stream.iterator();
-            O one;
-            if (iterator.hasNext()) {
-                one = iterator.next();
-            } else {
-                throw new OrmException(format("Required exactly one %s but found none", tail.getReturnTable().getObjectClass().getSimpleName()));
-            }
-            if (iterator.hasNext()) {
-                throw new OrmException(format("Required exactly one %s but found more than one", tail.getReturnTable().getObjectClass().getSimpleName()));
-            }
-            return one;
-        }
-    }
+//
+//    private <O, P extends Part & Executable> Optional<O> optional(P tail) throws OrmException {
+//        try (Stream<O> stream = stream(tail)) {
+//            O one;
+//            Iterator<O> iterator = stream.iterator();
+//            if (iterator.hasNext()) {
+//                one = iterator.next();
+//            } else {
+//                return Optional.empty();
+//            }
+//            if (iterator.hasNext()) {
+//                throw new OrmException(format("Required one or none %s but found more than one", tail.getReturnTable().getObjectClass().getSimpleName()));
+//            }
+//            return Optional.of(one);
+//        }
+//    }
+//
+//    private <O, P extends Part & Executable> O one(P tail) throws OrmException {
+//        try (Stream<O> stream = stream(tail)) {
+//            Iterator<O> iterator = stream.iterator();
+//            O one;
+//            if (iterator.hasNext()) {
+//                one = iterator.next();
+//            } else {
+//                throw new OrmException(format("Required exactly one %s but found none", tail.getReturnTable().getObjectClass().getSimpleName()));
+//            }
+//            if (iterator.hasNext()) {
+//                throw new OrmException(format("Required exactly one %s but found more than one", tail.getReturnTable().getObjectClass().getSimpleName()));
+//            }
+//            return one;
+//        }
+//    }
 
     /**
      * Obtain the SQL connection to use

@@ -1,39 +1,33 @@
 package com.heliorm.impl;
 
-import com.heliorm.def.Executable;
-import com.heliorm.def.Field;
 import com.heliorm.Table;
+import com.heliorm.def.Executable;
+
+import java.util.List;
 
 /**
  *
  * @author gideon
  */
-public final class OrderedPart<DT extends Table<DO>, DO> extends ExecutablePart<DT, DO> implements  Executable<DT, DO> {
+public final class OrderedPart<DT extends Table<DO>, DO> extends ExecutablePart<DT, DO> implements  Executable<DO> {
 
-    public enum Direction {
-        ASCENDING, DESCENDING;
-    }
 
-    private final Direction direction;
-    private final FieldPart<DT, DO, ?> field;
+    private final SelectPart<DT,DO> select;
+    private final List<OrderPart<DT,DO>> order;
 
-    public OrderedPart(Part left, Direction direction, FieldPart<DT, DO, ?> field) {
-        super(Type.ORDER, left);
-        this.direction = direction;
-        this.field = field;
-    }
-
-    public Direction getDirection() {
-        return direction;
-    }
-
-    public Field<DT, DO, ?> getField() {
-        return field;
+    public OrderedPart(Selector selector, SelectPart<DT,DO> select, List<OrderPart<DT,DO>>  order) {
+        super(selector);
+        this.select =select;
+        this.order = order;
     }
 
     @Override
-    public String toString() {
-        return getType().name();
+    public SelectPart<DT, DO> getSelect() {
+        return select;
     }
 
+    @Override
+    public List<OrderPart<DT, DO>> getOrder() {
+        return order;
+    }
 }

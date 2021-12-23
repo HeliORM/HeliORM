@@ -13,13 +13,10 @@ public abstract class Part<DT extends Table<DO>, DO, LT extends Table<LO>, LO> {
         WHERE,
         AND,
         OR,
-        NESTED_AND,
-        NESTED_OR,
         FIELD,
         VALUE_EXPRESSION,
         LIST_EXPRESSION,
         IS_EXPRESSION,
-        ON_CLAUSE,
         JOIN,
         ORDER;
     }

@@ -1,5 +1,6 @@
 package com.heliorm.def;
 
+import com.heliorm.FieldOrder;
 import com.heliorm.Table;
 
 /**
@@ -10,10 +11,8 @@ import com.heliorm.Table;
  * @param <LT> The type of the right hand table
  * @param <LO> Type of the right hand POJO
  */
-public interface Select<DT extends Table<DO>, DO, LT extends Table<LO>, LO> extends Executable<DT, DO>, Order<DT, DO> {
+public interface Select<DT extends Table<DO>, DO> extends Executable<DO>, Order<DT, DO> {
 
-    <RT extends Table<RO>, RO> Join<DT, DO, LT, LO, RT, RO> join(RT table);
-
-    Continuation<DT, DO, LT, LO> where(ExpressionContinuation<LT, LO> cont);
+     <F extends FieldOrder<DT, DO, ?>> Executable<DO> orderBy(F order, F... orders);
 
 }

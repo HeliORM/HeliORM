@@ -1,12 +1,17 @@
 package com.heliorm.sql;
 
 import com.heliorm.Table;
+import com.heliorm.impl.ExecutablePart;
 import com.heliorm.impl.JoinPart;
-import com.heliorm.impl.OrderedPart;
+import com.heliorm.impl.OrderPart;
 import com.heliorm.impl.Part;
 import com.heliorm.impl.SelectPart;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 class AbstractionHelper {
 
@@ -16,8 +21,8 @@ class AbstractionHelper {
      * @param tail part
      * @return The expanded query parts lists.
      */
-     List<List<Part>> explodeAbstractions(Part tail) {
-        return explode(tailToList(tail), 0);
+     List<SelectPart<?,?>> explodeAbstractions(ExecutablePart<?,?> tail) {
+         return explode( tail.getSelect());
     }
 
     /**
@@ -25,20 +30,13 @@ class AbstractionHelper {
      * Pojos on their fields.
      *
      * @param <O>
-     * @param <P>
-     * @param tail
      * @return
      */
-     <O, P extends Part> Comparator<PojoCompare<O>> makeComparatorForTail(P tail) {
-        List<OrderedPart> order = new LinkedList();
-        while (tail.getType() == Part.Type.ORDER) {
-            order.add(0, (OrderedPart) tail);
-            tail = (P) tail.left();
-        }
+     <T extends Table<O>, O> Comparator<PojoCompare<O>> makeComparatorForTail(List<OrderPart<T,O>> order) {
         List<Comparator<PojoCompare<O>>> comps = new LinkedList();
-        for (OrderedPart op : order) {
-            comps.add((Comparator<PojoCompare<O>>) (PojoCompare<O> w1, PojoCompare<O> w2) -> {
-                if (op.getDirection() == OrderedPart.Direction.ASCENDING) {
+        for (OrderPart op : order) {
+            comps.add((PojoCompare<O> w1, PojoCompare<O> w2) -> {
+                if (op.getDirection() == OrderPart.Direction.ASCENDING) {
                     return w1.compareTo(w2, op.getField());
                 } else {
                     return w2.compareTo(w1, op.getField());
@@ -67,50 +65,34 @@ class AbstractionHelper {
         return parts;
     }
 
-
-    /**
-     * Expand the query parts in the list so that the query branches into
-     * multiple table queries when a select or join with a table which has
-     * sub-tables is encountered.
-     *
-     * @param parts the query parts
-     * @param idx   the index of the part being examined
-     * @return The expanded query parts lists.
-     */
-    private List<List<Part>> explode(List<Part> parts, int idx) {
-        Part part = parts.get(idx);
-        List<List<Part>> res = new LinkedList();
-        if ((part.getType() == Part.Type.SELECT) || (part.getType() == Part.Type.JOIN)) {
-            Table<?> table = part.getSelectTable();
-            Set<Table<?>> subTables = table.getSubTables();
-            if (!subTables.isEmpty()) {
-                for (Table<?> subTable : subTables) {
-                    List<Part> copy = new ArrayList(parts);
-                    Part old = copy.remove(idx);
-                    Part left = null;
-                    if (idx > 0) {
-                        left = old.left();
-                    }
-                    Part newPart;
-                    if (part.getType() == Part.Type.SELECT) {
-                        copy.add(idx, new SelectPart(left, subTable));
-                    } else {
-                        copy.add(idx, new JoinPart(left, subTable));
-                    }
-                    if (idx < parts.size() - 1) {
-                        res.addAll(explode(copy, idx + 1));
-                    } else {
-                        res.add(copy);
-                    }
-                }
-                return res;
-            }
-        }
-        if (idx < parts.size() - 1) {
-            res.addAll(explode(parts, idx + 1));
+    private List<SelectPart<?,?>> explode(SelectPart<?,?> select) {
+        List<SelectPart<?, ?>> res = new ArrayList<>();
+        Table<?> table = select.getTable();
+        Set<Table<?>> subTables = table.getSubTables();
+        if (subTables.isEmpty()) {
+            res.add(new SelectPart(select.getSelector(), select.getTable(), select.getWhere(), explode(select.getJoins())));
         } else {
-            res.add(parts);
+            for (Table<?> subTable : subTables) {
+                res.add(new SelectPart(select.getSelector(), subTable, select.getWhere(), explode(select.getJoins())));
+            }
         }
         return res;
     }
+
+    private List<JoinPart<?,?,?,?>> explode(List<JoinPart<?,?,?,?>> joins) {
+         List<JoinPart<?,?,?,?>> res = new ArrayList<>();
+        for (JoinPart<?,?,?,?> join : joins) {
+            Table<?> table = join.getTable();
+            Set<Table<?>> subTables = table.getSubTables();
+            if (subTables.isEmpty()) {
+                res.add(new JoinPart(join.getTable(), join.getOn(), join.getWhere().orElseGet(null), explode(join.getJoins())));
+            } else {
+                for (Table<?> subTable : subTables) {
+                    res.add(new JoinPart(subTable, join.getOn(), join.getWhere().orElseGet(null), explode(join.getJoins())));
+                }
+            }
+        }
+        return res;
+    }
+
 }

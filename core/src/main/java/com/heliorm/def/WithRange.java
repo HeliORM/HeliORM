@@ -12,12 +12,12 @@ import com.heliorm.Table;
  */
 public interface WithRange<T extends Table<O>, O, C> {
 
-    ExpressionContinuation<T, O> lt(C value) throws OrmException;
+    Continuation<T, O> lt(C value) throws OrmException;
 
-    ExpressionContinuation<T, O> le(C value) throws OrmException;
+    Continuation<T, O> le(C value) throws OrmException;
 
-    ExpressionContinuation<T, O> gt(C value) throws OrmException;
+    Continuation<T, O> gt(C value) throws OrmException;
 
-    ExpressionContinuation<T, O> ge(C value) throws OrmException;
+    Continuation<T, O> ge(C value) throws OrmException;
 
 }

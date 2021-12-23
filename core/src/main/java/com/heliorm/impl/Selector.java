@@ -1,7 +1,8 @@
 package com.heliorm.impl;
 
 import com.heliorm.OrmException;
-import com.heliorm.def.Executable;
+import com.heliorm.Table;
+import com.heliorm.def.Select;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,13 +20,12 @@ public interface Selector {
      * Execute the supplied programmed query and return a list of result pojos.
      *
      * @param <O>  The type of Pojo to return
-     * @param <P>  The type of programmed query
      * @param tail The tail of the query
      * @return The list of loaded Pojos
      * @throws OrmException Thrown if any of the large number of things that can
      *                      go wrong did go wrong.
      */
-    <O, P extends Part & Executable> List<O> list(P tail) throws OrmException;
+    <T extends Table<O>, O> List<O> list(Select<T, O> tail) throws OrmException;
 
     /**
      * Execute the supplied programmed query and return a stream of result
@@ -38,7 +38,7 @@ public interface Selector {
      * @throws OrmException Thrown if any of the large number of things that can
      *                      go wrong did go wrong.
      */
-    <O, P extends Part & Executable> Stream<O> stream(P tail) throws OrmException;
+    <T extends Table<O>, O>  Stream<O> stream(Select<T,O> tail) throws OrmException;
 
     /**
      * Execute the supplied programmed query and return an optional with a
@@ -52,7 +52,7 @@ public interface Selector {
      * @throws OrmException Thrown if any of the large number of things that can
      *                      go wrong did go wrong.
      */
-    <O, P extends Part & Executable> Optional<O> optional(P tail) throws OrmException;
+     <T extends Table<O>, O> Optional<O> optional(Select<T,O> tail) throws OrmException;
 
     /**
      * Execute the supplied programmed query and return exactly one matching
@@ -66,6 +66,6 @@ public interface Selector {
      * @throws OrmException Thrown if any of the large number of things that can
      *                      go wrong did go wrong.
      */
-    <O, P extends Part & Executable> O one(P tail) throws OrmException;
+     <T extends Table<O>, O>  O one(Select<T,O> tail) throws OrmException;
 
 }

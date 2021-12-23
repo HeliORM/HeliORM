@@ -4,15 +4,19 @@ import com.heliorm.Orm;
 import com.heliorm.OrmException;
 import com.heliorm.OrmTransaction;
 import com.heliorm.Table;
-import com.heliorm.def.Executable;
+import com.heliorm.Where;
+import com.heliorm.def.Join;
 import com.heliorm.def.Select;
-import com.heliorm.impl.Part;
+import com.heliorm.impl.JoinPart;
 import com.heliorm.impl.SelectPart;
 import com.heliorm.impl.Selector;
 import com.heliorm.json.QuerySerializer;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class JsonOrm implements Orm {
@@ -39,8 +43,25 @@ public class JsonOrm implements Orm {
     }
 
     @Override
-    public <T extends Table<O>, O> Select<T, O, T, O> select(T table) {
-        return new SelectPart<>(null, table, selector());
+    public <T extends Table<O>, O> Select<T, O> select(T table) {
+        return new SelectPart<>(selector(), table);
+    }
+
+    @Override
+    public <T extends Table<O>, O> Select<T, O> select(T table, Where<T, O> where) {
+        return new SelectPart<>(selector(), table, Optional.of(where), Collections.EMPTY_LIST);
+    }
+
+    @Override
+    public <T extends Table<O>, O> Select<T, O> select(T table, Join<T, O>... joins) {
+        return new SelectPart<>(selector(), table, Optional.empty(), Arrays.asList(joins).stream()
+                .map(join -> (JoinPart<?,?,?,?>)join).collect(Collectors.toList()));
+    }
+
+    @Override
+    public <T extends Table<O>, O> Select<T, O> select(T table, Where<T, O> where, Join<T, O>... joins) {
+        return new SelectPart<>(selector(), table, Optional.of(where), Arrays.asList(joins).stream()
+                .map(join -> (JoinPart<?,?,?,?>)join).collect(Collectors.toList()));
     }
 
     @Override
@@ -67,31 +88,30 @@ public class JsonOrm implements Orm {
     public Selector selector() {
         return new Selector() {
             @Override
-            public <O, P extends Part & Executable> List<O> list(P tail) throws OrmException {
+            public <T extends Table<O>, O> List<O> list(Select<T,O> tail) throws OrmException {
                 return orm.selector().list(viaJson(tail));
             }
 
             @Override
-            public <O, P extends Part & Executable> Stream<O> stream(P tail) throws OrmException {
+            public <T extends Table<O>, O>  Stream<O> stream(Select<T,O> tail) throws OrmException {
                 return orm.selector().stream(viaJson(tail));
             }
 
             @Override
-            public <O, P extends Part & Executable> Optional<O> optional(P tail) throws OrmException {
+            public <T extends Table<O>, O>  Optional<O> optional(Select<T,O> tail) throws OrmException {
                 return orm.selector().optional(viaJson(tail));
             }
 
             @Override
-            public <O, P extends Part & Executable> O one(P tail) throws OrmException {
+            public <T extends Table<O>, O>  O one(Select<T,O> tail) throws OrmException {
                 return orm.selector().one(viaJson(tail));
             }
         };
     }
 
-    private <O, P extends Part & Executable> P viaJson(P tail) {
+    private <T extends Table<O>, O> Select<T, O> viaJson(Select<T,O> tail) {
         String json = QuerySerializer.toJson(orm, tail);
-        P res = (P) QuerySerializer.fromJson(orm, json);
-        return res;
+        return QuerySerializer.fromJson(orm, json);
     }
 
 }

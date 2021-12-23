@@ -1,5 +1,6 @@
 package com.heliorm;
 
+import com.heliorm.def.Join;
 import com.heliorm.def.Select;
 import com.heliorm.impl.Selector;
 
@@ -43,7 +44,13 @@ public interface Orm extends AutoCloseable {
      * @return The Select object that can be used to expand the query or to
      * query data.
      */
-    <T extends Table<O>, O> Select<T, O, T, O> select(T table);
+    <T extends Table<O>, O> Select<T, O> select(T table);
+
+    <T extends Table<O>, O> Select<T,O> select(T table, Where<T,O> where);
+
+    <T extends Table<O>, O> Select<T,O> select(T table, Join<T,O>...joins);
+
+    <T extends Table<O>, O> Select<T,O> select(T table, Where<T,O> where, Join<T,O>...joins);
 
     /** Open a new transaction.
      *

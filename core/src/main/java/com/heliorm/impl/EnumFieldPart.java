@@ -3,7 +3,7 @@ package com.heliorm.impl;
 import com.heliorm.OrmException;
 import com.heliorm.Table;
 import com.heliorm.def.EnumField;
-import com.heliorm.def.ExpressionContinuation;
+import com.heliorm.def.Continuation;
 
 import java.util.Arrays;
 import java.util.List;
@@ -24,42 +24,42 @@ public class EnumFieldPart<T extends Table<O>, O, E extends Enum> extends FieldP
     }
 
     @Override
-    public ExpressionContinuation<T, O> eq(E value) throws OrmException {
+    public Continuation<T, O> eq(E value) throws OrmException {
         return new EnumValueExpressionPart(getThis(), ValueExpressionPart.Operator.EQ, value);
     }
 
     @Override
-    public ExpressionContinuation<T, O> notEq(E value) throws OrmException {
+    public Continuation<T, O> notEq(E value) throws OrmException {
         return new EnumValueExpressionPart(getThis(), ValueExpressionPart.Operator.NOT_EQ, value);
     }
 
     @Override
-    public ExpressionContinuation<T, O> isNull() throws OrmException {
+    public Continuation<T, O> isNull() throws OrmException {
         return new IsExpressionPart(getThis(), IsExpressionPart.Operator.IS_NULL);
     }
 
     @Override
-    public ExpressionContinuation<T, O> isNotNull() throws OrmException {
+    public Continuation<T, O> isNotNull() throws OrmException {
         return new IsExpressionPart(getThis(), IsExpressionPart.Operator.IS_NOT_NULL);
     }
 
     @Override
-    public ExpressionContinuation<T, O> in(List<E> values) throws OrmException {
+    public Continuation<T, O> in(List<E> values) throws OrmException {
         return new EnumListExpressionPart(getThis(), ListExpressionPart.Operator.IN, values);
     }
 
     @Override
-    public ExpressionContinuation<T, O> notIn(List<E> values) throws OrmException {
+    public Continuation<T, O> notIn(List<E> values) throws OrmException {
         return new EnumListExpressionPart(getThis(), ListExpressionPart.Operator.NOT_IN, values);
     }
 
     @Override
-    public ExpressionContinuation<T, O> in(E... values) throws OrmException {
+    public Continuation<T, O> in(E... values) throws OrmException {
         return new EnumListExpressionPart(getThis(), ListExpressionPart.Operator.IN, Arrays.asList(values));
     }
 
     @Override
-    public ExpressionContinuation<T, O> notIn(E... values) throws OrmException {
+    public Continuation<T, O> notIn(E... values) throws OrmException {
         return new EnumListExpressionPart(getThis(), ListExpressionPart.Operator.NOT_IN, Arrays.asList(values));
     }
 

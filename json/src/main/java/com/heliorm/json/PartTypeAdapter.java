@@ -240,10 +240,6 @@ public class PartTypeAdapter extends TypeAdapter<Part> {
             case WHERE:
             case AND:
             case OR:
-                javaType = ContinuationPart.class;
-                break;
-            case NESTED_AND:
-            case NESTED_OR:
                 javaType = ExpressionContinuationPart.class;
                 break;
             case FIELD:
@@ -259,9 +255,6 @@ public class PartTypeAdapter extends TypeAdapter<Part> {
             }
             case IS_EXPRESSION:
                 javaType = IsExpressionPart.class;
-                break;
-            case ON_CLAUSE:
-                javaType = OnClausePart.class;
                 break;
             case JOIN:
                 javaType = JoinPart.class;

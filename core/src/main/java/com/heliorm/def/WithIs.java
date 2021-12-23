@@ -12,9 +12,9 @@ import com.heliorm.Table;
  */
 public interface WithIs<T extends Table<O>, O, C> {
 
-    ExpressionContinuation<T, O> isNull() throws OrmException;
+    Continuation<T, O> isNull() throws OrmException;
 
-    ExpressionContinuation<T, O> isNotNull() throws OrmException;
+    Continuation<T, O> isNotNull() throws OrmException;
 
 
 }

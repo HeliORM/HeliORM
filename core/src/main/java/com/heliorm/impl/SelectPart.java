@@ -1,90 +1,107 @@
 package com.heliorm.impl;
 
 import com.heliorm.FieldOrder;
+import com.heliorm.OrmException;
 import com.heliorm.Table;
-import com.heliorm.def.Continuation;
+import com.heliorm.Where;
 import com.heliorm.def.Executable;
-import com.heliorm.def.ExpressionContinuation;
-import com.heliorm.def.Join;
 import com.heliorm.def.Select;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 import static java.lang.String.format;
 
 /**
- *
  * @author gideon
  */
-public class SelectPart<DT extends Table<DO>, DO, LT extends Table<LO>, LO> extends ExecutablePart<DT, DO>
-        implements Select<DT, DO, LT, LO> {
+public class SelectPart<DT extends Table<DO>, DO> extends ExecutablePart<DT, DO> implements Select<DT, DO> {
 
     private final Selector selector;
-    private final Table table;
+    private final DT table;
+    private final Optional<Where<DT,DO>> where;
+    private final List<JoinPart<?,?,?,?>> joins;
 
-    public SelectPart(Type type, Part left, Table table) {
-        super(type, left);
-        this.selector = null;
-        this.table = table;
+    public SelectPart(Selector orm, DT table) {
+        this(orm, table, Optional.empty(), Collections.EMPTY_LIST);
     }
 
-    public SelectPart(Part left, Table table) {
-        this(left, table, null);
-    }
-
-    public SelectPart(Part left, Table table, Selector orm) {
-        super(Type.SELECT, left);
+    public SelectPart(Selector orm, DT table, Optional<Where<DT, DO>> where,  List<JoinPart<?,?,?,?>> joins) {
+        super(orm);
         this.table = table;
+        this.where = where;
         this.selector = orm;
+        this.joins = joins;
     }
 
-    @Override
-    protected Selector getSelector() {
-        if (left() != null) {
-            return left().getSelector();
-        }
+    public Selector getSelector() {
         return selector;
     }
 
-    @Override
-    public final DT getReturnTable() {
-        if (left() != null) {
-            return (DT) left().getReturnTable();
-        }
-        return (DT) table;
-    }
 
-    @Override
-    public Table getSelectTable() {
+    public Table getTable() {
         return table;
     }
 
     @Override
-    public <RT extends Table<RO>, RO> Join<DT, DO, LT, LO, RT, RO> join(RT table) {
-        return new JoinPart(this, table);
-    }
-
-    @Override
-    public Continuation<DT, DO, LT, LO> where(ExpressionContinuation<LT, LO> cont) {
-        return new ContinuationPart(this, Type.WHERE, cont);
-    }
-
-    @Override
-    public <F extends FieldOrder<DT, DO, ?>> Executable<DT, DO> orderBy(F order, F...orders) {
-        OrderedPart<DT, DO>  part = order(this, order);
+    public <F extends FieldOrder<DT, DO, ?>> Executable<DO> orderBy(F order, F... orders) {
+        List<OrderPart<DT,DO>> list =new ArrayList<>();
+        list.add(makePart(order));
         for (F o : orders) {
-            part = order(part, o);
+            list.add(makePart(o));
         }
-        return part;
+        return new OrderedPart<>(getSelector(), this, list);
     }
 
-    private <F extends FieldOrder<DT, DO, ?>> OrderedPart<DT, DO> order(Part left, F order) {
-        return new OrderedPart(left,
-                order.getDirection() == FieldOrder.Direction.ASC ?  OrderedPart.Direction.ASCENDING : OrderedPart.Direction.DESCENDING,
-                (FieldPart) (order.getField()));
+    @Override
+    public SelectPart<DT, DO> getSelect() {
+        return this;
+    }
+
+    @Override
+    public List<OrderPart<DT,DO>> getOrder() {
+        return Collections.EMPTY_LIST;
+    }
+
+    @Override
+    public List<DO> list() throws OrmException {
+        return getSelector().list(this);
+    }
+
+    @Override
+    public Stream<DO> stream() throws OrmException {
+        return getSelector().stream(this);
+    }
+
+    @Override
+    public DO one() throws OrmException {
+        return getSelector().one(this);
+    }
+
+    @Override
+    public Optional<DO> optional() throws OrmException {
+        return getSelector().optional(this);
+    }
+
+    public Optional<Where<DT, DO>> getWhere() {
+        return where;
+    }
+
+    public List<JoinPart<?,?,?,?>> getJoins() {
+        return joins;
     }
 
     @Override
     public String toString() {
-        return format("%s %s", getType().name(), table.getSqlTable());
+        return format("SELECT %s", table.getSqlTable());
     }
 
+
+    private  <F extends FieldOrder<DT, DO, ?>> OrderPart<DT, DO> makePart(F order) {
+        return new OrderPart(order.getDirection() == FieldOrder.Direction.ASC ? OrderPart.Direction.ASCENDING : OrderPart.Direction.DESCENDING,
+                (FieldPart) (order.getField()));
+    }
 }

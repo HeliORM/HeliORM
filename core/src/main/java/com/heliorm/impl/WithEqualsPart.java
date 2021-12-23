@@ -1,6 +1,6 @@
 package com.heliorm.impl;
 
-import com.heliorm.def.ExpressionContinuation;
+import com.heliorm.def.Continuation;
 import com.heliorm.def.WithEquals;
 import com.heliorm.OrmException;
 import com.heliorm.Table;
@@ -14,9 +14,9 @@ public interface WithEqualsPart<T extends Table<O>, O, C> extends WithEquals<T, 
     FieldPart<T, O, C> getThis() throws OrmException;
 
     @Override
-    ExpressionContinuation<T, O> eq(C value) throws OrmException;
+    Continuation<T, O> eq(C value) throws OrmException;
 
     @Override
-    ExpressionContinuation<T, O> notEq(C value) throws OrmException;
+    Continuation<T, O> notEq(C value) throws OrmException;
 
 }
