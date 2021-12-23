@@ -321,7 +321,7 @@ public class SelectTest extends AbstractOrmTest {
                         .thenComparing(Cat::getId))
                 .collect(Collectors.toList());
         List<Cat> all = orm().select(CAT)
-                .orderBy(CAT.age, CAT.name, CAT.personId.asc(), CAT.id)
+                .orderBy(CAT.age, CAT.name, CAT.personId, CAT.id)
                 .list();
         assertNotNull(all, "The list returned by list() should be non-null");
         assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
@@ -337,9 +337,52 @@ public class SelectTest extends AbstractOrmTest {
         wanted.addAll(cats);
         wanted.addAll(dogs);
         wanted.addAll(birds);
+
         assertNotNull(all, "The list returned by list() should be non-null");
         assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
         assertTrue(listCompareOrdered(all, wanted), "The items loaded are exactly the same as the ones we expected");
+    }
+
+    @Test
+    @Order(202)
+    public void testSelectOnAbstractWithWhere() throws Exception {
+        say("Testing select on an abstract object with where");
+
+        List<Pet> wanted = new ArrayList<>();
+        wanted.addAll(cats.stream().filter(cat -> cat.getAge() < 6).collect(Collectors.toList()));
+        wanted.addAll(dogs.stream().filter(cat -> cat.getAge() < 6).collect(Collectors.toList()));
+        wanted.addAll(birds.stream().filter(cat -> cat.getAge() < 6).collect(Collectors.toList()));
+
+        List<Pet> all = orm().select(PET, where(PET.age.lt(6))).list();
+
+        assertNotNull(all, "The list returned by list() should be non-null");
+        assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
+        assertTrue(listCompareOrdered(all, wanted), "The items loaded are exactly the same as the ones we expected");
+    }
+
+    @Test
+    @Order(201)
+    public void testSelectOnAbstractWithWhereAndOrder() throws Exception {
+        say("Testing select on an abstract object with where and order");
+
+        List<Pet> wanted = new ArrayList<>();
+        wanted.addAll(cats.stream().filter(cat -> cat.getAge() < 6).collect(Collectors.toList()));
+        wanted.addAll(dogs.stream().filter(cat -> cat.getAge() < 6).collect(Collectors.toList()));
+        wanted.addAll(birds.stream().filter(cat -> cat.getAge() < 6).collect(Collectors.toList()));
+        wanted = wanted.stream()
+                .sorted(Comparator.comparing(Pet::getAge)
+                        .thenComparing(Pet::getName)
+                        .thenComparing(Pet::getPersonId))
+                .collect(Collectors.toList());
+
+        List<Pet> all = orm().select(PET,
+                        where(PET.age.lt(6)))
+                .orderBy(PET.age, PET.name, PET.personId)
+                .list();
+
+        assertNotNull(all, "The list returned by list() should be non-null");
+        assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
+        assertTrue(listCompareAsIs(all, wanted), "The items loaded are exactly the same as the ones we expected");
     }
 
     @Test
