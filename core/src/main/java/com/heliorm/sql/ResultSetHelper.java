@@ -2,7 +2,7 @@ package com.heliorm.sql;
 
 import com.heliorm.OrmException;
 import com.heliorm.Table;
-import com.heliorm.def.Field;
+import com.heliorm.Field;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -14,6 +14,10 @@ import java.util.function.Function;
 
 import static java.lang.String.format;
 
+/** A helper class that provides common functionality for unpacking POJOs from SQL result sets.
+ *
+ * @author gideon
+ */
 class ResultSetHelper {
 
     private final PojoOperations pops;

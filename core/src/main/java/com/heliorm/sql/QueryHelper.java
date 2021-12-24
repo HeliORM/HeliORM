@@ -2,8 +2,8 @@ package com.heliorm.sql;
 
 import com.heliorm.OrmException;
 import com.heliorm.Table;
-import com.heliorm.Where;
-import com.heliorm.def.Field;
+import com.heliorm.def.Where;
+import com.heliorm.Field;
 import com.heliorm.impl.ExecutablePart;
 import com.heliorm.impl.ExpressionContinuationPart;
 import com.heliorm.impl.ExpressionPart;
@@ -28,6 +28,8 @@ import static java.lang.String.format;
 
 /**
  * Helper class that builds SQL queries.
+ *
+ * @author gideon
  */
 final class QueryHelper {
 

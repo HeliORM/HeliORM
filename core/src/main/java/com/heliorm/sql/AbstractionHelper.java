@@ -14,6 +14,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+/** Helper class that deals with creating concrete selection hierarchies from ones containing abstract classes.
+ *
+ */
 class AbstractionHelper {
 
     /**

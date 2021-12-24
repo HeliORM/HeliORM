@@ -1,6 +1,6 @@
 package com.heliorm.sql;
 
-import com.heliorm.def.Field;
+import com.heliorm.Field;
 import com.heliorm.OrmException;
 import com.heliorm.Table;
 

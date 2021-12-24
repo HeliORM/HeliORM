@@ -1,6 +1,6 @@
-package com.heliorm;
+package com.heliorm.def;
 
-import com.heliorm.def.Continuation;
+import com.heliorm.Table;
 
 public interface Where<T extends Table<O>, O> {
 

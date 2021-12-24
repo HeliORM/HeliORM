@@ -3,7 +3,7 @@ package com.heliorm.sql.postgresql;
 import com.heliorm.Database;
 import com.heliorm.OrmException;
 import com.heliorm.Table;
-import com.heliorm.def.Field;
+import com.heliorm.Field;
 import com.heliorm.sql.OrmSqlException;
 import com.heliorm.sql.SqlDriver;
 import com.heliorm.sql.TableGenerator;

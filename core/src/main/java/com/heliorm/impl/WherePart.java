@@ -1,7 +1,7 @@
 package com.heliorm.impl;
 
 import com.heliorm.Table;
-import com.heliorm.Where;
+import com.heliorm.def.Where;
 import com.heliorm.def.Continuation;
 
 import java.util.LinkedList;

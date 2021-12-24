@@ -1,8 +1,8 @@
 package com.heliorm.sql.mysql;
 
 import com.heliorm.Table;
-import com.heliorm.def.Field;
-import com.heliorm.def.Index;
+import com.heliorm.Field;
+import com.heliorm.Index;
 import com.heliorm.sql.OrmSqlException;
 import com.heliorm.sql.TableGenerator;
 

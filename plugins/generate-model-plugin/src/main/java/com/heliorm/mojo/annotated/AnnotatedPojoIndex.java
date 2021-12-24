@@ -1,7 +1,7 @@
 package com.heliorm.mojo.annotated;
 
-import com.heliorm.def.Field;
-import com.heliorm.def.Index;
+import com.heliorm.Field;
+import com.heliorm.Index;
 
 import java.util.ArrayList;
 import java.util.List;

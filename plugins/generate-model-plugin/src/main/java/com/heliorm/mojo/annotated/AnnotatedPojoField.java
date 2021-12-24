@@ -1,10 +1,10 @@
 package com.heliorm.mojo.annotated;
 
-import com.heliorm.FieldOrder;
+import com.heliorm.def.FieldOrder;
 import com.heliorm.annotation.Column;
 import com.heliorm.annotation.ForeignKey;
 import com.heliorm.annotation.PrimaryKey;
-import com.heliorm.def.Field;
+import com.heliorm.Field;
 import com.heliorm.Table;
 
 import java.lang.annotation.Annotation;

@@ -2,8 +2,8 @@ package com.heliorm.mojo.annotated;
 
 import com.heliorm.annotation.Ignore;
 import com.heliorm.annotation.Pojo;
-import com.heliorm.def.Field;
-import com.heliorm.def.Index;
+import com.heliorm.Field;
+import com.heliorm.Index;
 import com.heliorm.Database;
 import com.heliorm.Table;
 

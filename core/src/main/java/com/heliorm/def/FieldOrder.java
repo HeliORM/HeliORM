@@ -1,6 +1,7 @@
-package com.heliorm;
+package com.heliorm.def;
 
-import com.heliorm.def.Field;
+import com.heliorm.Field;
+import com.heliorm.Table;
 
 public interface FieldOrder<DT extends Table<DO>, DO, C> {
 

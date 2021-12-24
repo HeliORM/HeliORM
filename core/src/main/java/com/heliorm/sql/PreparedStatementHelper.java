@@ -1,13 +1,17 @@
 package com.heliorm.sql;
 
 import com.heliorm.OrmException;
-import com.heliorm.def.Field;
+import com.heliorm.Field;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import static java.lang.String.format;
 
+/** A helper class that provides common operations on prepared statements.
+ *
+ * @author gideon
+ */
 class PreparedStatementHelper {
 
     private final PojoHelper pojoHelper;

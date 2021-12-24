@@ -11,7 +11,7 @@ import static java.lang.String.format;
  * specific conventions. This allows the user to write their POJOs the way they
  * want to reflect their application logic without caring about ceremony.
  * Default constructors and getters and setters are not required.
- * <p>
+ *
  * This is however using an internal Java API with an unclear future, so users
  * who worry about this can implement PojoOperations in different and safer
  * ways.

@@ -237,7 +237,7 @@ public final class BeanPojoOperations extends AbstractPojoOperations {
     }
 
     /**
-     * Create camel case from a array of strings
+     * Create camel case from an array of strings
      *
      * @param args The strings
      * @return The camel case string

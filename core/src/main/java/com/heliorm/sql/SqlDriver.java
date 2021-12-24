@@ -3,7 +3,7 @@ package com.heliorm.sql;
 import com.heliorm.Database;
 import com.heliorm.OrmException;
 import com.heliorm.Table;
-import com.heliorm.def.Field;
+import com.heliorm.Field;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

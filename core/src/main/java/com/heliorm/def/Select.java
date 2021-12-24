@@ -1,6 +1,5 @@
 package com.heliorm.def;
 
-import com.heliorm.FieldOrder;
 import com.heliorm.Table;
 
 /**

@@ -2,7 +2,7 @@ package com.heliorm.sql;
 
 import com.heliorm.OrmException;
 import com.heliorm.Table;
-import com.heliorm.def.Field;
+import com.heliorm.Field;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -12,6 +12,8 @@ import java.util.WeakHashMap;
 import static java.lang.String.format;
 
 /**
+ * Abstract implementation for creating PojoOperations
+ *
  * @author gideon
  */
 abstract class AbstractPojoOperations implements PojoOperations {
@@ -189,7 +191,7 @@ abstract class AbstractPojoOperations implements PojoOperations {
 
     protected abstract Object newPojoInstance(Class<?> type) throws OrmException;
 
-    AbstractPojoOperations() throws OrmException {
+    protected AbstractPojoOperations() {
     }
 
     /**

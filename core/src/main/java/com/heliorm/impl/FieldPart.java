@@ -1,9 +1,9 @@
 package com.heliorm.impl;
 
-import com.heliorm.FieldOrder;
+import com.heliorm.def.FieldOrder;
 import com.heliorm.OrmException;
 import com.heliorm.Table;
-import com.heliorm.def.Field;
+import com.heliorm.Field;
 
 import java.util.Optional;
 

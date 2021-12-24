@@ -1,9 +1,9 @@
 package com.heliorm.impl;
 
-import com.heliorm.FieldOrder;
+import com.heliorm.def.FieldOrder;
 import com.heliorm.OrmException;
 import com.heliorm.Table;
-import com.heliorm.Where;
+import com.heliorm.def.Where;
 import com.heliorm.def.Executable;
 import com.heliorm.def.Select;
 

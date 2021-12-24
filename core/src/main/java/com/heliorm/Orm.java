@@ -2,6 +2,7 @@ package com.heliorm;
 
 import com.heliorm.def.Join;
 import com.heliorm.def.Select;
+import com.heliorm.def.Where;
 import com.heliorm.impl.Selector;
 
 public interface Orm extends AutoCloseable {

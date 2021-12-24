@@ -1,7 +1,7 @@
 package com.heliorm.impl;
 
 import com.heliorm.Table;
-import com.heliorm.def.Field;
+import com.heliorm.Field;
 
 public final class StringValueExpressionPart<T extends Table<O>, O> extends ValueExpressionPart<T,O, String> {
 

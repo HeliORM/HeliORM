@@ -1,9 +1,9 @@
 package com.heliorm;
 
 import com.heliorm.def.Continuation;
-import com.heliorm.def.Field;
 import com.heliorm.def.Join;
 import com.heliorm.def.On;
+import com.heliorm.def.Where;
 import com.heliorm.impl.JoinPart;
 import com.heliorm.impl.OnPart;
 import com.heliorm.impl.WherePart;
@@ -12,6 +12,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
 
+/** Static methods for building queries.
+ *
+ * @author gideon
+ */
 public class Query {
 
 

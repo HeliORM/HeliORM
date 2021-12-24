@@ -1,7 +1,7 @@
 package com.heliorm.impl;
 
 import com.heliorm.Table;
-import com.heliorm.def.Field;
+import com.heliorm.Field;
 import com.heliorm.def.On;
 
 public class OnPart<LT extends Table<LO>, LO, RT extends Table<RO>, RO> implements On<LT,LO,RT,RO> {
