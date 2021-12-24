@@ -11,6 +11,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 import test.persons.Person;
 import test.pets.Bird;
 import test.pets.Cat;
+import test.pets.CatBreed;
 import test.pets.CatType;
 import test.pets.Dog;
 import test.pets.Pet;
@@ -29,6 +30,7 @@ import static com.heliorm.Query.join;
 import static com.heliorm.Query.on;
 import static com.heliorm.Query.where;
 import static com.heliorm.sql.TestData.makeBirds;
+import static com.heliorm.sql.TestData.makeCatBreeds;
 import static com.heliorm.sql.TestData.makeCats;
 import static com.heliorm.sql.TestData.makeDogs;
 import static com.heliorm.sql.TestData.makePersons;
@@ -40,6 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static test.Tables.CAT;
+import static test.Tables.CATBREED;
 import static test.Tables.PERSON;
 import static test.Tables.PET;
 import static test.Tables.PROVINCE;
@@ -51,6 +54,7 @@ public class SelectTest extends AbstractOrmTest {
     private static List<Province> provinces;
     private static List<Town> towns;
     private static List<Person> persons;
+    private static List<CatBreed> catBreeds;
     private static List<Cat> cats;
     private static List<Dog> dogs;
     private static List<Bird> birds;
@@ -67,7 +71,8 @@ public class SelectTest extends AbstractOrmTest {
         provinces = createAll(makeProvinces());
         towns = createAll(makeTowns(provinces));
         persons = createAll(makePersons(towns));
-        cats = createAll(makeCats(persons.size() * 5, persons));
+        catBreeds = createAll(makeCatBreeds());
+        cats = createAll(makeCats(persons.size() * 5, persons, catBreeds));
         dogs = createAll(makeDogs(persons.size() * 4, persons));
         birds = createAll(makeBirds(persons.size() * 2, persons));
     }
@@ -500,6 +505,30 @@ public class SelectTest extends AbstractOrmTest {
 
         List<Pet> wanted = Stream.concat(Stream.concat(cats.stream(), dogs.stream()), birds.stream())
                 .filter(pet -> personMap.containsKey(pet.getPersonId()))
+                .collect(Collectors.toList());
+
+        assertNotNull(selected, "The list returned by list() should be non-null");
+        assertTrue(selected.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", selected.size(), wanted.size()));
+        assertTrue(listCompareOrdered(selected, wanted), "The items loaded are exactly the same as the ones we expected");
+    }
+
+    @Test
+    @Order(251)
+    public void joinOnTwoTables() throws Exception {
+        say("Testing select with join against two tables");
+        List<Cat> selected = orm().select(CAT,
+                        join(PERSON, on(CAT.personId, PERSON.id), where(PERSON.firstName.eq("Bob"))),
+                        join(CATBREED, on (CAT.breedId, CATBREED.id),
+                                where(CATBREED.name.eq("Persian"))))
+                .list();
+
+        Map<Long, Person> personMap = persons.stream()
+                .filter(person -> person.getFirstName().equals("Bob"))
+                .collect(Collectors.toMap(person -> person.getId(), person -> person));
+        CatBreed persian = catBreeds.stream().filter(breed -> breed.getName().equals("Persian")).findFirst().get();
+
+        List<Cat> wanted = cats.stream().filter(cat -> cat.getBreedId().equals(persian.getId()))
+                .filter(cat -> personMap.containsKey(cat.getPersonId()))
                 .collect(Collectors.toList());
 
         assertNotNull(selected, "The list returned by list() should be non-null");

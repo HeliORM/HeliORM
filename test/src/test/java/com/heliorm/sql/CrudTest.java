@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import test.persons.Person;
 import test.pets.Cat;
+import test.pets.CatBreed;
 import test.place.Province;
 import test.place.Town;
 
@@ -16,6 +17,7 @@ import java.util.Optional;
 
 import static com.heliorm.Query.where;
 import static com.heliorm.sql.TestData.makeCat;
+import static com.heliorm.sql.TestData.makeCatBreeds;
 import static com.heliorm.sql.TestData.makePersons;
 import static com.heliorm.sql.TestData.makeProvinces;
 import static com.heliorm.sql.TestData.makeTowns;
@@ -30,6 +32,7 @@ public class CrudTest extends AbstractOrmTest {
     private static List<Person> persons;
     private static List<Cat> cats = new ArrayList<>();
     private static List<Province> provinces;
+    private static List<CatBreed> catBreeds;
     private static List<Town> towns;
 
     @BeforeAll
@@ -37,13 +40,14 @@ public class CrudTest extends AbstractOrmTest {
         provinces = createAll(makeProvinces());
         towns = createAll(makeTowns(provinces));
         persons = createAll(makePersons(towns));
+        catBreeds = createAll(makeCatBreeds());
     }
 
     @Test
     public void testCreate() throws Exception {
         say("Testing create with auto-number Long key");
         Person person = orm().select(PERSON, where(PERSON.id.eq(persons.get(0).getId()))).one();
-        Cat cat = makeCat(person);
+        Cat cat = makeCat(person, catBreeds.get(0));
         Cat saved = orm().create(cat);
         cats.add(saved);    
         assertNotNull(saved, "The object returned by create should not be null");

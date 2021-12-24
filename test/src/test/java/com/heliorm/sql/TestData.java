@@ -3,6 +3,7 @@ package com.heliorm.sql;
 import test.persons.Person;
 import test.pets.Bird;
 import test.pets.Cat;
+import test.pets.CatBreed;
 import test.pets.CatType;
 import test.pets.Dog;
 import test.pets.Pet;
@@ -164,10 +165,11 @@ class TestData {
         return towns;
     }
 
-    static Cat makeCat(Person person) {
+    static Cat makeCat(Person person, CatBreed breed) {
         Cat cat = new Cat();
         cat = makePet(cat, person);
         cat.setType(random.nextBoolean() ? CatType.INDOOR : CatType.OUTDOOR);
+        cat.setBreedId(breed.getId());
         return cat;
     }
 
@@ -222,13 +224,28 @@ class TestData {
         return persons;
     }
 
-    static List<Cat> makeCats(int n, List<Person> persons) {
+    static List<Cat> makeCats(int n, List<Person> persons, List<CatBreed> breeds) {
         List<Cat> res = new ArrayList<>();
         for (int i = 0; i < n; i++) {
-            res.add(makeCat(persons.get(random.nextInt(persons.size()))));
+            res.add(makeCat(persons.get(random.nextInt(persons.size())),breeds.get(random.nextInt(breeds.size()))));
         }
         return res;
     }
+
+    static List<CatBreed> makeCatBreeds() {
+        List<CatBreed> res = new ArrayList<>();
+        res.add(makeCatBreed("Persian"));
+        res.add(makeCatBreed("Brithish Blue"));
+        res.add(makeCatBreed("African Wild Cat"));
+        return res;
+    }
+
+    static CatBreed makeCatBreed(String name) {
+        CatBreed breed = new CatBreed();
+        breed.setName(name);
+        return breed;
+    }
+
 
     static List<Dog> makeDogs(int n, List<Person> persons) {
         List<Dog> res = new ArrayList<>();
@@ -250,5 +267,6 @@ class TestData {
         pet.setPersonId(person.getId());
         return pet;
     }
+
 
 }
