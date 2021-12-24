@@ -14,7 +14,7 @@ import java.time.Duration;
  * @deprecated Duration is a good candidate to rather use a type adapter for
  */
 @Deprecated()
-public interface DurationField<T extends Table<O>, O> extends Field<T, O, Duration>, Expression<T, O, Duration>, WithRange<T, O, Duration>, WithEquals<T, O, Duration>, WithIn<T, O, Duration>, WithIs<T, O, Duration> {
+public interface DurationField<T extends Table<O>, O> extends Field<T, O, Duration>,  WithRange<T, O, Duration>, WithEquals<T, O, Duration>, WithIn<T, O, Duration>, WithIs<T, O, Duration> {
 
     @Override
    default FieldType getFieldType() {

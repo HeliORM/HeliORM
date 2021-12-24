@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
  *
  * @author gideon
  */
-public interface LongField<T extends Table<O>, O> extends Field<T, O, Long>, Expression<T, O, Long>, WithRange<T, O, Long>, WithEquals<T, O, Long>, WithIn<T, O, Long>, WithIs<T, O, Long> {
+public interface LongField<T extends Table<O>, O> extends Field<T, O, Long>, WithRange<T, O, Long>, WithEquals<T, O, Long>, WithIn<T, O, Long>, WithIs<T, O, Long> {
 
     default Continuation<T, O> lt(Integer value) throws OrmException {
         return lt(value.longValue());
