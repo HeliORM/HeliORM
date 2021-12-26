@@ -1,13 +1,14 @@
 package com.heliorm.sql.postgresql;
 
 import com.heliorm.Database;
+import com.heliorm.Field;
 import com.heliorm.OrmException;
 import com.heliorm.Table;
-import com.heliorm.Field;
 import com.heliorm.sql.OrmSqlException;
 import com.heliorm.sql.SqlDriver;
-import com.heliorm.sql.TableGenerator;
+import com.heliorm.sql.SqlModeller;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -58,8 +59,8 @@ public final class PostgreSqlDriver extends SqlDriver {
     }
 
     @Override
-    protected TableGenerator getTableGenerator() throws OrmException {
-        return new PostgresDialectGenerator();
+    protected SqlModeller modeller(Connection con) {
+        return SqlModeller.postgres(() -> con);
     }
 
     @Override

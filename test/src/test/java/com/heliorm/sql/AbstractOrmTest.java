@@ -1,15 +1,18 @@
 package com.heliorm.sql;
 
+import com.heliorm.Field;
 import com.heliorm.Orm;
 import com.heliorm.OrmException;
 import com.heliorm.Table;
-import com.heliorm.Field;
 import com.heliorm.sql.mysql.MySqlDriver;
 import com.heliorm.sql.postgresql.PostgreSqlDriver;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.h2.jdbcx.JdbcDataSource;
 import org.junit.jupiter.api.BeforeAll;
+import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.utility.DockerImageName;
 import test.persons.Person;
 import test.pets.Cat;
 import test.pets.Dog;
@@ -23,8 +26,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static java.lang.String.format;
+
 abstract class AbstractOrmTest {
 
+    private static final String TEST_DB_NAME = "petz";
     private static Orm orm;
     private static DataSource jdbcDataSource;
     private static Class<? extends SqlDriver> driver;
@@ -38,22 +44,32 @@ abstract class AbstractOrmTest {
         }
     }
 
+
+    @Container
+    public static GenericContainer mariadb = new GenericContainer(DockerImageName.parse("mariadb"))
+            .withExposedPorts(3306)
+            .withEnv("MYSQL_DATABASE", "neutral")
+            .withEnv("MYSQL_ROOT_PASSWORD", "dev");
+
+    @Container
+    public static GenericContainer postgres = new GenericContainer(DockerImageName.parse("postgres"))
+            .withExposedPorts(5432)
+            .withEnv("POSTGRES_DB", "neutral")
+            .withEnv("POSTGRES_PASSWORD", "dev");
+
+
     @BeforeAll
     public static void setup() throws Exception {
         String dbType = System.getenv("ORM_TEST_DB");
         dbType = (dbType == null) ? "" : dbType;
         switch (dbType) {
-            case "mysql":
-                jdbcDataSource = setupMysqlDataSource();
-                driver = MySqlDriver.class;
-                break;
             case "postgresql":
                 jdbcDataSource = setupPostgreSqlDatasource();
                 driver = PostgreSqlDriver.class;
                 break;
-            case "h2" :
+            case "mysql":
             default:
-                jdbcDataSource = setupH2DataSource();
+                jdbcDataSource = setupMysqlDataSource();
                 driver = MySqlDriver.class;
         }
         say("Using %s data source with driver %s", dbType, driver.getSimpleName());
@@ -63,13 +79,6 @@ abstract class AbstractOrmTest {
                 .setRollbackOnUncommittedClose(false)
                 .setUseUnionAll(true)
                 .build();
-//        boolean useJson = false;
-//        String json = System.getenv("ORM_TEST_JSON");
-//        useJson = (json == null) ? false : true;
-//        if (useJson) {
-//            orm = new JsonOrm(orm);
-//            say("Testing JSON layer");
-//        }
         deleteAll(Cat.class);
         deleteAll(Dog.class);
         deleteAll(Person.class);
@@ -199,8 +208,9 @@ abstract class AbstractOrmTest {
     }
 
     private static DataSource setupMysqlDataSource() throws SQLException {
+        mariadb.start();
         HikariConfig conf = new HikariConfig();
-        conf.setJdbcUrl("jdbc:mysql://127.0.0.1:3306/petz");
+        conf.setJdbcUrl(format("jdbc:mysql://%s:%d/neutral", mariadb.getHost(), mariadb.getFirstMappedPort(), TEST_DB_NAME));
         conf.setUsername("root");
         conf.setPassword("dev");
         HikariDataSource ds = new HikariDataSource(conf);
@@ -209,8 +219,9 @@ abstract class AbstractOrmTest {
 
 
     private static DataSource setupPostgreSqlDatasource() throws SQLException {
+        postgres.start();
         HikariConfig conf = new HikariConfig();
-        conf.setJdbcUrl("jdbc:postgresql://127.0.0.1:5432/petz");
+        conf.setJdbcUrl(format("jdbc:postgresql://%s:%d/%s", postgres.getHost(), postgres.getFirstMappedPort(), TEST_DB_NAME));
         conf.setUsername("postgres");
         conf.setPassword("dev");
         HikariDataSource ds = new HikariDataSource(conf);

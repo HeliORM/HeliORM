@@ -5,6 +5,7 @@ import com.heliorm.OrmException;
 import com.heliorm.Table;
 import com.heliorm.Field;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -70,6 +71,8 @@ public abstract class SqlDriver {
 
     protected abstract boolean supportsTransactions();
 
+    protected abstract SqlModeller modeller(Connection con);
+
     protected abstract String castNull(Field field) throws OrmException;
 
     /**
@@ -133,13 +136,13 @@ public abstract class SqlDriver {
     protected abstract String virtualValue(String name);
 
 
-    /**
-     * Get the table generator for this driver
-     *
-     * @return The table generator
-     * @throws OrmException Thrown if there isn't one.
-     */
-    protected abstract TableGenerator getTableGenerator() throws OrmException;
+//    /**
+//     * Get the table generator for this driver
+//     *
+//     * @return The table generator
+//     * @throws OrmException Thrown if there isn't one.
+//     */
+//    protected abstract TableGenerator getTableGenerator() throws OrmException;
 
     /**
      * Work out the short table name to use.

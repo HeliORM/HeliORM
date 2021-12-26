@@ -1,13 +1,14 @@
 package com.heliorm.sql.mysql;
 
 import com.heliorm.Database;
+import com.heliorm.Field;
 import com.heliorm.OrmException;
 import com.heliorm.Table;
-import com.heliorm.Field;
 import com.heliorm.sql.OrmSqlException;
 import com.heliorm.sql.SqlDriver;
-import com.heliorm.sql.TableGenerator;
+import com.heliorm.sql.SqlModeller;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collections;
@@ -55,8 +56,8 @@ public final class MySqlDriver extends SqlDriver {
     }
 
     @Override
-    protected TableGenerator getTableGenerator() throws OrmException {
-        return new MysqlDialectGenerator();
+    protected SqlModeller modeller(Connection con) {
+        return SqlModeller.mysql(() -> con);
     }
 
     @Override
