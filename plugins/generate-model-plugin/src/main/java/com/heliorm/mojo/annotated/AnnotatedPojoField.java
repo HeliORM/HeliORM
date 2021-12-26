@@ -118,7 +118,7 @@ public class AnnotatedPojoField implements Field {
         if (pkA.isPresent()) {
             return pkA.get().autoIncrement();
         }
-        return true;
+        return false;
     }
 
     @Override
