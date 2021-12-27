@@ -68,8 +68,7 @@ public final class PostgreSqlDriver extends SqlDriver {
         return format("CAST(NULL AS %s)", fieldType(field.getTable(), field));
     }
 
-    @Override
-    protected String fieldType(Table table, Field field) throws OrmException {
+    private String fieldType(Table table, Field field) throws OrmException {
         switch (field.getFieldType()) {
             case BOOLEAN:
                 return "BIT";
@@ -103,7 +102,7 @@ public final class PostgreSqlDriver extends SqlDriver {
             case DURATION:
                 return "VARCHAR(32)";
             default:
-                throw new OrmSqlException(format("Unkown field type '%s'. BUG!", field.getFieldType()));
+                throw new OrmSqlException(format("Unknown field type '%s'. BUG!", field.getFieldType()));
         }
     }
 

@@ -30,6 +30,7 @@ import static java.lang.String.format;
 
 abstract class AbstractOrmTest {
 
+    private static final String TEST_DB_VAR = "TEST_DB";
     private static final String TEST_DB_NAME = "petz";
     private static Orm orm;
     private static DataSource jdbcDataSource;
@@ -60,8 +61,8 @@ abstract class AbstractOrmTest {
 
     @BeforeAll
     public static void setup() throws Exception {
-        String dbType = System.getenv("ORM_TEST_DB");
-        dbType = (dbType == null) ? "" : dbType;
+        String dbType = System.getenv(TEST_DB_VAR);
+        dbType = (dbType == null) ? "mysql" : dbType;
         switch (dbType) {
             case "postgresql":
                 jdbcDataSource = setupPostgreSqlDatasource();
