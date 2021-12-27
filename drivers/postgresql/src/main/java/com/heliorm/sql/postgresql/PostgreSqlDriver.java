@@ -85,7 +85,7 @@ public final class PostgreSqlDriver extends SqlDriver {
             case FLOAT:
                 return "DOUBLE PRECISION";
             case ENUM:
-                return format("%s", enumTypeName(table, field));
+                return format("\"%s\"", enumTypeName(table, field));
             case STRING: {
                 int length = 255;
                 if (field.isPrimaryKey()) {
