@@ -62,11 +62,12 @@ public class CrudTest extends AbstractOrmTest {
         Long id = persons.get(0).getId();
         Person person = orm().select(PERSON, where(PERSON.id.eq(id))).one();
         String tmp = person.getFirstName();
-        person.setFirstName(person.getLastName());
+        person.setFirstName(person.getLastName() == null ? "Doe" : person.getLastName());
         person.setLastName(tmp);
         Person updated = orm().update(person);
         Person loaded = orm().select(PERSON,where(PERSON.id.eq(id))).one();
         assertNotNull(updated, "The object returned by update should not be null");
+        assertTrue(updated.getId() == person.getId(), "The ID of the updated object is the same as original");
         assertTrue(pojoCompare(updated, loaded), "The updated and loaded objects must be the same");
         assertTrue(pojoCompare(updated, person), "The updated and modified objects must be the same");
         assertTrue(pojoCompare(loaded, person), "The loaded and modified objects must be the same");
