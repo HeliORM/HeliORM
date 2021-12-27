@@ -12,7 +12,7 @@ import static java.lang.String.format;
 public class StructureColumn implements Column {
 
     private StructureTable table;
-    private Field field;
+    protected Field<?,?,?> field;
 
     public StructureColumn(StructureTable table, Field field) {
         this.table = table;

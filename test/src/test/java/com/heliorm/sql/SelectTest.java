@@ -301,13 +301,13 @@ public class SelectTest extends AbstractOrmTest {
     public void testSelectOrderDesc() throws Exception {
         say("Testing select with a descending ordering");
         List<Cat> wanted = cats.stream()
+                .filter(cat -> cat.getType().equals(CatType.INDOOR))
                 .sorted(Comparator.comparing(Cat::getName)
                         .thenComparing(Cat::getAge)
-                        .thenComparing(Cat::getType)
                         .thenComparing(Cat::getPersonId)
                         .reversed())
                 .collect(Collectors.toList());
-        List<Cat> all = orm().select(CAT)
+        List<Cat> all = orm().select(CAT,  where(CAT.type.eq(CatType.INDOOR)))
                 .orderBy(CAT.name.desc(), CAT.age.desc(), CAT.type.desc(), CAT.personId.desc())
                 .list();
         assertNotNull(all, "The list returned by list() should be non-null");

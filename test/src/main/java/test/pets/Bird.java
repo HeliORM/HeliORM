@@ -2,8 +2,6 @@ package test.pets;
 
 import com.heliorm.annotation.Pojo;
 
-import java.time.Duration;
-
 /**
  * @author gideon
  */
@@ -15,12 +13,13 @@ public class Bird extends Avian {
     }
     private Type type;
 
-    private Duration singTime;
-    public Duration getSingTime() {
+    private Integer singTime;
+
+    public Integer getSingTime() {
         return singTime;
     }
 
-    public void setSingTime(Duration singTime) {
+    public void setSingTime(Integer singTime) {
         this.singTime = singTime;
     }
 

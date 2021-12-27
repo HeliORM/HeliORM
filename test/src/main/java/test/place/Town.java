@@ -10,7 +10,7 @@ public class Town {
 
     @PrimaryKey(autoIncrement = true)
     private Long id;
-    @Column(length = 30, nullable = false)
+    @Column(length = 40, nullable = false)
     private String name;
     @ForeignKey(pojo = Province.class)
     private Long provinceId;

@@ -58,6 +58,8 @@ public class StructureTable implements Table {
         switch (field.getFieldType()) {
             case ENUM:
                 return new StructureEnumColumn(this,field, getEnumValues(field));
+            case STRING:
+                return new StructureStringColumn(this,field);
             default:
                 return new StructureColumn(this, field);
         }

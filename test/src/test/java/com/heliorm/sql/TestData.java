@@ -10,7 +10,6 @@ import test.pets.Pet;
 import test.place.Province;
 import test.place.Town;
 
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -184,7 +183,7 @@ class TestData {
         Bird bird = new Bird();
         bird = makePet(bird, person);
         bird.setType(random.nextBoolean() ? Bird.Type.CAGED : Bird.Type.FREERANGE);
-        bird.setSingTime(Duration.ofMinutes(random.nextInt(31)));
+        bird.setSingTime(random.nextInt(31));
         return bird;
     }
 

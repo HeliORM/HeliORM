@@ -48,13 +48,13 @@ abstract class AbstractOrmTest {
     @Container
     public static GenericContainer mariadb = new GenericContainer(DockerImageName.parse("mariadb"))
             .withExposedPorts(3306)
-            .withEnv("MYSQL_DATABASE", "neutral")
+            .withEnv("MYSQL_DATABASE", TEST_DB_NAME)
             .withEnv("MYSQL_ROOT_PASSWORD", "dev");
 
     @Container
     public static GenericContainer postgres = new GenericContainer(DockerImageName.parse("postgres"))
             .withExposedPorts(5432)
-            .withEnv("POSTGRES_DB", "neutral")
+            .withEnv("POSTGRES_DB", TEST_DB_NAME)
             .withEnv("POSTGRES_PASSWORD", "dev");
 
 
@@ -144,6 +144,7 @@ abstract class AbstractOrmTest {
         Table<?> t1 = orm.tableFor(l1.get(0));
         for (int i = 0; i < l1.size(); ++i) {
             if (!pojoCompare(l1.get(i), l2.get(i))) {
+                say("Failed on item %d of %d (%s != %s)", i, l1.size(), l1.get(i), l2.get(i));
                 return false;
             }
         }
@@ -210,7 +211,7 @@ abstract class AbstractOrmTest {
     private static DataSource setupMysqlDataSource() throws SQLException {
         mariadb.start();
         HikariConfig conf = new HikariConfig();
-        conf.setJdbcUrl(format("jdbc:mysql://%s:%d/neutral", mariadb.getHost(), mariadb.getFirstMappedPort(), TEST_DB_NAME));
+        conf.setJdbcUrl(format("jdbc:mysql://%s:%d/%s", mariadb.getHost(), mariadb.getFirstMappedPort(), TEST_DB_NAME));
         conf.setUsername("root");
         conf.setPassword("dev");
         HikariDataSource ds = new HikariDataSource(conf);

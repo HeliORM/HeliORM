@@ -28,7 +28,7 @@ public @interface Column {
      *
      * @return The field length
      */
-    int length() default 0;
+    int length() default 255;
 
     /** Determine if the column on the database can be null.
      *
