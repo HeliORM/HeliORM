@@ -116,9 +116,8 @@ public class GenerateSql extends AbstractMojo {
     private String processTable(Table table) throws GeneratorException {
         try {
             StructureTable st = new StructureTable(table);
-            return gen.generateSchema(st);
-        }
-        catch (SqlModellerException ex) {
+            return gen.generateSchema(st) + ";";
+        } catch (SqlModellerException ex) {
             throw new GeneratorException(ex.getMessage(), ex);
         }
     }

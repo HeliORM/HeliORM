@@ -27,7 +27,7 @@ public class StructureIndex implements Index {
     public String getName() {
         return index.getFields().stream()
                 .map(field -> field.getSqlName())
-                .reduce("idx", (a,b) -> a + "_" + b);
+                .reduce(table.getName(), (a,b) -> a + "_" + b);
     }
 
     @Override
