@@ -1,9 +1,10 @@
 package test.persons;
 
-import com.heliorm.annotation.Column;
+import com.heliorm.annotation.Decimal;
 import com.heliorm.annotation.ForeignKey;
 import com.heliorm.annotation.Pojo;
 import com.heliorm.annotation.PrimaryKey;
+import com.heliorm.annotation.Text;
 import test.place.Town;
 
 /**
@@ -17,13 +18,13 @@ public class Person {
     private Long id;
     @ForeignKey(pojo = Town.class)
     private Long townId;
-    @Column
+    @Text(length = 30)
     private String firstName;
-    @Column(nullable = true)
+    @Text(length = 30, nullable = true)
     private String lastName;
-    @Column
+    @Text(length = 128, nullable = true)
     private String emailAddress;
-    @Column(nullable = true)
+    @Decimal(nullable = true)
     private Double income;
 
     public Long getId() {

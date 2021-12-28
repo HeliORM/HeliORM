@@ -1,18 +1,17 @@
 package com.heliorm.mojo.annotated;
 
-import com.heliorm.def.FieldOrder;
-import com.heliorm.annotation.Column;
-import com.heliorm.annotation.ForeignKey;
-import com.heliorm.annotation.PrimaryKey;
 import com.heliorm.Field;
 import com.heliorm.Table;
+import com.heliorm.annotation.ForeignKey;
+import com.heliorm.def.FieldOrder;
 
-import java.lang.annotation.Annotation;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
 import java.util.Optional;
 
+import static com.heliorm.mojo.annotated.AnnotationHelper.getAnnotation;
+import static com.heliorm.mojo.annotated.AnnotationHelper.getFieldName;
 import static java.lang.String.format;
 
 /**
@@ -35,11 +34,11 @@ public class AnnotatedPojoField implements Field {
 
     @Override
     public String getSqlName() {
-        Optional<Column> col = getAnnotation(Column.class);
-        if (col.isPresent()) {
-            String name = col.get().fieldName();
-            if ((name != null) && !name.isEmpty()) {
-                return name;
+        Optional<String> opt = getFieldName(pojoField);
+        if (opt.isPresent()) {
+            String fieldName = opt.get();
+            if (!fieldName.trim().isEmpty()) {
+                return fieldName;
             }
         }
         return pojoField.getName();
@@ -109,24 +108,20 @@ public class AnnotatedPojoField implements Field {
 
     @Override
     public boolean isPrimaryKey() {
-        return getAnnotation(PrimaryKey.class).isPresent();
+        return AnnotationHelper.isPrimaryKey(pojoField);
     }
 
     @Override
     public boolean isAutoNumber() {
-        Optional<PrimaryKey> pkA = getAnnotation(PrimaryKey.class);
-        if (pkA.isPresent()) {
-            return pkA.get().autoIncrement();
-        }
-        return false;
+        return AnnotationHelper.isAutoNumber(pojoField);
     }
 
     @Override
     public Optional<Integer> getLength() {
-        Optional<Column> lA = getAnnotation(Column.class);
-        if (lA.isPresent()) {
-            if (lA.get().length() > 0) {
-                return Optional.of(lA.get().length());
+        Optional<Integer> opt = AnnotationHelper.getLength(pojoField);
+        if (opt.isPresent()) {
+            if (opt.get() > 0) {
+                return Optional.of(opt.get());
             }
         }
         return Optional.empty();
@@ -134,11 +129,7 @@ public class AnnotatedPojoField implements Field {
 
     @Override
     public boolean isNullable() {
-        Optional<Column> lA = getAnnotation(Column.class);
-        if (lA.isPresent()) {
-                return lA.get().nullable();
-        }
-        return false;
+        return AnnotationHelper.isNullable(pojoField);
     }
 
     @Override
@@ -169,15 +160,15 @@ public class AnnotatedPojoField implements Field {
 
     @Override
     public boolean isForeignKey() {
-        return getAnnotation(ForeignKey.class).isPresent();
+        return AnnotationHelper.isForeignKey(pojoField);
     }
 
     @Override
     public Optional<Table<?>> getForeignTable() {
-        Optional<ForeignKey> fk = getAnnotation(ForeignKey.class);
+        Optional<ForeignKey> fk = getAnnotation(pojoField, ForeignKey.class);
         if (fk.isPresent()) {
             Class<?> type = fk.get().pojo();
-            if (type != null)  {
+            if (type != null) {
                 return table.getDatabase().getTables().stream()
                         .filter(table -> table.getObjectClass().equals(type))
                         .findFirst();
@@ -186,15 +177,4 @@ public class AnnotatedPojoField implements Field {
         return Optional.empty();
     }
 
-    /**
-     * Return the annotation of the given type from the POJO field, if it
-     * exists.
-     *
-     * @param <T>             The type of annotation
-     * @param annotationClass The annotation class
-     * @return
-     */
-    private <T extends Annotation> Optional<T> getAnnotation(Class<T> annotationClass) {
-        return Optional.ofNullable(pojoField.getAnnotation(annotationClass));
-    }
 }

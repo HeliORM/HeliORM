@@ -1,16 +1,16 @@
 package test.place;
 
-import com.heliorm.annotation.Column;
 import com.heliorm.annotation.ForeignKey;
 import com.heliorm.annotation.Pojo;
 import com.heliorm.annotation.PrimaryKey;
+import com.heliorm.annotation.Text;
 
 @Pojo
 public class Town {
 
     @PrimaryKey(autoIncrement = true)
     private Long id;
-    @Column(length = 40, nullable = false)
+    @Text(length = 40, nullable = false)
     private String name;
     @ForeignKey(pojo = Province.class)
     private Long provinceId;

@@ -1,13 +1,12 @@
 package com.heliorm.mojo.annotated;
 
-import com.heliorm.annotation.Ignore;
-import com.heliorm.annotation.Pojo;
+import com.heliorm.Database;
 import com.heliorm.Field;
 import com.heliorm.Index;
-import com.heliorm.Database;
 import com.heliorm.Table;
+import com.heliorm.annotation.Ignore;
+import com.heliorm.annotation.Pojo;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -46,13 +45,13 @@ public final class AnnotatedPojoTable implements Table {
 
     @Override
     public String getSqlTable() {
-        Optional<Pojo> pojo = getAnnotation(Pojo.class);
+        Optional<Pojo> pojo = AnnotationHelper.getAnnotation(pojoClass, Pojo.class);
         if (pojo.isPresent()) {
             if (!pojo.get().tableName().isEmpty()) {
                 return pojo.get().tableName();
             }
         }
-        return getJavaName();
+        return pojoClass.getSimpleName();
     }
 
     @Override
@@ -98,7 +97,7 @@ public final class AnnotatedPojoTable implements Table {
     public List<Index> getIndexes() {
         if (indexes == null) {
             indexes = new ArrayList<>();
-            List<com.heliorm.annotation.Index> anns = getAnnotations(com.heliorm.annotation.Index.class);
+            List<com.heliorm.annotation.Index> anns = AnnotationHelper.getAnnotations(pojoClass, com.heliorm.annotation.Index.class);
             for (com.heliorm.annotation.Index ann : anns) {
                 indexes.add(new AnnotatedPojoIndex(this, ann));
             }
@@ -127,38 +126,6 @@ public final class AnnotatedPojoTable implements Table {
             return false;
         }
         return !field.isAnnotationPresent(Ignore.class);
-    }
-
-    /**
-     * Return the Java name for the POJO class represented by this
-     *
-     * @return The Java name
-     */
-    private String getJavaName() {
-        return pojoClass.getSimpleName();
-    }
-
-    /**
-     * Convenience method to find the optional annotation on the POJO class.
-     *
-     * @param <T> The type of the annotation
-     * @param annotationClass The annotation class
-     * @return Optional annotation found
-     */
-    private <T extends Annotation> Optional<T> getAnnotation(Class<T> annotationClass) {
-        return Optional.ofNullable(pojoClass.getAnnotation(annotationClass));
-    }
-
-
-    private <T extends Annotation> List<T> getAnnotations(Class<T> annotationClass) {
-        Class<?> target = pojoClass;
-        List<T> annotations = new ArrayList<>();
-        while (!Object.class.equals(target)) {
-            T[] found = target.getAnnotationsByType(annotationClass);
-            annotations.addAll(Arrays.asList(found));
-            target = target.getSuperclass();
-        }
-        return annotations;
     }
 
     /**

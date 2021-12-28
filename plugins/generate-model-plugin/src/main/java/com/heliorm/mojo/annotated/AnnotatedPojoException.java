@@ -14,5 +14,4 @@ public class AnnotatedPojoException extends RuntimeException {
     public AnnotatedPojoException(String message, Throwable cause) {
         super(message, cause);
     }
-
 }
