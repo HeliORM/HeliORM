@@ -59,6 +59,11 @@
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>com.heliorm.sql</groupId>
+            <artifactId>sql-structure</artifactId>
+            <version>1.0</version>
+        </dependency>
     </dependencies>
 
     <build>

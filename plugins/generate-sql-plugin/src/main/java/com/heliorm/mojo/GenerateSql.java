@@ -1,15 +1,14 @@
 package com.heliorm.mojo;
 
-import com.heliorm.sql.OrmSqlException;
-import com.heliorm.sql.TableGenerator;
-import com.heliorm.sql.mysql.MysqlDialectGenerator;
-import com.heliorm.sql.postgresql.PostgresDialectGenerator;
+import com.heliorm.Database;
+import com.heliorm.Table;
+import com.heliorm.sql.SqlModeller;
+import com.heliorm.sql.SqlModellerException;
+import com.heliorm.sql.structure.StructureTable;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfo;
 import io.github.classgraph.ClassInfoList;
 import io.github.classgraph.ScanResult;
-import com.heliorm.Database;
-import com.heliorm.Table;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -29,7 +28,12 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.*;
+import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import static java.lang.String.format;
 
@@ -57,7 +61,7 @@ public class GenerateSql extends AbstractMojo {
 
     private ClassLoader globalClassLoader;
     private ClassLoader localClassLoader;
-    private TableGenerator gen;
+    private SqlModeller gen;
 
     public GenerateSql() throws GeneratorException, DependencyResolutionRequiredException {
     }
@@ -67,10 +71,10 @@ public class GenerateSql extends AbstractMojo {
         setupClassLoader();
         switch (dialect) {
             case MYSQL:
-                gen = new MysqlDialectGenerator();
+                gen = SqlModeller.mysql(this::getConnection);
                 break;
             case POSTGRESQL:
-                gen = new PostgresDialectGenerator();
+                gen = SqlModeller.postgres(this::getConnection);
                 break;
             default:
                 throw new MojoExecutionException(format("Unsupported SQL Dialect '%s'. BUG?", dialect));
@@ -82,6 +86,10 @@ public class GenerateSql extends AbstractMojo {
         for (Class<Database> type : classes) {
             processDatabase(type);
         }
+    }
+
+    private Connection getConnection() {
+        return null;
     }
 
     private void processDatabase(Class<Database> type) throws GeneratorException {
@@ -107,9 +115,10 @@ public class GenerateSql extends AbstractMojo {
 
     private String processTable(Table table) throws GeneratorException {
         try {
-            return gen.generateSchema(table);
+            StructureTable st = new StructureTable(table);
+            return gen.generateSchema(st);
         }
-        catch (OrmSqlException ex) {
+        catch (SqlModellerException ex) {
             throw new GeneratorException(ex.getMessage(), ex);
         }
     }
