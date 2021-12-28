@@ -1,7 +1,7 @@
 package com.heliorm.impl;
 
 import com.heliorm.Table;
-import com.heliorm.def.Field;
+import com.heliorm.Field;
 
 public abstract class NumberListExpressionPart<T extends Table<O>,O, C extends Number> extends ListExpressionPart<T,O,C> {
 

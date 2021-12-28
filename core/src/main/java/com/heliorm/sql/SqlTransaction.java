@@ -11,6 +11,7 @@ import static java.lang.String.format;
 
 /** A SQL transaction
  *
+ * @author gideon
  */
 final class SqlTransaction implements OrmTransaction, AutoCloseable {
 

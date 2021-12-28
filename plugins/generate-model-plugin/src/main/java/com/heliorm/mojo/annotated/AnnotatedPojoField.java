@@ -1,12 +1,12 @@
 package com.heliorm.mojo.annotated;
 
+import com.heliorm.Field;
 import com.heliorm.Table;
 import com.heliorm.annotation.Collection;
-import com.heliorm.FieldOrder;
 import com.heliorm.annotation.Column;
 import com.heliorm.annotation.ForeignKey;
 import com.heliorm.annotation.PrimaryKey;
-import com.heliorm.def.Field;
+import com.heliorm.def.FieldOrder;
 
 import java.lang.annotation.Annotation;
 import java.time.Duration;
@@ -127,7 +127,7 @@ public class AnnotatedPojoField implements Field {
         if (pkA.isPresent()) {
             return pkA.get().autoIncrement();
         }
-        return true;
+        return false;
     }
 
     @Override

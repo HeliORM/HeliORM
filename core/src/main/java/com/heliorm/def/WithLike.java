@@ -12,8 +12,8 @@ import com.heliorm.Table;
  */
 public interface WithLike<T extends Table<O>, O, C> {
 
-    ExpressionContinuation<T, O> like(C value) throws OrmException;
+    Continuation<T, O> like(C value) throws OrmException;
 
-    ExpressionContinuation<T, O> notLike(C value) throws OrmException;
+    Continuation<T, O> notLike(C value) throws OrmException;
 
 }

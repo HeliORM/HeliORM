@@ -4,6 +4,7 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
+ * A comparator that compares two objects based on a list of supplied comparators.
  *
  * @author gideon
  */

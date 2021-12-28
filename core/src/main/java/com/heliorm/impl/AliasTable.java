@@ -2,8 +2,8 @@ package com.heliorm.impl;
 
 import com.heliorm.Database;
 import com.heliorm.Table;
-import com.heliorm.def.Field;
-import com.heliorm.def.Index;
+import com.heliorm.Field;
+import com.heliorm.Index;
 
 import java.util.HashSet;
 import java.util.List;

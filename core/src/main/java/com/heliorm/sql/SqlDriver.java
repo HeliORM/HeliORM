@@ -3,7 +3,7 @@ package com.heliorm.sql;
 import com.heliorm.Database;
 import com.heliorm.OrmException;
 import com.heliorm.Table;
-import com.heliorm.def.Field;
+import com.heliorm.Field;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -13,6 +13,8 @@ import java.util.Map;
 import static java.lang.String.format;
 
 /**
+ *  Abstract implementation of a database specific driver
+ *
  * @author gideon
  */
 public abstract class SqlDriver {
@@ -26,6 +28,10 @@ public abstract class SqlDriver {
         this.aliases = aliases;
     }
 
+    /** Set the driver to rollback or commit data on an un-committed auto-close
+     * s
+     * @param rollback
+     */
     public final void setRollbackOnUncommittedClose(boolean rollback) {
         rollbackOnUncommittedClose = rollback;
     }

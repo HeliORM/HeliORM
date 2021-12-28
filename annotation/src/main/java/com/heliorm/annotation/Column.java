@@ -7,7 +7,7 @@ import java.lang.annotation.Target;
 
 /**
  * This annotation marks a POJO field that we wish adjust default behavior on.
- * This influences the way the meta data is generated.
+ * This influences the way the metadata is generated.
  *
  * @author gideon
  */

@@ -1,13 +1,17 @@
 package com.heliorm.sql;
 
 import com.heliorm.OrmException;
-import com.heliorm.def.Field;
+import com.heliorm.Field;
 
 import java.time.Duration;
 import java.time.Instant;
 
 import static java.lang.String.format;
 
+/** A helper class that provides common operations on POJOs
+ *
+ * @author gideon
+ */
 class PojoHelper {
 
     private final PojoOperations pops;
@@ -28,7 +32,6 @@ class PojoHelper {
         return pops.getValue(pojo, field);
     }
 
-
     /**
      * Get a string value from the given POJO for the given field.
      *
@@ -47,7 +50,6 @@ class PojoHelper {
         }
         return (String) value;
     }
-
 
     /**
      * Get a date value from the given POJO for the given field.

@@ -9,17 +9,17 @@ import com.heliorm.annotation.PrimaryKey;
 public class Town {
 
     @PrimaryKey(autoIncrement = true)
-    private String id;
+    private Long id;
     @Column(length = 30, nullable = false)
     private String name;
     @ForeignKey(pojo = Province.class)
     private Long provinceId;
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

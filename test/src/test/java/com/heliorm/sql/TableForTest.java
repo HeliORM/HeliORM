@@ -7,11 +7,13 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import test.persons.Person;
 import test.pets.Cat;
+import test.pets.CatBreed;
 import test.place.Province;
 import test.place.Town;
 
 import java.util.List;
 
+import static com.heliorm.sql.TestData.makeCatBreeds;
 import static com.heliorm.sql.TestData.makeCats;
 import static com.heliorm.sql.TestData.makePersons;
 import static com.heliorm.sql.TestData.makeProvinces;
@@ -24,6 +26,7 @@ public class TableForTest extends AbstractOrmTest {
     private static List<Province> provinces;
     private static List<Town> towns;
     private static List<Person> persons;
+    private static List<CatBreed> catBreeds;
     private static List<Cat> cats;
 
 
@@ -32,7 +35,8 @@ public class TableForTest extends AbstractOrmTest {
         provinces = createAll(makeProvinces());
         towns = createAll(makeTowns(provinces));
         persons = createAll(makePersons(towns));
-        cats = createAll(makeCats(persons.size() * 5, persons));
+        catBreeds = createAll(makeCatBreeds());
+        cats = createAll(makeCats(persons.size() * 5, persons, catBreeds));
     }
 
 

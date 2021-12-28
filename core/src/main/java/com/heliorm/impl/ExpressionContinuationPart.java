@@ -1,8 +1,7 @@
 package com.heliorm.impl;
 
-import com.heliorm.def.ExpressionContinuation;
-import com.heliorm.OrmException;
 import com.heliorm.Table;
+import com.heliorm.def.Continuation;
 
 /**
  *
@@ -10,31 +9,36 @@ import com.heliorm.Table;
  * @param <T> Type of table
  * @param <O> Type of POJO
  */
-public class ExpressionContinuationPart<T extends Table<O>, O> extends Part<T, O, T, O> implements ExpressionContinuation<T, O> {
+public class ExpressionContinuationPart<T extends Table<O>, O>  implements Continuation<T, O> {
 
-    private final Part expression;
+    public enum Type {
+         AND, OR;
+    }
 
-    public ExpressionContinuationPart(Part left, Type type, ExpressionContinuation expr) {
-        super(type, left);
-        expression = ((Part) expr).head();
+    private final Type type;
+    private final ExpressionPart expression;
+
+    public ExpressionContinuationPart(Type type, Continuation expr) {
+        expression =  (ExpressionPart)expr;
+        this.type = type;
     }
 
     @Override
-    public ExpressionContinuation<T, O> and(ExpressionContinuation<T, O> expr) {
-        return new ExpressionContinuationPart(this, Type.NESTED_AND, expr);
+    public Continuation<T, O> and(Continuation<T, O> expr) {
+        return new ExpressionContinuationPart(Type.AND, expr);
     }
 
     @Override
-    public ExpressionContinuation<T, O> or(ExpressionContinuation<T, O> expr) {
-        return new ExpressionContinuationPart(this, Type.NESTED_OR, expr);
+    public Continuation<T, O> or(Continuation<T, O> expr) {
+        return new ExpressionContinuationPart(Type.OR, expr);
     }
 
-    public Part getExpression() throws OrmException {
+    public  ExpressionPart<T, O,?> getExpression() {
         return expression;
     }
 
-    @Override
-    public String toString() {
-        return getType().name();
+    public Type getType() {
+        return type;
     }
 }
+

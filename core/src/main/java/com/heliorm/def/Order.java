@@ -1,6 +1,5 @@
 package com.heliorm.def;
 
-import com.heliorm.FieldOrder;
 import com.heliorm.Table;
 
 /**
@@ -11,7 +10,7 @@ import com.heliorm.Table;
  */
 public interface Order<T extends Table<O>, O> {
 
-    <F extends FieldOrder<T, O, ?>> Executable<T, O> orderBy(F field, F...orders);
+    <F extends FieldOrder<T, O, ?>> Executable<O> orderBy(F field, F...orders);
 
 
 }

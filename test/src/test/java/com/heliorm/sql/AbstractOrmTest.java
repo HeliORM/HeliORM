@@ -3,7 +3,7 @@ package com.heliorm.sql;
 import com.heliorm.Orm;
 import com.heliorm.OrmException;
 import com.heliorm.Table;
-import com.heliorm.def.Field;
+import com.heliorm.Field;
 import com.heliorm.sql.mysql.MySqlDriver;
 import com.heliorm.sql.postgresql.PostgreSqlDriver;
 import com.zaxxer.hikari.HikariConfig;
@@ -64,13 +64,13 @@ abstract class AbstractOrmTest {
                 .setRollbackOnUncommittedClose(false)
                 .setUseUnionAll(true)
                 .build();
-        boolean useJson = false;
-        String json = System.getenv("ORM_TEST_JSON");
-        useJson = (json == null) ? false : true;
-        if (useJson) {
-            orm = new JsonOrm(orm);
-            say("Testing JSON layer");
-        }
+//        boolean useJson = false;
+//        String json = System.getenv("ORM_TEST_JSON");
+//        useJson = (json == null) ? false : true;
+//        if (useJson) {
+//            orm = new JsonOrm(orm);
+//            say("Testing JSON layer");
+//        }
         deleteAll(Cat.class);
         deleteAll(Dog.class);
         deleteAll(Person.class);

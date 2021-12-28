@@ -1,8 +1,5 @@
 package com.heliorm;
 
-import com.heliorm.def.Field;
-import com.heliorm.def.Index;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;

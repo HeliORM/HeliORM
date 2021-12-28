@@ -1,7 +1,7 @@
 package com.heliorm.impl;
 
 import com.heliorm.Table;
-import com.heliorm.def.Field;
+import com.heliorm.Field;
 
 public final class EnumValueExpressionPart<T extends Table<O>, O, E extends Enum> extends ValueExpressionPart<T,O, E> {
 

@@ -1,37 +1,43 @@
 package com.heliorm.impl;
 
 import com.heliorm.Table;
-import com.heliorm.def.Field;
 import com.heliorm.def.Join;
-import com.heliorm.def.OnClause;
 
-import static java.lang.String.format;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 /**
  *
  * @author gideon
  */
-public class JoinPart<LT extends Table<LO>, LO, RT extends Table<RO>, RO> extends Part<LT, LO, RT, RO> implements Join<LT, LO, RT, RO> {
+public class JoinPart<LT extends Table<LO>, LO, RT extends Table<RO>, RO> implements Join<LT, LO> {
 
-    private final Table table;
+    private final RT table;
+    private final OnPart<LT,LO, RT,RO> on;
+    private final Optional<WherePart<RT,RO>> where;
+    private final List<JoinPart<?,?,?,?>> joins;
 
-    public JoinPart(Part left, RT table) {
-        super(Type.JOIN, left);
+    public JoinPart(RT table, OnPart<LT,LO,RT,RO> on, Optional<WherePart<RT,RO>> where, List<JoinPart<RT,RO,?,?>> joins ) {
         this.table = table;
+        this.on = on;
+        this.where = where;
+        this.joins = new ArrayList<>(joins);
     }
 
-    @Override
-    public <L extends Field<LT, LO, C>, R extends Field<RT, RO, C>, C> OnClause<LT, LO, RT, RO> on(L leftField, R rightField) {
-        return new OnClausePart(this, (FieldPart) leftField, (FieldPart)rightField);
-    }
-
-    @Override
-    public Table getSelectTable() {
+    public RT getTable() {
         return table;
     }
 
-    @Override
-    public String toString() {
-        return format("JOIN (%s)", table.getSqlTable());
+    public OnPart<LT, LO, RT, RO> getOn() {
+        return on;
+    }
+
+    public Optional<WherePart<RT, RO>> getWhere() {
+        return where;
+    }
+
+    public List<JoinPart<?, ?, ?, ?>> getJoins() {
+        return joins;
     }
 }

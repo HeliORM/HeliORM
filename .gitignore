@@ -26,3 +26,6 @@ nb-configuration.xml
 # Idea IntelliJ
 .idea
 *.iml
+
+# FB infer 
+infer-out/

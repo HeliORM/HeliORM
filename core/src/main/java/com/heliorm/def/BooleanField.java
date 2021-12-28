@@ -1,15 +1,17 @@
 package com.heliorm.def;
 
+import com.heliorm.Field;
 import com.heliorm.Table;
 
 /**
+ * A field representing a boolean value
  *
- * @param <T> Table type
- * @param <O> Object type
+ * @param <DT> Table type
+ * @param <DO> Object type
  *
  * @author gideon
  */
-public interface BooleanField<T extends Table<O>, O> extends Field<T, O, Boolean>, Expression<T, O, Boolean>, WithEquals<T, O, Boolean>, WithIs<T, O, Boolean> {
+public interface BooleanField<DT extends Table<DO>, DO> extends Field<DT, DO, Boolean>, WithEquals<DT, DO, Boolean>, WithIs<DT, DO, Boolean> {
 
     @Override
    default FieldType getFieldType() {
