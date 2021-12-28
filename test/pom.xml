@@ -64,12 +64,6 @@
         </dependency>
         <dependency>
             <groupId>com.heliorm</groupId>
-            <artifactId>json</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.heliorm</groupId>
             <artifactId>annotation</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
