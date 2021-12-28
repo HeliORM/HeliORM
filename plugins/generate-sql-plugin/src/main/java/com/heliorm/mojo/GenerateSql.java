@@ -122,7 +122,7 @@ public class GenerateSql extends AbstractMojo {
     }
 
     private void writeSqlFile(String name, String sql) throws GeneratorException {
-        String fileName = format("%s/%s.sql", outputDir, name);
+        String fileName = format("%s/%s-%s.sql", outputDir, dialect.name().toLowerCase(), name);
         info("Writing SQL to %s", fileName);
         try (PrintWriter out = new PrintWriter(new FileWriter(fileName))) {
             out.print(sql);

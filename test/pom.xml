@@ -143,6 +143,7 @@
                 <version>${project.version}</version>
                 <executions>
                     <execution>
+                        <id>generate-mysql</id>
                         <phase>install</phase>
                         <goals>
                             <goal>generate-sql</goal>
@@ -152,6 +153,21 @@
                                 <package>test</package>
                             </packages>
                             <dialect>MYSQL</dialect>
+                            <filePerTable>false</filePerTable>
+                            <outputDir>${sourceOutputDir}</outputDir>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>generate-postgresql</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>generate-sql</goal>
+                        </goals>
+                        <configuration>
+                            <packages>
+                                <package>test</package>
+                            </packages>
+                            <dialect>POSTGRESQL</dialect>
                             <filePerTable>false</filePerTable>
                             <outputDir>${sourceOutputDir}</outputDir>
                         </configuration>
