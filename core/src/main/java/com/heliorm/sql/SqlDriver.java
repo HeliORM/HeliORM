@@ -23,6 +23,7 @@ public abstract class SqlDriver {
     private boolean rollbackOnUncommittedClose = false;
     private boolean useUnionAll = false;
     private boolean createTables  = false;
+    private boolean modifyTables = false;
     private final Map<Database, Database> aliases;
 
     public SqlDriver(Map<Database, Database> aliases) {
@@ -45,6 +46,10 @@ public abstract class SqlDriver {
         return createTables;
     }
 
+    public boolean modifyTables() {
+        return modifyTables;
+    }
+
     /**
      * Configure driver to create missing SQL tables.
      *
@@ -54,6 +59,9 @@ public abstract class SqlDriver {
         this.createTables = createTables;
     }
 
+    public void setModifyTables(boolean modifyTables) {
+        this.modifyTables = modifyTables;
+    }
 
     final boolean getRollbackOnUncommittedClose() {
         return rollbackOnUncommittedClose;

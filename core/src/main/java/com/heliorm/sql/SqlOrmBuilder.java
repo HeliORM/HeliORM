@@ -27,6 +27,7 @@ public class SqlOrmBuilder {
     private PojoOperations pops;
     private boolean rollbackOnUncommittedClose = false;
     private boolean createMissingTables = false;
+    private boolean modifyChangedTables = false;
     private boolean useUnionAll = true;
 
     /**
@@ -96,6 +97,12 @@ public class SqlOrmBuilder {
         return this;
     }
 
+
+    public SqlOrmBuilder setModifyChangedTables(boolean modifyChangedTables) {
+        this.modifyChangedTables = modifyChangedTables;
+        return this;
+    }
+
     /** Configure the ORM to use or not use SQU 'UNION ALL' statements.
      * Default is true
      *
@@ -123,6 +130,7 @@ public class SqlOrmBuilder {
             Constructor<? extends  SqlDriver> constructor = driverClass.getConstructor(Map.class);
             driver = constructor.newInstance(aliases);
             driver.setCreateTables(createMissingTables);
+            driver.setModifyTables(modifyChangedTables);
             driver.setUseUnionAll(useUnionAll);
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException e) {
             throw new OrmException(format("Cannot start driver of type '%s' (%s)", driverClass.getSimpleName(), e.getMessage()),e);

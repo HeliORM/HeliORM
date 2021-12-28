@@ -536,9 +536,21 @@ public final class SqlOrm implements Orm {
      * @throws OrmException
      */
     private void checkTable(Table table) throws OrmException {
-        if (driver.createTables()) {
+        if (driver.createTables() || driver.modifyTables()) {
             if (!exists.containsKey(table)) {
-                if (!tableExists(table)) {
+                if (tableExists(table) && driver.modifyTables()) {
+                    Connection con = getConnection();
+                    SqlVerifier verifier = SqlVerifier.forModeller(driver.modeller(con));
+                    try {
+                        verifier.verifyTable(new StructureTable(table));
+                    }
+                    catch (SqlModellerException ex) {
+                        throw new OrmSqlException(format("Error verifying table (%s)", ex.getMessage(), ex));
+                    }
+                    finally {
+                        closeConnection(con);
+                    }
+                } else if (!tableExists(table) && driver.createTables()) {
                     Connection con = getConnection();
                     SqlModeller modeller = driver.modeller(con);
                     try {
