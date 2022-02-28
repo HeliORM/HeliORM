@@ -62,7 +62,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>3.1.1</version>
+                        <version>3.3.2</version>
                         <configuration>
                             <excludePackageNames>example;*.impl</excludePackageNames>
                         </configuration>
@@ -78,7 +78,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>3.1.1</version>
+                        <version>3.3.2</version>
                         <executions>
                             <execution>
                                 <id>attach-javadocs</id>
