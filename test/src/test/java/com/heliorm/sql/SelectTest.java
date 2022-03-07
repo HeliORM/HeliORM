@@ -26,6 +26,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -456,6 +457,24 @@ public class SelectTest extends AbstractOrmTest {
                         where(CAT.type.eq(CatType.INDOOR)),
                         join(PERSON, on(CAT.personId, PERSON.id),
                                 where(PERSON.emailAddress.eq(person.getEmailAddress()))))
+                .list();
+        assertNotNull(all, "The list returned by list() should be non-null");
+        assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
+        assertTrue(listCompareOrdered(all, wanted), "The items loaded are exactly the same as the ones we expected");
+    }
+
+    @Test
+    @Order(211)
+    public void testJoinNoWhere() throws Exception {
+        say("Testing select with a join without a where");
+        Set<Long> personIds = persons.stream().map(person -> person.getId()).collect(Collectors.toSet());
+        List<Cat> wanted = cats.stream()
+                .filter(cat -> cat.getType() == CatType.INDOOR)
+                .filter(cat -> personIds.contains(cat.getPersonId()))
+                .collect(Collectors.toList());
+        List<Cat> all = orm().select(CAT,
+                        where(CAT.type.eq(CatType.INDOOR)),
+                        join(PERSON, on(CAT.personId, PERSON.id)))
                 .list();
         assertNotNull(all, "The list returned by list() should be non-null");
         assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
