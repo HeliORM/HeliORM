@@ -15,6 +15,8 @@ import com.heliorm.impl.SelectPart;
 import com.heliorm.impl.ValueExpressionPart;
 import com.heliorm.impl.WherePart;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -37,6 +39,8 @@ final class QueryHelper {
     private final SqlDriver driver;
     private final Function<Field, String> getFieldId;
     private final FullTableName fullTableName;
+
+    private static final DateFormat dateTimeFormat =new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSS");
 
     QueryHelper(SqlDriver driver, Function<Field, String> getFieldId, FullTableName fullTableName) {
         this.driver = driver;
@@ -250,7 +254,7 @@ final class QueryHelper {
                     crit.getField().getJavaName(), table.getObjectClass().getSimpleName()));
         }
         for (Object val : crit.getValues()) {
-            list.add(format("'%s'", sqlValue(val)));
+            list.add(format("'%s'", sqlValue(crit.getField(), val)));
         }
         return format("%s %s (%s)", driver.fullFieldName(table, crit.getField()), listOperator(crit), list);
     }
@@ -261,7 +265,7 @@ final class QueryHelper {
             throw new OrmException(format("Null %s value for field %s in table %s", crit.getOperator(),
                     crit.getField().getJavaName(), table.getObjectClass().getSimpleName()));
         }
-        query.append(format("%s%s'%s'", driver.fullFieldName(table, crit.getField()), valueOperator(crit), sqlValue(crit.getValue())));
+        query.append(format("%s%s'%s'", driver.fullFieldName(table, crit.getField()), valueOperator(crit), sqlValue(crit.getField(), crit.getValue())));
         return query.toString();
     }
 
@@ -296,8 +300,13 @@ final class QueryHelper {
         return query.toString();
     }
 
-    private String sqlValue(Object object) {
-        return object.toString();
+    private String sqlValue(Field field, Object object) {
+        switch (field.getFieldType()) {
+            case DATE:
+                return dateTimeFormat.format(object);
+            default:
+                return object.toString();
+        }
     }
 
     /**

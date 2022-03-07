@@ -7,6 +7,8 @@ import com.heliorm.annotation.Pojo;
 import com.heliorm.annotation.PrimaryKey;
 import test.persons.Person;
 
+import java.util.Date;
+
 /**
  * @author gideon
  */
@@ -23,6 +25,7 @@ public abstract class Pet  {
     @Column(length = 32)
     private String name;
     private int age;
+    private Date birthday;
 
     public Long getPersonId() {
         return personId;
@@ -59,5 +62,13 @@ public abstract class Pet  {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Date getBirthday() {
+        return birthday;
+    }
+
+    public void setBirthday(Date birthday) {
+        this.birthday = birthday;
     }
 }

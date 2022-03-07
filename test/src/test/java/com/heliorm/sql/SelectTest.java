@@ -20,7 +20,10 @@ import test.place.Town;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Comparator;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -275,6 +278,56 @@ public class SelectTest extends AbstractOrmTest {
                 .filter(cat -> cat.getAge() < 5 || cat.getType().equals(CatType.OUTDOOR))
                 .collect(Collectors.toList());
         List<Cat> all = orm().select(CAT, where(CAT.age.lt(5)).or(CAT.type.eq(CatType.OUTDOOR)))
+                .list();
+        assertNotNull(all, "The list returned by list() should be non-null");
+        assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
+        assertTrue(listCompareOrdered(all, wanted), "The items loaded are exactly the same as the ones we expected");
+    }
+
+
+    @Test
+    @Order(161)
+    public void testSelectWhereAndTwoFields() throws Exception {
+        say("Testing select with a where clause with and on two fields");
+        List<Cat> wanted = cats.stream()
+                .filter(cat -> cat.getAge() < 5 && cat.getType().equals(CatType.OUTDOOR))
+                .collect(Collectors.toList());
+        List<Cat> all = orm().select(CAT, where(CAT.age.lt(5)).and(CAT.type.eq(CatType.OUTDOOR)))
+                .list();
+        assertNotNull(all, "The list returned by list() should be non-null");
+        assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
+        assertTrue(listCompareOrdered(all, wanted), "The items loaded are exactly the same as the ones we expected");
+    }
+
+
+    @Test
+    @Order(162)
+    public void testSelectWhereDateField() throws Exception {
+        say("Testing select with a where clause with and on two fields");
+        Calendar cal = new GregorianCalendar();
+        cal.add(Calendar.YEAR, -5);
+        Date then = cal.getTime();
+        List<Cat> wanted = cats.stream()
+                .filter(cat -> cat.getBirthday().before(then))
+                .collect(Collectors.toList());
+        List<Cat> all = orm().select(CAT, where(CAT.birthday.lt(then    )))
+                .list();
+        assertNotNull(all, "The list returned by list() should be non-null");
+        assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
+        assertTrue(listCompareOrdered(all, wanted), "The items loaded are exactly the same as the ones we expected");
+    }
+    @Test
+    @Order(163)
+    public void testSelectWhereAndTwoDateFields() throws Exception {
+        say("Testing select with a where clause with and on two fields");
+        Date today = new Date();
+        Calendar cal = new GregorianCalendar();
+        cal.add(Calendar.YEAR, -5);
+        Date then = cal.getTime();
+        List<Cat> wanted = cats.stream()
+                .filter(cat -> cat.getBirthday().after(then) && cat.getBirthday().before(today))
+                .collect(Collectors.toList());
+        List<Cat> all = orm().select(CAT, where(CAT.birthday.gt(then)).and(CAT.birthday.lt(today)))
                 .list();
         assertNotNull(all, "The list returned by list() should be non-null");
         assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
