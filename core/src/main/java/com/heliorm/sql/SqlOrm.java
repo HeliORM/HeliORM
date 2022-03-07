@@ -542,7 +542,7 @@ public final class SqlOrm implements Orm {
                     Connection con = getConnection();
                     SqlVerifier verifier = SqlVerifier.forModeller(driver.modeller(con));
                     try {
-                        verifier.verifyTable(new StructureTable(table));
+                        verifier.synchronizeDatabaseTable(new StructureTable(table));
                     }
                     catch (SqlModellerException ex) {
                         throw new OrmSqlException(format("Error verifying table (%s)", ex.getMessage(), ex));
