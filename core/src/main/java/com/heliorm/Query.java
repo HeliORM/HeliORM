@@ -25,7 +25,7 @@ public class Query {
 
 
     public static <LT extends Table<LO>,LO, RT extends Table<RO>, RO> Join<LT, LO> join(RT table, On<LT,LO, RT, RO> on) {
-        return new JoinPart(table, (OnPart) on, null, Collections.EMPTY_LIST);
+        return new JoinPart(table, (OnPart) on, Optional.empty(), Collections.EMPTY_LIST);
     }
 
 
