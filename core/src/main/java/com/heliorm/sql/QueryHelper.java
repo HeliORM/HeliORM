@@ -113,10 +113,13 @@ final class QueryHelper {
         }
         for (JoinPart<?,?,?,?> join : root.getJoins()) {
             tablesQuery.append(expandLinkTables(root.getTable(), join));
-            if (whereQuery.length() > 0) {
-                whereQuery.append(" AND ");
+            String joinWhere = expandLinkWheres(join);
+            if (!joinWhere.isEmpty()) {
+                if (whereQuery.length() > 0) {
+                    whereQuery.append(" AND ");
+                }
+                whereQuery.append(expandLinkWheres(join));
             }
-            whereQuery.append(expandLinkWheres(join));
         }
         // finalize the query
         StringBuilder query = new StringBuilder();
