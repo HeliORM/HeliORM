@@ -40,7 +40,7 @@ final class QueryHelper {
     private final Function<Field, String> getFieldId;
     private final FullTableName fullTableName;
 
-    private static final DateFormat dateTimeFormat =new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSS");
+    private static final DateFormat dateTimeFormat =new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 
     QueryHelper(SqlDriver driver, Function<Field, String> getFieldId, FullTableName fullTableName) {
         this.driver = driver;
