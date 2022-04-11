@@ -1,14 +1,15 @@
 package com.heliorm.sql;
 
+import com.heliorm.Field;
 import com.heliorm.OrmException;
 import com.heliorm.Table;
 import com.heliorm.def.Where;
-import com.heliorm.Field;
 import com.heliorm.impl.ExecutablePart;
 import com.heliorm.impl.ExpressionContinuationPart;
 import com.heliorm.impl.ExpressionPart;
 import com.heliorm.impl.IsExpressionPart;
 import com.heliorm.impl.JoinPart;
+import com.heliorm.impl.LimitPart;
 import com.heliorm.impl.ListExpressionPart;
 import com.heliorm.impl.OrderPart;
 import com.heliorm.impl.SelectPart;
@@ -130,6 +131,8 @@ final class QueryHelper {
         }
         // do ordering
         query.append(expandOrder(root.getTable(), exec.getOrder()));
+        // do limit
+        query.append(expandLimit(exec.getLimit()));
         return query.toString();
     }
 
@@ -300,6 +303,19 @@ final class QueryHelper {
             }
         }
         query.append(body);
+        return query.toString();
+    }
+
+    private String expandLimit(LimitPart<?> limit) {
+        StringBuilder query = new StringBuilder();
+        if (limit.getNumber() > -1) {
+            query.append(" LIMIT ");
+            if (limit.getFrom() > 0) {
+                query.append(limit.getFrom());
+                query.append(",");
+            }
+            query.append(limit.getNumber());
+        }
         return query.toString();
     }
 
