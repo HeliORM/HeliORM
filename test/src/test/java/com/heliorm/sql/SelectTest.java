@@ -301,7 +301,7 @@ public class SelectTest extends AbstractOrmTest {
     }
 
 
-    @Test
+  //  @Test
     @Order(162)
     public void testSelectWhereDateField() throws Exception {
         say("Testing select with a where clause with and on two fields");
@@ -317,7 +317,7 @@ public class SelectTest extends AbstractOrmTest {
         assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
         assertTrue(listCompareOrdered(all, wanted), "The items loaded are exactly the same as the ones we expected");
     }
-    @Test
+//    @Test
     @Order(163)
     public void testSelectWhereAndTwoDateFields() throws Exception {
         say("Testing select with a where clause with and on two fields");
@@ -381,6 +381,35 @@ public class SelectTest extends AbstractOrmTest {
                 .collect(Collectors.toList());
         List<Cat> all = orm().select(CAT)
                 .orderBy(CAT.age, CAT.name, CAT.personId, CAT.id)
+                .list();
+        assertNotNull(all, "The list returned by list() should be non-null");
+        assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
+        assertTrue(listCompareAsIs(all, wanted), "The items loaded are exactly the same as the ones we expected");
+    }
+
+    @Test
+    @Order(191)
+    public void testSelectLimit() throws Exception {
+        say("Testing select with a limit");
+        int number = 10;
+        List<Cat> all = orm().select(CAT)
+                .limit(10)
+                .list();
+        assertNotNull(all, "The list returned by list() should be non-null");
+        assertTrue(all.size() == number, format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), number));
+    }
+
+    @Test
+    @Order(192)
+    public void testSelectOrderWithLimit() throws Exception {
+        say("Testing select with a order and limit");
+        List<Town> wanted = towns.stream()
+                .sorted(Comparator.comparing(Town::getName))
+                .limit(2)
+                .collect(Collectors.toList());
+        List<Town> all = orm().select(TOWN)
+                .orderBy(TOWN.name)
+                .limit(2)
                 .list();
         assertNotNull(all, "The list returned by list() should be non-null");
         assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
