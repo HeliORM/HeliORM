@@ -21,10 +21,11 @@ final class SqlTransaction implements OrmTransaction, AutoCloseable {
 
     /** Create a new transactoion for the given driver.
      *
-     * @param driver The driver to use
+     * @param driver The driver for this transaction
+     * @param connection the SQL Connection for this transaction
      * @throws OrmTransactionException
      */
-    SqlTransaction(SqlDriver driver,Connection connection) throws OrmTransactionException {
+    SqlTransaction(SqlDriver driver, Connection connection) throws OrmTransactionException {
         this.driver = driver;
         this.connection = connection;
         try {
@@ -43,6 +44,7 @@ final class SqlTransaction implements OrmTransaction, AutoCloseable {
             }
             connection.commit();
             open = false;
+            connection.close();
         } catch (SQLException ex) {
             throw new OrmException(format("Error commiting transaction (%s)", ex.getMessage()));
         }
@@ -56,6 +58,7 @@ final class SqlTransaction implements OrmTransaction, AutoCloseable {
             }
             connection.rollback();
             open = false;
+            connection.close();
         } catch (SQLException ex) {
             throw new OrmException(format("Error rolling back transaction (%s)", ex.getMessage()));
         }
@@ -65,10 +68,11 @@ final class SqlTransaction implements OrmTransaction, AutoCloseable {
     @Override
     public void close() throws OrmException {
         if (open) {
-            if (!driver.getRollbackOnUncommittedClose()) {
+            if (driver.getRollbackOnUncommittedClose()) {
                 open = false;
                 throw new OrmException("Transaction is being auto-closed without committing or rolling back");
             }
+            open = false;
             rollback();
         }
     }
