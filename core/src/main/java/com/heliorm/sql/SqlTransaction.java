@@ -15,18 +15,18 @@ import static java.lang.String.format;
  */
 final class SqlTransaction implements OrmTransaction, AutoCloseable {
 
-    private final SqlOrm orm;
+    private final SqlDriver driver;
     private final Connection connection;
     private boolean open;
 
     /** Create a new transactoion for the given driver.
      *
-     * @param orm The ORM for this transaction
+     * @param driver The driver for this transaction
      * @param connection the SQL Connection for this transaction
      * @throws OrmTransactionException
      */
-    SqlTransaction(SqlOrm orm, Connection connection) throws OrmTransactionException {
-        this.orm = orm;
+    SqlTransaction(SqlDriver driver, Connection connection) throws OrmTransactionException {
+        this.driver = driver;
         this.connection = connection;
         try {
             connection.setAutoCommit(false);
@@ -68,7 +68,7 @@ final class SqlTransaction implements OrmTransaction, AutoCloseable {
     @Override
     public void close() throws OrmException {
         if (open) {
-            if (orm.getDriver().getRollbackOnUncommittedClose()) {
+            if (driver.getRollbackOnUncommittedClose()) {
                 open = false;
                 throw new OrmException("Transaction is being auto-closed without committing or rolling back");
             }
