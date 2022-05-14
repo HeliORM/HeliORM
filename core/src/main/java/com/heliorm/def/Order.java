@@ -10,7 +10,7 @@ import com.heliorm.Table;
  */
 public interface Order<T extends Table<O>, O> {
 
-    <F extends FieldOrder<T, O, ?>> Executable<O> orderBy(F field, F...orders);
+    <F extends FieldOrder<T, O, ?>> Complete<O> orderBy(F field, F...orders);
 
 
 }

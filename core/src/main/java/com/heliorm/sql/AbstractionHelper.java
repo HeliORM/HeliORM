@@ -14,8 +14,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-/** Helper class that deals with creating concrete selection hierarchies from ones containing abstract classes.
- *
+/**
+ * Helper class that deals with creating concrete selection hierarchies from ones containing abstract classes.
  */
 class AbstractionHelper {
 
@@ -66,12 +66,13 @@ class AbstractionHelper {
         Set<Table<?>> subTables = table.getSubTables();
         if (subTables.isEmpty()) {
             SelectPart selectPart = new SelectPart(select.getSelector(), select.getTable(), select.getWhere(), explode(select.getJoins()));
-            res.add(new OrderedPart<>(select.getSelector(), selectPart,
-                    ordered.getOrder()));
+            res.add(new OrderedPart(select.getSelector(), selectPart,
+                    ordered.getOrder(), ordered.getLimit()));
         } else {
             for (Table<?> subTable : subTables) {
-                res.add(new OrderedPart<>(select.getSelector(), new SelectPart(select.getSelector(), subTable, select.getWhere(), explode(select.getJoins())),
-                        ordered.getOrder()));
+                res.add(new OrderedPart(select.getSelector(),
+                        new SelectPart(select.getSelector(), subTable, select.getWhere(), explode(select.getJoins())),
+                        ordered.getOrder(), ordered.getLimit()));
             }
         }
         return res;
@@ -82,10 +83,10 @@ class AbstractionHelper {
         Table<?> table = select.getTable();
         Set<Table<?>> subTables = table.getSubTables();
         if (subTables.isEmpty()) {
-            res.add(new SelectPart(select.getSelector(), select.getTable(), select.getWhere(), explode(select.getJoins()), select.getOrder()));
+            res.add(new SelectPart(select.getSelector(), select.getTable(), select.getWhere(), explode(select.getJoins()), select.getOrder(), select.getLimit()));
         } else {
             for (Table<?> subTable : subTables) {
-                res.add(new SelectPart(select.getSelector(), subTable, select.getWhere(), explode(select.getJoins()), select.getOrder()));
+                res.add(new SelectPart(select.getSelector(), subTable, select.getWhere(), explode(select.getJoins()), select.getOrder(), select.getLimit()));
             }
         }
         return res;
