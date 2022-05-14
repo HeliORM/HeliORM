@@ -1,12 +1,11 @@
 package com.heliorm.impl;
 
-import com.heliorm.def.Continuation;
-import com.heliorm.def.WithRange;
 import com.heliorm.OrmException;
 import com.heliorm.Table;
+import com.heliorm.def.Continuation;
+import com.heliorm.def.WithRange;
 
 /**
- *
  * @author gideon
  */
 public interface WithRangePart<T extends Table<O>, O, C> extends WithRange<T, O, C> {

@@ -1,8 +1,8 @@
 package com.heliorm.sql;
 
+import com.heliorm.Field;
 import com.heliorm.OrmException;
 import com.heliorm.Table;
-import com.heliorm.Field;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -18,7 +18,10 @@ import static java.lang.String.format;
  */
 abstract class AbstractPojoOperations implements PojoOperations {
 
-    private Map<Class<?>, Map<String, java.lang.reflect.Field>> fields = new WeakHashMap( );
+    private Map<Class<?>, Map<String, java.lang.reflect.Field>> fields = new WeakHashMap();
+
+    protected AbstractPojoOperations() {
+    }
 
     @Override
     public final Object newPojoInstance(Table table) throws OrmException {
@@ -157,7 +160,6 @@ abstract class AbstractPojoOperations implements PojoOperations {
 
     protected abstract void setObject(Object pojo, java.lang.reflect.Field refField, Object value) throws OrmException;
 
-
     @Override
     public final int compareTo(Object pojo1, Object pojo2, Field field) throws OrmException {
         switch (field.getFieldType()) {
@@ -190,9 +192,6 @@ abstract class AbstractPojoOperations implements PojoOperations {
     }
 
     protected abstract Object newPojoInstance(Class<?> type) throws OrmException;
-
-    protected AbstractPojoOperations() {
-    }
 
     /**
      * Recursively find the reflected field or the given field name on the given

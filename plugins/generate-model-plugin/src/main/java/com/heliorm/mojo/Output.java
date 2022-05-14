@@ -1,6 +1,8 @@
 package com.heliorm.mojo;
 
 import com.heliorm.Database;
+import com.heliorm.Field;
+import com.heliorm.Index;
 import com.heliorm.Table;
 import com.heliorm.def.BooleanField;
 import com.heliorm.def.ByteField;
@@ -8,23 +10,29 @@ import com.heliorm.def.DateField;
 import com.heliorm.def.DoubleField;
 import com.heliorm.def.DurationField;
 import com.heliorm.def.EnumField;
-import com.heliorm.Field;
 import com.heliorm.def.FloatField;
-import com.heliorm.Index;
+import com.heliorm.def.InstantField;
 import com.heliorm.def.IntegerField;
 import com.heliorm.def.LongField;
 import com.heliorm.def.ShortField;
 import com.heliorm.def.StringField;
-import com.heliorm.impl.IndexPart;
-import com.heliorm.def.*;
 import com.heliorm.impl.FieldBuilder;
+import com.heliorm.impl.IndexPart;
 import com.heliorm.impl.TableBuilder;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
@@ -40,9 +48,9 @@ class Output {
     private final Map<Table, Set<Table>> tables = new HashMap();
 
     private final StringBuilder buf = new StringBuilder();
+    private final Set<String> imports = new HashSet();
     private int depth;
     private PrintWriter out;
-    private final Set<String> imports = new HashSet();
 
     Output(GenerateModel gen, Database database, String packageName) {
         this.packageName = packageName;
@@ -94,7 +102,7 @@ class Output {
 
     void output(String directory) throws GeneratorException, OrmMetaDataException {
         String databaseClass = gen.getDatabaseClassFor(database);
-        String packageName = databaseClass.substring(0,  databaseClass.lastIndexOf('.'));
+        String packageName = databaseClass.substring(0, databaseClass.lastIndexOf('.'));
         String path = directory + "/" + packageName.replace(".", "/");
         File pathFile = new File(path);
         if (!pathFile.exists()) {
@@ -166,7 +174,7 @@ class Output {
         StringJoiner fieldNames = new StringJoiner(",");
         impt(TableBuilder.class);
         impt(FieldBuilder.class);
-        emit("private transient TableBuilder<%s,%s> builder = TableBuilder.create(this, %s.class);",  tableName(cm), getJavaName(cm), getJavaName(cm));
+        emit("private transient TableBuilder<%s,%s> builder = TableBuilder.create(this, %s.class);", tableName(cm), getJavaName(cm), getJavaName(cm));
         emit("");
         for (Field fm : cm.getFields()) {
             addFieldModel(cm, fm);
@@ -370,7 +378,7 @@ class Output {
         impt(EnumField.class);
         String enumTypeName;
         if (fm.getJavaType().getEnclosingClass() == null) {
-            enumTypeName = fm.getJavaType().getCanonicalName()  ;
+            enumTypeName = fm.getJavaType().getCanonicalName();
         } else {
             enumTypeName = format("%s.%s", cm.getObjectClass().getSimpleName(), fm.getJavaType().getSimpleName());
         }
@@ -418,7 +426,7 @@ class Output {
         return indexName;
     }
 
-    private String indexName(Table tm, Index<?,?> im) {
+    private String indexName(Table tm, Index<?, ?> im) {
         StringJoiner sj = new StringJoiner("_");
         for (Field field : im.getFields()) {
             sj.add(field.getJavaName());
@@ -427,7 +435,7 @@ class Output {
         return sj.toString();
     }
 
-    private void addField(Table<?> cm, Field<?,?,?> fm, Class<? extends Field> fieldType, String buildMethod) {
+    private void addField(Table<?> cm, Field<?, ?, ?> fm, Class<? extends Field> fieldType, String buildMethod) {
         impt(fieldType);
         emit("public final %s<%s, %s> %s = builder.%s(\"%s\")",
                 fieldType.getSimpleName(),
@@ -439,7 +447,7 @@ class Output {
         completeField(fm);
     }
 
-    private void completeField(Field<?,?,?> fm) {
+    private void completeField(Field<?, ?, ?> fm) {
         push();
         emit(".withPrimaryKey(%b)", fm.isPrimaryKey());
         emit(".withAutoNumber(%b)", fm.isAutoNumber());
@@ -451,7 +459,7 @@ class Output {
 
         }
         if (fm.getForeignTable().isPresent()) {
-            emit(".withForeignTable(%s)",  shortFieldName(fm.getForeignTable().get()));
+            emit(".withForeignTable(%s)", shortFieldName(fm.getForeignTable().get()));
         }
         emit(".build();");
         pop();

@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
  *
  * @param <T> Table type
  * @param <O> Object type
- *
  * @author gideon
  */
 public interface LongField<T extends Table<O>, O> extends Field<T, O, Long>, WithRange<T, O, Long>, WithEquals<T, O, Long>, WithIn<T, O, Long>, WithIs<T, O, Long> {

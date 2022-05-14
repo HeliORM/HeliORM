@@ -1,15 +1,14 @@
 package com.heliorm.impl;
 
 import com.heliorm.OrmException;
+import com.heliorm.Table;
 import com.heliorm.def.Continuation;
 import com.heliorm.def.FloatField;
-import com.heliorm.Table;
 
 import java.util.Arrays;
 import java.util.List;
 
 /**
- *
  * @author gideon
  */
 public class FloatFieldPart<T extends Table<O>, O> extends NumberFieldPart<T, O, Float> implements FloatField<T, O> {
@@ -48,6 +47,7 @@ public class FloatFieldPart<T extends Table<O>, O> extends NumberFieldPart<T, O,
     public Continuation<T, O> ge(Float value) throws OrmException {
         return new FloatValueExpressionPart((FloatFieldPart) getThis(), ValueExpressionPart.Operator.GE, value);
     }
+
     @Override
     public Continuation<T, O> isNull() throws OrmException {
         return new IsExpressionPart(getThis(), IsExpressionPart.Operator.IS_NULL);

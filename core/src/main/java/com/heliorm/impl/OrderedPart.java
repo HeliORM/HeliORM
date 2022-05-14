@@ -7,18 +7,17 @@ import com.heliorm.def.Executable;
 import java.util.List;
 
 /**
- *
  * @author gideon
  */
 public final class OrderedPart<DT extends Table<DO>, DO> extends ExecutablePart<DT, DO> implements Complete<DO> {
 
 
-    private final SelectPart<DT,DO> select;
-    private final List<OrderPart<DT,DO>> order;
+    private final SelectPart<DT, DO> select;
+    private final List<OrderPart<DT, DO>> order;
 
-    public OrderedPart(Selector selector, SelectPart<DT,DO> select, List<OrderPart<DT,DO>>  order, LimitPart<DO> limit) {
+    public OrderedPart(Selector selector, SelectPart<DT, DO> select, List<OrderPart<DT, DO>> order, LimitPart<DO> limit) {
         super(selector);
-        this.select =select;
+        this.select = select;
         this.order = order;
         this.select.setLimit(limit);
     }

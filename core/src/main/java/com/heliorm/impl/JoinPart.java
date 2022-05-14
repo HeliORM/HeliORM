@@ -8,17 +8,16 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- *
  * @author gideon
  */
 public class JoinPart<LT extends Table<LO>, LO, RT extends Table<RO>, RO> implements Join<LT, LO> {
 
     private final RT table;
-    private final OnPart<LT,LO, RT,RO> on;
-    private final Optional<WherePart<RT,RO>> where;
-    private final List<JoinPart<?,?,?,?>> joins;
+    private final OnPart<LT, LO, RT, RO> on;
+    private final Optional<WherePart<RT, RO>> where;
+    private final List<JoinPart<?, ?, ?, ?>> joins;
 
-    public JoinPart(RT table, OnPart<LT,LO,RT,RO> on, Optional<WherePart<RT,RO>> where, List<JoinPart<RT,RO,?,?>> joins ) {
+    public JoinPart(RT table, OnPart<LT, LO, RT, RO> on, Optional<WherePart<RT, RO>> where, List<JoinPart<RT, RO, ?, ?>> joins) {
         this.table = table;
         this.on = on;
         this.where = where;

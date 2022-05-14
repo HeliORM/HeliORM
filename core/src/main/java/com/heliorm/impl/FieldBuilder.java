@@ -1,8 +1,8 @@
 package com.heliorm.impl;
 
+import com.heliorm.Field;
 import com.heliorm.Table;
 import com.heliorm.UncaughtOrmException;
-import com.heliorm.Field;
 
 import java.util.Optional;
 
@@ -43,10 +43,12 @@ public class FieldBuilder<P extends FieldPart> {
         this.autoNumber = value;
         return this;
     }
+
     public FieldBuilder<P> withNullable(boolean value) {
         this.nullable = value;
         return this;
     }
+
     public FieldBuilder<P> withForeignKey(boolean value) {
         this.foreignKey = value;
         return this;
@@ -63,7 +65,7 @@ public class FieldBuilder<P extends FieldPart> {
     }
 
     public P build() {
-        P  part = null;
+        P part = null;
         switch (fieldType) {
             case STRING:
                 part = (P) new StringFieldPart(table, javaName);

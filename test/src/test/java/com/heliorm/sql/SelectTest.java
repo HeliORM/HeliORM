@@ -65,13 +65,6 @@ public class SelectTest extends AbstractOrmTest {
     private static List<Dog> dogs;
     private static List<Bird> birds;
 
-    private <O> void check(List<O> have, List<O> want) throws OrmException {
-        assertNotNull(have, "The first list should be non-null");
-        assertFalse(have.isEmpty(), "The first list should be non-empty");
-        assertTrue(have.size() == want.size(), format("The two lists should be the same size (%d vs %s)", have.size(), want.size()));
-        assertTrue(listCompareOrdered(have, want), "The items in the two lists should be exactly the same");
-    }
-
     @BeforeAll
     public static void setupData() throws OrmException {
         provinces = createAll(makeProvinces());
@@ -83,6 +76,22 @@ public class SelectTest extends AbstractOrmTest {
         birds = createAll(makeBirds(persons.size() * 2, persons));
     }
 
+    @AfterAll
+    public static void removeData() throws OrmException {
+        deleteAll(Cat.class);
+        deleteAll(Dog.class);
+        deleteAll(Bird.class);
+        deleteAll(Person.class);
+        deleteAll(Town.class);
+        deleteAll(Province.class);
+    }
+
+    private <O> void check(List<O> have, List<O> want) throws OrmException {
+        assertNotNull(have, "The first list should be non-null");
+        assertFalse(have.isEmpty(), "The first list should be non-empty");
+        assertTrue(have.size() == want.size(), format("The two lists should be the same size (%d vs %s)", have.size(), want.size()));
+        assertTrue(listCompareOrdered(have, want), "The items in the two lists should be exactly the same");
+    }
 
     @Test
     @Order(10)
@@ -287,7 +296,6 @@ public class SelectTest extends AbstractOrmTest {
         assertTrue(listCompareOrdered(all, wanted), "The items loaded are exactly the same as the ones we expected");
     }
 
-
     @Test
     @Order(161)
     public void testSelectWhereAndTwoFields() throws Exception {
@@ -302,8 +310,7 @@ public class SelectTest extends AbstractOrmTest {
         assertTrue(listCompareOrdered(all, wanted), "The items loaded are exactly the same as the ones we expected");
     }
 
-
-  //  @Test
+    //  @Test
     @Order(162)
     public void testSelectWhereDateField() throws Exception {
         say("Testing select with a where clause with and on two fields");
@@ -313,13 +320,14 @@ public class SelectTest extends AbstractOrmTest {
         List<Cat> wanted = cats.stream()
                 .filter(cat -> cat.getBirthday().before(then))
                 .collect(Collectors.toList());
-        List<Cat> all = orm().select(CAT, where(CAT.birthday.lt(then    )))
+        List<Cat> all = orm().select(CAT, where(CAT.birthday.lt(then)))
                 .list();
         assertNotNull(all, "The list returned by list() should be non-null");
         assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
         assertTrue(listCompareOrdered(all, wanted), "The items loaded are exactly the same as the ones we expected");
     }
-//    @Test
+
+    //    @Test
     @Order(163)
     public void testSelectWhereAndTwoDateFields() throws Exception {
         say("Testing select with a where clause with and on two fields");
@@ -428,7 +436,7 @@ public class SelectTest extends AbstractOrmTest {
                 .sorted(Comparator.comparing(Cat::getId))
                 .collect(Collectors.groupingBy(cat -> counter.getAndIncrement() / batchSize));
         Map<Integer, List<Cat>> all = new HashMap<>();
-        for (int i = 0; i < counter.get()/batchSize; ++i) {
+        for (int i = 0; i < counter.get() / batchSize; ++i) {
             List<Cat> batch = orm().select(CAT)
                     .orderBy(CAT.id)
                     .limit(i * batchSize, batchSize)
@@ -436,14 +444,13 @@ public class SelectTest extends AbstractOrmTest {
             all.put(i, batch);
         }
         assertNotNull(all, "The groups of cats should be non-null");
-        for (int i = 0; i < counter.get()/batchSize; ++i) {
+        for (int i = 0; i < counter.get() / batchSize; ++i) {
             List<Cat> wantedBatch = wanted.get(i);
             List<Cat> loadedBatch = all.get(i);
             assertTrue(loadedBatch.size() == wantedBatch.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
             assertTrue(listCompareAsIs(loadedBatch, wantedBatch), "The items loaded are exactly the same as the ones we expected");
         }
     }
-
 
     @Test
     @Order(200)
@@ -648,7 +655,7 @@ public class SelectTest extends AbstractOrmTest {
         say("Testing select with join against two tables");
         List<Cat> selected = orm().select(CAT,
                         join(PERSON, on(CAT.personId, PERSON.id), where(PERSON.firstName.eq("Bob"))),
-                        join(CATBREED, on (CAT.breedId, CATBREED.id),
+                        join(CATBREED, on(CAT.breedId, CATBREED.id),
                                 where(CATBREED.name.eq("Persian"))))
                 .list();
 
@@ -719,15 +726,5 @@ public class SelectTest extends AbstractOrmTest {
                     .list();
 
         });
-    }
-
-    @AfterAll
-    public static void removeData() throws OrmException {
-        deleteAll(Cat.class);
-        deleteAll(Dog.class);
-        deleteAll(Bird.class);
-        deleteAll(Person.class);
-        deleteAll(Town.class);
-        deleteAll(Province.class);
     }
 }

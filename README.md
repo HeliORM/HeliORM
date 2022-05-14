@@ -1,9 +1,11 @@
-# HeliORM 
+# HeliORM
+
 [![Java CI with Maven](https://github.com/HeliORM/HeliORM/actions/workflows/maven.yml/badge.svg)](https://github.com/HeliORM/HeliORM/actions/workflows/maven.yml)
 
-HeliORM is a **code-first** object-relational model for accessing SQL data from Java. It allows **compile time type safe** SQL queries from Java code. 
+HeliORM is a **code-first** object-relational model for accessing SQL data from Java. It allows **compile time type
+safe** SQL queries from Java code.
 
-Here is an example of a type safe query in Java: 
+Here is an example of a type safe query in Java:
 
 ```java
         List<Cat> all = orm().select(CAT)
@@ -16,18 +18,22 @@ Here is an example of a type safe query in Java:
 
 If you find this example interesting, read on.
 
-The idea is that you write your plain old Java Objects (POJOs), and then generate a supporting data model that allows type-safe queries, and then use this model and a very simple API to do Structured Query Language (SQL) queries and updates. It is focussed on working with POJOs and is intended to make create, update, read, delete (CRUD) operations easy. It is not meant to be a complete implementation of SQL in Java. 
+The idea is that you write your plain old Java Objects (POJOs), and then generate a supporting data model that allows
+type-safe queries, and then use this model and a very simple API to do Structured Query Language (SQL) queries and
+updates. It is focussed on working with POJOs and is intended to make create, update, read, delete (CRUD) operations
+easy. It is not meant to be a complete implementation of SQL in Java.
 
 HeliORM also supports querying on abstract data types.
 
 :warning: This page is currently **very** incomplete
 
-
 ## Getting HeliORM
 
-I recommend using Maven or your prefered package management technology to add HeliORM To your project. You'll need at least the `core` library, and most likely a SQL driver library, and if you wish to use annotations in your POJOs, the annotation library.
+I recommend using Maven or your prefered package management technology to add HeliORM To your project. You'll need at
+least the `core` library, and most likely a SQL driver library, and if you wish to use annotations in your POJOs, the
+annotation library.
 
-### The core library 
+### The core library
 
 ```xml
   <dependency>
@@ -47,7 +53,7 @@ I recommend using Maven or your prefered package management technology to add He
   </dependency>
 ```
 
-### The MySQL driver 
+### The MySQL driver
 
 ```xml
   <dependency>
@@ -57,10 +63,9 @@ I recommend using Maven or your prefered package management technology to add He
   </dependency>
 ```
 
+## Quick CRUD examples
 
-## Quick CRUD examples 
-
-In these examples we have a POJO class called `Dog` and a running ORM referenced by `orm`. 
+In these examples we have a POJO class called `Dog` and a running ORM referenced by `orm`.
 
 Class `Dog` can more or less look like this:
 
@@ -78,9 +83,10 @@ public class Dog {
 }   
 ```
 
-`Dog` is annotated with `@Pojo` and some of it's fields are annotated as well. We'll explain more about annotations later
+`Dog` is annotated with `@Pojo` and some of it's fields are annotated as well. We'll explain more about annotations
+later
 
-### Create 
+### Create
 
 Create a new 3-year old dog, and call it 'Fido':
 
@@ -93,7 +99,7 @@ Create a new 3-year old dog, and call it 'Fido':
    dog = orm.create(dog);
 ```
 
-### Read 
+### Read
 
 Read the dog called 'Fido':
 
@@ -122,7 +128,6 @@ Delete a dog:
    orm.delete(dog); // Rip Rex 
 ```
 
-
 ## Retrieving data as lists, streams, singletons or optionals
 
 ### Retrieve a list of data
@@ -144,7 +149,7 @@ Dog dog = orm.select(DOG)
                 .one();
 ```
 
-### Get an optional object 
+### Get an optional object
 
 Get dog with ID 10 if you're not sure it exists. If it doesn't exist, an empty `Optional` is returned.
 
@@ -154,7 +159,7 @@ Optional<Dog> optDog =  orm.select(DOG)
                 .optional();
 ```
 
-### Retrieve data as a stream 
+### Retrieve data as a stream
 
 Get all dogs in any order as a stream:
 
@@ -162,12 +167,11 @@ Get all dogs in any order as a stream:
 Stream<Dogs> dogs = orm.select(DOG).stream();
 ```
 
-## Ordering 
+## Ordering
 
+### Order by sinlge column/field in ascending order
 
-### Order by sinlge column/field in ascending order 
-
- Get all dogs ordered by name:
+Get all dogs ordered by name:
 
 ```java
 List<Dog> alphaDogs = orm.select(DOG)
@@ -185,7 +189,7 @@ List<Dog> dogHierarchy = orm.select(DOG)
    .list();
 ```
 
-### Order by a column/field in descending order, other in ascending 
+### Order by a column/field in descending order, other in ascending
 
 Get all dogs ordered from oldest to youngest:
 
@@ -195,9 +199,7 @@ List<Dog> dogHierarchy = orm.select(DOG)
    .list();
 ```
 
-
-## Joining data 
-
+## Joining data
 
 Keep in mind what `Dog` looks like, and take a look at `Person`:
 
@@ -223,9 +225,9 @@ public class Person {
 
 ````
 
-### Select on a joined selection table 
+### Select on a joined selection table
 
-Get all dogs owned by Bob: 
+Get all dogs owned by Bob:
 
 ```java
 List<Dog> bobsDogs = orm.select(DOG)
@@ -234,9 +236,9 @@ List<Dog> bobsDogs = orm.select(DOG)
     .list();
 ```
 
-###  Select on the result table and joined selection table
+### Select on the result table and joined selection table
 
-Get all dogs older than 2 years owned by Bob 
+Get all dogs older than 2 years owned by Bob
 
 ```java
 List<Dog> bobsDogs = orm.select(DOG)

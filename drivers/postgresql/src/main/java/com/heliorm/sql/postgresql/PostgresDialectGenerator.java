@@ -1,8 +1,8 @@
 package com.heliorm.sql.postgresql;
 
 import com.heliorm.Field;
-import com.heliorm.sql.OrmSqlException;
 import com.heliorm.Table;
+import com.heliorm.sql.OrmSqlException;
 import com.heliorm.sql.TableGenerator;
 
 import java.util.Optional;

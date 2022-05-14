@@ -1,13 +1,14 @@
 package com.heliorm.sql;
 
+import com.heliorm.Field;
 import com.heliorm.OrmException;
 import com.heliorm.Table;
 import com.heliorm.UncaughtOrmException;
-import com.heliorm.Field;
 
 import java.util.Optional;
 
-/** A comparable that compares two POJOs taking into account the meta data
+/**
+ * A comparable that compares two POJOs taking into account the meta data
  * available from a Table
  *
  * @author gideon
@@ -74,8 +75,7 @@ final class PojoCompare<O> implements Comparable<PojoCompare<O>> {
     int compareTo(PojoCompare<O> w, Field<?, O, ?> field) throws UncaughtOrmException {
         try {
             return pops.compareTo(pojo, w.getPojo(), field);
-        }
-        catch (OrmException ex) {
+        } catch (OrmException ex) {
             throw new UncaughtOrmException(ex.getMessage(), ex);
         }
     }

@@ -1,12 +1,11 @@
 package com.heliorm.impl;
 
-import com.heliorm.def.Continuation;
-import com.heliorm.def.WithEquals;
 import com.heliorm.OrmException;
 import com.heliorm.Table;
+import com.heliorm.def.Continuation;
+import com.heliorm.def.WithEquals;
 
 /**
- *
  * @author gideon
  */
 public interface WithEqualsPart<T extends Table<O>, O, C> extends WithEquals<T, O, C> {

@@ -30,7 +30,8 @@ public @interface Column {
      */
     int length() default 0;
 
-    /** Determine if the column on the database can be null.
+    /**
+     * Determine if the column on the database can be null.
      *
      * @return True if null is allowed
      */

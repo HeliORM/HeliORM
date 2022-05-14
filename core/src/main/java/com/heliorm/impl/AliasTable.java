@@ -1,9 +1,9 @@
 package com.heliorm.impl;
 
 import com.heliorm.Database;
-import com.heliorm.Table;
 import com.heliorm.Field;
 import com.heliorm.Index;
+import com.heliorm.Table;
 
 import java.util.HashSet;
 import java.util.List;
@@ -11,7 +11,6 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- *
  * @author gideon
  */
 public class AliasTable<O> implements Table<O> {
@@ -63,7 +62,7 @@ public class AliasTable<O> implements Table<O> {
 
     @Override
     public boolean isAbstract() {
-      return table.isAbstract();
+        return table.isAbstract();
     }
 
     @Override

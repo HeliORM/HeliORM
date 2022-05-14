@@ -1,6 +1,5 @@
 package com.heliorm;
 
-import com.heliorm.Table;
 import com.heliorm.def.FieldOrder;
 
 import java.util.Optional;
@@ -13,22 +12,7 @@ import java.util.Optional;
  * @param <C> The data type of the field
  * @author gideon
  */
-public interface Field<T extends Table<O>, O, C>  extends FieldOrder<T,O,C> {
-
-    enum FieldType {
-        LONG,
-        INTEGER,
-        SHORT,
-        BYTE,
-        DOUBLE,
-        FLOAT,
-        BOOLEAN,
-        ENUM,
-        STRING,
-        DATE,
-        INSTANT,
-        DURATION;
-    }
+public interface Field<T extends Table<O>, O, C> extends FieldOrder<T, O, C> {
 
     Table<?> getTable();
 
@@ -67,11 +51,12 @@ public interface Field<T extends Table<O>, O, C>  extends FieldOrder<T,O,C> {
      */
     boolean isPrimaryKey();
 
-    /** Return true if this field is the foreign key from another table.
+    /**
+     * Return true if this field is the foreign key from another table.
      *
      * @return True if it is
      */
-     boolean isForeignKey();
+    boolean isForeignKey();
 
     /**
      * Return true if this is an auto-number key
@@ -82,25 +67,42 @@ public interface Field<T extends Table<O>, O, C>  extends FieldOrder<T,O,C> {
 
     /**
      * Return the table to which this field links if it is a foreign key.
+     *
      * @return The linked table
      */
-     Optional<Table<?>> getForeignTable();
+    Optional<Table<?>> getForeignTable();
 
     /**
      * Return the field length, if a specific length is known.
      *
      * @return The length, if known
      */
-     Optional<Integer> getLength() ;
+    Optional<Integer> getLength();
 
-    /** Return true if the field can be null.
+    /**
+     * Return true if the field can be null.
      *
      * @return True if it can be null
      */
-     boolean isNullable() ;
+    boolean isNullable();
 
-     FieldOrder<T,O,C> asc();
+    FieldOrder<T, O, C> asc();
 
-     FieldOrder<T,O,C> desc();
+    FieldOrder<T, O, C> desc();
+
+    enum FieldType {
+        LONG,
+        INTEGER,
+        SHORT,
+        BYTE,
+        DOUBLE,
+        FLOAT,
+        BOOLEAN,
+        ENUM,
+        STRING,
+        DATE,
+        INSTANT,
+        DURATION;
+    }
 
 }

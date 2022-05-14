@@ -1,14 +1,14 @@
 package com.heliorm.impl;
 
-import com.heliorm.Table;
 import com.heliorm.Field;
+import com.heliorm.Table;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-public final class DateListExpressionPart<T extends Table<O>,O> extends ListExpressionPart<T,O, Date> {
+public final class DateListExpressionPart<T extends Table<O>, O> extends ListExpressionPart<T, O, Date> {
 
     private final List<Date> values;
 

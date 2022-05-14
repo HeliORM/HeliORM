@@ -1,9 +1,9 @@
 package com.heliorm.impl;
 
-import com.heliorm.def.FieldOrder;
+import com.heliorm.Field;
 import com.heliorm.OrmException;
 import com.heliorm.Table;
-import com.heliorm.Field;
+import com.heliorm.def.FieldOrder;
 
 import java.util.Optional;
 
@@ -58,14 +58,26 @@ public abstract class FieldPart<T extends Table<O>, O, C> implements Field<T, O,
         return sqlName;
     }
 
+    void setSqlName(String sqlName) {
+        this.sqlName = sqlName;
+    }
+
     @Override
     public final boolean isPrimaryKey() {
         return primaryKey;
     }
 
+    void setPrimaryKey(boolean primaryKey) {
+        this.primaryKey = primaryKey;
+    }
+
     @Override
     public boolean isAutoNumber() {
         return autoNumber;
+    }
+
+    void setAutoNumber(boolean autoNumber) {
+        this.autoNumber = autoNumber;
     }
 
     public final FieldPart<T, O, C> getThis() throws OrmException {
@@ -86,9 +98,17 @@ public abstract class FieldPart<T extends Table<O>, O, C> implements Field<T, O,
         return foreignKey;
     }
 
+    void setForeignKey(boolean foreignKey) {
+        this.foreignKey = foreignKey;
+    }
+
     @Override
     public final Optional<Table<?>> getForeignTable() {
         return foreignTable;
+    }
+
+    void setForeignTable(Optional<Table<?>> foreignTable) {
+        this.foreignTable = foreignTable;
     }
 
     @Override
@@ -96,16 +116,24 @@ public abstract class FieldPart<T extends Table<O>, O, C> implements Field<T, O,
         return length;
     }
 
+    public void setLength(Optional<Integer> length) {
+        this.length = length;
+    }
+
     @Override
     public final boolean isNullable() {
         return nullable;
     }
 
-    public FieldOrder<T,O,C> asc() {
+    void setNullable(boolean nullable) {
+        this.nullable = nullable;
+    }
+
+    public FieldOrder<T, O, C> asc() {
         return () -> FieldPart.this;
     }
 
-    public FieldOrder<T,O,C> desc() {
+    public FieldOrder<T, O, C> desc() {
         return new FieldOrder<T, O, C>() {
 
             @Override
@@ -123,34 +151,6 @@ public abstract class FieldPart<T extends Table<O>, O, C> implements Field<T, O,
     @Override
     public Field<T, O, C> getField() {
         return this;
-    }
-
-    void setSqlName(String sqlName) {
-        this.sqlName = sqlName;
-    }
-
-    void setPrimaryKey(boolean primaryKey) {
-        this.primaryKey = primaryKey;
-    }
-
-    void setAutoNumber(boolean autoNumber) {
-        this.autoNumber = autoNumber;
-    }
-
-    void setForeignKey(boolean foreignKey) {
-        this.foreignKey = foreignKey;
-    }
-
-    void setNullable(boolean nullable) {
-        this.nullable = nullable;
-    }
-
-    void setForeignTable(Optional<Table<?>> foreignTable) {
-        this.foreignTable = foreignTable;
-    }
-
-    public void setLength(Optional<Integer> length) {
-        this.length = length;
     }
 
     @Override

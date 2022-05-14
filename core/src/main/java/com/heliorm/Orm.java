@@ -47,13 +47,14 @@ public interface Orm extends AutoCloseable {
      */
     <T extends Table<O>, O> Select<T, O> select(T table);
 
-    <T extends Table<O>, O> Select<T,O> select(T table, Where<T,O> where);
+    <T extends Table<O>, O> Select<T, O> select(T table, Where<T, O> where);
 
-    <T extends Table<O>, O> Select<T,O> select(T table, Join<T,O>...joins);
+    <T extends Table<O>, O> Select<T, O> select(T table, Join<T, O>... joins);
 
-    <T extends Table<O>, O> Select<T,O> select(T table, Where<T,O> where, Join<T,O>...joins);
+    <T extends Table<O>, O> Select<T, O> select(T table, Where<T, O> where, Join<T, O>... joins);
 
-    /** Open a new transaction.
+    /**
+     * Open a new transaction.
      *
      * @return The transaction
      * @throws OrmException Thrown if the driver doesn't support transactions of if there is a problem opening one
@@ -83,10 +84,11 @@ public interface Orm extends AutoCloseable {
      */
     <O> Table<O> tableFor(Class<O> type) throws OrmException;
 
-    /** Return the selector that is used to select data.
+    /**
+     * Return the selector that is used to select data.
      *
      * @return The selector
      */
     Selector selector();
-    
+
 }

@@ -1,8 +1,8 @@
 package com.heliorm.impl;
 
+import com.heliorm.Field;
 import com.heliorm.Table;
 import com.heliorm.def.Continuation;
-import com.heliorm.Field;
 
 /**
  * @param <T> Type of table
@@ -13,15 +13,9 @@ import com.heliorm.Field;
 public abstract class ExpressionPart<T extends Table<O>, O, C> implements Continuation<T, O> {
 
 
-    public enum Type {
-        VALUE_EXPRESSION,
-        LIST_EXPRESSION, IS_EXPRESSION
-    }
-
     private final Type type;
-    private final Field<T,O,C> field;
-
-    public ExpressionPart(Type type, Field<T,O,C> field) {
+    private final Field<T, O, C> field;
+    public ExpressionPart(Type type, Field<T, O, C> field) {
         this.type = type;
         this.field = field;
     }
@@ -42,5 +36,10 @@ public abstract class ExpressionPart<T extends Table<O>, O, C> implements Contin
 
     public final Field<T, O, C> getField() {
         return field;
+    }
+
+    public enum Type {
+        VALUE_EXPRESSION,
+        LIST_EXPRESSION, IS_EXPRESSION
     }
 }

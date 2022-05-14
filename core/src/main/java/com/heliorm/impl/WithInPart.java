@@ -1,14 +1,13 @@
 package com.heliorm.impl;
 
-import java.util.List;
-
-import com.heliorm.def.Continuation;
 import com.heliorm.OrmException;
 import com.heliorm.Table;
+import com.heliorm.def.Continuation;
 import com.heliorm.def.WithIn;
 
+import java.util.List;
+
 /**
- *
  * @author gideon
  */
 public interface WithInPart<T extends Table<O>, O, C> extends WithIn<T, O, C> {

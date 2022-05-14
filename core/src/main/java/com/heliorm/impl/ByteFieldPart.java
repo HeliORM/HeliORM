@@ -9,7 +9,6 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- *
  * @author gideon
  */
 public final class ByteFieldPart<T extends Table<O>, O> extends NumberFieldPart<T, O, Byte> implements ByteField<T, O> {

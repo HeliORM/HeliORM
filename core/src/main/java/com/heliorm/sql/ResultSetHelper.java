@@ -1,8 +1,8 @@
 package com.heliorm.sql;
 
+import com.heliorm.Field;
 import com.heliorm.OrmException;
 import com.heliorm.Table;
-import com.heliorm.Field;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -14,7 +14,8 @@ import java.util.function.Function;
 
 import static java.lang.String.format;
 
-/** A helper class that provides common functionality for unpacking POJOs from SQL result sets.
+/**
+ * A helper class that provides common functionality for unpacking POJOs from SQL result sets.
  *
  * @author gideon
  */
@@ -38,7 +39,7 @@ class ResultSetHelper {
      * @return The pojo
      * @throws OrmException Thrown if there is an error building the Pojo.
      */
-     <O> O makePojoFromResultSet(ResultSet rs, Table<O> table) throws OrmException {
+    <O> O makePojoFromResultSet(ResultSet rs, Table<O> table) throws OrmException {
         try {
             O pojo = (O) pops.newPojoInstance(table);
             for (Field field : table.getFields()) {

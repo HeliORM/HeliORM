@@ -1,7 +1,7 @@
 package com.heliorm.impl;
 
-import com.heliorm.Table;
 import com.heliorm.Field;
+import com.heliorm.Table;
 
 public final class IntegerValueExpressionPart<T extends Table<O>, O> extends NumberValueExpressionPart<T, O, Integer> {
 

@@ -2,8 +2,8 @@ package com.heliorm.impl;
 
 import com.heliorm.OrmException;
 import com.heliorm.Table;
-import com.heliorm.def.EnumField;
 import com.heliorm.def.Continuation;
+import com.heliorm.def.EnumField;
 
 import java.util.Arrays;
 import java.util.List;

@@ -1,16 +1,15 @@
 package com.heliorm.def;
 
-import java.util.List;
-
 import com.heliorm.OrmException;
 import com.heliorm.Table;
 
+import java.util.List;
+
 /**
- *
- * @author gideon
  * @param <T> Table type
  * @param <O> Object type
  * @param <C> Column/field type
+ * @author gideon
  */
 public interface WithIn<T extends Table<O>, O, C> {
 
