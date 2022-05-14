@@ -1,11 +1,11 @@
 package com.heliorm.impl;
 
-import com.heliorm.Table;
 import com.heliorm.Field;
+import com.heliorm.Table;
 
 import java.time.Duration;
 
-public final class DurationValueExpressionPart<T extends Table<O>, O> extends ValueExpressionPart<T,O, Duration> {
+public final class DurationValueExpressionPart<T extends Table<O>, O> extends ValueExpressionPart<T, O, Duration> {
 
     private Duration value;
 
@@ -18,8 +18,6 @@ public final class DurationValueExpressionPart<T extends Table<O>, O> extends Va
     public Duration getValue() {
         return value;
     }
-
-   
 
 
 }

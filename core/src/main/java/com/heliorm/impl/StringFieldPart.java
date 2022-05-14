@@ -1,9 +1,9 @@
 package com.heliorm.impl;
 
 import com.heliorm.OrmException;
+import com.heliorm.Table;
 import com.heliorm.def.Continuation;
 import com.heliorm.def.StringField;
-import com.heliorm.Table;
 
 import java.util.Arrays;
 import java.util.List;
@@ -73,6 +73,7 @@ public class StringFieldPart<T extends Table<O>, O> extends FieldPart<T, O, Stri
     public Continuation<T, O> isNotNull() throws OrmException {
         return new IsExpressionPart(getThis(), IsExpressionPart.Operator.IS_NOT_NULL);
     }
+
     @Override
     public Continuation<T, O> in(List<String> values) throws OrmException {
         return new StringListExpressionPart((StringFieldPart) getThis(), ListExpressionPart.Operator.IN, values);

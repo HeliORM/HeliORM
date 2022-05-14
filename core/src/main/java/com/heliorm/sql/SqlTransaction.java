@@ -9,7 +9,8 @@ import java.sql.SQLException;
 
 import static java.lang.String.format;
 
-/** A SQL transaction
+/**
+ * A SQL transaction
  *
  * @author gideon
  */
@@ -19,9 +20,10 @@ final class SqlTransaction implements OrmTransaction, AutoCloseable {
     private final Connection connection;
     private boolean open;
 
-    /** Create a new transactoion for the given driver.
+    /**
+     * Create a new transactoion for the given driver.
      *
-     * @param driver The driver for this transaction
+     * @param driver     The driver for this transaction
      * @param connection the SQL Connection for this transaction
      * @throws OrmTransactionException
      */

@@ -57,9 +57,9 @@ public class StructureTable implements Table {
     private Column makeColumn(Field field) {
         switch (field.getFieldType()) {
             case ENUM:
-                return new StructureEnumColumn(this,field, getEnumValues(field));
+                return new StructureEnumColumn(this, field, getEnumValues(field));
             case STRING:
-                return new StructureStringColumn(this,field);
+                return new StructureStringColumn(this, field);
             default:
                 return new StructureColumn(this, field);
         }
@@ -68,7 +68,7 @@ public class StructureTable implements Table {
     private Set<String> getEnumValues(Field<?, ?, ?> field) {
         Class<?> javaType = field.getJavaType();
         return Arrays.stream(javaType.getEnumConstants())
-                .map(v -> ((Enum)v).name())
+                .map(v -> ((Enum) v).name())
                 .collect(Collectors.toSet());
     }
 }

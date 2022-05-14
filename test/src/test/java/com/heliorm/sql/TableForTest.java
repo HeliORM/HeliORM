@@ -39,27 +39,25 @@ public class TableForTest extends AbstractOrmTest {
         cats = createAll(makeCats(persons.size() * 5, persons, catBreeds));
     }
 
-
-    @Test
-    public void testTableForClass() throws Exception {
-        say("Testing tableFor for class");
-        List<?> all = orm().select(orm().tableFor(Cat.class)).list();
-        assertTrue(all.stream().filter(o -> o instanceof  Cat).count() == all.size(), format("All the objects loaded are of type cat (%d)", all.size()));
-    }
-
-    @Test
-    public void testTableForObject() throws Exception {
-        say("Testing tableFor for object");
-        List<?> all = orm().select(orm().tableFor(new Cat())).list();
-        assertTrue(all.stream().filter(o -> o instanceof  Cat).count() == all.size(), format("All the objects loaded are of type cat (%d)", all.size()));
-    }
-
-
     @AfterAll
     public static void removeData() throws OrmException {
         deleteAll(Cat.class);
         deleteAll(Person.class);
         deleteAll(Town.class);
         deleteAll(Province.class);
+    }
+
+    @Test
+    public void testTableForClass() throws Exception {
+        say("Testing tableFor for class");
+        List<?> all = orm().select(orm().tableFor(Cat.class)).list();
+        assertTrue(all.stream().filter(o -> o instanceof Cat).count() == all.size(), format("All the objects loaded are of type cat (%d)", all.size()));
+    }
+
+    @Test
+    public void testTableForObject() throws Exception {
+        say("Testing tableFor for object");
+        List<?> all = orm().select(orm().tableFor(new Cat())).list();
+        assertTrue(all.stream().filter(o -> o instanceof Cat).count() == all.size(), format("All the objects loaded are of type cat (%d)", all.size()));
     }
 }

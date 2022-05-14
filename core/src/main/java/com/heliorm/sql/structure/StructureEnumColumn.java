@@ -5,7 +5,7 @@ import com.heliorm.sql.EnumColumn;
 
 import java.util.Set;
 
-public class StructureEnumColumn  extends StructureColumn implements EnumColumn {
+public class StructureEnumColumn extends StructureColumn implements EnumColumn {
 
     private final Set<String> enumValues;
 

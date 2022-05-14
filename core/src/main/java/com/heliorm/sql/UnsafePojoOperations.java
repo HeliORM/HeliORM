@@ -11,7 +11,7 @@ import static java.lang.String.format;
  * specific conventions. This allows the user to write their POJOs the way they
  * want to reflect their application logic without caring about ceremony.
  * Default constructors and getters and setters are not required.
- *
+ * <p>
  * This is however using an internal Java API with an unclear future, so users
  * who worry about this can implement PojoOperations in different and safer
  * ways.
@@ -26,6 +26,24 @@ final class UnsafePojoOperations extends AbstractPojoOperations {
     UnsafePojoOperations() throws OrmException {
         super();
         unsafe = getUnsafe();
+    }
+
+    /**
+     * Get hold of the sun.misc.Unsafe object to use for object manipulation.
+     *
+     * @return The Unsafe object
+     * @throws OrmException Thrown if there is an error while getting the Unsafe
+     *                      object
+     */
+    private static Unsafe getUnsafe() throws OrmException {
+        try {
+            java.lang.reflect.Field f = Unsafe.class
+                    .getDeclaredField("theUnsafe");
+            f.setAccessible(true);
+            return (Unsafe) f.get(null);
+        } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException ex) {
+            throw new OrmException(format("Error getting Unsafe (%s)", ex.getMessage()), ex);
+        }
     }
 
     /**
@@ -320,24 +338,6 @@ final class UnsafePojoOperations extends AbstractPojoOperations {
             return unsafe.allocateInstance(type);
         } catch (InstantiationException ex) {
             throw new OrmException(ex.getMessage(), ex);
-        }
-    }
-
-    /**
-     * Get hold of the sun.misc.Unsafe object to use for object manipulation.
-     *
-     * @return The Unsafe object
-     * @throws OrmException Thrown if there is an error while getting the Unsafe
-     *                      object
-     */
-    private static Unsafe getUnsafe() throws OrmException {
-        try {
-            java.lang.reflect.Field f = Unsafe.class
-                    .getDeclaredField("theUnsafe");
-            f.setAccessible(true);
-            return (Unsafe) f.get(null);
-        } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException ex) {
-            throw new OrmException(format("Error getting Unsafe (%s)", ex.getMessage()), ex);
         }
     }
 }

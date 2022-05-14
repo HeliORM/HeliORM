@@ -1,7 +1,6 @@
 package com.heliorm.mojo;
 
 /**
- *
  * @author gideon
  */
 public class GeneratorException extends Exception {

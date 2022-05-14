@@ -63,8 +63,8 @@ public final class SqlOrm implements Orm {
     private final PojoHelper pojoHelper;
     private final PreparedStatementHelper preparedStatementHelper;
     private final ResultSetHelper resultSetHelper;
-    private SqlTransaction currentTransaction;
     private final Map<Field, String> fieldIds = new ConcurrentHashMap<>();
+    private SqlTransaction currentTransaction;
 
 
     /**

@@ -82,6 +82,10 @@ public class SelectPart<DT extends Table<DO>, DO> extends ExecutablePart<DT, DO>
         return limit;
     }
 
+    void setLimit(LimitPart<DO> limit) {
+        this.limit = limit;
+    }
+
     @Override
     public List<DO> list() throws OrmException {
         return getSelector().list(this);
@@ -115,7 +119,6 @@ public class SelectPart<DT extends Table<DO>, DO> extends ExecutablePart<DT, DO>
         return format("SELECT %s", table.getSqlTable());
     }
 
-
     private <F extends FieldOrder<DT, DO, ?>> OrderPart<DT, DO> makePart(F order) {
         return new OrderPart(order.getDirection() == FieldOrder.Direction.ASC ? OrderPart.Direction.ASCENDING : OrderPart.Direction.DESCENDING,
                 (FieldPart) (order.getField()));
@@ -125,10 +128,6 @@ public class SelectPart<DT extends Table<DO>, DO> extends ExecutablePart<DT, DO>
     public Executable<DO> limit(int from, int number) {
         limit = new LimitPart<>(from, number);
         return this;
-    }
-
-    void setLimit(LimitPart<DO> limit) {
-        this.limit = limit;
     }
 
     @Override

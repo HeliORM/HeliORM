@@ -8,13 +8,12 @@ import com.heliorm.Table;
  *
  * @param <DT> Table type
  * @param <DO> Object type
- *
  * @author gideon
  */
 public interface BooleanField<DT extends Table<DO>, DO> extends Field<DT, DO, Boolean>, WithEquals<DT, DO, Boolean>, WithIs<DT, DO, Boolean> {
 
     @Override
-   default FieldType getFieldType() {
+    default FieldType getFieldType() {
         return FieldType.BOOLEAN;
     }
 }

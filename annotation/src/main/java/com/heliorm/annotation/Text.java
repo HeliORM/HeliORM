@@ -30,13 +30,15 @@ public @interface Text {
      */
     int length() default 255;
 
-    /** Determine if the column on the database can be null.
+    /**
+     * Determine if the column on the database can be null.
      *
      * @return True if null is allowed
      */
     boolean nullable() default false;
 
-    /** Set the default value of the text field.
+    /**
+     * Set the default value of the text field.
      *
      * @return The default value supplied by the user
      */

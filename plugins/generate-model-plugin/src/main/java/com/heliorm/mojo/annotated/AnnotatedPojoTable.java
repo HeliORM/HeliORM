@@ -25,15 +25,15 @@ public final class AnnotatedPojoTable implements Table {
 
     private final Database database;
     private final Class<?> pojoClass;
+    private final Set<Table> subs;
     private List<Field> fieldModels;
     private List<Index> indexes;
-    private final Set<Table> subs;
 
     /**
      * Create a new table with the given database, POJO class and set of
      * sub-tables.
      *
-     * @param database The database
+     * @param database  The database
      * @param pojoClass The POJO class
      * @param subTables The set of sub-tables
      */
@@ -109,7 +109,6 @@ public final class AnnotatedPojoTable implements Table {
      * Decide if a reflected field is a data field we need to process. A field
      * is considered a POJO field if it is not native, not transient, not static
      * and not annotated with the @Ignore annotation.
-     *
      *
      * @param field The reflected field to evaluate
      * @return True if it is considered a data field

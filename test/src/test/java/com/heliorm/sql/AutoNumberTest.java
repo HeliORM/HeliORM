@@ -40,18 +40,12 @@ public class AutoNumberTest extends AbstractOrmTest {
         persons = createAll(makePersons(towns));
     }
 
-
-    @Test
-    public void testCreateWithLongKey() throws Exception {
-        say("Testing create with auto-number Long key");
-        Person person = persons.get(0);
-        Cat cat = makeCat(person, catBreeds.get(0));
-        Cat saved = orm().create(cat);
-        cats.add(saved);
-        assertNotNull(saved, "The object returned by create should not be null");
-        assertTrue(cat.getId() == null, "The id of the new object must be null before create");
-        assertTrue(saved.getId() != null, "The id of the new object must be not-null after create");
-        assertTrue(pojoCompareExcludingKey(cat, saved), "The new and created objects must be the same apart from the key");
+    @AfterAll
+    public static void removeData() throws OrmException {
+        deleteAll(Cat.class);
+        deleteAll(Person.class);
+        deleteAll(Town.class);
+        deleteAll(Province.class);
     }
 
 //    @Test
@@ -67,12 +61,16 @@ public class AutoNumberTest extends AbstractOrmTest {
 //        assertTrue(pojoCompareExcludingKey(town, saved), "The new and created objects must be the same apart from the key");
 //    }
 
-
-    @AfterAll
-    public static void removeData() throws OrmException {
-        deleteAll(Cat.class);
-        deleteAll(Person.class);
-        deleteAll(Town.class);
-        deleteAll(Province.class);
+    @Test
+    public void testCreateWithLongKey() throws Exception {
+        say("Testing create with auto-number Long key");
+        Person person = persons.get(0);
+        Cat cat = makeCat(person, catBreeds.get(0));
+        Cat saved = orm().create(cat);
+        cats.add(saved);
+        assertNotNull(saved, "The object returned by create should not be null");
+        assertTrue(cat.getId() == null, "The id of the new object must be null before create");
+        assertTrue(saved.getId() != null, "The id of the new object must be not-null after create");
+        assertTrue(pojoCompareExcludingKey(cat, saved), "The new and created objects must be the same apart from the key");
     }
 }

@@ -30,6 +30,9 @@ final class AnnotationHelper {
     private static final List<Class<? extends Annotation>> fieldAnnotations =
             Arrays.asList(PrimaryKey.class, ForeignKey.class, Ignore.class, Text.class, Decimal.class);
 
+    private AnnotationHelper() {
+    }
+
     static <A extends Annotation> Optional<A> getAnnotation(Class type, Class<A> aType) {
         return (Optional<A>) Optional.ofNullable(type.getAnnotation(aType));
     }
@@ -128,8 +131,5 @@ final class AnnotationHelper {
         } catch (NoSuchMethodException e) {
             return Optional.empty();
         }
-    }
-
-    private AnnotationHelper() {
     }
 }

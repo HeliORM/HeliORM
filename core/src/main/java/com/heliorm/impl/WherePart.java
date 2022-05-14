@@ -1,22 +1,22 @@
 package com.heliorm.impl;
 
 import com.heliorm.Table;
-import com.heliorm.def.Where;
 import com.heliorm.def.Continuation;
+import com.heliorm.def.Where;
 
 import java.util.LinkedList;
 import java.util.List;
 
-public class WherePart<T extends Table<O>, O> implements Where<T,O>  {
+public class WherePart<T extends Table<O>, O> implements Where<T, O> {
 
-    private final ExpressionPart<T,O,?> expression;
-    private final List<ExpressionContinuationPart<T,O>> continuations = new LinkedList<>();
+    private final ExpressionPart<T, O, ?> expression;
+    private final List<ExpressionContinuationPart<T, O>> continuations = new LinkedList<>();
 
     public WherePart(Continuation<T, O> expr) {
         this.expression = (ExpressionPart<T, O, ?>) expr;
     }
 
-    public ExpressionPart<T, O,?> getExpression() {
+    public ExpressionPart<T, O, ?> getExpression() {
         return expression;
     }
 

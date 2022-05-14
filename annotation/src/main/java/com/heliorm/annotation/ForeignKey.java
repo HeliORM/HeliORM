@@ -23,7 +23,8 @@ public @interface ForeignKey {
      */
     String fieldName() default "";
 
-    /** Determine if the column on the database can be null.
+    /**
+     * Determine if the column on the database can be null.
      *
      * @return True if null is allowed
      */

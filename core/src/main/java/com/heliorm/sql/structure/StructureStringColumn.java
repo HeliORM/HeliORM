@@ -5,7 +5,7 @@ import com.heliorm.sql.StringColumn;
 
 public class StructureStringColumn extends StructureColumn implements StringColumn {
 
-    public StructureStringColumn(StructureTable table, Field<?,?,?> field) {
+    public StructureStringColumn(StructureTable table, Field<?, ?, ?> field) {
         super(table, field);
     }
 

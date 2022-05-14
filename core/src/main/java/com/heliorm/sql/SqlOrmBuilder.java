@@ -1,9 +1,9 @@
 package com.heliorm.sql;
 
+import com.heliorm.Database;
 import com.heliorm.Orm;
 import com.heliorm.OrmException;
 import com.heliorm.impl.AliasDatabase;
-import com.heliorm.Database;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -30,6 +30,18 @@ public class SqlOrmBuilder {
     private boolean useUnionAll = true;
 
     /**
+     * Create a new ORM builder.
+     *
+     * @param con The connection supplier to start with.
+     * @throws OrmException Thrown if there is a problem creating the OrmBuilder
+     */
+    private SqlOrmBuilder(Supplier<Connection> con, Class<? extends SqlDriver> driverClass) throws OrmException {
+        this.con = con;
+        this.driverClass = driverClass;
+        this.pops = new UnsafePojoOperations();
+    }
+
+    /**
      * Create a new OrmBuilder using the given connection supplier. This makes
      * it easy to use a connection pool, since most pool implementation has a
      * getConnection() method, so one can just pass a lambda.
@@ -41,18 +53,6 @@ public class SqlOrmBuilder {
      */
     public static SqlOrmBuilder create(Supplier<Connection> con, Class<? extends SqlDriver> driverClass) throws OrmException {
         return new SqlOrmBuilder(con, driverClass);
-    }
-
-    /**
-     * Create a new ORM builder.
-     *
-     * @param con The connection supplier to start with.
-     * @throws OrmException Thrown if there is a problem creating the OrmBuilder
-     */
-    private SqlOrmBuilder(Supplier<Connection> con, Class<? extends SqlDriver> driverClass) throws OrmException {
-        this.con = con;
-        this.driverClass = driverClass;
-        this.pops = new UnsafePojoOperations();
     }
 
     /**
@@ -90,13 +90,14 @@ public class SqlOrmBuilder {
         this.rollbackOnUncommittedClose = rollback;
         return this;
     }
-    
+
     public SqlOrmBuilder setCreateMissingTables(boolean createMissingTables) {
         this.createMissingTables = createMissingTables;
         return this;
     }
 
-    /** Configure the ORM to use or not use SQU 'UNION ALL' statements.
+    /**
+     * Configure the ORM to use or not use SQU 'UNION ALL' statements.
      * Default is true
      *
      * @param useUnionAll Use or don't use 'UNION ALL'
@@ -120,12 +121,12 @@ public class SqlOrmBuilder {
         }
         SqlDriver driver;
         try {
-            Constructor<? extends  SqlDriver> constructor = driverClass.getConstructor(Map.class);
+            Constructor<? extends SqlDriver> constructor = driverClass.getConstructor(Map.class);
             driver = constructor.newInstance(aliases);
             driver.setCreateTables(createMissingTables);
             driver.setUseUnionAll(useUnionAll);
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException e) {
-            throw new OrmException(format("Cannot start driver of type '%s' (%s)", driverClass.getSimpleName(), e.getMessage()),e);
+            throw new OrmException(format("Cannot start driver of type '%s' (%s)", driverClass.getSimpleName(), e.getMessage()), e);
         }
         if (driver.supportsTransactions()) {
             driver.setRollbackOnUncommittedClose(rollbackOnUncommittedClose);

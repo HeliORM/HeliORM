@@ -1,15 +1,14 @@
 package com.heliorm.impl;
 
 import com.heliorm.OrmException;
+import com.heliorm.Table;
 import com.heliorm.def.Continuation;
 import com.heliorm.def.IntegerField;
-import com.heliorm.Table;
 
 import java.util.Arrays;
 import java.util.List;
 
 /**
- *
  * @author gideon
  */
 public class IntegerFieldPart<T extends Table<O>, O> extends NumberFieldPart<T, O, Integer> implements IntegerField<T, O> {
@@ -59,6 +58,7 @@ public class IntegerFieldPart<T extends Table<O>, O> extends NumberFieldPart<T, 
     public Continuation<T, O> isNotNull() throws OrmException {
         return new IsExpressionPart(getThis(), IsExpressionPart.Operator.IS_NOT_NULL);
     }
+
     @Override
     public Continuation<T, O> in(List<Integer> values) throws OrmException {
         return new IntegerListExpressionPart((IntegerFieldPart) getThis(), ListExpressionPart.Operator.IN, values);

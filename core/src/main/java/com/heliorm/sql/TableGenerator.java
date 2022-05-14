@@ -2,10 +2,13 @@ package com.heliorm.sql;
 
 import com.heliorm.Table;
 
-/** Interface to implement generation of SQL schemas.  */
+/**
+ * Interface to implement generation of SQL schemas.
+ */
 public interface TableGenerator {
 
-    /** Generate a SQL table schema
+    /**
+     * Generate a SQL table schema
      *
      * @param table The table for which to generate the schema
      * @return The schema

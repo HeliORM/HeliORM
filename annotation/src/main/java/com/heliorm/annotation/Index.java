@@ -9,18 +9,19 @@ import java.lang.annotation.RetentionPolicy;
 public @interface Index {
 
 
-    /** Indicates if this index requires unique keys.
+    /**
+     * Indicates if this index requires unique keys.
      *
      * @return The uniqueness of the index
      */
     boolean unique() default false;
 
-    /** Which columns to include in the index.
+    /**
+     * Which columns to include in the index.
      *
      * @return The index columns
      */
     String[] columns();
-
 
 
 }

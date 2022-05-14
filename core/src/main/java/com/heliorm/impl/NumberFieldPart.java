@@ -1,7 +1,7 @@
 package com.heliorm.impl;
 
-import com.heliorm.Table;
 import com.heliorm.Field;
+import com.heliorm.Table;
 import com.heliorm.def.WithEquals;
 import com.heliorm.def.WithIn;
 import com.heliorm.def.WithIs;

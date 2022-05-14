@@ -23,7 +23,7 @@ public class UncaughtOrmException extends RuntimeException {
      * Create a new exception with the given message and underlying cause.
      *
      * @param message The message
-     * @param cause The underlying error
+     * @param cause   The underlying error
      */
     public UncaughtOrmException(String message, Throwable cause) {
         super(message, cause);

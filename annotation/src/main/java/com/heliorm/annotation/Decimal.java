@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 /**
  * This annotation marks a decimal POJO field that we wish adjust default behavior on. This annotation applies to
  * Float, float, Double, double and BigDecimal types.
- *
+ * <p>
  * This influences the way the metadata is generated.
  *
  * @author gideon
@@ -25,25 +25,29 @@ public @interface Decimal {
      */
     String fieldName() default "";
 
-    /** Provide precision for a decimal.
+    /**
+     * Provide precision for a decimal.
      *
      * @return The precision
      */
     int precision() default 18;
 
-    /** Provide scale for a decimal.
+    /**
+     * Provide scale for a decimal.
      *
      * @return The scale
      */
     int scale() default 2;
 
-    /** Determine if the column on the database can be null.
+    /**
+     * Determine if the column on the database can be null.
      *
      * @return True if null is allowed
      */
     boolean nullable() default false;
 
-    /** Provide the default value
+    /**
+     * Provide the default value
      *
      * @return The default value
      */

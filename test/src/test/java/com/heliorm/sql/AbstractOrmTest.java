@@ -26,12 +26,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static java.lang.String.format;
-
 abstract class AbstractOrmTest {
 
     private static final String TEST_DB_VAR = "TEST_DB";
     private static final String TEST_DB_NAME = "petz";
+    @Container
+    public static GenericContainer mariadb = new GenericContainer(DockerImageName.parse("mariadb"))
+            .withExposedPorts(3306)
+            .withEnv("MYSQL_DATABASE", TEST_DB_NAME)
+            .withEnv("MYSQL_ROOT_PASSWORD", "dev");
+    @Container
+    public static GenericContainer postgres = new GenericContainer(DockerImageName.parse("postgres"))
+            .withExposedPorts(5432)
+            .withEnv("POSTGRES_DB", TEST_DB_NAME)
+            .withEnv("POSTGRES_PASSWORD", "dev");
     private static Orm orm;
     private static DataSource jdbcDataSource;
     private static Class<? extends SqlDriver> driver;
@@ -44,20 +52,6 @@ abstract class AbstractOrmTest {
             throw new RuntimeException(ex.getMessage(), ex);
         }
     }
-
-
-    @Container
-    public static GenericContainer mariadb = new GenericContainer(DockerImageName.parse("mariadb"))
-            .withExposedPorts(3306)
-            .withEnv("MYSQL_DATABASE", TEST_DB_NAME)
-            .withEnv("MYSQL_ROOT_PASSWORD", "dev");
-
-    @Container
-    public static GenericContainer postgres = new GenericContainer(DockerImageName.parse("postgres"))
-            .withExposedPorts(5432)
-            .withEnv("POSTGRES_DB", TEST_DB_NAME)
-            .withEnv("POSTGRES_PASSWORD", "dev");
-
 
     @BeforeAll
     public static void setup() throws Exception {
@@ -85,6 +79,60 @@ abstract class AbstractOrmTest {
         deleteAll(Person.class);
         deleteAll(Town.class);
         deleteAll(Province.class);
+    }
+
+    protected static final <O> List<O> createAll(List<O> data) throws OrmException {
+        List<O> res = new ArrayList<>();
+        for (O object : data) {
+            res.add(orm.create(object));
+        }
+        return res;
+    }
+
+    protected static <O> List<O> selectAll(Class<O> type) throws OrmException {
+        try {
+            return orm.select(orm.tableFor(type.newInstance())).list();
+        } catch (InstantiationException | IllegalAccessException e) {
+
+            throw new OrmException(e.getMessage(), e);
+        }
+    }
+
+    protected static <O> void deleteAll(Class<O> type) throws OrmException {
+        for (O obj : selectAll(type)) {
+            orm.delete(obj);
+        }
+    }
+
+    protected static final void say(String fmt, Object... args) {
+        System.out.printf(fmt, args);
+        System.out.println();
+    }
+
+    private static DataSource setupH2DataSource() {
+        JdbcDataSource jdbcDataSource = new JdbcDataSource();
+        jdbcDataSource.setUrl("jdbc:h2:mem:petz;DB_CLOSE_DELAY=-1;INIT=CREATE SCHEMA IF NOT EXISTS petz;MODE=MYSQL;DATABASE_TO_UPPER=false");
+        return jdbcDataSource;
+    }
+
+    private static DataSource setupMysqlDataSource() throws SQLException {
+        mariadb.start();
+        HikariConfig conf = new HikariConfig();
+        conf.setJdbcUrl(format("jdbc:mysql://%s:%d/%s", mariadb.getHost(), mariadb.getFirstMappedPort(), TEST_DB_NAME));
+        conf.setUsername("root");
+        conf.setPassword("dev");
+        HikariDataSource ds = new HikariDataSource(conf);
+        return ds;
+    }
+
+    private static DataSource setupPostgreSqlDatasource() throws SQLException {
+        postgres.start();
+        HikariConfig conf = new HikariConfig();
+        conf.setJdbcUrl(format("jdbc:postgresql://%s:%d/%s", postgres.getHost(), postgres.getFirstMappedPort(), TEST_DB_NAME));
+        conf.setUsername("postgres");
+        conf.setPassword("dev");
+        HikariDataSource ds = new HikariDataSource(conf);
+        return ds;
     }
 
     protected Orm orm() {
@@ -156,77 +204,22 @@ abstract class AbstractOrmTest {
         return listCompareAsIs(sort(l1), sort(l2));
     }
 
-    protected static final <O> List<O> createAll(List<O> data) throws OrmException {
-        List<O> res = new ArrayList<>();
-        for (O object : data) {
-            res.add(orm.create(object));
-        }
-        return res;
-    }
-
-    protected static <O> List<O> selectAll(Class<O> type) throws OrmException {
-        try {
-            return orm.select(orm.tableFor(type.newInstance())).list();
-        } catch (InstantiationException | IllegalAccessException e) {
-
-            throw new OrmException(e.getMessage(), e);
-        }
-    }
-
-    protected static <O> void deleteAll(Class<O> type) throws OrmException {
-        for (O obj : selectAll(type)) {
-            orm.delete(obj);
-        }
-    }
-
     private <O> List<O> sort(List<O> data) throws OrmException {
         if (data.size() < 2) {
             return data;
         }
         Table<?> t1 = orm.tableFor(data.get(0));
         return data.stream().sorted((o1, o2) -> {
-            try {
-                int o = o1.getClass().getName().compareTo(o2.getClass().getName());
-                if (o == 0) {
-                    return pops.compareTo(o1, o2, t1.getPrimaryKey().get());
-                }
-                return o;
-            } catch (OrmException e) {
-                return 0;
-            }
-        })
+                    try {
+                        int o = o1.getClass().getName().compareTo(o2.getClass().getName());
+                        if (o == 0) {
+                            return pops.compareTo(o1, o2, t1.getPrimaryKey().get());
+                        }
+                        return o;
+                    } catch (OrmException e) {
+                        return 0;
+                    }
+                })
                 .collect(Collectors.toList());
-    }
-
-    protected static final void say(String fmt, Object... args) {
-        System.out.printf(fmt, args);
-        System.out.println();
-    }
-
-    private static DataSource setupH2DataSource() {
-        JdbcDataSource jdbcDataSource = new JdbcDataSource();
-        jdbcDataSource.setUrl("jdbc:h2:mem:petz;DB_CLOSE_DELAY=-1;INIT=CREATE SCHEMA IF NOT EXISTS petz;MODE=MYSQL;DATABASE_TO_UPPER=false");
-        return jdbcDataSource;
-    }
-
-    private static DataSource setupMysqlDataSource() throws SQLException {
-        mariadb.start();
-        HikariConfig conf = new HikariConfig();
-        conf.setJdbcUrl(format("jdbc:mysql://%s:%d/%s", mariadb.getHost(), mariadb.getFirstMappedPort(), TEST_DB_NAME));
-        conf.setUsername("root");
-        conf.setPassword("dev");
-        HikariDataSource ds = new HikariDataSource(conf);
-        return ds;
-    }
-
-
-    private static DataSource setupPostgreSqlDatasource() throws SQLException {
-        postgres.start();
-        HikariConfig conf = new HikariConfig();
-        conf.setJdbcUrl(format("jdbc:postgresql://%s:%d/%s", postgres.getHost(), postgres.getFirstMappedPort(), TEST_DB_NAME));
-        conf.setUsername("postgres");
-        conf.setPassword("dev");
-        HikariDataSource ds = new HikariDataSource(conf);
-        return ds;
     }
 }

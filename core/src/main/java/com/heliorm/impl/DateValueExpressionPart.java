@@ -1,11 +1,11 @@
 package com.heliorm.impl;
 
-import com.heliorm.Table;
 import com.heliorm.Field;
+import com.heliorm.Table;
 
 import java.util.Date;
 
-public final class DateValueExpressionPart<T extends Table<O>, O> extends ValueExpressionPart<T,O, Date> {
+public final class DateValueExpressionPart<T extends Table<O>, O> extends ValueExpressionPart<T, O, Date> {
 
     private Date value;
 
@@ -18,8 +18,6 @@ public final class DateValueExpressionPart<T extends Table<O>, O> extends ValueE
     public Date getValue() {
         return value;
     }
-
-   
 
 
 }

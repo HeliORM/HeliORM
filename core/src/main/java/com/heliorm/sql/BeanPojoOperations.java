@@ -12,7 +12,7 @@ import static java.lang.String.format;
 /**
  * An implementation of PojoOperations that uses the general JavaBean convention to
  * manipulate POJOs.
- *
+ * <p>
  * Default public constructors and public getters and public setters are required.
  *
  * @author gideon
@@ -104,8 +104,8 @@ public final class BeanPojoOperations extends AbstractPojoOperations {
         Optional<Method> method = findMethod(pojo.getClass(), name, new Class[]{});
         if (!method.isPresent()) {
             if (Boolean.class.isAssignableFrom(type) || Boolean.TYPE.isAssignableFrom(type)) {
-                 name = toCamel("is", field.getName());
-                 method = findMethod(pojo.getClass(), name, new Class[]{});
+                name = toCamel("is", field.getName());
+                method = findMethod(pojo.getClass(), name, new Class[]{});
             }
         }
         try {
@@ -243,6 +243,6 @@ public final class BeanPojoOperations extends AbstractPojoOperations {
      * @return The camel case string
      */
     private String toCamel(String... args) {
-        return Arrays.stream(args).reduce((l,r) -> l + Character.toUpperCase(r.charAt(0)) + r.substring(1)).get();
+        return Arrays.stream(args).reduce((l, r) -> l + Character.toUpperCase(r.charAt(0)) + r.substring(1)).get();
     }
 }
