@@ -13,6 +13,9 @@ import test.place.Town;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -265,8 +268,15 @@ class TestData {
         pet.setAge(random.nextInt(18));
         pet.setName(PEOPLE_NAMES[random.nextInt(PEOPLE_NAMES.length)]);
         pet.setPersonId(person.getId());
+        pet.setBirthday(makeBirthDay(pet.getAge()));
         return pet;
     }
 
+    private static Date makeBirthDay(int age) {
+        Calendar cal = new GregorianCalendar();
+        cal.add(Calendar.YEAR, -age);
+        cal.add(Calendar.DATE, random.nextInt(364));
+        return cal.getTime();
+    }
 
 }

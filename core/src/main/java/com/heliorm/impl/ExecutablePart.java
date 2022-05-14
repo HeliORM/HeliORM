@@ -23,6 +23,8 @@ public abstract class ExecutablePart<DT extends Table<DO>, DO> implements Execut
 
     public abstract List<OrderPart<DT,DO>> getOrder();
 
+    public abstract LimitPart<DO> getLimit();
+
     @Override
     public List<DO> list() throws OrmException {
         return selector.list(getSelect());

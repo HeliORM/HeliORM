@@ -5,8 +5,8 @@ import com.heliorm.Table;
 /**
  *
  * @author gideon
- * @param <T>
- * @param <O>
+ * @param <T> Type of the table
+ * @param <O> Type of the POJO
  */
 public interface Continuation<T extends Table<O>, O> {
 
