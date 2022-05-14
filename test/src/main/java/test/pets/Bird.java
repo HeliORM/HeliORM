@@ -8,11 +8,7 @@ import com.heliorm.annotation.Pojo;
 @Pojo
 public class Bird extends Avian {
 
-    public enum Type {
-        CAGED, FREERANGE;
-    }
     private Type type;
-
     private Integer singTime;
 
     public Integer getSingTime() {
@@ -29,5 +25,9 @@ public class Bird extends Avian {
 
     public void setType(Type type) {
         this.type = type;
+    }
+
+    public enum Type {
+        CAGED, FREERANGE;
     }
 }

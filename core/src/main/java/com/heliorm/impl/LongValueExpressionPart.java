@@ -1,13 +1,13 @@
 package com.heliorm.impl;
 
-import com.heliorm.Table;
 import com.heliorm.Field;
+import com.heliorm.Table;
 
-public final class LongValueExpressionPart<T extends Table<O>, O> extends NumberValueExpressionPart<T,O, Long> {
+public final class LongValueExpressionPart<T extends Table<O>, O> extends NumberValueExpressionPart<T, O, Long> {
 
     private Long value;
 
-    public LongValueExpressionPart(LongFieldPart<T,O> left, Operator op, Long value) {
+    public LongValueExpressionPart(LongFieldPart<T, O> left, Operator op, Long value) {
         super(Field.FieldType.LONG, left, op);
         this.value = value;
     }
@@ -16,8 +16,6 @@ public final class LongValueExpressionPart<T extends Table<O>, O> extends Number
     public Long getValue() {
         return value;
     }
-
-   
 
 
 }

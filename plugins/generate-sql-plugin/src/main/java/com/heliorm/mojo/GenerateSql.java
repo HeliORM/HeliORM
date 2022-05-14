@@ -44,10 +44,6 @@ import static java.lang.String.format;
         requiresDependencyResolution = ResolutionScope.COMPILE)
 public class GenerateSql extends AbstractMojo {
 
-    public enum Dialect {
-        MYSQL, POSTGRESQL;
-    }
-
     @Parameter(property = "dialect", required = true)
     private Dialect dialect;
     @Parameter(property = "filePerTable", required = false, defaultValue = "false")
@@ -58,11 +54,9 @@ public class GenerateSql extends AbstractMojo {
     private String outputDir;
     @Component
     private MavenProject project;
-
     private ClassLoader globalClassLoader;
     private ClassLoader localClassLoader;
     private SqlModeller gen;
-
     public GenerateSql() throws GeneratorException, DependencyResolutionRequiredException {
     }
 
@@ -184,5 +178,9 @@ public class GenerateSql extends AbstractMojo {
 
     private void info(String fmt, Object... args) {
         getLog().info(format(fmt, args));
+    }
+
+    public enum Dialect {
+        MYSQL, POSTGRESQL;
     }
 }

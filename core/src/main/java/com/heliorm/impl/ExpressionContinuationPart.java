@@ -4,22 +4,16 @@ import com.heliorm.Table;
 import com.heliorm.def.Continuation;
 
 /**
- *
- * @author gideon
  * @param <T> Type of table
  * @param <O> Type of POJO
+ * @author gideon
  */
-public class ExpressionContinuationPart<T extends Table<O>, O>  implements Continuation<T, O> {
-
-    public enum Type {
-         AND, OR;
-    }
+public class ExpressionContinuationPart<T extends Table<O>, O> implements Continuation<T, O> {
 
     private final Type type;
     private final ExpressionPart expression;
-
     public ExpressionContinuationPart(Type type, Continuation expr) {
-        expression =  (ExpressionPart)expr;
+        expression = (ExpressionPart) expr;
         this.type = type;
     }
 
@@ -33,12 +27,16 @@ public class ExpressionContinuationPart<T extends Table<O>, O>  implements Conti
         return new ExpressionContinuationPart(Type.OR, expr);
     }
 
-    public  ExpressionPart<T, O,?> getExpression() {
+    public ExpressionPart<T, O, ?> getExpression() {
         return expression;
     }
 
     public Type getType() {
         return type;
+    }
+
+    public enum Type {
+        AND, OR;
     }
 }
 

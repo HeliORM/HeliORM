@@ -1,14 +1,15 @@
 package com.heliorm.sql;
 
-import com.heliorm.OrmException;
 import com.heliorm.Field;
+import com.heliorm.OrmException;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import static java.lang.String.format;
 
-/** A helper class that provides common operations on prepared statements.
+/**
+ * A helper class that provides common operations on prepared statements.
  *
  * @author gideon
  */
@@ -32,7 +33,7 @@ class PreparedStatementHelper {
      * @param par   The position in the prepared statement for the value
      * @throws OrmException
      */
-     void setValueInStatement(PreparedStatement stmt, Object pojo, Field field, int par) throws OrmException {
+    void setValueInStatement(PreparedStatement stmt, Object pojo, Field field, int par) throws OrmException {
         try {
             switch (field.getFieldType()) {
                 case LONG:

@@ -63,8 +63,8 @@ public final class SqlOrm implements Orm {
     private final PojoHelper pojoHelper;
     private final PreparedStatementHelper preparedStatementHelper;
     private final ResultSetHelper resultSetHelper;
-    private SqlTransaction currentTransaction;
     private final Map<Field, String> fieldIds = new ConcurrentHashMap<>();
+    private SqlTransaction currentTransaction;
 
 
     /**
@@ -543,11 +543,9 @@ public final class SqlOrm implements Orm {
                     SqlVerifier verifier = SqlVerifier.forModeller(driver.modeller(con));
                     try {
                         verifier.synchronizeDatabaseTable(new StructureTable(table));
-                    }
-                    catch (SqlModellerException ex) {
+                    } catch (SqlModellerException ex) {
                         throw new OrmSqlException(format("Error verifying table (%s)", ex.getMessage(), ex));
-                    }
-                    finally {
+                    } finally {
                         closeConnection(con);
                     }
                 } else if (!tableExists(table) && driver.createTables()) {

@@ -1,13 +1,13 @@
 package com.heliorm.impl;
 
-import com.heliorm.Table;
 import com.heliorm.Field;
+import com.heliorm.Table;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public final class ShortListExpressionPart<T extends Table<O>,O> extends NumberListExpressionPart<T,O,Short>  {
+public final class ShortListExpressionPart<T extends Table<O>, O> extends NumberListExpressionPart<T, O, Short> {
 
     private final List<Short> values;
 

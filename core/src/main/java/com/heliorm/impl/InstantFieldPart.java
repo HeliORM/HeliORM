@@ -1,23 +1,22 @@
 package com.heliorm.impl;
 
 import com.heliorm.OrmException;
+import com.heliorm.Table;
 import com.heliorm.def.Continuation;
 import com.heliorm.def.InstantField;
-import com.heliorm.Table;
 
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 
 /**
- *
  * @author gideon
  */
 public final class InstantFieldPart<T extends Table<O>, O> extends FieldPart<T, O, Instant> implements
         InstantField<T, O>,
         WithRangePart<T, O, Instant>,
         WithEqualsPart<T, O, Instant>,
-        WithInPart<T, O, Instant>, WithIsPart<T,O,Instant> {
+        WithInPart<T, O, Instant>, WithIsPart<T, O, Instant> {
 
     public InstantFieldPart(T table, String javaName) {
         super(table, FieldType.INSTANT, Instant.class, javaName);

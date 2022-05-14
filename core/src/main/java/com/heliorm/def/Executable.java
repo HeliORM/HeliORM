@@ -7,20 +7,21 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 /**
- *
- * @author gideon
  * @param <O> Object type
+ * @author gideon
  */
 public interface Executable<O> {
 
-    /** Query data and return a list of POJOs.
+    /**
+     * Query data and return a list of POJOs.
      *
      * @return The list
      * @throws OrmException
      */
     List<O> list() throws OrmException;
 
-    /** Query data and return a stream of POJOs.
+    /**
+     * Query data and return a stream of POJOs.
      *
      * @return The stream
      * @throws OrmException

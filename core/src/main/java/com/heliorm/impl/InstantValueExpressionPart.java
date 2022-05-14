@@ -1,11 +1,11 @@
 package com.heliorm.impl;
 
-import com.heliorm.Table;
 import com.heliorm.Field;
+import com.heliorm.Table;
 
 import java.time.Instant;
 
-public final class InstantValueExpressionPart<T extends Table<O>, O> extends ValueExpressionPart<T,O, Instant> {
+public final class InstantValueExpressionPart<T extends Table<O>, O> extends ValueExpressionPart<T, O, Instant> {
 
     private Instant value;
 

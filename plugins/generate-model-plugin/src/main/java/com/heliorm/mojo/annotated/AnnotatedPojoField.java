@@ -1,11 +1,11 @@
 package com.heliorm.mojo.annotated;
 
-import com.heliorm.def.FieldOrder;
+import com.heliorm.Field;
+import com.heliorm.Table;
 import com.heliorm.annotation.Column;
 import com.heliorm.annotation.ForeignKey;
 import com.heliorm.annotation.PrimaryKey;
-import com.heliorm.Field;
-import com.heliorm.Table;
+import com.heliorm.def.FieldOrder;
 
 import java.lang.annotation.Annotation;
 import java.time.Duration;
@@ -136,7 +136,7 @@ public class AnnotatedPojoField implements Field {
     public boolean isNullable() {
         Optional<Column> lA = getAnnotation(Column.class);
         if (lA.isPresent()) {
-                return lA.get().nullable();
+            return lA.get().nullable();
         }
         return false;
     }
@@ -177,7 +177,7 @@ public class AnnotatedPojoField implements Field {
         Optional<ForeignKey> fk = getAnnotation(ForeignKey.class);
         if (fk.isPresent()) {
             Class<?> type = fk.get().pojo();
-            if (type != null)  {
+            if (type != null) {
                 return table.getDatabase().getTables().stream()
                         .filter(table -> table.getObjectClass().equals(type))
                         .findFirst();

@@ -1,9 +1,9 @@
 package com.heliorm;
 
-/** Thrown by the ORM if there is a problem with a transaction.
+/**
+ * Thrown by the ORM if there is a problem with a transaction.
  *
  * @author gideon
- *
  */
 public class OrmTransactionException extends OrmException {
 

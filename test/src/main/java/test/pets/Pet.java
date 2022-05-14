@@ -13,9 +13,9 @@ import java.util.Date;
  * @author gideon
  */
 @Pojo
-@Index(columns={"name","age"}, unique = false)
+@Index(columns = {"name", "age"}, unique = false)
 @Index(columns = {"personId"}, unique = false)
-public abstract class Pet  {
+public abstract class Pet {
 
     @PrimaryKey(autoIncrement = true)
     private Long id;

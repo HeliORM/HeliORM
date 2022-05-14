@@ -1,16 +1,15 @@
 package com.heliorm.impl;
 
 import com.heliorm.OrmException;
-import com.heliorm.def.DateField;
 import com.heliorm.Table;
 import com.heliorm.def.Continuation;
+import com.heliorm.def.DateField;
 
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
 /**
- *
  * @author gideon
  */
 public final class DateFieldPart<T extends Table<O>, O> extends FieldPart<T, O, Date> implements
@@ -54,6 +53,7 @@ public final class DateFieldPart<T extends Table<O>, O> extends FieldPart<T, O, 
     public Continuation<T, O> ge(Date value) throws OrmException {
         return new DateValueExpressionPart(getThis(), ValueExpressionPart.Operator.GE, value);
     }
+
     @Override
     public Continuation<T, O> isNull() throws OrmException {
         return new IsExpressionPart(getThis(), IsExpressionPart.Operator.IS_NULL);

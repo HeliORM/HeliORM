@@ -1,16 +1,15 @@
 package com.heliorm.impl;
 
 import com.heliorm.OrmException;
-import com.heliorm.def.DurationField;
 import com.heliorm.Table;
 import com.heliorm.def.Continuation;
+import com.heliorm.def.DurationField;
 
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 
 /**
- *
  * @author gideon
  */
 public class DurationFieldPart<T extends Table<O>, O> extends FieldPart<T, O, Duration> implements

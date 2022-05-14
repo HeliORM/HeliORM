@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
  * @author gideon
  */
 public class AliasDatabase implements Database {
@@ -16,9 +15,10 @@ public class AliasDatabase implements Database {
     private final String sqlDatabase;
     private List<Table<?>> tables;
 
-    /** Create a new alias database.
+    /**
+     * Create a new alias database.
      *
-     * @param database The underlying database model
+     * @param database    The underlying database model
      * @param sqlDatabase The name of the SQL database
      */
     public AliasDatabase(Database database, String sqlDatabase) {
