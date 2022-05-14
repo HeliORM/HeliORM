@@ -31,8 +31,8 @@ public interface Selector {
      * Execute the supplied programmed query and return a stream of result
      * pojos.
      *
-     * @param <O>  The type of Pojo to return
-     * @param <P>  The type of programmed query
+     * @param <O>  The type of POJO to return
+     * @param <T> The rtpe of the table queried
      * @param tail The tail of the query
      * @return The stream of loaded Pojos
      * @throws OrmException Thrown if any of the large number of things that can
@@ -45,8 +45,8 @@ public interface Selector {
      * possible result. It is expected that either zero or one results will be
      * found, so more than one result will cause an error.
      *
-     * @param <O>  The type of Pojo to return
-     * @param <P>  The type of programmed query
+     * @param <O>  The type of POJO to return
+     * @param <T>  The type of the table queried
      * @param tail The tail of the query
      * @return The optional found Pojo
      * @throws OrmException Thrown if any of the large number of things that can
@@ -59,8 +59,8 @@ public interface Selector {
      * result. It is expected that exactly one result will be found, so no
      * result or more than one result will cause an error.
      *
-     * @param <O>  The type of Pojo to return
-     * @param <P>  The type of programmed query
+     * @param <O>  The type of POJO to return
+     * @param <T>  The type of the table queried
      * @param tail The tail of the query
      * @return The found Pojo
      * @throws OrmException Thrown if any of the large number of things that can

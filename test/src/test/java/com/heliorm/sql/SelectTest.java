@@ -20,9 +20,15 @@ import test.place.Town;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Comparator;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -281,6 +287,56 @@ public class SelectTest extends AbstractOrmTest {
         assertTrue(listCompareOrdered(all, wanted), "The items loaded are exactly the same as the ones we expected");
     }
 
+
+    @Test
+    @Order(161)
+    public void testSelectWhereAndTwoFields() throws Exception {
+        say("Testing select with a where clause with and on two fields");
+        List<Cat> wanted = cats.stream()
+                .filter(cat -> cat.getAge() < 5 && cat.getType().equals(CatType.OUTDOOR))
+                .collect(Collectors.toList());
+        List<Cat> all = orm().select(CAT, where(CAT.age.lt(5)).and(CAT.type.eq(CatType.OUTDOOR)))
+                .list();
+        assertNotNull(all, "The list returned by list() should be non-null");
+        assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
+        assertTrue(listCompareOrdered(all, wanted), "The items loaded are exactly the same as the ones we expected");
+    }
+
+
+  //  @Test
+    @Order(162)
+    public void testSelectWhereDateField() throws Exception {
+        say("Testing select with a where clause with and on two fields");
+        Calendar cal = new GregorianCalendar();
+        cal.add(Calendar.YEAR, -5);
+        Date then = cal.getTime();
+        List<Cat> wanted = cats.stream()
+                .filter(cat -> cat.getBirthday().before(then))
+                .collect(Collectors.toList());
+        List<Cat> all = orm().select(CAT, where(CAT.birthday.lt(then    )))
+                .list();
+        assertNotNull(all, "The list returned by list() should be non-null");
+        assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
+        assertTrue(listCompareOrdered(all, wanted), "The items loaded are exactly the same as the ones we expected");
+    }
+//    @Test
+    @Order(163)
+    public void testSelectWhereAndTwoDateFields() throws Exception {
+        say("Testing select with a where clause with and on two fields");
+        Date today = new Date();
+        Calendar cal = new GregorianCalendar();
+        cal.add(Calendar.YEAR, -5);
+        Date then = cal.getTime();
+        List<Cat> wanted = cats.stream()
+                .filter(cat -> cat.getBirthday().after(then) && cat.getBirthday().before(today))
+                .collect(Collectors.toList());
+        List<Cat> all = orm().select(CAT, where(CAT.birthday.gt(then)).and(CAT.birthday.lt(today)))
+                .list();
+        assertNotNull(all, "The list returned by list() should be non-null");
+        assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
+        assertTrue(listCompareOrdered(all, wanted), "The items loaded are exactly the same as the ones we expected");
+    }
+
     @Test
     @Order(170)
     public void testSelectOrder() throws Exception {
@@ -332,6 +388,62 @@ public class SelectTest extends AbstractOrmTest {
         assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
         assertTrue(listCompareAsIs(all, wanted), "The items loaded are exactly the same as the ones we expected");
     }
+
+    @Test
+    @Order(191)
+    public void testSelectLimit() throws Exception {
+        say("Testing select with a limit");
+        int number = 10;
+        List<Cat> all = orm().select(CAT)
+                .limit(10)
+                .list();
+        assertNotNull(all, "The list returned by list() should be non-null");
+        assertTrue(all.size() == number, format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), number));
+    }
+
+    @Test
+    @Order(192)
+    public void testSelectOrderWithLimit() throws Exception {
+        say("Testing select with a order and limit");
+        List<Town> wanted = towns.stream()
+                .sorted(Comparator.comparing(Town::getName))
+                .limit(2)
+                .collect(Collectors.toList());
+        List<Town> all = orm().select(TOWN)
+                .orderBy(TOWN.name)
+                .limit(2)
+                .list();
+        assertNotNull(all, "The list returned by list() should be non-null");
+        assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
+        assertTrue(listCompareAsIs(all, wanted), "The items loaded are exactly the same as the ones we expected");
+    }
+
+    @Test
+    @Order(193)
+    public void testLimitPaging() throws Exception {
+        say("Testing select with a order and limit for paging");
+        int batchSize = 10;
+        AtomicInteger counter = new AtomicInteger();
+        Map<Integer, List<Cat>> wanted = cats.stream()
+                .sorted(Comparator.comparing(Cat::getId))
+                .collect(Collectors.groupingBy(cat -> counter.getAndIncrement() / batchSize));
+        Map<Integer, List<Cat>> all = new HashMap<>();
+        for (int i = 0; i < counter.get()/batchSize; ++i) {
+            List<Cat> batch = orm().select(CAT)
+                    .orderBy(CAT.id)
+                    .limit(i * batchSize, batchSize)
+                    .list();
+            all.put(i, batch);
+        }
+        assertNotNull(all, "The groups of cats should be non-null");
+        for (int i = 0; i < counter.get()/batchSize; ++i) {
+            List<Cat> wantedBatch = wanted.get(i);
+            List<Cat> loadedBatch = all.get(i);
+            assertTrue(loadedBatch.size() == wantedBatch.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
+            assertTrue(listCompareAsIs(loadedBatch, wantedBatch), "The items loaded are exactly the same as the ones we expected");
+        }
+    }
+
 
     @Test
     @Order(200)
@@ -403,6 +515,24 @@ public class SelectTest extends AbstractOrmTest {
                         where(CAT.type.eq(CatType.INDOOR)),
                         join(PERSON, on(CAT.personId, PERSON.id),
                                 where(PERSON.emailAddress.eq(person.getEmailAddress()))))
+                .list();
+        assertNotNull(all, "The list returned by list() should be non-null");
+        assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
+        assertTrue(listCompareOrdered(all, wanted), "The items loaded are exactly the same as the ones we expected");
+    }
+
+    @Test
+    @Order(211)
+    public void testJoinNoWhere() throws Exception {
+        say("Testing select with a join without a where");
+        Set<Long> personIds = persons.stream().map(person -> person.getId()).collect(Collectors.toSet());
+        List<Cat> wanted = cats.stream()
+                .filter(cat -> cat.getType() == CatType.INDOOR)
+                .filter(cat -> personIds.contains(cat.getPersonId()))
+                .collect(Collectors.toList());
+        List<Cat> all = orm().select(CAT,
+                        where(CAT.type.eq(CatType.INDOOR)),
+                        join(PERSON, on(CAT.personId, PERSON.id)))
                 .list();
         assertNotNull(all, "The list returned by list() should be non-null");
         assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));

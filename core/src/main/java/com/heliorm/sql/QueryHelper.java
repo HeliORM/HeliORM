@@ -1,20 +1,23 @@
 package com.heliorm.sql;
 
+import com.heliorm.Field;
 import com.heliorm.OrmException;
 import com.heliorm.Table;
 import com.heliorm.def.Where;
-import com.heliorm.Field;
 import com.heliorm.impl.ExecutablePart;
 import com.heliorm.impl.ExpressionContinuationPart;
 import com.heliorm.impl.ExpressionPart;
 import com.heliorm.impl.IsExpressionPart;
 import com.heliorm.impl.JoinPart;
+import com.heliorm.impl.LimitPart;
 import com.heliorm.impl.ListExpressionPart;
 import com.heliorm.impl.OrderPart;
 import com.heliorm.impl.SelectPart;
 import com.heliorm.impl.ValueExpressionPart;
 import com.heliorm.impl.WherePart;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -37,6 +40,8 @@ final class QueryHelper {
     private final SqlDriver driver;
     private final Function<Field, String> getFieldId;
     private final FullTableName fullTableName;
+
+    private static final DateFormat dateTimeFormat =new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 
     QueryHelper(SqlDriver driver, Function<Field, String> getFieldId, FullTableName fullTableName) {
         this.driver = driver;
@@ -109,10 +114,13 @@ final class QueryHelper {
         }
         for (JoinPart<?,?,?,?> join : root.getJoins()) {
             tablesQuery.append(expandLinkTables(root.getTable(), join));
-            if (whereQuery.length() > 0) {
-                whereQuery.append(" AND ");
+            String joinWhere = expandLinkWheres(join);
+            if (!joinWhere.isEmpty()) {
+                if (whereQuery.length() > 0) {
+                    whereQuery.append(" AND ");
+                }
+                whereQuery.append(expandLinkWheres(join));
             }
-            whereQuery.append(expandLinkWheres(join));
         }
         // finalize the query
         StringBuilder query = new StringBuilder();
@@ -123,6 +131,8 @@ final class QueryHelper {
         }
         // do ordering
         query.append(expandOrder(root.getTable(), exec.getOrder()));
+        // do limit
+        query.append(expandLimit(exec.getLimit()));
         return query.toString();
     }
 
@@ -250,7 +260,7 @@ final class QueryHelper {
                     crit.getField().getJavaName(), table.getObjectClass().getSimpleName()));
         }
         for (Object val : crit.getValues()) {
-            list.add(format("'%s'", sqlValue(val)));
+            list.add(format("'%s'", sqlValue(crit.getField(), val)));
         }
         return format("%s %s (%s)", driver.fullFieldName(table, crit.getField()), listOperator(crit), list);
     }
@@ -261,7 +271,7 @@ final class QueryHelper {
             throw new OrmException(format("Null %s value for field %s in table %s", crit.getOperator(),
                     crit.getField().getJavaName(), table.getObjectClass().getSimpleName()));
         }
-        query.append(format("%s%s'%s'", driver.fullFieldName(table, crit.getField()), valueOperator(crit), sqlValue(crit.getValue())));
+        query.append(format("%s%s'%s'", driver.fullFieldName(table, crit.getField()), valueOperator(crit), sqlValue(crit.getField(), crit.getValue())));
         return query.toString();
     }
 
@@ -296,8 +306,26 @@ final class QueryHelper {
         return query.toString();
     }
 
-    private String sqlValue(Object object) {
-        return object.toString();
+    private String expandLimit(LimitPart<?> limit) {
+        StringBuilder query = new StringBuilder();
+        if (limit.getNumber() > -1) {
+            query.append(" LIMIT ");
+            if (limit.getFrom() > 0) {
+                query.append(limit.getFrom());
+                query.append(",");
+            }
+            query.append(limit.getNumber());
+        }
+        return query.toString();
+    }
+
+    private String sqlValue(Field field, Object object) {
+        switch (field.getFieldType()) {
+            case DATE:
+                return dateTimeFormat.format(object);
+            default:
+                return object.toString();
+        }
     }
 
     /**
