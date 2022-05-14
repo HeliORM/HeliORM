@@ -70,8 +70,8 @@ public class CrudTest extends AbstractOrmTest {
         say("Testing update with auto-number Long key");
         Long id = persons.get(0).getId();
         Person person = orm().select(PERSON, where(PERSON.id.eq(id))).one();
-        person.setFirstName(person.getFirstName() == null ? "Bob" : person.getLastName().toUpperCase());
-        person.setLastName(person.getLastName().toLowerCase(Locale.ROOT));
+        person.setFirstName(person.getFirstName() == null ? "Bob" : person.getFirstName().toUpperCase());
+        person.setLastName(person.getLastName() == null ? "Smith" : person.getLastName().toLowerCase());
         Person updated = orm().update(person);
         Person loaded = orm().select(PERSON, where(PERSON.id.eq(id))).one();
         assertNotNull(updated, "The object returned by update should not be null");
