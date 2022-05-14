@@ -24,9 +24,11 @@ import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -415,6 +417,33 @@ public class SelectTest extends AbstractOrmTest {
         assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
         assertTrue(listCompareAsIs(all, wanted), "The items loaded are exactly the same as the ones we expected");
     }
+
+    @Test
+    @Order(193)
+    public void testLimitPaging() throws Exception {
+        say("Testing select with a order and limit for paging");
+        int batchSize = 10;
+        AtomicInteger counter = new AtomicInteger();
+        Map<Integer, List<Cat>> wanted = cats.stream()
+                .sorted(Comparator.comparing(Cat::getId))
+                .collect(Collectors.groupingBy(cat -> counter.getAndIncrement() / batchSize));
+        Map<Integer, List<Cat>> all = new HashMap<>();
+        for (int i = 0; i < counter.get()/batchSize; ++i) {
+            List<Cat> batch = orm().select(CAT)
+                    .orderBy(CAT.id)
+                    .limit(i * batchSize, batchSize)
+                    .list();
+            all.put(i, batch);
+        }
+        assertNotNull(all, "The groups of cats should be non-null");
+        for (int i = 0; i < counter.get()/batchSize; ++i) {
+            List<Cat> wantedBatch = wanted.get(i);
+            List<Cat> loadedBatch = all.get(i);
+            assertTrue(loadedBatch.size() == wantedBatch.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
+            assertTrue(listCompareAsIs(loadedBatch, wantedBatch), "The items loaded are exactly the same as the ones we expected");
+        }
+    }
+
 
     @Test
     @Order(200)
