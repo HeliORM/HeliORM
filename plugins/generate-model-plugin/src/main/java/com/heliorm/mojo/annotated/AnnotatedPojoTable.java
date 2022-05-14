@@ -7,6 +7,7 @@ import com.heliorm.Table;
 import com.heliorm.annotation.Ignore;
 import com.heliorm.annotation.Pojo;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -125,6 +126,38 @@ public final class AnnotatedPojoTable implements Table {
             return false;
         }
         return !field.isAnnotationPresent(Ignore.class);
+    }
+
+    /**
+     * Return the Java name for the POJO class represented by this
+     *
+     * @return The Java name
+     */
+    private String getJavaName() {
+        return pojoClass.getSimpleName();
+    }
+
+    /**
+     * Convenience method to find the optional annotation on the POJO class.
+     *
+     * @param <T>             The type of the annotation
+     * @param annotationClass The annotation class
+     * @return Optional annotation found
+     */
+    private <T extends Annotation> Optional<T> getAnnotation(Class<T> annotationClass) {
+        return Optional.ofNullable(pojoClass.getAnnotation(annotationClass));
+    }
+
+
+    private <T extends Annotation> List<T> getAnnotations(Class<T> annotationClass) {
+        Class<?> target = pojoClass;
+        List<T> annotations = new ArrayList<>();
+        while (!Object.class.equals(target)) {
+            T[] found = target.getAnnotationsByType(annotationClass);
+            annotations.addAll(Arrays.asList(found));
+            target = target.getSuperclass();
+        }
+        return annotations;
     }
 
     /**

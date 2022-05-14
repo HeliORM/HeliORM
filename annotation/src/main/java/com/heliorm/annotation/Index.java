@@ -8,7 +8,6 @@ import java.lang.annotation.RetentionPolicy;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Index {
 
-
     /**
      * Indicates if this index requires unique keys.
      *
