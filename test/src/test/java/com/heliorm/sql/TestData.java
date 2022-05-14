@@ -187,7 +187,7 @@ class TestData {
         Bird bird = new Bird();
         bird = makePet(bird, person);
         bird.setType(random.nextBoolean() ? Bird.Type.CAGED : Bird.Type.FREERANGE);
-        bird.setSingTime(Duration.ofMinutes(random.nextInt(31)));
+        bird.setSingTime(random.nextInt(31));
         return bird;
     }
 

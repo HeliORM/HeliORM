@@ -92,8 +92,6 @@ public class MysqlDialectGenerator implements TableGenerator {
                 return "DATE";
             case INSTANT:
                 return "DATETIME";
-            case DURATION:
-                return "VARCHAR(32)";
             default:
                 throw new OrmSqlException(format("Unkown field type '%s'. BUG!", field.getFieldType()));
         }

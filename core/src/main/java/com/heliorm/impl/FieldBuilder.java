@@ -100,9 +100,6 @@ public class FieldBuilder<P extends FieldPart> {
             case INSTANT:
                 part = (P) new InstantFieldPart(table, javaName);
                 break;
-            case DURATION:
-                part = (P) new DurationFieldPart(table, javaName);
-                break;
             default:
                 throw new UncaughtOrmException(format("Unexpected field type %s. BUG!", fieldType));
         }

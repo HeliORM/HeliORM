@@ -11,13 +11,13 @@ import java.time.Duration;
 public class Bird extends Avian {
 
     private Type type;
-    private Duration singTime;
+    private int singTime;
 
-    public Duration getSingTime() {
+    public int getSingTime() {
         return singTime;
     }
 
-    public void setSingTime(Duration singTime) {
+    public void setSingTime(int singTime) {
         this.singTime = singTime;
     }
 

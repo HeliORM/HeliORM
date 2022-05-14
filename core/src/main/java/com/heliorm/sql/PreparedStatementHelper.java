@@ -57,9 +57,6 @@ class PreparedStatementHelper {
                 case INSTANT:
                     stmt.setTimestamp(par, pojoHelper.getTimestampFromPojo(pojo, field));
                     break;
-                case DURATION:
-                    stmt.setString(par, pojoHelper.getDurationFromPojo(pojo, field));
-                    break;
                 default:
                     throw new OrmException(format("Field type '%s' is unsupported. BUG!", field.getFieldType()));
             }

@@ -8,7 +8,6 @@ import com.heliorm.def.BooleanField;
 import com.heliorm.def.ByteField;
 import com.heliorm.def.DateField;
 import com.heliorm.def.DoubleField;
-import com.heliorm.def.DurationField;
 import com.heliorm.def.EnumField;
 import com.heliorm.def.FloatField;
 import com.heliorm.def.InstantField;
@@ -329,9 +328,6 @@ class Output {
             case INSTANT:
                 addTimestampField(cm, fm);
                 break;
-            case DURATION:
-                addDurationField(cm, fm);
-                break;
             case STRING:
                 addStringField(cm, fm);
                 break;
@@ -399,11 +395,6 @@ class Output {
 
     private void addTimestampField(Table cm, Field fm) throws GeneratorException {
         addField(cm, fm, InstantField.class, "timestampField");
-    }
-
-    private void addDurationField(Table cm, Field fm) throws GeneratorException {
-        addField(cm, fm, DurationField.class, "durationField");
-
     }
 
     private void addStringField(Table cm, Field fm) throws GeneratorException {

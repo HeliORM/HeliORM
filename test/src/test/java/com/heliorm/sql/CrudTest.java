@@ -13,6 +13,7 @@ import test.place.Town;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 import static com.heliorm.Query.where;
@@ -69,9 +70,8 @@ public class CrudTest extends AbstractOrmTest {
         say("Testing update with auto-number Long key");
         Long id = persons.get(0).getId();
         Person person = orm().select(PERSON, where(PERSON.id.eq(id))).one();
-        String tmp = person.getFirstName();
-        person.setFirstName(person.getLastName());
-        person.setLastName(tmp);
+        person.setFirstName(person.getFirstName() == null ? "Bob" : person.getLastName().toUpperCase());
+        person.setLastName(person.getLastName().toLowerCase(Locale.ROOT));
         Person updated = orm().update(person);
         Person loaded = orm().select(PERSON, where(PERSON.id.eq(id))).one();
         assertNotNull(updated, "The object returned by update should not be null");
