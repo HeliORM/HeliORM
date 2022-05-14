@@ -97,7 +97,6 @@ public class SqlOrmBuilder {
         return this;
     }
 
-
     public SqlOrmBuilder setModifyChangedTables(boolean modifyChangedTables) {
         this.modifyChangedTables = modifyChangedTables;
         return this;

@@ -57,6 +57,7 @@ public class GenerateSql extends AbstractMojo {
     private ClassLoader globalClassLoader;
     private ClassLoader localClassLoader;
     private SqlModeller gen;
+
     public GenerateSql() throws GeneratorException, DependencyResolutionRequiredException {
     }
 

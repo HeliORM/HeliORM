@@ -73,4 +73,9 @@ public class StructureColumn implements Column {
     public boolean isAutoIncrement() {
         return field.isAutoNumber();
     }
+
+    @Override
+    public String getDefault() {
+        return null;
+    }
 }

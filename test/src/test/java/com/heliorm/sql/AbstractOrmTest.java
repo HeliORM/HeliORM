@@ -26,6 +26,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static java.lang.String.format;
+
 abstract class AbstractOrmTest {
 
     private static final String TEST_DB_VAR = "TEST_DB";
@@ -63,6 +65,7 @@ abstract class AbstractOrmTest {
                 driver = PostgreSqlDriver.class;
                 break;
             case "mysql":
+            case "h2":
             default:
                 jdbcDataSource = setupMysqlDataSource();
                 driver = MySqlDriver.class;
