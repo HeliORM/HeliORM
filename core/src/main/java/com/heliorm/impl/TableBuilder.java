@@ -47,10 +47,6 @@ public final class TableBuilder<T extends Table<O>, O> {
         return new FieldBuilder<>(table, Field.FieldType.DATE, Date.class, javaName);
     }
 
-    public FieldBuilder<DurationFieldPart<T, O>> durationField(String javaName) {
-        return new FieldBuilder<>(table, Field.FieldType.DURATION, Duration.class, javaName);
-    }
-
     public FieldBuilder<InstantFieldPart<T, O>> timestampField(String javaName) {
         return new FieldBuilder<>(table, Field.FieldType.INSTANT, Instant.class, javaName);
     }

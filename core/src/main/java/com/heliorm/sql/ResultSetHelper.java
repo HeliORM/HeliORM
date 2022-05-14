@@ -7,9 +7,7 @@ import com.heliorm.Table;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.time.Duration;
 import java.time.Instant;
-import java.time.format.DateTimeParseException;
 import java.util.function.Function;
 
 import static java.lang.String.format;
@@ -69,9 +67,6 @@ class ResultSetHelper {
             case INSTANT:
                 pops.setValue(pojo, field, getTimestamp(rs, column));
                 break;
-            case DURATION:
-                pops.setValue(pojo, field, getDuration(rs, column));
-                break;
             default:
                 throw new OrmException(format("Field type '%s' is unsupported. BUG!", field.getFieldType()));
         }
@@ -116,21 +111,6 @@ class ResultSetHelper {
                     return rs.getDate(column);
                 case INSTANT:
                     return rs.getTimestamp(column);
-                case DURATION: {
-                    Class javaType = field.getJavaType();
-                    if (!Duration.class.isAssignableFrom(javaType)) {
-                        throw new OrmException(format("Field %s is not a duration. BUG!", field.getJavaName()));
-                    }
-                    String val = rs.getString(column);
-                    if (val != null) {
-                        try {
-                            return Duration.parse(val);
-                        } catch (DateTimeParseException ex) {
-                            throw new OrmException(format("Cannot parse text to a duration (%s)", ex.getMessage()), ex);
-                        }
-                    }
-                    return null;
-                }
                 default:
                     throw new OrmException(format("Field type '%s' is unsupported. BUG!", field.getFieldType()));
             }
@@ -158,25 +138,6 @@ class ResultSetHelper {
             return ((Timestamp) value).toInstant();
         } catch (SQLException ex) {
             throw new OrmException(format("Could not read timestamp value from SQL (%s)", ex.getMessage()), ex);
-        }
-    }
-
-    /**
-     * Get a duration value from SQL for the given POJO and field
-     *
-     * @param rs     The ResultSet
-     * @param column The SQL column field
-     * @return The correct value
-     */
-    private Duration getDuration(ResultSet rs, String column) throws OrmException {
-        try {
-            String value = rs.getString(column);
-            if (value == null) {
-                return null;
-            }
-            return Duration.parse(value);
-        } catch (SQLException ex) {
-            throw new OrmException(format("Could not read duration value from SQL (%s)", ex.getMessage()), ex);
         }
     }
 

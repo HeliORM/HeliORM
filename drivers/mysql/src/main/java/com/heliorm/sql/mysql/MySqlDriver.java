@@ -93,7 +93,6 @@ public final class MySqlDriver extends SqlDriver {
                 case ENUM:
                 case DATE:
                 case INSTANT:
-                case DURATION:
                     throw new OrmException(format("Field type '%s' is not a supported primary key type", field.getFieldType()));
                 default:
                     throw new OrmException(format("Field type '%s' is unsupported. BUG!", field.getFieldType()));

@@ -47,7 +47,6 @@ public class StructureColumn implements Column {
             case BOOLEAN:
                 return JDBCType.BOOLEAN;
             case STRING:
-            case DURATION:
                 return JDBCType.VARCHAR;
             default:
                 throw new UncaughtOrmException(format("Unsupported field type '%s'. BUG!", field.getFieldType()));

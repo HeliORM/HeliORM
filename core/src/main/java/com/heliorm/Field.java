@@ -101,8 +101,7 @@ public interface Field<T extends Table<O>, O, C> extends FieldOrder<T, O, C> {
         ENUM,
         STRING,
         DATE,
-        INSTANT,
-        DURATION;
+        INSTANT;
     }
 
 }
