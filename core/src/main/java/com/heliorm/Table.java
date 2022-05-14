@@ -8,8 +8,8 @@ import java.util.Set;
  * The interface that must be implemented to define a database table for use by
  * the ORM
  *
- * @author gideon
  * @param <O> The type of Object stored in the table.
+ * @author gideon
  */
 public interface Table<O> {
 
@@ -56,14 +56,16 @@ public interface Table<O> {
      */
     Database getDatabase();
 
-    /** Return true if this table refers to an abstract POJO and not to a concrete
+    /**
+     * Return true if this table refers to an abstract POJO and not to a concrete
      * POJO with a database table.
      *
      * @return true if abstract
      */
     boolean isAbstract();
 
-    /** Return the indexes for this POJO
+    /**
+     * Return the indexes for this POJO
      *
      * @return The indexes
      */

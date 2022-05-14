@@ -1,15 +1,19 @@
 package com.heliorm;
 
-/** A transaction returned by the ORM. */
+/**
+ * A transaction returned by the ORM.
+ */
 public interface OrmTransaction extends AutoCloseable {
 
-    /** Commit changes and close the transaction.
+    /**
+     * Commit changes and close the transaction.
      *
      * @throws OrmException
      */
     void commit() throws OrmException;
 
-    /** Rollback changes and close the transaction.
+    /**
+     * Rollback changes and close the transaction.
      *
      * @throws OrmException
      */

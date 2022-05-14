@@ -1,7 +1,7 @@
 package test.pets;
 
-public enum  CatType {
+public enum CatType {
 
-    INDOOR,OUTDOOR;
+    INDOOR, OUTDOOR;
 
 }

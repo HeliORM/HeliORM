@@ -10,12 +10,9 @@ import java.time.Duration;
 @Pojo
 public class Bird extends Avian {
 
-    public enum Type {
-        CAGED, FREERANGE;
-    }
     private Type type;
-
     private Duration singTime;
+
     public Duration getSingTime() {
         return singTime;
     }
@@ -30,5 +27,9 @@ public class Bird extends Avian {
 
     public void setType(Type type) {
         this.type = type;
+    }
+
+    public enum Type {
+        CAGED, FREERANGE;
     }
 }

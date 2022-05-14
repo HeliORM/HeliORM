@@ -2,7 +2,6 @@ package com.heliorm.collection;
 
 import com.heliorm.UncaughtOrmException;
 import com.heliorm.def.Executable;
-import com.heliorm.impl.Part;
 
 import java.util.*;
 import java.util.function.Supplier;
@@ -13,7 +12,7 @@ import java.util.function.Supplier;
  * @param <T> The type of data contained in the set
  * @param <P> The type of query part
  */
-public class LazyLoadedSet<T, P extends Part & Executable> extends AbstractSet<T> {
+public class LazyLoadedSet<T, P extends Executable> extends AbstractSet<T> {
 
     private boolean loaded = false;
     private Set<T> data;

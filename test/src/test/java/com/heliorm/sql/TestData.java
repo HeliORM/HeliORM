@@ -196,12 +196,11 @@ class TestData {
         person.setFirstName(PEOPLE_NAMES[random.nextInt(PEOPLE_NAMES.length)]);
         if (random.nextInt(5) == 0) {
             person.setLastName(null);
-        }
-        else {
+        } else {
             person.setLastName(PEOPLE_NAMES[random.nextInt(PEOPLE_NAMES.length)]);
         }
         person.setEmailAddress(PEOPLE_NAMES[random.nextInt(PEOPLE_NAMES.length)].toLowerCase() + n + "@gmail.com");
-        person.setIncome(random.nextDouble()*10000);
+        person.setIncome(random.nextDouble() * 10000);
         return person;
     }
 
@@ -219,7 +218,7 @@ class TestData {
                 person.setLastName(last);
                 person.setEmailAddress(first + "." + last + i + "@gmail.com");
                 person.setTownId(town.getId());
-                person.setIncome(random.nextDouble()*10000);
+                person.setIncome(random.nextDouble() * 10000);
                 persons.add(person);
             }
 
@@ -230,7 +229,7 @@ class TestData {
     static List<Cat> makeCats(int n, List<Person> persons, List<CatBreed> breeds) {
         List<Cat> res = new ArrayList<>();
         for (int i = 0; i < n; i++) {
-            res.add(makeCat(persons.get(random.nextInt(persons.size())),breeds.get(random.nextInt(breeds.size()))));
+            res.add(makeCat(persons.get(random.nextInt(persons.size())), breeds.get(random.nextInt(breeds.size()))));
         }
         return res;
     }
@@ -257,6 +256,7 @@ class TestData {
         }
         return res;
     }
+
     static List<Bird> makeBirds(int n, List<Person> persons) {
         List<Bird> res = new ArrayList<>();
         for (int i = 0; i < n; i++) {
@@ -264,6 +264,7 @@ class TestData {
         }
         return res;
     }
+
     private static <P extends Pet> P makePet(P pet, Person person) {
         pet.setAge(random.nextInt(18));
         pet.setName(PEOPLE_NAMES[random.nextInt(PEOPLE_NAMES.length)]);

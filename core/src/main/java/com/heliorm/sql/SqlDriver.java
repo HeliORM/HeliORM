@@ -1,9 +1,9 @@
 package com.heliorm.sql;
 
 import com.heliorm.Database;
+import com.heliorm.Field;
 import com.heliorm.OrmException;
 import com.heliorm.Table;
-import com.heliorm.Field;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -13,27 +13,19 @@ import java.util.Map;
 import static java.lang.String.format;
 
 /**
- *  Abstract implementation of a database specific driver
+ * Abstract implementation of a database specific driver
  *
  * @author gideon
  */
 public abstract class SqlDriver {
 
+    private final Map<Database, Database> aliases;
     private boolean rollbackOnUncommittedClose = false;
     private boolean useUnionAll = false;
-    private boolean createTables  = false;
-    private final Map<Database, Database> aliases;
+    private boolean createTables = false;
 
     public SqlDriver(Map<Database, Database> aliases) {
         this.aliases = aliases;
-    }
-
-    /** Set the driver to rollback or commit data on an un-committed auto-close
-     * s
-     * @param rollback
-     */
-    public final void setRollbackOnUncommittedClose(boolean rollback) {
-        rollbackOnUncommittedClose = rollback;
     }
 
     public final void setUseUnionAll(boolean useUnionAll) {
@@ -53,9 +45,18 @@ public abstract class SqlDriver {
         this.createTables = createTables;
     }
 
-
     final boolean getRollbackOnUncommittedClose() {
         return rollbackOnUncommittedClose;
+    }
+
+    /**
+     * Set the driver to rollback or commit data on an un-committed auto-close
+     * s
+     *
+     * @param rollback
+     */
+    public final void setRollbackOnUncommittedClose(boolean rollback) {
+        rollbackOnUncommittedClose = rollback;
     }
 
     final boolean useUnionAll() {

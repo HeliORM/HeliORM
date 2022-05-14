@@ -9,19 +9,19 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 /**
- *
  * @author gideon
  */
 public abstract class ExecutablePart<DT extends Table<DO>, DO> implements Executable<DO> {
 
     private final Selector selector;
+
     public ExecutablePart(Selector selector) {
         this.selector = selector;
     }
 
-    public abstract SelectPart<DT,DO> getSelect();
+    public abstract SelectPart<DT, DO> getSelect();
 
-    public abstract List<OrderPart<DT,DO>> getOrder();
+    public abstract List<OrderPart<DT, DO>> getOrder();
 
     public abstract LimitPart<DO> getLimit();
 

@@ -37,11 +37,10 @@ import static java.lang.String.format;
 final class QueryHelper {
 
     static final String POJO_NAME_FIELD = "pojo_field_name";
+    private static final DateFormat dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
     private final SqlDriver driver;
     private final Function<Field, String> getFieldId;
     private final FullTableName fullTableName;
-
-    private static final DateFormat dateTimeFormat =new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 
     QueryHelper(SqlDriver driver, Function<Field, String> getFieldId, FullTableName fullTableName) {
         this.driver = driver;
@@ -97,12 +96,12 @@ final class QueryHelper {
         }
     }
 
-    String buildSelectQuery(ExecutablePart<?,?> exec) throws OrmException {
+    String buildSelectQuery(ExecutablePart<?, ?> exec) throws OrmException {
         SelectPart<?, ?> root = exec.getSelect();
         StringBuilder tablesQuery = new StringBuilder();
         tablesQuery.append("SELECT DISTINCT  ");
         StringJoiner fieldList = new StringJoiner(",");
-        for (Field field : new ArrayList<Field<?,?,?>>(root.getTable().getFields())) {
+        for (Field field : new ArrayList<Field<?, ?, ?>>(root.getTable().getFields())) {
             fieldList.add(format("%s AS %s", driver.fullFieldName(root.getTable(), field), driver.virtualFieldName(getFieldId(field))));
         }
         tablesQuery.append(fieldList.toString());
@@ -112,7 +111,7 @@ final class QueryHelper {
         if (where.isPresent()) {
             whereQuery.append(expandCriteria(root.getSelect().getTable(), (WherePart<?, ?>) where.get()));
         }
-        for (JoinPart<?,?,?,?> join : root.getJoins()) {
+        for (JoinPart<?, ?, ?, ?> join : root.getJoins()) {
             tablesQuery.append(expandLinkTables(root.getTable(), join));
             String joinWhere = expandLinkWheres(join);
             if (!joinWhere.isEmpty()) {
@@ -142,7 +141,7 @@ final class QueryHelper {
                 .flatMap(table -> (Stream<Field>) (table.getFields().stream()))
                 .collect(Collectors.toSet());
         StringJoiner buf = new StringJoiner(" UNION ALL ");
-        ExecutablePart<?,?> root = null;
+        ExecutablePart<?, ?> root = null;
         for (ExecutablePart query : queries) {
             if (root == null) {
                 root = query;
@@ -155,7 +154,7 @@ final class QueryHelper {
         return buf.toString();
     }
 
-    private String buildPartialUnionQuery(SelectPart<?,?> select, Set<Field> allFields) throws OrmException {
+    private String buildPartialUnionQuery(SelectPart<?, ?> select, Set<Field> allFields) throws OrmException {
         StringBuilder tablesQuery = new StringBuilder();
         StringJoiner fieldsQuery = new StringJoiner(",");
         List<Field> tableFields = select.getTable().getFields();
@@ -176,7 +175,7 @@ final class QueryHelper {
         if (where.isPresent()) {
             whereQuery.append(expandCriteria(select.getTable(), (WherePart<?, ?>) where.get()));
         }
-        for (JoinPart<?,?,?,?> join : select.getJoins()) {
+        for (JoinPart<?, ?, ?, ?> join : select.getJoins()) {
             tablesQuery.append(expandLinkTables(select.getTable(), join));
             if (whereQuery.length() > 0) {
                 whereQuery.append(" AND ");
@@ -190,25 +189,25 @@ final class QueryHelper {
         return tablesQuery.toString();
     }
 
-    private String expandLinkTables(Table table, JoinPart<?,?,?,?> right) throws OrmException {
+    private String expandLinkTables(Table table, JoinPart<?, ?, ?, ?> right) throws OrmException {
         StringBuilder query = new StringBuilder();
         query.append(format(" JOIN %s ON %s=%s ",
                 fullTableName.apply(right.getTable()),
                 driver.fullFieldName(table, right.getOn().getLeftField()),
                 driver.fullFieldName(right.getTable(), right.getOn().getRightField())));
-        for (JoinPart<?,?,?,?> join : right.getJoins()) {
+        for (JoinPart<?, ?, ?, ?> join : right.getJoins()) {
             query.append(expandLinkTables(right.getTable(), join));
         }
         return query.toString();
     }
 
-    private String expandLinkWheres(JoinPart<?,?,?,?> join) throws OrmException {
-        String query ="";
+    private String expandLinkWheres(JoinPart<?, ?, ?, ?> join) throws OrmException {
+        String query = "";
         Optional<? extends WherePart<?, ?>> where = join.getWhere();
         if (where.isPresent()) {
             query = expandCriteria(join.getTable(), where.get());
         }
-        for (JoinPart<?,?,?,?> next : join.getJoins()) {
+        for (JoinPart<?, ?, ?, ?> next : join.getJoins()) {
             String linkWheres = expandLinkWheres(next);
             if (!linkWheres.isEmpty()) {
                 if (!query.isEmpty()) {
@@ -220,11 +219,11 @@ final class QueryHelper {
         return query;
     }
 
-    private String expandCriteria(Table<?> table, WherePart<?,?> where) throws OrmException {
+    private String expandCriteria(Table<?> table, WherePart<?, ?> where) throws OrmException {
         ExpressionPart<?, ?, ?> expr = where.getExpression();
         StringBuilder query = new StringBuilder();
         query.append(expandExpression(table, expr));
-        for (ExpressionContinuationPart<?,?> ec : where.getContinuations()) {
+        for (ExpressionContinuationPart<?, ?> ec : where.getContinuations()) {
             switch (ec.getType()) {
                 case AND:
                     query.append(" AND ");
@@ -241,9 +240,9 @@ final class QueryHelper {
     }
 
     private String expandExpression(Table table, ExpressionPart expr) throws OrmException {
-        switch (expr.getType() ) {
+        switch (expr.getType()) {
             case LIST_EXPRESSION:
-              return  expandListFieldCriteria(table, ((ListExpressionPart) expr));
+                return expandListFieldCriteria(table, ((ListExpressionPart) expr));
             case VALUE_EXPRESSION:
                 return expandValueFieldCriteria(table, (ValueExpressionPart) expr);
             case IS_EXPRESSION:
@@ -253,7 +252,7 @@ final class QueryHelper {
         }
     }
 
-    private String expandListFieldCriteria(Table table,  ListExpressionPart crit) throws OrmException {
+    private String expandListFieldCriteria(Table table, ListExpressionPart crit) throws OrmException {
         StringJoiner list = new StringJoiner(",");
         if (crit.getValues().isEmpty()) {
             throw new OrmException(format("Empty %s list for field %s in table %s", crit.getOperator(),
@@ -287,7 +286,7 @@ final class QueryHelper {
      * @param table The table spec to which the ordering applies
      * @return The partial SQL query string
      */
-    private String expandOrder(Table table,  List<? extends OrderPart<?,?>> orders) throws OrmException {
+    private String expandOrder(Table table, List<? extends OrderPart<?, ?>> orders) throws OrmException {
         StringBuilder query = new StringBuilder();
         if (!orders.isEmpty()) {
             query.append(" ORDER BY ");

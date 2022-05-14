@@ -1,16 +1,16 @@
 package com.heliorm.sql;
 
 import com.heliorm.Database;
+import com.heliorm.Field;
 import com.heliorm.Orm;
 import com.heliorm.OrmException;
 import com.heliorm.OrmTransaction;
 import com.heliorm.OrmTransactionException;
 import com.heliorm.Table;
 import com.heliorm.UncaughtOrmException;
-import com.heliorm.def.Where;
-import com.heliorm.Field;
 import com.heliorm.def.Join;
 import com.heliorm.def.Select;
+import com.heliorm.def.Where;
 import com.heliorm.impl.ExecutablePart;
 import com.heliorm.impl.JoinPart;
 import com.heliorm.impl.SelectPart;
@@ -62,8 +62,8 @@ public final class SqlOrm implements Orm {
     private final PojoHelper pojoHelper;
     private final PreparedStatementHelper preparedStatementHelper;
     private final ResultSetHelper resultSetHelper;
-    private SqlTransaction currentTransaction;
     private final Map<Field, String> fieldIds = new ConcurrentHashMap<>();
+    private SqlTransaction currentTransaction;
 
 
     /**
@@ -84,22 +84,22 @@ public final class SqlOrm implements Orm {
         selector = new Selector() {
             @Override
             public <T extends Table<O>, O> List<O> list(Select<T, O> tail) throws OrmException {
-                return SqlOrm.this.list((SelectPart<T,O>) tail);
+                return SqlOrm.this.list((SelectPart<T, O>) tail);
             }
 
             @Override
             public <T extends Table<O>, O> Stream<O> stream(Select<T, O> tail) throws OrmException {
-                return SqlOrm.this.stream((SelectPart<T,O>) tail);
+                return SqlOrm.this.stream((SelectPart<T, O>) tail);
             }
 
             @Override
             public <T extends Table<O>, O> Optional<O> optional(Select<T, O> tail) throws OrmException {
-                return  SqlOrm.this.optional((SelectPart<T,O>) tail);
+                return SqlOrm.this.optional((SelectPart<T, O>) tail);
             }
 
             @Override
             public <T extends Table<O>, O> O one(Select<T, O> tail) throws OrmException {
-                return  SqlOrm.this.one((SelectPart<T,O>) tail);
+                return SqlOrm.this.one((SelectPart<T, O>) tail);
             }
         };
     }
@@ -245,14 +245,14 @@ public final class SqlOrm implements Orm {
     public <T extends Table<O>, O> Select<T, O> select(T table, Join<T, O>... joins) {
         List<JoinPart<?, ?, ?, ?>> list = Arrays.stream(joins)
                 .map(join -> (JoinPart<?, ?, ?, ?>) join).collect(Collectors.toList());
-        return new SelectPart<T,O>(selector(), table, Optional.empty(),list);
+        return new SelectPart<T, O>(selector(), table, Optional.empty(), list);
     }
 
     @Override
     public <T extends Table<O>, O> Select<T, O> select(T table, Where<T, O> where, Join<T, O>... joins) {
         List<JoinPart<?, ?, ?, ?>> list = Arrays.stream(joins)
                 .map(join -> (JoinPart<?, ?, ?, ?>) join).collect(Collectors.toList());
-        return new SelectPart<T,O>(selector(), table, Optional.of(where), list);
+        return new SelectPart<T, O>(selector(), table, Optional.of(where), list);
     }
 
     @Override
@@ -303,7 +303,7 @@ public final class SqlOrm implements Orm {
         return selector;
     }
 
-    private <T extends Table<O>, O> List<O> list(SelectPart<T,O> tail) throws OrmException {
+    private <T extends Table<O>, O> List<O> list(SelectPart<T, O> tail) throws OrmException {
         try (Stream<O> stream = stream(tail)) {
             return stream.collect(Collectors.toList());
         }
@@ -431,7 +431,7 @@ public final class SqlOrm implements Orm {
         }
     }
 
-    private  <T extends Table<O>, O>  Optional<O> optional(SelectPart<T,O> tail) throws OrmException {
+    private <T extends Table<O>, O> Optional<O> optional(SelectPart<T, O> tail) throws OrmException {
         try (Stream<O> stream = stream(tail)) {
             O one;
             Iterator<O> iterator = stream.iterator();
@@ -447,7 +447,7 @@ public final class SqlOrm implements Orm {
         }
     }
 
-    private  <T extends Table<O>, O> O one(SelectPart<T,O> tail) throws OrmException {
+    private <T extends Table<O>, O> O one(SelectPart<T, O> tail) throws OrmException {
         try (Stream<O> stream = stream(tail)) {
             Iterator<O> iterator = stream.iterator();
             O one;

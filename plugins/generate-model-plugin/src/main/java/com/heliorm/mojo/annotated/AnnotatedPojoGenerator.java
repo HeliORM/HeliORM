@@ -1,10 +1,10 @@
 package com.heliorm.mojo.annotated;
 
+import com.heliorm.Database;
 import com.heliorm.annotation.Pojo;
 import com.heliorm.mojo.GenerateModel;
 import com.heliorm.mojo.Generator;
 import com.heliorm.mojo.GeneratorException;
-import com.heliorm.Database;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfo;
 import io.github.classgraph.ClassInfoList;
@@ -20,8 +20,8 @@ import java.util.Set;
  */
 public class AnnotatedPojoGenerator implements Generator<AnnotatedPojoTable> {
 
-    private ScanResult scan;
     private final GenerateModel generator;
+    private ScanResult scan;
 
     public AnnotatedPojoGenerator(GenerateModel generator, Set<String> packages) throws GeneratorException {
         this.generator = generator;
@@ -54,10 +54,11 @@ public class AnnotatedPojoGenerator implements Generator<AnnotatedPojoTable> {
         return new AnnotatedPojoTable(database, clazz, subTables);
     }
 
-    /** Find subclasses for Pojo super classes which are not annotated as Pojo.
+    /**
+     * Find subclasses for Pojo super classes which are not annotated as Pojo.
      *
      * @param annos The list of super class
-     * @param all The list of subclasses
+     * @param all   The list of subclasses
      * @return The list containing the missing classes
      */
     private List<ClassInfo> findMissingSubClasses(ClassInfoList annos, ClassInfoList all) {
@@ -69,9 +70,10 @@ public class AnnotatedPojoGenerator implements Generator<AnnotatedPojoTable> {
         return res;
     }
 
-    /** Find subclasses off Pojo super class which are not annotated as Pojo.
+    /**
+     * Find subclasses off Pojo super class which are not annotated as Pojo.
      *
-     * @param superClass The super class
+     * @param superClass         The super class
      * @param possibleSubClasses The list of subclasses
      * @return The list containing the missing classes
      */

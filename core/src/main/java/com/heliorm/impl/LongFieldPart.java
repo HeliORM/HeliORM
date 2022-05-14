@@ -1,15 +1,14 @@
 package com.heliorm.impl;
 
 import com.heliorm.OrmException;
+import com.heliorm.Table;
 import com.heliorm.def.Continuation;
 import com.heliorm.def.LongField;
-import com.heliorm.Table;
 
 import java.util.Arrays;
 import java.util.List;
 
 /**
- *
  * @author gideon
  */
 public class LongFieldPart<T extends Table<O>, O> extends NumberFieldPart<T, O, Long> implements LongField<T, O> {
@@ -59,6 +58,7 @@ public class LongFieldPart<T extends Table<O>, O> extends NumberFieldPart<T, O, 
     public Continuation<T, O> isNotNull() throws OrmException {
         return new IsExpressionPart(getThis(), IsExpressionPart.Operator.IS_NOT_NULL);
     }
+
     @Override
     public Continuation<T, O> in(List<Long> values) throws OrmException {
         return new LongListExpressionPart((LongFieldPart) getThis(), ListExpressionPart.Operator.IN, values);

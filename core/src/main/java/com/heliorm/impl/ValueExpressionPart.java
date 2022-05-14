@@ -1,7 +1,7 @@
 package com.heliorm.impl;
 
-import com.heliorm.Table;
 import com.heliorm.Field;
+import com.heliorm.Table;
 
 import static java.lang.String.format;
 
@@ -15,10 +15,6 @@ public abstract class ValueExpressionPart<T extends Table<O>, O, C> extends Expr
 
     private final Field.FieldType dataType;
     private final Operator operator;
-
-    public enum Operator {
-        EQ, NOT_EQ, LT, LE, GT, GE, LIKE, NOT_LIKE;
-    }
 
     protected ValueExpressionPart(Field.FieldType dataType, FieldPart left, Operator op) {
         super(Type.VALUE_EXPRESSION, left);
@@ -39,6 +35,10 @@ public abstract class ValueExpressionPart<T extends Table<O>, O, C> extends Expr
     @Override
     public final String toString() {
         return format("%s '%s'", operator.name(), getValue());
+    }
+
+    public enum Operator {
+        EQ, NOT_EQ, LT, LE, GT, GE, LIKE, NOT_LIKE;
     }
 
 }

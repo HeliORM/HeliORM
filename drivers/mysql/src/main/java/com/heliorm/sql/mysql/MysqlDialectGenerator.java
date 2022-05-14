@@ -1,8 +1,8 @@
 package com.heliorm.sql.mysql;
 
-import com.heliorm.Table;
 import com.heliorm.Field;
 import com.heliorm.Index;
+import com.heliorm.Table;
 import com.heliorm.sql.OrmSqlException;
 import com.heliorm.sql.TableGenerator;
 
@@ -43,12 +43,12 @@ public class MysqlDialectGenerator implements TableGenerator {
         }
 
         int num = 0;
-        for (Index<?,?> index : table.getIndexes()) {
+        for (Index<?, ?> index : table.getIndexes()) {
             sql.append(",\n");
             if (index.isUnique()) {
                 sql.append("UNIQUE ");
             }
-            sql.append(format("INDEX %s(",  format("%s_idx%d",table.getSqlTable(), num)));
+            sql.append(format("INDEX %s(", format("%s_idx%d", table.getSqlTable(), num)));
             Optional<String> fields = index.getFields().stream()
                     .map(field -> "`" + field.getSqlName() + "`")
                     .reduce((s1, s2) -> s1 + "," + s2);

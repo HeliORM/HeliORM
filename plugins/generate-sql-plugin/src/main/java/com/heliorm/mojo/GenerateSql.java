@@ -1,5 +1,7 @@
 package com.heliorm.mojo;
 
+import com.heliorm.Database;
+import com.heliorm.Table;
 import com.heliorm.sql.OrmSqlException;
 import com.heliorm.sql.TableGenerator;
 import com.heliorm.sql.mysql.MysqlDialectGenerator;
@@ -8,8 +10,6 @@ import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfo;
 import io.github.classgraph.ClassInfoList;
 import io.github.classgraph.ScanResult;
-import com.heliorm.Database;
-import com.heliorm.Table;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -29,7 +29,11 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import static java.lang.String.format;
 
@@ -39,10 +43,6 @@ import static java.lang.String.format;
 @Mojo(name = "generate-sql", defaultPhase = LifecyclePhase.PREPARE_PACKAGE,
         requiresDependencyResolution = ResolutionScope.COMPILE)
 public class GenerateSql extends AbstractMojo {
-
-    public enum Dialect {
-        MYSQL, POSTGRESQL;
-    }
 
     @Parameter(property = "dialect", required = true)
     private Dialect dialect;
@@ -54,11 +54,9 @@ public class GenerateSql extends AbstractMojo {
     private String outputDir;
     @Component
     private MavenProject project;
-
     private ClassLoader globalClassLoader;
     private ClassLoader localClassLoader;
     private TableGenerator gen;
-
     public GenerateSql() throws GeneratorException, DependencyResolutionRequiredException {
     }
 
@@ -108,8 +106,7 @@ public class GenerateSql extends AbstractMojo {
     private String processTable(Table table) throws GeneratorException {
         try {
             return gen.generateSchema(table);
-        }
-        catch (OrmSqlException ex) {
+        } catch (OrmSqlException ex) {
             throw new GeneratorException(ex.getMessage(), ex);
         }
     }
@@ -177,5 +174,9 @@ public class GenerateSql extends AbstractMojo {
 
     private void info(String fmt, Object... args) {
         getLog().info(format(fmt, args));
+    }
+
+    public enum Dialect {
+        MYSQL, POSTGRESQL;
     }
 }

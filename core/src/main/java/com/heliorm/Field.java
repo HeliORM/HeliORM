@@ -1,6 +1,5 @@
 package com.heliorm;
 
-import com.heliorm.Table;
 import com.heliorm.def.FieldOrder;
 
 import java.util.Optional;

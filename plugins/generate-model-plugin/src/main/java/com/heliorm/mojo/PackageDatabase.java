@@ -15,8 +15,8 @@ import java.util.List;
 public class PackageDatabase implements Database {
 
     private final String packageName;
-    private String sqlDatabase;
     private final List<Table<?>> tables = new ArrayList();
+    private String sqlDatabase;
 
     /**
      * Create a database package with the given package name.
@@ -31,6 +31,15 @@ public class PackageDatabase implements Database {
     @Override
     public String getSqlDatabase() {
         return sqlDatabase;
+    }
+
+    /**
+     * Set the SQL database name.
+     *
+     * @param sqlDatabase The SQL database name
+     */
+    void setSqlDatabase(String sqlDatabase) {
+        this.sqlDatabase = sqlDatabase;
     }
 
     @Override
@@ -54,15 +63,6 @@ public class PackageDatabase implements Database {
      */
     void addTable(Table table) {
         tables.add(table);
-    }
-
-    /**
-     * Set the SQL database name.
-     *
-     * @param sqlDatabase The SQL database name
-     */
-    void setSqlDatabase(String sqlDatabase) {
-        this.sqlDatabase = sqlDatabase;
     }
 
 }

@@ -1,15 +1,15 @@
 package com.heliorm.impl;
 
-import com.heliorm.Table;
 import com.heliorm.Field;
 import com.heliorm.Index;
+import com.heliorm.Table;
 
 import java.util.List;
 
-public final class IndexPart<T extends Table<O>, O> implements Index<T,O> {
+public final class IndexPart<T extends Table<O>, O> implements Index<T, O> {
 
     private final boolean unique;
-    private final List<Field<T,O,?>> fields;
+    private final List<Field<T, O, ?>> fields;
 
     public IndexPart(boolean unique, List<Field<T, O, ?>> fields) {
         this.unique = unique;
@@ -20,6 +20,7 @@ public final class IndexPart<T extends Table<O>, O> implements Index<T,O> {
     public List<Field<T, O, ?>> getFields() {
         return fields;
     }
+
     @Override
     public boolean isUnique() {
         return unique;

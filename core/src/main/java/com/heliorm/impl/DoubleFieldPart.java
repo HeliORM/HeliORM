@@ -2,14 +2,13 @@ package com.heliorm.impl;
 
 import com.heliorm.OrmException;
 import com.heliorm.Table;
-import com.heliorm.def.DoubleField;
 import com.heliorm.def.Continuation;
+import com.heliorm.def.DoubleField;
 
 import java.util.Arrays;
 import java.util.List;
 
 /**
- *
  * @author gideon
  */
 public final class DoubleFieldPart<T extends Table<O>, O> extends NumberFieldPart<T, O, Double> implements DoubleField<T, O> {

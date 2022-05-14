@@ -1,14 +1,15 @@
 package com.heliorm.sql;
 
-import com.heliorm.OrmException;
 import com.heliorm.Field;
+import com.heliorm.OrmException;
 
 import java.time.Duration;
 import java.time.Instant;
 
 import static java.lang.String.format;
 
-/** A helper class that provides common operations on POJOs
+/**
+ * A helper class that provides common operations on POJOs
  *
  * @author gideon
  */
@@ -40,7 +41,7 @@ class PojoHelper {
      * @return The string value.
      * @throws OrmException
      */
-     String getStringFromPojo(Object pojo, Field field) throws OrmException {
+    String getStringFromPojo(Object pojo, Field field) throws OrmException {
         Object value = getValueFromPojo(pojo, field);
         if (value == null) {
             return null;
@@ -59,7 +60,7 @@ class PojoHelper {
      * @return The date value.
      * @throws OrmException
      */
-     java.sql.Date getDateFromPojo(Object pojo, Field field) throws OrmException {
+    java.sql.Date getDateFromPojo(Object pojo, Field field) throws OrmException {
         Object value = getValueFromPojo(pojo, field);
         if (value == null) {
             return null;
@@ -78,7 +79,7 @@ class PojoHelper {
      * @return The timestamp value.
      * @throws OrmException
      */
-     java.sql.Timestamp getTimestampFromPojo(Object pojo, Field field) throws OrmException {
+    java.sql.Timestamp getTimestampFromPojo(Object pojo, Field field) throws OrmException {
         Object value = getValueFromPojo(pojo, field);
         if (value == null) {
             return null;
@@ -100,7 +101,7 @@ class PojoHelper {
      * @return The duration string value.
      * @throws OrmException
      */
-     String getDurationFromPojo(Object pojo, Field field) throws OrmException {
+    String getDurationFromPojo(Object pojo, Field field) throws OrmException {
         Object value = getValueFromPojo(pojo, field);
         if (value == null) {
             return null;

@@ -1,9 +1,9 @@
 package com.heliorm.impl;
 
-import com.heliorm.Table;
 import com.heliorm.Field;
+import com.heliorm.Table;
 
-public final class ByteValueExpressionPart<T extends Table<O>, O> extends NumberValueExpressionPart<T,O, Byte> {
+public final class ByteValueExpressionPart<T extends Table<O>, O> extends NumberValueExpressionPart<T, O, Byte> {
 
     private Byte value;
 

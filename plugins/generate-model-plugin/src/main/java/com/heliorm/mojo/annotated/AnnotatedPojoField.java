@@ -145,7 +145,7 @@ public class AnnotatedPojoField implements Field {
     public boolean isNullable() {
         Optional<Column> lA = getAnnotation(Column.class);
         if (lA.isPresent()) {
-                return lA.get().nullable();
+            return lA.get().nullable();
         }
         return false;
     }

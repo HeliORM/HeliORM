@@ -1,12 +1,11 @@
 package com.heliorm.impl;
 
-import com.heliorm.def.Continuation;
-import com.heliorm.def.WithIs;
 import com.heliorm.OrmException;
 import com.heliorm.Table;
+import com.heliorm.def.Continuation;
+import com.heliorm.def.WithIs;
 
 /**
- *
  * @author gideon
  */
 public interface WithIsPart<T extends Table<O>, O, C> extends WithIs<T, O, C> {
