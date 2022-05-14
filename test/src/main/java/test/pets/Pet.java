@@ -1,10 +1,10 @@
 package test.pets;
 
-import com.heliorm.annotation.Column;
 import com.heliorm.annotation.ForeignKey;
 import com.heliorm.annotation.Index;
 import com.heliorm.annotation.Pojo;
 import com.heliorm.annotation.PrimaryKey;
+import com.heliorm.annotation.Text;
 import test.persons.Person;
 
 import java.util.Date;
@@ -22,7 +22,7 @@ public abstract class Pet {
 
     @ForeignKey(pojo = Person.class)
     private Long personId;
-    @Column(length = 32)
+    @Text(length = 32)
     private String name;
     private int age;
     private Date birthday;

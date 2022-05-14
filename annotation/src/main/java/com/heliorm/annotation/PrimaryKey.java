@@ -14,6 +14,13 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 public @interface PrimaryKey {
+    /**
+     * Provide the SQL field name for this field. If left as undefined (blank) the meta
+     * data will define the SQL field to have the same name as the Java field.
+     *
+     * @return The field name
+     */
+    String fieldName() default "";
 
     /**
      * True for auto-increment keys, false if you want to do your own key

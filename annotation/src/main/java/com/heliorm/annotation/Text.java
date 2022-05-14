@@ -6,14 +6,14 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Use this annotation to indicate that a field is a foreign key linking it to
- * another POJO.
+ * This annotation marks a String POJO field that we wish adjust default behavior on.
+ * This influences the way the metadata is generated.
  *
  * @author gideon
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
-public @interface ForeignKey {
+public @interface Text {
 
     /**
      * Provide the SQL field name for this field. If left as undefined (blank) the meta
@@ -24,6 +24,13 @@ public @interface ForeignKey {
     String fieldName() default "";
 
     /**
+     * Provide the SQL field length for this column, assuming it is a String.
+     *
+     * @return The field length
+     */
+    int length() default 255;
+
+    /**
      * Determine if the column on the database can be null.
      *
      * @return True if null is allowed
@@ -31,10 +38,10 @@ public @interface ForeignKey {
     boolean nullable() default false;
 
     /**
-     * The POJO class to which this field links.
+     * Set the default value of the text field.
      *
-     * @return The foreign POJO class
+     * @return The default value supplied by the user
      */
-    Class<?> pojo();
+    String defaultValue() default "";
 
 }

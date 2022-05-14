@@ -1,8 +1,8 @@
 package test.pets;
 
-import com.heliorm.annotation.Column;
 import com.heliorm.annotation.Pojo;
 import com.heliorm.annotation.PrimaryKey;
+import com.heliorm.annotation.Text;
 
 /**
  * @author gideon
@@ -12,7 +12,7 @@ public class CatBreed {
 
     @PrimaryKey(autoIncrement = true)
     private Long id;
-    @Column(length = 32, nullable = false)
+    @Text(length = 32, nullable = false)
     private String name;
 
     public Long getId() {
