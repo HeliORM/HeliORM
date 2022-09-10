@@ -70,7 +70,7 @@ public interface Orm extends AutoCloseable {
      * @param <O>  The type of the POJO
      * @param pojo The pojo
      * @return The table
-     * @throws OrmException Thrown if there is an finding the table the POJO
+     * @throws OrmException Thrown if there is an error finding the table the POJO
      */
     <O> Table<O> tableFor(O pojo) throws OrmException;
 
@@ -80,7 +80,7 @@ public interface Orm extends AutoCloseable {
      * @param <O>  The type of the POJO
      * @param type The type of pojo
      * @return The table
-     * @throws OrmException Thrown if there is an finding the table the POJO
+     * @throws OrmException Thrown if there is an error finding the table the POJO
      */
     <O> Table<O> tableFor(Class<O> type) throws OrmException;
 

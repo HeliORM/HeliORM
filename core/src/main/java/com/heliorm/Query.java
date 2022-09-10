@@ -17,8 +17,7 @@ import java.util.Optional;
  *
  * @author gideon
  */
-public class Query {
-
+public final class Query {
 
     private Query() {
     }

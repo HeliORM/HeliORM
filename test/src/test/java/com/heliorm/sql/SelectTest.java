@@ -21,12 +21,15 @@ import test.place.Town;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -43,6 +46,7 @@ import static com.heliorm.sql.TestData.makePersons;
 import static com.heliorm.sql.TestData.makeProvinces;
 import static com.heliorm.sql.TestData.makeTowns;
 import static java.lang.String.format;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -89,7 +93,7 @@ public class SelectTest extends AbstractOrmTest {
     private <O> void check(List<O> have, List<O> want) throws OrmException {
         assertNotNull(have, "The first list should be non-null");
         assertFalse(have.isEmpty(), "The first list should be non-empty");
-        assertTrue(have.size() == want.size(), format("The two lists should be the same size (%d vs %s)", have.size(), want.size()));
+        assertEquals(have.size(), want.size(), format("The two lists should be the same size (%d vs %s)", have.size(), want.size()));
         assertTrue(listCompareOrdered(have, want), "The items in the two lists should be exactly the same");
     }
 
@@ -248,7 +252,7 @@ public class SelectTest extends AbstractOrmTest {
                                 .and(CAT.age.lt(10)))
                 .list();
         assertNotNull(all, "The list returned by list() should be non-null");
-        assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
+        assertEquals(all.size(), wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
         assertTrue(listCompareOrdered(all, wanted), "The items loaded are exactly the same as the ones we expected");
     }
 
@@ -264,7 +268,7 @@ public class SelectTest extends AbstractOrmTest {
                         where(CAT.age.lt(5)).and(CAT.type.eq(CatType.INDOOR)))
                 .list();
         assertNotNull(all, "The list returned by list() should be non-null");
-        assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
+        assertEquals(all.size(), wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
         assertTrue(listCompareOrdered(all, wanted), "The items loaded are exactly the same as the ones we expected");
     }
 
@@ -278,7 +282,7 @@ public class SelectTest extends AbstractOrmTest {
         List<Cat> all = orm().select(CAT, where(CAT.age.lt(5)).or(CAT.age.gt(10)))
                 .list();
         assertNotNull(all, "The list returned by list() should be non-null");
-        assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
+        assertEquals(all.size(), wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
         assertTrue(listCompareOrdered(all, wanted), "The items loaded are exactly the same as the ones we expected");
     }
 
@@ -292,7 +296,7 @@ public class SelectTest extends AbstractOrmTest {
         List<Cat> all = orm().select(CAT, where(CAT.age.lt(5)).or(CAT.type.eq(CatType.OUTDOOR)))
                 .list();
         assertNotNull(all, "The list returned by list() should be non-null");
-        assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
+        assertEquals(all.size(), wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
         assertTrue(listCompareOrdered(all, wanted), "The items loaded are exactly the same as the ones we expected");
     }
 
@@ -306,11 +310,11 @@ public class SelectTest extends AbstractOrmTest {
         List<Cat> all = orm().select(CAT, where(CAT.age.lt(5)).and(CAT.type.eq(CatType.OUTDOOR)))
                 .list();
         assertNotNull(all, "The list returned by list() should be non-null");
-        assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
+        assertEquals(all.size(), wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
         assertTrue(listCompareOrdered(all, wanted), "The items loaded are exactly the same as the ones we expected");
     }
 
-    //  @Test
+    @Test
     @Order(162)
     public void testSelectWhereDateField() throws Exception {
         say("Testing select with a where clause with and on two fields");
@@ -323,11 +327,11 @@ public class SelectTest extends AbstractOrmTest {
         List<Cat> all = orm().select(CAT, where(CAT.birthday.lt(then)))
                 .list();
         assertNotNull(all, "The list returned by list() should be non-null");
-        assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
+        assertEquals(all.size(), wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
         assertTrue(listCompareOrdered(all, wanted), "The items loaded are exactly the same as the ones we expected");
     }
 
-    //    @Test
+    @Test
     @Order(163)
     public void testSelectWhereAndTwoDateFields() throws Exception {
         say("Testing select with a where clause with and on two fields");
@@ -341,7 +345,7 @@ public class SelectTest extends AbstractOrmTest {
         List<Cat> all = orm().select(CAT, where(CAT.birthday.gt(then)).and(CAT.birthday.lt(today)))
                 .list();
         assertNotNull(all, "The list returned by list() should be non-null");
-        assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
+        assertEquals(all.size(), wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
         assertTrue(listCompareOrdered(all, wanted), "The items loaded are exactly the same as the ones we expected");
     }
 
@@ -356,7 +360,7 @@ public class SelectTest extends AbstractOrmTest {
                 .orderBy(TOWN.name)
                 .list();
         assertNotNull(all, "The list returned by list() should be non-null");
-        assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
+        assertEquals(all.size(), wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
         assertTrue(listCompareAsIs(all, wanted), "The items loaded are exactly the same as the ones we expected");
     }
 
@@ -375,7 +379,7 @@ public class SelectTest extends AbstractOrmTest {
                 .orderBy(CAT.name.desc(), CAT.age.desc(), CAT.type.desc(), CAT.personId.desc())
                 .list();
         assertNotNull(all, "The list returned by list() should be non-null");
-        assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
+        assertEquals(all.size(), wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
         assertTrue(listCompareAsIs(all, wanted), "The items loaded are exactly the same as the ones we expected");
     }
 
@@ -393,7 +397,7 @@ public class SelectTest extends AbstractOrmTest {
                 .orderBy(CAT.age, CAT.name, CAT.personId, CAT.id)
                 .list();
         assertNotNull(all, "The list returned by list() should be non-null");
-        assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
+        assertEquals(all.size(), wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
         assertTrue(listCompareAsIs(all, wanted), "The items loaded are exactly the same as the ones we expected");
     }
 
@@ -406,7 +410,7 @@ public class SelectTest extends AbstractOrmTest {
                 .limit(10)
                 .list();
         assertNotNull(all, "The list returned by list() should be non-null");
-        assertTrue(all.size() == number, format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), number));
+        assertEquals(all.size(), number, format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), number));
     }
 
     @Test
@@ -422,7 +426,7 @@ public class SelectTest extends AbstractOrmTest {
                 .limit(2)
                 .list();
         assertNotNull(all, "The list returned by list() should be non-null");
-        assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
+        assertEquals(all.size(), wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
         assertTrue(listCompareAsIs(all, wanted), "The items loaded are exactly the same as the ones we expected");
     }
 
@@ -447,7 +451,7 @@ public class SelectTest extends AbstractOrmTest {
         for (int i = 0; i < counter.get() / batchSize; ++i) {
             List<Cat> wantedBatch = wanted.get(i);
             List<Cat> loadedBatch = all.get(i);
-            assertTrue(loadedBatch.size() == wantedBatch.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
+            assertEquals(loadedBatch.size(), wantedBatch.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
             assertTrue(listCompareAsIs(loadedBatch, wantedBatch), "The items loaded are exactly the same as the ones we expected");
         }
     }
@@ -463,7 +467,7 @@ public class SelectTest extends AbstractOrmTest {
         wanted.addAll(birds);
 
         assertNotNull(all, "The list returned by list() should be non-null");
-        assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
+        assertEquals(all.size(), wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
         assertTrue(listCompareOrdered(all, wanted), "The items loaded are exactly the same as the ones we expected");
     }
 
@@ -480,7 +484,7 @@ public class SelectTest extends AbstractOrmTest {
         List<Pet> all = orm().select(PET, where(PET.age.lt(6))).list();
 
         assertNotNull(all, "The list returned by list() should be non-null");
-        assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
+        assertEquals(all.size(), wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
         assertTrue(listCompareOrdered(all, wanted), "The items loaded are exactly the same as the ones we expected");
     }
 
@@ -505,7 +509,7 @@ public class SelectTest extends AbstractOrmTest {
                 .list();
 
         assertNotNull(all, "The list returned by list() should be non-null");
-        assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
+        assertEquals(all.size(), wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
         assertTrue(listCompareAsIs(all, wanted), "The items loaded are exactly the same as the ones we expected");
     }
 
@@ -516,7 +520,7 @@ public class SelectTest extends AbstractOrmTest {
         Person person = persons.get(0);
         List<Cat> wanted = cats.stream()
                 .filter(cat -> cat.getType() == CatType.INDOOR)
-                .filter(cat -> cat.getPersonId() == person.getId())
+                .filter(cat -> cat.getPersonId().equals(person.getId()))
                 .collect(Collectors.toList());
         List<Cat> all = orm().select(CAT,
                         where(CAT.type.eq(CatType.INDOOR)),
@@ -524,7 +528,7 @@ public class SelectTest extends AbstractOrmTest {
                                 where(PERSON.emailAddress.eq(person.getEmailAddress()))))
                 .list();
         assertNotNull(all, "The list returned by list() should be non-null");
-        assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
+        assertEquals(all.size(), wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
         assertTrue(listCompareOrdered(all, wanted), "The items loaded are exactly the same as the ones we expected");
     }
 
@@ -532,7 +536,7 @@ public class SelectTest extends AbstractOrmTest {
     @Order(211)
     public void testJoinNoWhere() throws Exception {
         say("Testing select with a join without a where");
-        Set<Long> personIds = persons.stream().map(person -> person.getId()).collect(Collectors.toSet());
+        Set<Long> personIds = persons.stream().map(Person::getId).collect(Collectors.toSet());
         List<Cat> wanted = cats.stream()
                 .filter(cat -> cat.getType() == CatType.INDOOR)
                 .filter(cat -> personIds.contains(cat.getPersonId()))
@@ -542,7 +546,7 @@ public class SelectTest extends AbstractOrmTest {
                         join(PERSON, on(CAT.personId, PERSON.id)))
                 .list();
         assertNotNull(all, "The list returned by list() should be non-null");
-        assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
+        assertEquals(all.size(), wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
         assertTrue(listCompareOrdered(all, wanted), "The items loaded are exactly the same as the ones we expected");
     }
 
@@ -550,13 +554,17 @@ public class SelectTest extends AbstractOrmTest {
     @Order(220)
     public void testJoinThenJoin() throws Exception {
         say("Testing select with a join and then join");
-        Town town = towns.stream()
+        Optional<Town> opt = towns.stream()
                 .filter(t -> t.getName().equals("Durban"))
-                .findFirst().get();
+                .findFirst();
+        if (!opt.isPresent()) {
+            throw new NoSuchElementException("No town found in test");
+        }
+        Town town = opt.get();
         List<Long> fromThere = persons.stream()
-                .filter(p -> p.getTownId() == town.getId())
+                .filter(p -> p.getTownId().equals(town.getId()))
                 .filter(p -> p.getIncome() > 5000)
-                .map(p -> p.getId())
+                .map(Person::getId)
                 .collect(Collectors.toList());
         List<Cat> wanted = cats.stream()
                 .filter(cat -> cat.getType() == CatType.INDOOR)
@@ -569,7 +577,7 @@ public class SelectTest extends AbstractOrmTest {
                                         where(TOWN.name.eq("Durban")))))
                 .list();
         assertNotNull(all, "The list returned by list() should be non-null");
-        assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
+        assertEquals(all.size(), wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
         assertTrue(listCompareOrdered(all, wanted), "The items loaded are exactly the same as the ones we expected");
 
     }
@@ -583,12 +591,12 @@ public class SelectTest extends AbstractOrmTest {
                 .findFirst().get();
         List<Long> towns = SelectTest.towns.stream()
                 .filter(t -> t.getProvinceId().equals(province.getProvinceId()))
-                .map(town -> town.getId())
+                .map(Town::getId)
                 .collect(Collectors.toList());
         List<Long> fromThere = persons.stream()
                 .filter(p -> towns.contains(p.getTownId()))
                 .filter(p -> p.getIncome() > 5000)
-                .map(p -> p.getId())
+                .map(Person::getId)
                 .collect(Collectors.toList());
         List<Cat> wanted = cats.stream()
                 .filter(cat -> cat.getType() == CatType.INDOOR)
@@ -604,7 +612,7 @@ public class SelectTest extends AbstractOrmTest {
                                                 where(PROVINCE.name.eq("Western Cape"))))))
                 .list();
         assertNotNull(all, "The list returned by list() should be non-null");
-        assertTrue(all.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
+        assertEquals(all.size(), wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
         assertTrue(listCompareOrdered(all, wanted), "The items loaded are exactly the same as the ones we expected");
 
     }
@@ -623,7 +631,7 @@ public class SelectTest extends AbstractOrmTest {
                 .collect(Collectors.toList());
 
         assertNotNull(selected, "The list returned by list() should be non-null");
-        assertTrue(selected.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", selected.size(), wanted.size()));
+        assertEquals(selected.size(), wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", selected.size(), wanted.size()));
         assertTrue(listCompareOrdered(selected, wanted), "The items loaded are exactly the same as the ones we expected");
     }
 
@@ -638,14 +646,14 @@ public class SelectTest extends AbstractOrmTest {
 
         Map<Long, Person> personMap = persons.stream()
                 .filter(person -> person.getFirstName().equals(persons.get(0).getFirstName()))
-                .collect(Collectors.toMap(person -> person.getId(), person -> person));
+                .collect(Collectors.toMap(Person::getId, person -> person));
 
         List<Pet> wanted = Stream.concat(Stream.concat(cats.stream(), dogs.stream()), birds.stream())
                 .filter(pet -> personMap.containsKey(pet.getPersonId()))
                 .collect(Collectors.toList());
 
         assertNotNull(selected, "The list returned by list() should be non-null");
-        assertTrue(selected.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", selected.size(), wanted.size()));
+        assertEquals(selected.size(), wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", selected.size(), wanted.size()));
         assertTrue(listCompareOrdered(selected, wanted), "The items loaded are exactly the same as the ones we expected");
     }
 
@@ -661,7 +669,7 @@ public class SelectTest extends AbstractOrmTest {
 
         Map<Long, Person> personMap = persons.stream()
                 .filter(person -> person.getFirstName().equals("Bob"))
-                .collect(Collectors.toMap(person -> person.getId(), person -> person));
+                .collect(Collectors.toMap(Person::getId, person -> person));
         CatBreed persian = catBreeds.stream().filter(breed -> breed.getName().equals("Persian")).findFirst().get();
 
         List<Cat> wanted = cats.stream().filter(cat -> cat.getBreedId().equals(persian.getId()))
@@ -669,7 +677,7 @@ public class SelectTest extends AbstractOrmTest {
                 .collect(Collectors.toList());
 
         assertNotNull(selected, "The list returned by list() should be non-null");
-        assertTrue(selected.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", selected.size(), wanted.size()));
+        assertEquals(selected.size(), wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", selected.size(), wanted.size()));
         assertTrue(listCompareOrdered(selected, wanted), "The items loaded are exactly the same as the ones we expected");
     }
 
@@ -684,7 +692,7 @@ public class SelectTest extends AbstractOrmTest {
                 .filter(person -> person.getLastName() == null)
                 .collect(Collectors.toList());
         assertNotNull(selected, "The list returned by list() should be non-null");
-        assertTrue(selected.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", selected.size(), wanted.size()));
+        assertEquals(selected.size(), wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", selected.size(), wanted.size()));
         assertNotNull(selected, "The list returned by list() should be non-null");
         assertTrue(listCompareOrdered(selected, wanted), "The items loaded are exactly the same as the ones we expected");
     }
@@ -700,29 +708,29 @@ public class SelectTest extends AbstractOrmTest {
                 .filter(person -> person.getLastName() != null)
                 .collect(Collectors.toList());
         assertNotNull(selected, "The list returned by list() should be non-null");
-        assertTrue(selected.size() == wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", selected.size(), wanted.size()));
+        assertEquals(selected.size(), wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", selected.size(), wanted.size()));
         assertNotNull(selected, "The list returned by list() should be non-null");
         assertTrue(listCompareOrdered(selected, wanted), "The items loaded are exactly the same as the ones we expected");
     }
 
     @Test
     @Order(280)
-    public void testSelectWhereInEmpty() throws Exception {
+    public void testSelectWhereInEmpty() {
         say("Testing select with a simple where x in empty list - must fail");
         assertThrows(OrmException.class, () -> {
-            List<Integer> ages = Arrays.asList();
-            List<Cat> all = orm().select(CAT, where(CAT.age.in(ages)))
+            List<Integer> ages = Collections.emptyList();
+            orm().select(CAT, where(CAT.age.in(ages)))
                     .list();
         });
     }
 
     @Test
     @Order(290)
-    public void testSelectWhereNotInEmpty() throws Exception {
+    public void testSelectWhereNotInEmpty() {
         say("Testing select with a simple where x not in empty list - must fail");
         assertThrows(OrmException.class, () -> {
-            List<Integer> ages = Arrays.asList();
-            List<Cat> all = orm().select(CAT, where(CAT.age.notIn(ages)))
+            List<Integer> ages = Collections.emptyList();
+            orm().select(CAT, where(CAT.age.notIn(ages)))
                     .list();
 
         });
