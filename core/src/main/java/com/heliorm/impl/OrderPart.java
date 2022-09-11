@@ -1,11 +1,9 @@
 package com.heliorm.impl;
 
-import com.heliorm.Table;
-
-public class OrderPart<T extends Table<O>, O> {
+public class OrderPart<O> {
     private final Direction direction;
-    private final FieldPart<T, O, ?> field;
-    public OrderPart(Direction direction, FieldPart<T, O, ?> field) {
+    private final FieldPart< O, ?> field;
+    public OrderPart(Direction direction, FieldPart< O, ?> field) {
         this.direction = direction;
         this.field = field;
     }
@@ -14,11 +12,11 @@ public class OrderPart<T extends Table<O>, O> {
         return direction;
     }
 
-    public FieldPart<T, O, ?> getField() {
+    public FieldPart<O, ?> getField() {
         return field;
     }
 
     public enum Direction {
-        ASCENDING, DESCENDING;
+        ASCENDING, DESCENDING
     }
 }

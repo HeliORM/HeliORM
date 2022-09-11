@@ -1,13 +1,12 @@
 package com.heliorm.impl;
 
 import com.heliorm.Field;
-import com.heliorm.Table;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public final class ByteListExpressionPart<T extends Table<O>, O> extends NumberListExpressionPart<T, O, Byte> {
+public final class ByteListExpressionPart<O> extends NumberListExpressionPart<O, Byte> {
 
     private final List<Byte> values;
 

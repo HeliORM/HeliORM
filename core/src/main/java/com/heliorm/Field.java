@@ -7,12 +7,11 @@ import java.util.Optional;
 /**
  * A field on a table.
  *
- * @param <T> The type of the table
  * @param <O> The type of the POJO to which the table and this field applies
  * @param <C> The data type of the field
  * @author gideon
  */
-public interface Field<T extends Table<O>, O, C> extends FieldOrder<T, O, C> {
+public interface Field<O, C> extends FieldOrder<O, C> {
 
     Table<?> getTable();
 
@@ -86,9 +85,9 @@ public interface Field<T extends Table<O>, O, C> extends FieldOrder<T, O, C> {
      */
     boolean isNullable();
 
-    FieldOrder<T, O, C> asc();
+    FieldOrder<O, C> asc();
 
-    FieldOrder<T, O, C> desc();
+    FieldOrder<O, C> desc();
 
     enum FieldType {
         LONG,

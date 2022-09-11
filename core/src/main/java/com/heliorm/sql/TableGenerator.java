@@ -14,6 +14,6 @@ public interface TableGenerator {
      * @return The schema
      * @throws OrmSqlException Throws if there is an error generating the schema
      */
-    String generateSchema(Table<?> table) throws OrmSqlException;
+    <O> String generateSchema(Table<O> table) throws OrmSqlException;
 
 }

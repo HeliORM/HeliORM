@@ -10,14 +10,13 @@ import java.util.Optional;
 import static java.lang.String.format;
 
 /**
- * @param <T> Type of table
  * @param <O> Type of POJO
  * @param <C> Type of the field
  * @author gideon
  */
-public abstract class FieldPart<T extends Table<O>, O, C> implements Field<T, O, C>, Cloneable {
+public abstract class FieldPart<O, C> implements Field<O, C>, Cloneable {
 
-    private final Table table;
+    private final Table<O> table;
     private final FieldType fieldType;
     private final Class<C> javaType;
     private final String javaName;
@@ -30,7 +29,7 @@ public abstract class FieldPart<T extends Table<O>, O, C> implements Field<T, O,
     private Optional<Integer> length = Optional.empty();
 
 
-    public FieldPart(Table table, FieldType fieldType, Class<C> javaType, String javaName) {
+    public FieldPart(Table<O> table, FieldType fieldType, Class<C> javaType, String javaName) {
         this.table = table;
         this.fieldType = fieldType;
         this.javaType = javaType;
@@ -39,8 +38,8 @@ public abstract class FieldPart<T extends Table<O>, O, C> implements Field<T, O,
     }
 
     @Override
-    public final T getTable() {
-        return (T) table;
+    public final Table<O> getTable() {
+        return table;
     }
 
     @Override
@@ -80,9 +79,9 @@ public abstract class FieldPart<T extends Table<O>, O, C> implements Field<T, O,
         this.autoNumber = autoNumber;
     }
 
-    public final FieldPart<T, O, C> getThis() throws OrmException {
+    public final FieldPart<O, C> getThis() throws OrmException {
         try {
-            return (FieldPart<T, O, C>) clone();
+            return (FieldPart<O, C>) clone();
         } catch (CloneNotSupportedException ex) {
             throw new OrmException(format("Could not make a copy of class %s.BUG!", getClass().getSimpleName()));
         }
@@ -129,12 +128,12 @@ public abstract class FieldPart<T extends Table<O>, O, C> implements Field<T, O,
         this.nullable = nullable;
     }
 
-    public FieldOrder<T, O, C> asc() {
+    public FieldOrder<O, C> asc() {
         return () -> FieldPart.this;
     }
 
-    public FieldOrder<T, O, C> desc() {
-        return new FieldOrder<T, O, C>() {
+    public FieldOrder<O, C> desc() {
+        return new FieldOrder<O, C>() {
 
             @Override
             public Direction getDirection() {
@@ -142,14 +141,14 @@ public abstract class FieldPart<T extends Table<O>, O, C> implements Field<T, O,
             }
 
             @Override
-            public Field<T, O, C> getField() {
+            public Field<O, C> getField() {
                 return FieldPart.this;
             }
         };
     }
 
     @Override
-    public Field<T, O, C> getField() {
+    public Field<O, C> getField() {
         return this;
     }
 

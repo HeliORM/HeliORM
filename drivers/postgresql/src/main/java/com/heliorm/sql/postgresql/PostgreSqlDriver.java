@@ -24,7 +24,7 @@ public final class PostgreSqlDriver extends SqlDriver {
     }
 
     public PostgreSqlDriver() {
-        super(Collections.EMPTY_MAP);
+        super(Collections.emptyMap());
     }
 
     @Override

@@ -9,57 +9,56 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * @param <T> Type of table
  * @param <O> Type of POJO
  * @param <E> Type of the enum
  * @author gideon
  */
-public class EnumFieldPart<T extends Table<O>, O, E extends Enum> extends FieldPart<T, O, E> implements
-        EnumField<T, O, E>,
-        WithEqualsPart<T, O, E>,
-        WithInPart<T, O, E>, WithIsPart<T, O, E> {
+public class EnumFieldPart<O, E extends Enum<E>> extends FieldPart<O, E> implements
+        EnumField<O, E>,
+        WithEqualsPart<O, E>,
+        WithInPart<O, E>, WithIsPart<O, E> {
 
-    public EnumFieldPart(T table, Class<E> javaType, String javaName) {
+    public EnumFieldPart(Table<O> table, Class<E> javaType, String javaName) {
         super(table, FieldType.ENUM, javaType, javaName);
     }
 
     @Override
-    public Continuation<T, O> eq(E value) throws OrmException {
+    public Continuation<O> eq(E value) throws OrmException {
         return new EnumValueExpressionPart(getThis(), ValueExpressionPart.Operator.EQ, value);
     }
 
     @Override
-    public Continuation<T, O> notEq(E value) throws OrmException {
+    public Continuation<O> notEq(E value) throws OrmException {
         return new EnumValueExpressionPart(getThis(), ValueExpressionPart.Operator.NOT_EQ, value);
     }
 
     @Override
-    public Continuation<T, O> isNull() throws OrmException {
+    public Continuation<O> isNull() throws OrmException {
         return new IsExpressionPart(getThis(), IsExpressionPart.Operator.IS_NULL);
     }
 
     @Override
-    public Continuation<T, O> isNotNull() throws OrmException {
+    public Continuation<O> isNotNull() throws OrmException {
         return new IsExpressionPart(getThis(), IsExpressionPart.Operator.IS_NOT_NULL);
     }
 
     @Override
-    public Continuation<T, O> in(List<E> values) throws OrmException {
+    public Continuation<O> in(List<E> values) throws OrmException {
         return new EnumListExpressionPart(getThis(), ListExpressionPart.Operator.IN, values);
     }
 
     @Override
-    public Continuation<T, O> notIn(List<E> values) throws OrmException {
+    public Continuation<O> notIn(List<E> values) throws OrmException {
         return new EnumListExpressionPart(getThis(), ListExpressionPart.Operator.NOT_IN, values);
     }
 
     @Override
-    public Continuation<T, O> in(E... values) throws OrmException {
+    public Continuation<O> in(E... values) throws OrmException {
         return new EnumListExpressionPart(getThis(), ListExpressionPart.Operator.IN, Arrays.asList(values));
     }
 
     @Override
-    public Continuation<T, O> notIn(E... values) throws OrmException {
+    public Continuation<O> notIn(E... values) throws OrmException {
         return new EnumListExpressionPart(getThis(), ListExpressionPart.Operator.NOT_IN, Arrays.asList(values));
     }
 

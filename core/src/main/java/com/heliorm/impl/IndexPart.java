@@ -2,22 +2,21 @@ package com.heliorm.impl;
 
 import com.heliorm.Field;
 import com.heliorm.Index;
-import com.heliorm.Table;
 
 import java.util.List;
 
-public final class IndexPart<T extends Table<O>, O> implements Index<T, O> {
+public final class IndexPart<O> implements Index<O> {
 
     private final boolean unique;
-    private final List<Field<T, O, ?>> fields;
+    private final List<Field<O, ?>> fields;
 
-    public IndexPart(boolean unique, List<Field<T, O, ?>> fields) {
+    public IndexPart(boolean unique, List<Field<O, ?>> fields) {
         this.unique = unique;
         this.fields = fields;
     }
 
     @Override
-    public List<Field<T, O, ?>> getFields() {
+    public List<Field<O, ?>> getFields() {
         return fields;
     }
 

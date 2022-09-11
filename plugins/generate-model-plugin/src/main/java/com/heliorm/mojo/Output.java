@@ -161,7 +161,7 @@ class Output {
         }
     }
 
-    private void emit(Table<?> cm) throws OrmMetaDataException, GeneratorException {
+    private <O> void emit(Table<O> cm) throws OrmMetaDataException, GeneratorException {
         impt(cm.getObjectClass());
         emit("public static class %s implements Table<%s> {",
                 tableName(cm), getJavaName(cm));
@@ -185,18 +185,18 @@ class Output {
         impt(Arrays.class);
         emit("");
         emit("@Override");
-        emit("public List<Field> getFields() {");
+        emit("public List<Field<Table<%s>,%s,?>> getFields() {", getJavaName(cm), getJavaName(cm));
         push();
-        emit(format("return Arrays.asList(%s);", fieldNames.toString()));
+        emit(format("return Arrays.asList(%s);", fieldNames));
         pop();
         emit("}");
         // getPrimaryKey();
         impt(Optional.class);
         emit("");
         emit("@Override");
-        emit("public Optional<Field> getPrimaryKey() {");
+        emit("public Optional<Field<Table<%s>,%s,?>> getPrimaryKey() {", getJavaName(cm), getJavaName(cm));
         push();
-        Optional<Field> opt = cm.getPrimaryKey();
+        Optional<Field<O,?>> opt = cm.getPrimaryKey();
         if (opt.isPresent()) {
             emit("return Optional.of(%s);", opt.get().getJavaName());
         } else {
@@ -277,7 +277,7 @@ class Output {
         impt(Index.class);
         emit("");
         emit("@Override");
-        emit("public List<Index> getIndexes() {");
+        emit("public List<Index<Table<%s>,%s>> getIndexes() {", getJavaName(cm), getJavaName(cm));
         push();
         emit(format("return Arrays.asList(%s);", indexNames.toString()));
         pop();
@@ -378,9 +378,9 @@ class Output {
         } else {
             enumTypeName = format("%s.%s", cm.getObjectClass().getSimpleName(), fm.getJavaType().getSimpleName());
         }
-        emit("public final %s<%s, %s, %s> %s = builder.enumField(\"%s\", %s.class)",
+        emit("public final %s<Table<%s>, %s, %s> %s = builder.enumField(\"%s\", %s.class)",
                 EnumField.class.getSimpleName(),
-                tableName(cm),
+                getJavaName(cm),
                 cm.getObjectClass().getSimpleName(),
                 enumTypeName,
                 fm.getJavaName(),
@@ -401,7 +401,7 @@ class Output {
         addField(cm, fm, StringField.class, "stringField");
     }
 
-    private String addIndexModel(Table tm, Index<?, ?> im) {
+    private String addIndexModel(Table tm, Index<?> im) {
         impt(IndexPart.class);
         StringJoiner sj = new StringJoiner(",");
         for (Field field : im.getFields()) {
@@ -417,7 +417,7 @@ class Output {
         return indexName;
     }
 
-    private String indexName(Table tm, Index<?, ?> im) {
+    private String indexName(Table tm, Index< ?> im) {
         StringJoiner sj = new StringJoiner("_");
         for (Field field : im.getFields()) {
             sj.add(field.getJavaName());
@@ -426,11 +426,11 @@ class Output {
         return sj.toString();
     }
 
-    private void addField(Table<?> cm, Field<?, ?, ?> fm, Class<? extends Field> fieldType, String buildMethod) {
+    private void addField(Table<?> cm, Field<?, ?> fm, Class<? extends Field> fieldType, String buildMethod) {
         impt(fieldType);
-        emit("public final %s<%s, %s> %s = builder.%s(\"%s\")",
+        emit("public final %s<Table<%s>, %s> %s = builder.%s(\"%s\")",
                 fieldType.getSimpleName(),
-                tableName(cm),
+                getJavaName(cm),
                 cm.getObjectClass().getSimpleName(),
                 fm.getJavaName(),
                 buildMethod,
@@ -438,7 +438,7 @@ class Output {
         completeField(fm);
     }
 
-    private void completeField(Field<?, ?, ?> fm) {
+    private void completeField(Field<?, ?> fm) {
         push();
         emit(".withPrimaryKey(%b)", fm.isPrimaryKey());
         emit(".withAutoNumber(%b)", fm.isAutoNumber());
@@ -468,7 +468,7 @@ class Output {
         return getJavaName(table).toUpperCase();
     }
 
-    private String fullFieldName(Table table) throws GeneratorException {
+    private String fullFieldName(Table table) {
         return gen.getTablesPackageFor(table) + ".Tables." + shortFieldName(table);
     }
 

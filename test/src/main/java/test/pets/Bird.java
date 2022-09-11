@@ -2,8 +2,6 @@ package test.pets;
 
 import com.heliorm.annotation.Pojo;
 
-import java.time.Duration;
-
 /**
  * @author gideon
  */
@@ -30,6 +28,6 @@ public class Bird extends Avian {
     }
 
     public enum Type {
-        CAGED, FREERANGE;
+        CAGED, FREERANGE
     }
 }

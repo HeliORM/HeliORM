@@ -83,23 +83,23 @@ public final class SqlOrm implements Orm {
         this.resultSetHelper = new ResultSetHelper(pops, this::getFieldId);
         selector = new Selector() {
             @Override
-            public <T extends Table<O>, O> List<O> list(Select<T, O> tail) throws OrmException {
-                return SqlOrm.this.list((SelectPart<T, O>) tail);
+            public <O> List<O> list(Select<O> tail) throws OrmException {
+                return SqlOrm.this.list((SelectPart<O>) tail);
             }
 
             @Override
-            public <T extends Table<O>, O> Stream<O> stream(Select<T, O> tail) throws OrmException {
-                return SqlOrm.this.stream((SelectPart<T, O>) tail);
+            public <O> Stream<O> stream(Select<O> tail) throws OrmException {
+                return SqlOrm.this.stream((SelectPart<O>) tail);
             }
 
             @Override
-            public <T extends Table<O>, O> Optional<O> optional(Select<T, O> tail) throws OrmException {
-                return SqlOrm.this.optional((SelectPart<T, O>) tail);
+            public <O> Optional<O> optional(Select<O> tail) throws OrmException {
+                return SqlOrm.this.optional((SelectPart<O>) tail);
             }
 
             @Override
-            public <T extends Table<O>, O> O one(Select<T, O> tail) throws OrmException {
-                return SqlOrm.this.one((SelectPart<T, O>) tail);
+            public <O> O one(Select<O> tail) throws OrmException {
+                return SqlOrm.this.one((SelectPart<O>) tail);
             }
         };
     }
@@ -142,7 +142,7 @@ public final class SqlOrm implements Orm {
                 }
             }
             stmt.executeUpdate();
-            Optional<Field> opt = table.getPrimaryKey();
+            Optional<Field<O, ?>> opt = table.getPrimaryKey();
             if (opt.isPresent()) {
                 Field keyField = opt.get();
                 if (keyField.isAutoNumber()) {
@@ -183,7 +183,7 @@ public final class SqlOrm implements Orm {
                     par++;
                 }
             }
-            Optional<Field> primaryKey = table.getPrimaryKey();
+            Optional<Field<O, ?>> primaryKey = table.getPrimaryKey();
             if (primaryKey.isPresent()) {
                 Object val = pojoHelper.getValueFromPojo(pojo, primaryKey.get());
                 if (val == null) {
@@ -232,27 +232,27 @@ public final class SqlOrm implements Orm {
     }
 
     @Override
-    public <T extends Table<O>, O> Select<T, O> select(T table) {
+    public <O> Select<O> select(Table<O> table) {
         return new SelectPart<>(selector(), table);
     }
 
     @Override
-    public <T extends Table<O>, O> Select<T, O> select(T table, Where<T, O> where) {
+    public <O> Select<O> select(Table<O> table, Where<O> where) {
         return new SelectPart<>(selector(), table, Optional.of(where), Collections.EMPTY_LIST);
     }
 
     @Override
-    public <T extends Table<O>, O> Select<T, O> select(T table, Join<T, O>... joins) {
+    public <O> Select<O> select(Table<O> table, Join<O>... joins) {
         List<JoinPart<?, ?, ?, ?>> list = Arrays.stream(joins)
                 .map(join -> (JoinPart<?, ?, ?, ?>) join).collect(Collectors.toList());
-        return new SelectPart<T, O>(selector(), table, Optional.empty(), list);
+        return new SelectPart<>(selector(), table, Optional.empty(), list);
     }
 
     @Override
-    public <T extends Table<O>, O> Select<T, O> select(T table, Where<T, O> where, Join<T, O>... joins) {
+    public <O> Select<O> select(Table<O> table, Where<O> where, Join<O>... joins) {
         List<JoinPart<?, ?, ?, ?>> list = Arrays.stream(joins)
                 .map(join -> (JoinPart<?, ?, ?, ?>) join).collect(Collectors.toList());
-        return new SelectPart<T, O>(selector(), table, Optional.of(where), list);
+        return new SelectPart<>(selector(), table, Optional.of(where), list);
     }
 
     @Override
@@ -303,19 +303,19 @@ public final class SqlOrm implements Orm {
         return selector;
     }
 
-    private <T extends Table<O>, O> List<O> list(SelectPart<T, O> tail) throws OrmException {
+    private <O> List<O> list(SelectPart<O> tail) throws OrmException {
         try (Stream<O> stream = stream(tail)) {
             return stream.collect(Collectors.toList());
         }
     }
 
-    private <T extends Table<O>, O> Stream<O> stream(ExecutablePart<T, O> tail) throws OrmException {
-        List<? extends ExecutablePart<?, ?>> queries = abstractionHelper.explodeAbstractions(tail);
+    private <O> Stream<O> stream(ExecutablePart<O> tail) throws OrmException {
+        List<? extends ExecutablePart<?>> queries = abstractionHelper.explodeAbstractions(tail);
         if (queries.isEmpty()) {
             throw new OrmException("Could not build query from parts. BUG!");
         }
         if (queries.size() == 1) {
-            SelectPart<?, ?> query = queries.get(0).getSelect();
+            SelectPart<?> query = queries.get(0).getSelect();
             Stream<PojoCompare<O>> res = streamSingle(query.getTable(), queryHelper.buildSelectQuery(tail));
             return res.map(pojoCompare -> pojoCompare.getPojo());
         } else {
@@ -431,7 +431,7 @@ public final class SqlOrm implements Orm {
         }
     }
 
-    private <T extends Table<O>, O> Optional<O> optional(SelectPart<T, O> tail) throws OrmException {
+    private <O> Optional<O> optional(SelectPart<O> tail) throws OrmException {
         try (Stream<O> stream = stream(tail)) {
             O one;
             Iterator<O> iterator = stream.iterator();
@@ -447,7 +447,7 @@ public final class SqlOrm implements Orm {
         }
     }
 
-    private <T extends Table<O>, O> O one(SelectPart<T, O> tail) throws OrmException {
+    private <O> O one(SelectPart<O> tail) throws OrmException {
         try (Stream<O> stream = stream(tail)) {
             Iterator<O> iterator = stream.iterator();
             O one;

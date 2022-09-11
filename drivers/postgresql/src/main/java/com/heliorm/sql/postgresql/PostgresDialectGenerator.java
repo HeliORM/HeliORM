@@ -13,12 +13,12 @@ import static java.lang.String.format;
 public class PostgresDialectGenerator implements TableGenerator {
 
     @Override
-    public String generateSchema(Table<?> table) throws OrmSqlException {
+    public <O> String generateSchema(Table<O> table) throws OrmSqlException {
         StringBuilder sql = new StringBuilder();
         sql.append(format("CREATE TABLE \"%s\" (\n", table.getSqlTable()));
         boolean first = true;
         StringBuilder enums = new StringBuilder();
-        for (Field field : table.getFields()) {
+        for (Field<O,?> field : table.getFields()) {
             if (first) {
                 first = false;
             } else {
@@ -30,19 +30,19 @@ public class PostgresDialectGenerator implements TableGenerator {
                 sql.append(" NOT NULL");
             }
             if (field.getFieldType() == Field.FieldType.ENUM) {
-                enums.append(format("CREATE TYPE %s as ENUM(%s);\n", enumTypeName(table, field), getEnumValues(table, field)));
+                enums.append(format("CREATE TYPE %s as ENUM(%s);\n", enumTypeName(table, field), getEnumValues(field)));
             }
         }
-        Optional<Field> key = table.getPrimaryKey();
+        Optional<Field<O,?>> key = table.getPrimaryKey();
         if (key.isPresent()) {
             sql.append(",\n");
             sql.append(format("PRIMARY KEY (\"%s\")", key.get().getSqlName()));
         }
         sql.append(");\n");
-        return enums.toString() + sql.toString();
+        return enums + sql.toString();
     }
 
-    private String generateFieldSql(Table table, Field field) throws OrmSqlException {
+    private <O> String generateFieldSql(Table<O> table, Field<O, ?> field) throws OrmSqlException {
         switch (field.getFieldType()) {
             case BOOLEAN:
                 return "BIT";
@@ -67,7 +67,6 @@ public class PostgresDialectGenerator implements TableGenerator {
                 }
                 return "BIGINT";
             case DOUBLE:
-                return "DOUBLE PRECISION";
             case FLOAT:
                 return "DOUBLE PRECISION";
             case ENUM:
@@ -78,7 +77,7 @@ public class PostgresDialectGenerator implements TableGenerator {
                     length = 36;
                 }
                 if (field.getLength().isPresent()) {
-                    length = (int) field.getLength().get();
+                    length = field.getLength().get();
                 }
                 return format("VARCHAR(%d)", length);
             }
@@ -91,15 +90,15 @@ public class PostgresDialectGenerator implements TableGenerator {
         }
     }
 
-    private String enumTypeName(Table table, Field field) {
+    private <O> String enumTypeName(Table<O> table, Field<O,?> field) {
         return format("%s_%s", table.getSqlTable(), field.getSqlName());
     }
 
-    private String getEnumValues(Table table, Field<?, ?, ?> field) {
+    private String getEnumValues(Field<?, ?> field) {
         StringJoiner sql = new StringJoiner(",");
         Class<?> javaType = field.getJavaType();
         for (Object v : javaType.getEnumConstants()) {
-            sql.add(format("'%s'", ((Enum) v).name()));
+            sql.add(format("'%s'", ((Enum<?>) v).name()));
         }
         return sql.toString();
     }

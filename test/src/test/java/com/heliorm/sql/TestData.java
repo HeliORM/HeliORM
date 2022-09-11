@@ -10,7 +10,6 @@ import test.pets.Pet;
 import test.place.Province;
 import test.place.Town;
 
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -137,8 +136,7 @@ class TestData {
             "Kwazulu-Natal"
     };
 
-    private static Random random = new Random();
-    private List<Province> provinces = new ArrayList<>();
+    private static final Random random = new Random();
 
     private TestData() {
     }

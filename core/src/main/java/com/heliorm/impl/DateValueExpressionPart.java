@@ -1,11 +1,10 @@
 package com.heliorm.impl;
 
 import com.heliorm.Field;
-import com.heliorm.Table;
 
 import java.util.Date;
 
-public final class DateValueExpressionPart<T extends Table<O>, O> extends ValueExpressionPart<T, O, Date> {
+public final class DateValueExpressionPart< O> extends ValueExpressionPart<O, Date> {
 
     private Date value;
 

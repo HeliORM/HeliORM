@@ -1,9 +1,8 @@
 package com.heliorm.impl;
 
 import com.heliorm.Field;
-import com.heliorm.Table;
 
-public final class BooleanValueExpressionPart<T extends Table<O>, O> extends ValueExpressionPart<T, O, Boolean> {
+public final class BooleanValueExpressionPart<O> extends ValueExpressionPart<O, Boolean> {
 
     private Boolean value;
 

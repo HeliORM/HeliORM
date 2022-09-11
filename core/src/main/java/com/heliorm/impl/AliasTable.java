@@ -19,7 +19,7 @@ public class AliasTable<O> implements Table<O> {
     private final Table<O> table;
     private Set<Table<?>> subs;
 
-    public AliasTable(Database database, Table table) {
+    public AliasTable(Database database, Table<O> table) {
         this.database = database;
         this.table = table;
     }
@@ -30,12 +30,12 @@ public class AliasTable<O> implements Table<O> {
     }
 
     @Override
-    public List<Field> getFields() {
+    public List<Field<O,?>> getFields() {
         return table.getFields();
     }
 
     @Override
-    public Optional<Field> getPrimaryKey() {
+    public Optional<Field<O,?>> getPrimaryKey() {
         return table.getPrimaryKey();
     }
 
@@ -47,9 +47,9 @@ public class AliasTable<O> implements Table<O> {
     @Override
     public Set<Table<?>> getSubTables() {
         if (subs == null) {
-            subs = new HashSet();
+            subs = new HashSet<>();
             for (Table<?> sub : table.getSubTables()) {
-                subs.add(new AliasTable(database, sub));
+                subs.add(new AliasTable<>(database, sub));
             }
         }
         return subs;
@@ -66,7 +66,7 @@ public class AliasTable<O> implements Table<O> {
     }
 
     @Override
-    public List<Index> getIndexes() {
+    public List<Index<O>> getIndexes() {
         return table.getIndexes();
     }
 }

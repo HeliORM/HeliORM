@@ -1,14 +1,12 @@
 package com.heliorm.impl;
 
-import com.heliorm.Table;
 import com.heliorm.def.Continuation;
 
 /**
- * @param <T> Type of table
  * @param <O> Type of POJO
  * @author gideon
  */
-public class ExpressionContinuationPart<T extends Table<O>, O> implements Continuation<T, O> {
+public class ExpressionContinuationPart< O> implements Continuation<O> {
 
     private final Type type;
     private final ExpressionPart expression;
@@ -18,16 +16,16 @@ public class ExpressionContinuationPart<T extends Table<O>, O> implements Contin
     }
 
     @Override
-    public Continuation<T, O> and(Continuation<T, O> expr) {
+    public Continuation<O> and(Continuation<O> expr) {
         return new ExpressionContinuationPart(Type.AND, expr);
     }
 
     @Override
-    public Continuation<T, O> or(Continuation<T, O> expr) {
+    public Continuation<O> or(Continuation<O> expr) {
         return new ExpressionContinuationPart(Type.OR, expr);
     }
 
-    public ExpressionPart<T, O, ?> getExpression() {
+    public ExpressionPart<O, ?> getExpression() {
         return expression;
     }
 

@@ -1,32 +1,30 @@
 package com.heliorm.impl;
 
 import com.heliorm.Field;
-import com.heliorm.Table;
 import com.heliorm.def.Continuation;
 
 /**
- * @param <T> Type of table
  * @param <O> Type of POJO
  * @param <C> Type of the field
  * @author gideon
  */
-public abstract class ExpressionPart<T extends Table<O>, O, C> implements Continuation<T, O> {
+public abstract class ExpressionPart<O, C> implements Continuation<O> {
 
 
     private final Type type;
-    private final Field<T, O, C> field;
-    public ExpressionPart(Type type, Field<T, O, C> field) {
+    private final Field<O, C> field;
+    public ExpressionPart(Type type, Field<O, C> field) {
         this.type = type;
         this.field = field;
     }
 
     @Override
-    public Continuation<T, O> and(Continuation<T, O> expr) {
+    public Continuation<O> and(Continuation<O> expr) {
         return new ExpressionContinuationPart(ExpressionContinuationPart.Type.AND, expr);
     }
 
     @Override
-    public Continuation<T, O> or(Continuation<T, O> expr) {
+    public Continuation<O> or(Continuation<O> expr) {
         return new ExpressionContinuationPart(ExpressionContinuationPart.Type.OR, expr);
     }
 
@@ -34,7 +32,7 @@ public abstract class ExpressionPart<T extends Table<O>, O, C> implements Contin
         return type;
     }
 
-    public final Field<T, O, C> getField() {
+    public final Field<O, C> getField() {
         return field;
     }
 

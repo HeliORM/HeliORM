@@ -6,11 +6,10 @@ import com.heliorm.Table;
 /**
  * A field representing a String value
  *
- * @param <T> Table type
  * @param <O> Object type
  * @author gideon
  */
-public interface StringField<T extends Table<O>, O> extends Field<T, O, String>, WithRange<T, O, String>, WithEquals<T, O, String>, WithIn<T, O, String>, WithLike<T, O, String>, WithIs<T, O, String> {
+public interface StringField< O> extends Field<O, String>, WithRange<O, String>, WithEquals<O, String>, WithIn<O, String>, WithLike<O, String>, WithIs<O> {
 
     @Override
     default FieldType getFieldType() {

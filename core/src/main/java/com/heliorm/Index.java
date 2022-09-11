@@ -2,9 +2,9 @@ package com.heliorm;
 
 import java.util.List;
 
-public interface Index<T extends Table<O>, O> {
+public interface Index<O> {
 
-    List<Field<T, O, ?>> getFields();
+    List<Field<O, ?>> getFields();
 
     boolean isUnique();
 

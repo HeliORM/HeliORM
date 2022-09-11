@@ -14,11 +14,11 @@ import static java.lang.String.format;
 public class MysqlDialectGenerator implements TableGenerator {
 
     @Override
-    public String generateSchema(Table<?> table) throws OrmSqlException {
+    public <O> String generateSchema(Table<O> table) throws OrmSqlException {
         StringBuilder sql = new StringBuilder();
         sql.append(format("CREATE TABLE %s (\n", fullTableName(table)));
         boolean first = true;
-        for (Field field : table.getFields()) {
+        for (Field<?,?> field : table.getFields()) {
             if (first) {
                 first = false;
             } else {
@@ -33,14 +33,14 @@ public class MysqlDialectGenerator implements TableGenerator {
                 sql.append(" AUTO_INCREMENT");
             }
         }
-        Optional<Field> key = table.getPrimaryKey();
+        Optional<Field<O,?>> key = table.getPrimaryKey();
         if (key.isPresent()) {
             sql.append(",\n");
             sql.append(format("PRIMARY KEY (`%s`)", key.get().getSqlName()));
         }
 
         int num = 0;
-        for (Index<?, ?> index : table.getIndexes()) {
+        for (Index<?> index : table.getIndexes()) {
             sql.append(",\n");
             if (index.isUnique()) {
                 sql.append("UNIQUE ");
@@ -49,9 +49,7 @@ public class MysqlDialectGenerator implements TableGenerator {
             Optional<String> fields = index.getFields().stream()
                     .map(field -> "`" + field.getSqlName() + "`")
                     .reduce((s1, s2) -> s1 + "," + s2);
-            if (fields.isPresent()) {
-                sql.append(fields.get());
-            }
+            fields.ifPresent(sql::append);
             sql.append(")");
             num++;
         }
@@ -97,7 +95,7 @@ public class MysqlDialectGenerator implements TableGenerator {
         }
     }
 
-    private String getEnumValues(Table table, Field<?, ?, ?> field) {
+    private String getEnumValues(Table table, Field<?, ?> field) {
         StringJoiner sql = new StringJoiner(",");
         Class<?> javaType = field.getJavaType();
         for (Object v : javaType.getEnumConstants()) {

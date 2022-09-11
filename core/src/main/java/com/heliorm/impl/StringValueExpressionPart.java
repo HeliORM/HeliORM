@@ -1,9 +1,8 @@
 package com.heliorm.impl;
 
 import com.heliorm.Field;
-import com.heliorm.Table;
 
-public final class StringValueExpressionPart<T extends Table<O>, O> extends ValueExpressionPart<T, O, String> {
+public final class StringValueExpressionPart< O> extends ValueExpressionPart<O, String> {
 
     private String value;
 

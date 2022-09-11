@@ -1,16 +1,13 @@
 package com.heliorm.impl;
 
-import com.heliorm.Table;
-
 import static java.lang.String.format;
 
 /**
- * @param <T> Type of table
  * @param <O> Type of POJO
  * @param <C> Type of the field
  * @author gideon
  */
-public class IsExpressionPart<T extends Table<O>, O, C> extends ExpressionPart<T, O, C> {
+public class IsExpressionPart< O, C> extends ExpressionPart<O, C> {
 
     private final Operator operator;
 

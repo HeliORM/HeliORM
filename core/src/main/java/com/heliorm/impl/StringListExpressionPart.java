@@ -1,13 +1,12 @@
 package com.heliorm.impl;
 
 import com.heliorm.Field;
-import com.heliorm.Table;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public final class StringListExpressionPart<T extends Table<O>, O> extends ListExpressionPart<T, O, String> {
+public final class StringListExpressionPart<O> extends ListExpressionPart<O, String> {
 
     private final List<String> values;
 

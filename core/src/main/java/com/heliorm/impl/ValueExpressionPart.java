@@ -1,7 +1,6 @@
 package com.heliorm.impl;
 
 import com.heliorm.Field;
-import com.heliorm.Table;
 
 import static java.lang.String.format;
 
@@ -11,7 +10,7 @@ import static java.lang.String.format;
  * @param <C> Type of the field
  * @author gideon
  */
-public abstract class ValueExpressionPart<T extends Table<O>, O, C> extends ExpressionPart<T, O, C> {
+public abstract class ValueExpressionPart< O, C> extends ExpressionPart<O, C> {
 
     private final Field.FieldType dataType;
     private final Operator operator;

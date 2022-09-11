@@ -77,7 +77,7 @@ abstract class AbstractOrmTest {
         deleteAll(Province.class);
     }
 
-    protected static final <O> List<O> createAll(List<O> data) throws OrmException {
+    protected static <O> List<O> createAll(List<O> data) throws OrmException {
         List<O> res = new ArrayList<>();
         for (O object : data) {
             res.add(orm.create(object));
@@ -100,7 +100,7 @@ abstract class AbstractOrmTest {
         }
     }
 
-    protected static final void say(String fmt, Object... args) {
+    protected static void say(String fmt, Object... args) {
         System.out.printf(fmt, args);
         System.out.println();
     }
@@ -111,22 +111,20 @@ abstract class AbstractOrmTest {
         return jdbcDataSource;
     }
 
-    private static DataSource setupMysqlDataSource() throws SQLException {
+    private static DataSource setupMysqlDataSource() {
         HikariConfig conf = new HikariConfig();
         conf.setJdbcUrl("jdbc:mysql://127.0.0.1:3306/petz");
         conf.setUsername("root");
         conf.setPassword("dev");
-        HikariDataSource ds = new HikariDataSource(conf);
-        return ds;
+        return new HikariDataSource(conf);
     }
 
-    private static DataSource setupPostgreSqlDatasource() throws SQLException {
+    private static DataSource setupPostgreSqlDatasource() {
         HikariConfig conf = new HikariConfig();
         conf.setJdbcUrl("jdbc:postgresql://127.0.0.1:5432/petz");
         conf.setUsername("postgres");
         conf.setPassword("dev");
-        HikariDataSource ds = new HikariDataSource(conf);
-        return ds;
+        return new HikariDataSource(conf);
     }
 
     protected Orm orm() {
@@ -201,7 +199,7 @@ abstract class AbstractOrmTest {
         if (data.size() < 2) {
             return data;
         }
-        Table<?> t1 = orm.tableFor(data.get(0));
+        Table<O> t1 = orm.tableFor(data.get(0));
         return data.stream().sorted((o1, o2) -> {
                     try {
                         int o = o1.getClass().getName().compareTo(o2.getClass().getName());
