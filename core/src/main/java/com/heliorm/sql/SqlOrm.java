@@ -571,7 +571,7 @@ public final class SqlOrm implements Orm {
      * @return True if it exsits in the database
      * @throws OrmException
      */
-    private final boolean tableExists(Table table) throws OrmException {
+    private boolean tableExists(Table table) throws OrmException {
         Connection con = getConnection();
         try {
             DatabaseMetaData dbm = con.getMetaData();

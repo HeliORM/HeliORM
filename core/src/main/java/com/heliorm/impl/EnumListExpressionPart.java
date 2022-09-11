@@ -1,7 +1,5 @@
 package com.heliorm.impl;
 
-import com.heliorm.Field;
-
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -12,7 +10,7 @@ public final class EnumListExpressionPart<O, E extends Enum<E>> extends ListExpr
     private final List<E> values;
 
     public EnumListExpressionPart(FieldPart left, Operator op, Collection<Duration> values) {
-        super(Field.FieldType.ENUM, left, op);
+        super(left, op);
         this.values = new ArrayList(values);
     }
 

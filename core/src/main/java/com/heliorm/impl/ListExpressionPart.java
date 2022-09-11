@@ -1,7 +1,5 @@
 package com.heliorm.impl;
 
-import com.heliorm.Field;
-
 import java.util.List;
 
 import static java.lang.String.format;
@@ -11,13 +9,11 @@ import static java.lang.String.format;
  */
 public abstract class ListExpressionPart< O, C> extends ExpressionPart<O, C> {
 
-    private final Field.FieldType dataType;
     private final Operator operator;
 
-    protected ListExpressionPart(Field.FieldType dataType, FieldPart left, Operator op) {
+    protected ListExpressionPart(FieldPart<O,C> left, Operator op) {
         super(Type.LIST_EXPRESSION, left);
         this.operator = op;
-        this.dataType = dataType;
     }
 
     public Operator getOperator() {

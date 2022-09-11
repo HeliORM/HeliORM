@@ -1,7 +1,6 @@
 package com.heliorm.def;
 
 /**
- * @param <DT> Type of table
  * @param <DO> Type of POJO
  * @author gideon
  */

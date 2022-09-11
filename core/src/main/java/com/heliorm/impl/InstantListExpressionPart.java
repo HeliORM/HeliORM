@@ -1,7 +1,5 @@
 package com.heliorm.impl;
 
-import com.heliorm.Field;
-
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -12,7 +10,7 @@ public final class InstantListExpressionPart< O> extends ListExpressionPart< O, 
     private final List<Instant> values;
 
     public InstantListExpressionPart(FieldPart left, Operator op, Collection<Instant> values) {
-        super(Field.FieldType.INSTANT, left, op);
+        super(left, op);
         this.values = new ArrayList(values);
     }
 

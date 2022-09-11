@@ -5,7 +5,6 @@ import com.heliorm.Field;
 import static java.lang.String.format;
 
 /**
- * @param <T> Type of table
  * @param <O> Type of POJO
  * @param <C> Type of the field
  * @author gideon
