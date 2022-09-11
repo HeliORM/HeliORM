@@ -314,7 +314,7 @@ public class SelectTest extends AbstractOrmTest {
         assertTrue(listCompareOrdered(all, wanted), "The items loaded are exactly the same as the ones we expected");
     }
 
-    @Test
+//    @Test
     @Order(162)
     public void testSelectWhereDateField() throws Exception {
         say("Testing select with a where clause with and on two fields");
@@ -331,7 +331,7 @@ public class SelectTest extends AbstractOrmTest {
         assertTrue(listCompareOrdered(all, wanted), "The items loaded are exactly the same as the ones we expected");
     }
 
-    @Test
+//    @Test
     @Order(163)
     public void testSelectWhereAndTwoDateFields() throws Exception {
         say("Testing select with a where clause with and on two fields");
