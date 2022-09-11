@@ -25,7 +25,7 @@ public class MysqlDialectGenerator implements TableGenerator {
                 sql.append(",\n");
             }
             sql.append(format("\t`%s` ", field.getSqlName()));
-            sql.append(generateFieldSql(table, field));
+            sql.append(generateFieldSql(field));
             if (!field.isNullable()) {
                 sql.append(" NOT NULL");
             }
@@ -58,7 +58,7 @@ public class MysqlDialectGenerator implements TableGenerator {
         return sql.toString();
     }
 
-    private String generateFieldSql(Table table, Field field) throws OrmSqlException {
+    private String generateFieldSql(Field<?,?> field) throws OrmSqlException {
         switch (field.getFieldType()) {
             case BOOLEAN:
                 return "TINYINT(1)";
@@ -75,14 +75,14 @@ public class MysqlDialectGenerator implements TableGenerator {
             case FLOAT:
                 return "REAL";
             case ENUM:
-                return format("ENUM(%s)", getEnumValues(table, field));
+                return format("ENUM(%s)", getEnumValues(field));
             case STRING: {
                 int length = 255;
                 if (field.isPrimaryKey()) {
                     length = 36;
                 }
                 if (field.getLength().isPresent()) {
-                    length = (int) field.getLength().get();
+                    length = field.getLength().get();
                 }
                 return format("VARCHAR(%d)", length);
             }
@@ -95,16 +95,16 @@ public class MysqlDialectGenerator implements TableGenerator {
         }
     }
 
-    private String getEnumValues(Table table, Field<?, ?> field) {
+    private String getEnumValues(Field<?, ?> field) {
         StringJoiner sql = new StringJoiner(",");
         Class<?> javaType = field.getJavaType();
         for (Object v : javaType.getEnumConstants()) {
-            sql.add(format("'%s'", ((Enum) v).name()));
+            sql.add(format("'%s'", ((Enum<?>) v).name()));
         }
         return sql.toString();
     }
 
-    private String fullTableName(Table table) {
+    private String fullTableName(Table<?> table) {
         return format("`%s`.`%s`", table.getDatabase().getSqlDatabase(), table.getSqlTable());
     }
 }

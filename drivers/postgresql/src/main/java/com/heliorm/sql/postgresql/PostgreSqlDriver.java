@@ -58,7 +58,7 @@ public final class PostgreSqlDriver extends SqlDriver {
     }
 
     @Override
-    protected TableGenerator getTableGenerator() throws OrmException {
+    protected TableGenerator getTableGenerator() {
         return new PostgresDialectGenerator();
     }
 

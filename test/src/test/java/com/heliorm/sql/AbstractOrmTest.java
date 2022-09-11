@@ -17,6 +17,7 @@ import test.place.Province;
 import test.place.Town;
 
 import javax.sql.DataSource;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -27,7 +28,6 @@ abstract class AbstractOrmTest {
 
     private static Orm orm;
     private static DataSource jdbcDataSource;
-    private static Class<? extends SqlDriver> driver;
     private static PojoOperations pops;
 
     private static Connection getConnection() {
@@ -42,6 +42,7 @@ abstract class AbstractOrmTest {
     public static void setup() throws Exception {
         String dbType = System.getenv("ORM_TEST_DB");
         dbType = (dbType == null) ? "" : dbType;
+        Class<? extends SqlDriver> driver;
         switch (dbType) {
             case "mysql":
                 jdbcDataSource = setupMysqlDataSource();
@@ -63,13 +64,6 @@ abstract class AbstractOrmTest {
                 .setRollbackOnUncommittedClose(false)
                 .setUseUnionAll(true)
                 .build();
-//        boolean useJson = false;
-//        String json = System.getenv("ORM_TEST_JSON");
-//        useJson = (json == null) ? false : true;
-//        if (useJson) {
-//            orm = new JsonOrm(orm);
-//            say("Testing JSON layer");
-//        }
         deleteAll(Cat.class);
         deleteAll(Dog.class);
         deleteAll(Person.class);
@@ -87,9 +81,8 @@ abstract class AbstractOrmTest {
 
     protected static <O> List<O> selectAll(Class<O> type) throws OrmException {
         try {
-            return orm.select(orm.tableFor(type.newInstance())).list();
-        } catch (InstantiationException | IllegalAccessException e) {
-
+            return orm.select(orm.tableFor(type.getConstructor().newInstance())).list();
+        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
             throw new OrmException(e.getMessage(), e);
         }
     }
@@ -182,7 +175,6 @@ abstract class AbstractOrmTest {
         if (l1.isEmpty()) {
             return true;
         }
-        Table<?> t1 = orm.tableFor(l1.get(0));
         for (int i = 0; i < l1.size(); ++i) {
             if (!pojoCompare(l1.get(i), l2.get(i))) {
                 return false;

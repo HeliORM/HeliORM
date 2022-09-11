@@ -26,7 +26,7 @@ public final class MySqlDriver extends SqlDriver {
     }
 
     public MySqlDriver() {
-        super(Collections.EMPTY_MAP);
+        super(Collections.emptyMap());
     }
 
     @Override
@@ -40,7 +40,7 @@ public final class MySqlDriver extends SqlDriver {
     }
 
     @Override
-    protected String fieldName(Table table, Field field) throws OrmException {
+    protected String fieldName(Table table, Field field) {
         return format("`%s`", field.getSqlName());
     }
 
@@ -55,12 +55,12 @@ public final class MySqlDriver extends SqlDriver {
     }
 
     @Override
-    protected TableGenerator getTableGenerator() throws OrmException {
+    protected TableGenerator getTableGenerator() {
         return new MysqlDialectGenerator();
     }
 
     @Override
-    protected String castNull(Field field) throws OrmException {
+    protected String castNull(Field field) {
         return "NULL";
     }
 
@@ -103,7 +103,7 @@ public final class MySqlDriver extends SqlDriver {
     }
 
     @Override
-    protected String fieldType(Table table, Field field) throws OrmException {
+    protected String fieldType(Table<?> table, Field field) throws OrmException {
         switch (field.getFieldType()) {
             case BOOLEAN:
                 return "TINYINT(1)";
@@ -120,7 +120,7 @@ public final class MySqlDriver extends SqlDriver {
             case FLOAT:
                 return "REAL";
             case ENUM:
-                return format("ENUM(%s)", getEnumValues(table, field));
+                return format("ENUM(%s)", getEnumValues(field));
             case STRING: {
                 int length = 255;
                 if (field.isPrimaryKey()) {
@@ -140,7 +140,7 @@ public final class MySqlDriver extends SqlDriver {
         }
     }
 
-    private String getEnumValues(Table table, Field<?, ?> field) {
+    private String getEnumValues(Field<?, ?> field) {
         StringJoiner sql = new StringJoiner(",");
         Class<?> javaType = field.getJavaType();
         for (Object v : javaType.getEnumConstants()) {
