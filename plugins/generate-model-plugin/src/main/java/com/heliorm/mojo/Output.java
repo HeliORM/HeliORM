@@ -185,7 +185,7 @@ class Output {
         impt(Arrays.class);
         emit("");
         emit("@Override");
-        emit("public List<Field<Table<%s>,%s,?>> getFields() {", getJavaName(cm), getJavaName(cm));
+        emit("public List<Field<%s,?>> getFields() {", getJavaName(cm));
         push();
         emit(format("return Arrays.asList(%s);", fieldNames));
         pop();
@@ -194,9 +194,9 @@ class Output {
         impt(Optional.class);
         emit("");
         emit("@Override");
-        emit("public Optional<Field<Table<%s>,%s,?>> getPrimaryKey() {", getJavaName(cm), getJavaName(cm));
+        emit("public Optional<Field<%s,?>> getPrimaryKey() {", getJavaName(cm));
         push();
-        Optional<Field<O,?>> opt = cm.getPrimaryKey();
+        Optional<Field<O, ?>> opt = cm.getPrimaryKey();
         if (opt.isPresent()) {
             emit("return Optional.of(%s);", opt.get().getJavaName());
         } else {
@@ -277,7 +277,7 @@ class Output {
         impt(Index.class);
         emit("");
         emit("@Override");
-        emit("public List<Index<Table<%s>,%s>> getIndexes() {", getJavaName(cm), getJavaName(cm));
+        emit("public List<Index<%s>> getIndexes() {", getJavaName(cm));
         push();
         emit(format("return Arrays.asList(%s);", indexNames.toString()));
         pop();
@@ -378,9 +378,8 @@ class Output {
         } else {
             enumTypeName = format("%s.%s", cm.getObjectClass().getSimpleName(), fm.getJavaType().getSimpleName());
         }
-        emit("public final %s<Table<%s>, %s, %s> %s = builder.enumField(\"%s\", %s.class)",
+        emit("public final %s<%s, %s> %s = builder.enumField(\"%s\", %s.class)",
                 EnumField.class.getSimpleName(),
-                getJavaName(cm),
                 cm.getObjectClass().getSimpleName(),
                 enumTypeName,
                 fm.getJavaName(),
@@ -417,7 +416,7 @@ class Output {
         return indexName;
     }
 
-    private String indexName(Table tm, Index< ?> im) {
+    private String indexName(Table tm, Index<?> im) {
         StringJoiner sj = new StringJoiner("_");
         for (Field field : im.getFields()) {
             sj.add(field.getJavaName());
@@ -428,9 +427,8 @@ class Output {
 
     private void addField(Table<?> cm, Field<?, ?> fm, Class<? extends Field> fieldType, String buildMethod) {
         impt(fieldType);
-        emit("public final %s<Table<%s>, %s> %s = builder.%s(\"%s\")",
+        emit("public final %s<%s> %s = builder.%s(\"%s\")",
                 fieldType.getSimpleName(),
-                getJavaName(cm),
                 cm.getObjectClass().getSimpleName(),
                 fm.getJavaName(),
                 buildMethod,
