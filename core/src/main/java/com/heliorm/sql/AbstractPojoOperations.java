@@ -18,7 +18,7 @@ import static java.lang.String.format;
  */
 abstract class AbstractPojoOperations implements PojoOperations {
 
-    private Map<Class<?>, Map<String, java.lang.reflect.Field>> fields = new WeakHashMap();
+    private final Map<Class<?>, Map<String, java.lang.reflect.Field>> fields = new WeakHashMap();
 
     protected AbstractPojoOperations() {
     }

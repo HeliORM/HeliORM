@@ -154,7 +154,7 @@ class TestData {
     static List<Town> makeTowns(List<Province> provinces) {
         List<Town> towns = new ArrayList<>();
         for (int i = 0; i < TOWN_NAMES.length; ++i) {
-            String names[] = TOWN_NAMES[i];
+            String[] names = TOWN_NAMES[i];
             Province province = provinces.get(i);
             for (String name : names) {
                 Town town = new Town();

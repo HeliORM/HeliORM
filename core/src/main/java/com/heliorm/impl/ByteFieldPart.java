@@ -49,12 +49,12 @@ public final class ByteFieldPart<O> extends NumberFieldPart<O, Byte> implements 
 
     @Override
     public Continuation<O> isNull() throws OrmException {
-        return new IsExpressionPart((ByteFieldPart) getThis(), IsExpressionPart.Operator.IS_NULL);
+        return new IsExpressionPart(getThis(), IsExpressionPart.Operator.IS_NULL);
     }
 
     @Override
     public Continuation<O> isNotNull() throws OrmException {
-        return new IsExpressionPart((ByteFieldPart) getThis(), IsExpressionPart.Operator.IS_NOT_NULL);
+        return new IsExpressionPart(getThis(), IsExpressionPart.Operator.IS_NOT_NULL);
     }
 
     @Override

@@ -4,7 +4,7 @@ import com.heliorm.Field;
 
 public final class IntegerValueExpressionPart<O> extends NumberValueExpressionPart<O, Integer> {
 
-    private Integer value;
+    private final Integer value;
 
     public IntegerValueExpressionPart(IntegerFieldPart<O> left, Operator op, Integer value) {
         super(Field.FieldType.INTEGER, left, op);

@@ -4,7 +4,7 @@ import com.heliorm.Field;
 
 public final class DoubleValueExpressionPart<O> extends NumberValueExpressionPart< O, Double> {
 
-    private Double value;
+    private final Double value;
 
     public DoubleValueExpressionPart(DoubleFieldPart<O> left, Operator op, Double value) {
         super(Field.FieldType.DOUBLE, left, op);

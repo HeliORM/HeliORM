@@ -39,7 +39,7 @@ class ResultSetHelper {
      */
     <O> O makePojoFromResultSet(ResultSet rs, Table<O> table) throws OrmException {
         try {
-            O pojo = (O) pops.newPojoInstance(table);
+            O pojo = pops.newPojoInstance(table);
             for (Field field : table.getFields()) {
                 setValueInPojo(pojo, field, rs);
             }
@@ -135,7 +135,7 @@ class ResultSetHelper {
             if (!(value instanceof Timestamp)) {
                 throw new OrmException(format("Could not read Timestamp value from SQL for field '%s'", column));
             }
-            return ((Timestamp) value).toInstant();
+            return value.toInstant();
         } catch (SQLException ex) {
             throw new OrmException(format("Could not read timestamp value from SQL (%s)", ex.getMessage()), ex);
         }

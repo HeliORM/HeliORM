@@ -4,7 +4,7 @@ import com.heliorm.Field;
 
 public final class FloatValueExpressionPart<O> extends NumberValueExpressionPart<O, Float> {
 
-    private Float value;
+    private final Float value;
 
     public FloatValueExpressionPart(FloatFieldPart<O> left, Operator op, Float value) {
         super(Field.FieldType.FLOAT, left, op);

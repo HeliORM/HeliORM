@@ -116,7 +116,7 @@ public final class SqlOrm implements Orm {
             inserts.put(table, query);
         }
         Connection con = getConnection();
-        O popo = (O) pops.newPojoInstance(table);
+        O popo = pops.newPojoInstance(table);
         for (Field field : table.getFields()) {
             pops.setValue(popo, field, pops.getValue(pojo, field));
         }
@@ -415,7 +415,7 @@ public final class SqlOrm implements Orm {
                         @Override
                         public O next() {
                             try {
-                                return resultSetHelper.makePojoFromResultSet(rs, tables.get(rs.getString(queryHelper.POJO_NAME_FIELD)));
+                                return resultSetHelper.makePojoFromResultSet(rs, tables.get(rs.getString(QueryHelper.POJO_NAME_FIELD)));
                             } catch (OrmException | SQLException ex) {
                                 throw new UncaughtOrmException(ex.getMessage(), ex);
                             }

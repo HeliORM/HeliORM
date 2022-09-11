@@ -127,7 +127,7 @@ class Output {
             out.println("public final class Tables implements Database {");
             out.println("");
             out.println("");
-            out.print(buf.toString());
+            out.print(buf);
             out.println("");
 
             StringJoiner sj = new StringJoiner(", ");
@@ -137,7 +137,7 @@ class Output {
 
             out.println("@Override");
             out.println("\tpublic final List<Table<?>> getTables() {");
-            out.printf("\t\treturn Arrays.asList(%s);", sj.toString());
+            out.printf("\t\treturn Arrays.asList(%s);", sj);
             out.println("\n\t}");
             out.println("");
 
@@ -279,7 +279,7 @@ class Output {
         emit("@Override");
         emit("public List<Index<%s>> getIndexes() {", getJavaName(cm));
         push();
-        emit(format("return Arrays.asList(%s);", indexNames.toString()));
+        emit(format("return Arrays.asList(%s);", indexNames));
         pop();
         emit("}");
         pop();

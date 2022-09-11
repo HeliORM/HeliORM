@@ -177,6 +177,6 @@ public class GenerateSql extends AbstractMojo {
     }
 
     public enum Dialect {
-        MYSQL, POSTGRESQL;
+        MYSQL, POSTGRESQL
     }
 }

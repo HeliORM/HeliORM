@@ -4,7 +4,7 @@ import com.heliorm.Field;
 
 public final class BooleanValueExpressionPart<O> extends ValueExpressionPart<O, Boolean> {
 
-    private Boolean value;
+    private final Boolean value;
 
     public BooleanValueExpressionPart(FieldPart left, Operator op, Boolean value) {
         super(Field.FieldType.BOOLEAN, left, op);

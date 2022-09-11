@@ -34,7 +34,7 @@ public class ExpressionContinuationPart< O> implements Continuation<O> {
     }
 
     public enum Type {
-        AND, OR;
+        AND, OR
     }
 }
 

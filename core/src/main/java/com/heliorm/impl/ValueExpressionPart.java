@@ -37,7 +37,7 @@ public abstract class ValueExpressionPart< O, C> extends ExpressionPart<O, C> {
     }
 
     public enum Operator {
-        EQ, NOT_EQ, LT, LE, GT, GE, LIKE, NOT_LIKE;
+        EQ, NOT_EQ, LT, LE, GT, GE, LIKE, NOT_LIKE
     }
 
 }

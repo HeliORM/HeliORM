@@ -26,7 +26,7 @@ public class IsExpressionPart< O, C> extends ExpressionPart<O, C> {
     }
 
     public enum Operator {
-        IS_NULL, IS_NOT_NULL;
+        IS_NULL, IS_NOT_NULL
     }
 
 }

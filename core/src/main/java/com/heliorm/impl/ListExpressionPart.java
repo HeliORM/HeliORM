@@ -32,6 +32,6 @@ public abstract class ListExpressionPart< O, C> extends ExpressionPart<O, C> {
     }
 
     public enum Operator {
-        IN, NOT_IN;
+        IN, NOT_IN
     }
 }

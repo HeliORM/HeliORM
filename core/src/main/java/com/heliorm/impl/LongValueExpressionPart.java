@@ -4,7 +4,7 @@ import com.heliorm.Field;
 
 public final class LongValueExpressionPart<O> extends NumberValueExpressionPart< O, Long> {
 
-    private Long value;
+    private final Long value;
 
     public LongValueExpressionPart(LongFieldPart<O> left, Operator op, Long value) {
         super(Field.FieldType.LONG, left, op);

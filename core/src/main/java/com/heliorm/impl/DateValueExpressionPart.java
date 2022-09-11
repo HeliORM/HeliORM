@@ -6,7 +6,7 @@ import java.util.Date;
 
 public final class DateValueExpressionPart< O> extends ValueExpressionPart<O, Date> {
 
-    private Date value;
+    private final Date value;
 
     public DateValueExpressionPart(FieldPart left, Operator op, Date value) {
         super(Field.FieldType.DATE, left, op);

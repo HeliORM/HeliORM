@@ -104,7 +104,7 @@ final class QueryHelper {
         for (Field field : new ArrayList<Field<?, ?>>(root.getTable().getFields())) {
             fieldList.add(format("%s AS %s", driver.fullFieldName(root.getTable(), field), driver.virtualFieldName(getFieldId(field))));
         }
-        tablesQuery.append(fieldList.toString());
+        tablesQuery.append(fieldList);
         tablesQuery.append(format(" FROM %s", fullTableName.apply(root.getTable()), fullTableName.apply(root.getTable())));
         StringBuilder whereQuery = new StringBuilder();
         Optional<? extends Where<?>> where = root.getSelect().getWhere();
@@ -167,7 +167,7 @@ final class QueryHelper {
                 fieldsQuery.add(format("%s AS %s", empty, driver.virtualFieldName(fieldId)));
             }
         }
-        tablesQuery.append(format("SELECT %s", fieldsQuery.toString()));
+        tablesQuery.append(format("SELECT %s", fieldsQuery));
         tablesQuery.append(format(",%s AS %s", driver.virtualValue(select.getTable().getObjectClass().getName()), driver.virtualFieldName(POJO_NAME_FIELD)));
         tablesQuery.append(format(" FROM %s", fullTableName.apply(select.getTable()), fullTableName.apply(select.getTable())));
         StringBuilder whereQuery = new StringBuilder();

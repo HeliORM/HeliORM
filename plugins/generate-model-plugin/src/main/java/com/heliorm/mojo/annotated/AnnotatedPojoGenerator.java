@@ -21,7 +21,7 @@ import java.util.Set;
 public class AnnotatedPojoGenerator implements Generator<AnnotatedPojoTable> {
 
     private final GenerateModel generator;
-    private ScanResult scan;
+    private final ScanResult scan;
 
     public AnnotatedPojoGenerator(GenerateModel generator, Set<String> packages) throws GeneratorException {
         this.generator = generator;

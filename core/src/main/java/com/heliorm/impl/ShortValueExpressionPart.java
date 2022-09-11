@@ -4,7 +4,7 @@ import com.heliorm.Field;
 
 public final class ShortValueExpressionPart<O> extends NumberValueExpressionPart< O, Short> {
 
-    private Short value;
+    private final Short value;
 
     public ShortValueExpressionPart(ShortFieldPart<O> left, Operator op, Short value) {
         super(Field.FieldType.SHORT, left, op);
