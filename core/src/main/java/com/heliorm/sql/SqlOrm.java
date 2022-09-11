@@ -24,11 +24,13 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.ServiceLoader;
+import java.util.Set;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.UUID;
@@ -53,16 +55,16 @@ public final class SqlOrm implements Orm {
 
     private final Selector selector;
     private final Map<Class<?>, Table<?>> tables = new ConcurrentHashMap<>();
-    private final Map<Table, String> inserts = new ConcurrentHashMap<>();
-    private final Map<Table, String> updates = new ConcurrentHashMap();
-    private final Map<Table, String> deletes = new ConcurrentHashMap();
-    private final Map<Table, Boolean> exists = new ConcurrentHashMap();
+    private final Map<Table<?>, String> inserts = new ConcurrentHashMap<>();
+    private final Map<Table<?>, String> updates = new ConcurrentHashMap<>();
+    private final Map<Table<?>, String> deletes = new ConcurrentHashMap<>();
+    private final Map<Table<?>, Boolean> exists = new ConcurrentHashMap<>();
     private final QueryHelper queryHelper;
     private final AbstractionHelper abstractionHelper;
     private final PojoHelper pojoHelper;
     private final PreparedStatementHelper preparedStatementHelper;
     private final ResultSetHelper resultSetHelper;
-    private final Map<Field, String> fieldIds = new ConcurrentHashMap<>();
+    private final Map<Field<?,?>, String> fieldIds = new ConcurrentHashMap<>();
     private SqlTransaction currentTransaction;
 
 
@@ -116,46 +118,46 @@ public final class SqlOrm implements Orm {
             inserts.put(table, query);
         }
         Connection con = getConnection();
-        O popo = pops.newPojoInstance(table);
-        for (Field field : table.getFields()) {
-            pops.setValue(popo, field, pops.getValue(pojo, field));
+        O newPojo = pops.newPojoInstance(table);
+        for (Field<?,?> field : table.getFields()) {
+            pops.setValue(newPojo, field, pops.getValue(pojo, field));
         }
         try (PreparedStatement stmt = con.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
             int par = 1;
-            for (Field field : table.getFields()) {
+            for (Field<?,?> field : table.getFields()) {
                 if (field.isPrimaryKey()) {
                     if (field.isAutoNumber()) {
                         if (field.getFieldType() == Field.FieldType.STRING) {
-                            if (pops.getValue(popo, field) == null) {
-                                pops.setValue(popo, field, UUID.randomUUID().toString());
+                            if (pops.getValue(newPojo, field) == null) {
+                                pops.setValue(newPojo, field, UUID.randomUUID().toString());
                             }
-                            preparedStatementHelper.setValueInStatement(stmt, popo, field, par);
+                            preparedStatementHelper.setValueInStatement(stmt, newPojo, field, par);
                             par++;
                         }
                     } else {
-                        preparedStatementHelper.setValueInStatement(stmt, popo, field, par);
+                        preparedStatementHelper.setValueInStatement(stmt, newPojo, field, par);
                         par++;
                     }
                 } else {
-                    preparedStatementHelper.setValueInStatement(stmt, popo, field, par);
+                    preparedStatementHelper.setValueInStatement(stmt, newPojo, field, par);
                     par++;
                 }
             }
             stmt.executeUpdate();
             Optional<Field<O, ?>> opt = table.getPrimaryKey();
             if (opt.isPresent()) {
-                Field keyField = opt.get();
+                Field<?,?> keyField = opt.get();
                 if (keyField.isAutoNumber()) {
                     if (keyField.getFieldType() != Field.FieldType.STRING) {
                         try (ResultSet rs = stmt.getGeneratedKeys()) {
                             if (rs.next()) {
-                                pops.setValue(popo, keyField, driver.getKeyValueFromResultSet(rs, opt.get()));
+                                pops.setValue(newPojo, keyField, driver.getKeyValueFromResultSet(rs, opt.get()));
                             }
                         }
                     }
                 }
             }
-            return popo;
+            return newPojo;
         } catch (SQLException ex) {
             throw new OrmSqlException(ex.getMessage(), ex);
         } finally {
@@ -177,7 +179,7 @@ public final class SqlOrm implements Orm {
         Connection con = getConnection();
         try (PreparedStatement stmt = con.prepareStatement(query)) {
             int par = 1;
-            for (Field field : table.getFields()) {
+            for (Field<?,?> field : table.getFields()) {
                 if (!field.isPrimaryKey()) {
                     preparedStatementHelper.setValueInStatement(stmt, pojo, field, par);
                     par++;
@@ -185,16 +187,17 @@ public final class SqlOrm implements Orm {
             }
             Optional<Field<O, ?>> primaryKey = table.getPrimaryKey();
             if (primaryKey.isPresent()) {
-                Object val = pojoHelper.getValueFromPojo(pojo, primaryKey.get());
+                Field<O, ?> keyField = primaryKey.get();
+                Object val = pojoHelper.getValueFromPojo(pojo, keyField);
                 if (val == null) {
-                    throw new OrmException(format("No value for key %s for %s in update", primaryKey.get().getJavaName(), table.getObjectClass().getSimpleName()));
+                    throw new OrmException(format("No value for key %s for %s in update", keyField.getJavaName(), table.getObjectClass().getSimpleName()));
                 }
-                preparedStatementHelper.setValueInStatement(stmt, pojo, table.getPrimaryKey().get(), par);
+                preparedStatementHelper.setValueInStatement(stmt, pojo, keyField, par);
                 int modified = stmt.executeUpdate();
                 if (modified == 0) {
                     throw new OrmException(format("The update did not modify any data for %s with key field/value %s/%s. (Row does not exist)",
                             table.getObjectClass().getSimpleName(),
-                            primaryKey.get().getJavaName(),
+                            keyField.getJavaName(),
                             val));
                 }
                 return pojo;
@@ -222,7 +225,13 @@ public final class SqlOrm implements Orm {
         }
         Connection con = getConnection();
         try (PreparedStatement stmt = con.prepareStatement(query)) {
-            preparedStatementHelper.setValueInStatement(stmt, pojo, table.getPrimaryKey().get(), 1);
+            Optional<Field<O, ?>> primaryKey = table.getPrimaryKey();
+            if (primaryKey.isPresent()) {
+                preparedStatementHelper.setValueInStatement(stmt, pojo, primaryKey.get(), 1);
+            }
+            else {
+                throw new OrmException(format("No primary key for %s in delete", table.getObjectClass().getSimpleName()));
+            }
             stmt.executeUpdate();
         } catch (SQLException ex) {
             throw new OrmSqlException(ex.getMessage(), ex);
@@ -238,18 +247,20 @@ public final class SqlOrm implements Orm {
 
     @Override
     public <O> Select<O> select(Table<O> table, Where<O> where) {
-        return new SelectPart<>(selector(), table, Optional.of(where), Collections.EMPTY_LIST);
+        return new SelectPart<>(selector(), table, Optional.of(where), Collections.emptyList());
     }
 
+    @SafeVarargs
     @Override
-    public <O> Select<O> select(Table<O> table, Join<O>... joins) {
+    public final <O> Select<O> select(Table<O> table, Join<O>... joins) {
         List<JoinPart<?, ?, ?, ?>> list = Arrays.stream(joins)
                 .map(join -> (JoinPart<?, ?, ?, ?>) join).collect(Collectors.toList());
         return new SelectPart<>(selector(), table, Optional.empty(), list);
     }
 
+    @SafeVarargs
     @Override
-    public <O> Select<O> select(Table<O> table, Where<O> where, Join<O>... joins) {
+    public final <O> Select<O> select(Table<O> table, Where<O> where, Join<O>... joins) {
         List<JoinPart<?, ?, ?, ?>> list = Arrays.stream(joins)
                 .map(join -> (JoinPart<?, ?, ?, ?>) join).collect(Collectors.toList());
         return new SelectPart<>(selector(), table, Optional.of(where), list);
@@ -262,7 +273,7 @@ public final class SqlOrm implements Orm {
         }
         if (currentTransaction != null) {
             if (currentTransaction.isOpen()) {
-                throw new OrmTransactionException(format("A transaction is already open"));
+                throw new OrmTransactionException("A transaction is already open");
             }
         }
         currentTransaction = new SqlTransaction(driver, getConnection());
@@ -291,11 +302,11 @@ public final class SqlOrm implements Orm {
                 }
             }
         }
-        Table<?> table = tables.get(type);
+        Table<O> table = (Table<O>) tables.get(type);
         if (table == null) {
             throw new OrmException("Cannot find table for pojo of type " + type.getCanonicalName());
         }
-        return (Table<O>) table;
+        return table;
     }
 
     @Override
@@ -317,16 +328,16 @@ public final class SqlOrm implements Orm {
         if (queries.size() == 1) {
             SelectPart<?> query = queries.get(0).getSelect();
             Stream<PojoCompare<O>> res = streamSingle(query.getTable(), queryHelper.buildSelectQuery(tail));
-            return res.map(pojoCompare -> pojoCompare.getPojo());
+            return res.map(PojoCompare::getPojo);
         } else {
             if (driver.useUnionAll()) {
                 Map<String, Table<O>> tableMap = queries.stream()
                         .map(query -> query.getSelect().getTable())
                         .collect(Collectors.toMap(table -> table.getObjectClass().getName(), table -> table));
-                Stream<PojoCompare<O>> sorted = streamUnion(queryHelper.buildSelectUnionQuery(queries.stream().map(query -> query.getSelect()).collect(Collectors.toList())), tableMap)
+                Stream<PojoCompare<O>> sorted = streamUnion(queryHelper.buildSelectUnionQuery(queries.stream().map(ExecutablePart::getSelect).collect(Collectors.toList())), tableMap)
                         .map(pojo -> new PojoCompare<O>(pops, tail.getSelect().getTable(), pojo))
                         .sorted(abstractionHelper.makeComparatorForTail(tail.getOrder()));
-                return sorted.map(p -> p.getPojo());
+                return sorted.map(PojoCompare::getPojo);
             } else {
                 Stream<PojoCompare<O>> res = queries.stream()
                         .flatMap(select -> {
@@ -344,7 +355,7 @@ public final class SqlOrm implements Orm {
                         res = res.sorted();
                     }
                 }
-                return res.map(pojoCompare -> pojoCompare.getPojo());
+                return res.map(PojoCompare::getPojo);
             }
         }
     }
@@ -358,7 +369,7 @@ public final class SqlOrm implements Orm {
      * @param table The table on which to query
      * @param query The SQL query
      * @return The stream of results.
-     * @throws OrmException
+     * @throws OrmException Thrown if there are SQL or ORM errors
      */
     private <O> Stream<PojoCompare<O>> streamSingle(Table<O> table, String query) throws OrmException {
         Connection con = getConnection();
@@ -379,17 +390,14 @@ public final class SqlOrm implements Orm {
                                                             @Override
                                                             public PojoCompare<O> next() {
                                                                 try {
-                                                                    return new PojoCompare(pops, table, resultSetHelper.makePojoFromResultSet(rs, table));
+                                                                    return new PojoCompare<>(pops, table, resultSetHelper.makePojoFromResultSet(rs, table));
                                                                 } catch (OrmException ex) {
                                                                     throw new UncaughtOrmException(ex.getMessage(), ex);
                                                                 }
                                                             }
                                                         },
                             Spliterator.ORDERED), false);
-            stream.onClose(() -> {
-                cleanup(con, stmt, rs);
-            });
-            return stream;
+            return stream.onClose(() -> cleanup(con, stmt, rs));
         } catch (SQLException | UncaughtOrmException ex) {
             cleanup(con, null, null);
             throw new OrmSqlException(ex.getMessage(), ex);
@@ -421,10 +429,7 @@ public final class SqlOrm implements Orm {
                             }
                         }
                     }, Spliterator.ORDERED), false);
-            stream.onClose(() -> {
-                cleanup(con, stmt, rs);
-            });
-            return stream;
+            return stream.onClose(() -> cleanup(con, stmt, rs));
         } catch (SQLException | UncaughtOrmException ex) {
             cleanup(con, null, null);
             throw new OrmSqlException(ex.getMessage(), ex);
@@ -481,8 +486,8 @@ public final class SqlOrm implements Orm {
     /**
      * Close a SQL Connection in a way that properly deals with transactions.
      *
-     * @param con
-     * @throws OrmException
+     * @param con The SQL connection
+     * @throws OrmException Thrown if there are SQL errors
      */
     private void closeConnection(Connection con) throws OrmException {
         if ((currentTransaction == null) || (currentTransaction.getConnection() != con)) {
@@ -498,9 +503,9 @@ public final class SqlOrm implements Orm {
      * Cleanup SQL Connection, Statement and ResultSet insuring that
      * errors will not result in aborted cleanup.
      *
-     * @param con
-     * @param stmt
-     * @param rs
+     * @param con The SQL connection
+     * @param stmt The SQL statement
+     * @param rs The SQL result set
      */
     private void cleanup(Connection con, Statement stmt, ResultSet rs) {
         Exception error = null;
@@ -529,12 +534,12 @@ public final class SqlOrm implements Orm {
     }
 
     /**
-     * Check if a table exists, and create if if it does not
+     * Check if a table exists, and create if it does not
      *
-     * @param table
-     * @throws OrmException
+     * @param table The table to check
+     * @throws OrmException Thrown if there are SQL or ORM errors
      */
-    private void checkTable(Table table) throws OrmException {
+    private void checkTable(Table<?> table) throws OrmException {
         if (driver.createTables()) {
             if (!exists.containsKey(table)) {
                 if (!tableExists(table)) {
@@ -557,9 +562,9 @@ public final class SqlOrm implements Orm {
      *
      * @param table The table
      * @return The table name
-     * @throws OrmException
+     * @throws OrmException Thrown if there are SQL or ORM errors
      */
-    private String fullTableName(Table table) throws OrmException {
+    private String fullTableName(Table<?> table) throws OrmException {
         checkTable(table);
         return driver.fullTableName(table);
     }
@@ -568,10 +573,10 @@ public final class SqlOrm implements Orm {
      * Determine if the SQL table exists for a table structure
      *
      * @param table The Table
-     * @return True if it exsits in the database
-     * @throws OrmException
+     * @return True if it exists in the database
+     * @throws OrmException Thrown if there are SQL or ORM errors
      */
-    private boolean tableExists(Table table) throws OrmException {
+    private boolean tableExists(Table<?> table) throws OrmException {
         Connection con = getConnection();
         try {
             DatabaseMetaData dbm = con.getMetaData();
@@ -579,7 +584,7 @@ public final class SqlOrm implements Orm {
                 return tables.next();
             }
         } catch (SQLException ex) {
-            throw new OrmSqlException(format("Error checking table existance (%s)", ex.getMessage()), ex);
+            throw new OrmSqlException(format("Error checking table existence (%s)", ex.getMessage()), ex);
         } finally {
             closeConnection(con);
         }
@@ -591,13 +596,14 @@ public final class SqlOrm implements Orm {
      * @param field The field
      * @return The ID
      */
-    private String getFieldId(Field field) {
+    private String getFieldId(Field<?,?> field) {
         return fieldIds.computeIfAbsent(field, k -> {
             String uuid;
-            do { // very simple collison avoidance
+            Set<String> set = new HashSet<>(fieldIds.values());
+            do { // very simple collision avoidance
                 uuid = UUID.randomUUID().toString().substring(0, 8);
             }
-            while (fieldIds.containsKey(uuid));
+            while (set.contains(uuid));
             return uuid;
         });
     }

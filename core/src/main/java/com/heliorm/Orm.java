@@ -46,10 +46,38 @@ public interface Orm extends AutoCloseable {
      */
     <O> Select<O> select(Table<O> table);
 
+    /**
+     * Create a query builder pattern to select data from the database.
+     *
+     * @param <O>   The type of the POJOs selected
+     * @param table The table to use as starting point for building the query.
+     * @param where The where clause to use
+     * @return The Select object that can be used to expand the query or to
+     * query data.
+     */
     <O> Select<O> select(Table<O> table, Where<O> where);
 
+    /**
+     * Create a query builder pattern to select data from the database.
+     *
+     * @param <O>   The type of the POJOs selected
+     * @param table The table to use as starting point for building the query.
+     * @param joins The joins to do
+     * @return The Select object that can be used to expand the query or to
+     * query data.
+     */
     <O> Select<O> select(Table<O> table, Join<O>... joins);
 
+    /**
+     * Create a query builder pattern to select data from the database.
+     *
+     * @param <O>   The type of the POJOs selected
+     * @param table The table to use as starting point for building the query.
+     * @param where The where clause to use
+     * @param joins The joins to do
+     * @return The Select object that can be used to expand the query or to
+     * query data.
+     */
     <O> Select<O> select(Table<O> table, Where<O> where, Join<O>... joins);
 
     /**
