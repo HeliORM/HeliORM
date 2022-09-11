@@ -6,7 +6,7 @@ public final class BooleanValueExpressionPart<O> extends ValueExpressionPart<O, 
 
     private final Boolean value;
 
-    public BooleanValueExpressionPart(FieldPart left, Operator op, Boolean value) {
+    public BooleanValueExpressionPart(FieldPart<O, Boolean> left, Operator op, Boolean value) {
         super(Field.FieldType.BOOLEAN, left, op);
         this.value = value;
     }

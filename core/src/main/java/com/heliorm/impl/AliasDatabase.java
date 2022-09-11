@@ -34,7 +34,7 @@ public class AliasDatabase implements Database {
     @Override
     public List<Table<?>> getTables() {
         if (tables == null) {
-            tables = new ArrayList();
+            tables = new ArrayList<>();
             for (Table<?> table : database.getTables()) {
                 tables.add(new AliasTable<>(this, table));
             }

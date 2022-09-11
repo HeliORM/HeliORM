@@ -19,7 +19,7 @@ public final class ByteFieldPart<O> extends NumberFieldPart<O, Byte> implements 
 
     @Override
     public Continuation<O> eq(Byte value) throws OrmException {
-        return new ByteValueExpressionPart((ByteFieldPart) getThis(), ValueExpressionPart.Operator.EQ, value);
+        return new ByteValueExpressionPart<>((ByteFieldPart) getThis(), ValueExpressionPart.Operator.EQ, value);
     }
 
     @Override
