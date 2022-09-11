@@ -92,9 +92,9 @@ class AbstractionHelper {
         return res;
     }
 
-    private List<JoinPart<?, ?, ?, ?>> explode(List<JoinPart<?, ?, ?, ?>> joins) {
-        List<JoinPart<?, ?, ?, ?>> res = new ArrayList<>();
-        for (JoinPart<?, ?, ?, ?> join : joins) {
+    private List<JoinPart<?, ?>> explode(List<JoinPart<?, ?>> joins) {
+        List<JoinPart<?, ?>> res = new ArrayList<>();
+        for (JoinPart<?, ?> join : joins) {
             Table<?> table = join.getTable();
             Set<Table<?>> subTables = table.getSubTables();
             if (subTables.isEmpty()) {

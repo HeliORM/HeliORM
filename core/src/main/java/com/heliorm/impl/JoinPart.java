@@ -10,33 +10,33 @@ import java.util.Optional;
 /**
  * @author gideon
  */
-public class JoinPart<LT extends Table<LO>, LO, RT extends Table<RO>, RO> implements Join< LO> {
+public class JoinPart<LO, RO> implements Join<LO> {
 
-    private final RT table;
-    private final OnPart<LT, LO, RT, RO> on;
-    private final Optional<WherePart<RT, RO>> where;
-    private final List<JoinPart<?, ?, ?, ?>> joins;
+    private final Table<RO> table;
+    private final OnPart<LO, RO> on;
+    private final Optional<WherePart<RO>> where;
+    private final List<JoinPart<?, ?>> joins;
 
-    public JoinPart(RT table, OnPart<LT, LO, RT, RO> on, Optional<WherePart<RT, RO>> where, List<JoinPart<RT, RO, ?, ?>> joins) {
+    public JoinPart(Table<RO> table, OnPart<LO, RO> on, Optional<WherePart<RO>> where, List<JoinPart<RO, ?>> joins) {
         this.table = table;
         this.on = on;
         this.where = where;
         this.joins = new ArrayList<>(joins);
     }
 
-    public RT getTable() {
+    public Table<RO> getTable() {
         return table;
     }
 
-    public OnPart<LT, LO, RT, RO> getOn() {
+    public OnPart< LO,  RO> getOn() {
         return on;
     }
 
-    public Optional<WherePart<RT, RO>> getWhere() {
+    public Optional<WherePart<RO>> getWhere() {
         return where;
     }
 
-    public List<JoinPart<?, ?, ?, ?>> getJoins() {
+    public List<JoinPart<?, ?>> getJoins() {
         return joins;
     }
 }

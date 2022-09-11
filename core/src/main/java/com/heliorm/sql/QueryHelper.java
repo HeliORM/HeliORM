@@ -109,9 +109,9 @@ final class QueryHelper {
         StringBuilder whereQuery = new StringBuilder();
         Optional<? extends Where<?>> where = root.getSelect().getWhere();
         if (where.isPresent()) {
-            whereQuery.append(expandCriteria(root.getSelect().getTable(), (WherePart<?, ?>) where.get()));
+            whereQuery.append(expandCriteria(root.getSelect().getTable(), (WherePart< ?>) where.get()));
         }
-        for (JoinPart<?, ?, ?, ?> join : root.getJoins()) {
+        for (JoinPart<?, ?> join : root.getJoins()) {
             tablesQuery.append(expandLinkTables(root.getTable(), join));
             String joinWhere = expandLinkWheres(join);
             if (!joinWhere.isEmpty()) {
@@ -173,9 +173,9 @@ final class QueryHelper {
         StringBuilder whereQuery = new StringBuilder();
         Optional<? extends Where<?>> where = select.getWhere();
         if (where.isPresent()) {
-            whereQuery.append(expandCriteria(select.getTable(), (WherePart<?, ?>) where.get()));
+            whereQuery.append(expandCriteria(select.getTable(), (WherePart<?>) where.get()));
         }
-        for (JoinPart<?, ?, ?, ?> join : select.getJoins()) {
+        for (JoinPart<?, ?> join : select.getJoins()) {
             tablesQuery.append(expandLinkTables(select.getTable(), join));
             if (whereQuery.length() > 0) {
                 whereQuery.append(" AND ");
@@ -189,25 +189,25 @@ final class QueryHelper {
         return tablesQuery.toString();
     }
 
-    private String expandLinkTables(Table table, JoinPart<?, ?, ?, ?> right) throws OrmException {
+    private String expandLinkTables(Table table, JoinPart<?, ?> right) throws OrmException {
         StringBuilder query = new StringBuilder();
         query.append(format(" JOIN %s ON %s=%s ",
                 fullTableName.apply(right.getTable()),
                 driver.fullFieldName(table, right.getOn().getLeftField()),
                 driver.fullFieldName(right.getTable(), right.getOn().getRightField())));
-        for (JoinPart<?, ?, ?, ?> join : right.getJoins()) {
+        for (JoinPart<?, ?> join : right.getJoins()) {
             query.append(expandLinkTables(right.getTable(), join));
         }
         return query.toString();
     }
 
-    private String expandLinkWheres(JoinPart<?, ?, ?, ?> join) throws OrmException {
+    private String expandLinkWheres(JoinPart<?, ?> join) throws OrmException {
         String query = "";
-        Optional<? extends WherePart<?, ?>> where = join.getWhere();
+        Optional<? extends WherePart<?>> where = join.getWhere();
         if (where.isPresent()) {
             query = expandCriteria(join.getTable(), where.get());
         }
-        for (JoinPart<?, ?, ?, ?> next : join.getJoins()) {
+        for (JoinPart<?, ?> next : join.getJoins()) {
             String linkWheres = expandLinkWheres(next);
             if (!linkWheres.isEmpty()) {
                 if (!query.isEmpty()) {
@@ -219,7 +219,7 @@ final class QueryHelper {
         return query;
     }
 
-    private String expandCriteria(Table<?> table, WherePart<?, ?> where) throws OrmException {
+    private String expandCriteria(Table<?> table, WherePart<?> where) throws OrmException {
         ExpressionPart<?, ?> expr = where.getExpression();
         StringBuilder query = new StringBuilder();
         query.append(expandExpression(table, expr));

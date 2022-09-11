@@ -1,10 +1,9 @@
 package com.heliorm.impl;
 
 import com.heliorm.Field;
-import com.heliorm.Table;
 import com.heliorm.def.On;
 
-public class OnPart<LT extends Table<LO>, LO, RT extends Table<RO>, RO> implements On<LT, LO, RT, RO> {
+public class OnPart<LO, RO> implements On< LO, RO> {
 
     private final Field<LO, ?> leftField;
     private final Field<RO, ?> rightField;

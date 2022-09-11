@@ -253,16 +253,16 @@ public final class SqlOrm implements Orm {
     @SafeVarargs
     @Override
     public final <O> Select<O> select(Table<O> table, Join<O>... joins) {
-        List<JoinPart<?, ?, ?, ?>> list = Arrays.stream(joins)
-                .map(join -> (JoinPart<?, ?, ?, ?>) join).collect(Collectors.toList());
+        List<JoinPart<?, ?>> list = Arrays.stream(joins)
+                .map(join -> (JoinPart<?, ?>) join).collect(Collectors.toList());
         return new SelectPart<>(selector(), table, Optional.empty(), list);
     }
 
     @SafeVarargs
     @Override
     public final <O> Select<O> select(Table<O> table, Where<O> where, Join<O>... joins) {
-        List<JoinPart<?, ?, ?, ?>> list = Arrays.stream(joins)
-                .map(join -> (JoinPart<?, ?, ?, ?>) join).collect(Collectors.toList());
+        List<JoinPart<?, ?>> list = Arrays.stream(joins)
+                .map(join -> (JoinPart<?, ?>) join).collect(Collectors.toList());
         return new SelectPart<>(selector(), table, Optional.of(where), list);
     }
 

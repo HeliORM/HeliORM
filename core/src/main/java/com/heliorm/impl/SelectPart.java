@@ -24,7 +24,7 @@ public class SelectPart<DO> extends ExecutablePart<DO> implements Select<DO> {
     private final Selector selector;
     private final Table<DO> table;
     private final Optional<Where<DO>> where;
-    private final List<JoinPart<?, ?, ?, ?>> joins;
+    private final List<JoinPart<?,?>> joins;
     private List<OrderPart<DO>> order;
     private LimitPart<DO> limit;
 
@@ -32,7 +32,7 @@ public class SelectPart<DO> extends ExecutablePart<DO> implements Select<DO> {
         this(orm, table, Optional.empty(), Collections.emptyList());
     }
 
-    public SelectPart(Selector orm, Table<DO> table, Optional<Where<DO>> where, List<JoinPart<?, ?, ?, ?>> joins, List<OrderPart<DO>> order, LimitPart<DO> limit) {
+    public SelectPart(Selector orm, Table<DO> table, Optional<Where<DO>> where, List<JoinPart<?, ?>> joins, List<OrderPart<DO>> order, LimitPart<DO> limit) {
         super(orm);
         this.table = table;
         this.where = where;
@@ -42,7 +42,7 @@ public class SelectPart<DO> extends ExecutablePart<DO> implements Select<DO> {
         this.limit = limit;
     }
 
-    public SelectPart(Selector orm, Table<DO> table, Optional<Where<DO>> where, List<JoinPart<?, ?, ?, ?>> joins) {
+    public SelectPart(Selector orm, Table<DO> table, Optional<Where<DO>> where, List<JoinPart<?, ?>> joins) {
         this(orm, table, where, joins, Collections.emptyList(), new LimitPart<>(-1, -1));
     }
 
@@ -110,7 +110,7 @@ public class SelectPart<DO> extends ExecutablePart<DO> implements Select<DO> {
         return where;
     }
 
-    public List<JoinPart<?, ?, ?, ?>> getJoins() {
+    public List<JoinPart<?, ?>> getJoins() {
         return joins;
     }
 
