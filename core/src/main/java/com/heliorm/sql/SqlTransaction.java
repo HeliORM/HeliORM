@@ -42,7 +42,7 @@ final class SqlTransaction implements OrmTransaction, AutoCloseable {
     public void commit() throws OrmException {
         try {
             if (!open) {
-                throw new OrmTransactionException(format("Cannot commit an already comitted or rolled back SQL transaction"));
+                throw new OrmTransactionException(format("Cannot commit an already committed or rolled back SQL transaction"));
             }
             connection.commit();
             open = false;
@@ -56,7 +56,7 @@ final class SqlTransaction implements OrmTransaction, AutoCloseable {
     public void rollback() throws OrmException {
         try {
             if (!open) {
-                throw new OrmTransactionException(format("Cannot commit an already comitted or rolled back SQL transaction"));
+                throw new OrmTransactionException(format("Cannot commit an already committed or rolled back SQL transaction"));
             }
             connection.rollback();
             open = false;
@@ -70,11 +70,16 @@ final class SqlTransaction implements OrmTransaction, AutoCloseable {
     @Override
     public void close() throws OrmException {
         if (open) {
-            if (driver.getRollbackOnUncommittedClose()) {
+            if (!driver.getRollbackOnUncommittedClose()) {
                 open = false;
+                try {
+                    connection.close();
+                }
+                catch (SQLException ex) {
+                    throw new OrmException(format("Transaction is being auto-closed without committing or rolling back (%s)", ex.getMessage()),ex);
+                }
                 throw new OrmException("Transaction is being auto-closed without committing or rolling back");
             }
-            open = false;
             rollback();
         }
     }

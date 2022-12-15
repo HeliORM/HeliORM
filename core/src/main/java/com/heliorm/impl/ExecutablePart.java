@@ -11,7 +11,7 @@ import java.util.stream.Stream;
 /**
  * @author gideon
  */
-public abstract class ExecutablePart<DT extends Table<DO>, DO> implements Executable<DO> {
+public abstract class ExecutablePart< DO> implements Executable<DO> {
 
     private final Selector selector;
 
@@ -19,9 +19,9 @@ public abstract class ExecutablePart<DT extends Table<DO>, DO> implements Execut
         this.selector = selector;
     }
 
-    public abstract SelectPart<DT, DO> getSelect();
+    public abstract SelectPart< DO> getSelect();
 
-    public abstract List<OrderPart<DT, DO>> getOrder();
+    public abstract List<OrderPart<DO>> getOrder();
 
     public abstract LimitPart<DO> getLimit();
 

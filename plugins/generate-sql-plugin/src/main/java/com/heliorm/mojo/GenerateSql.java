@@ -13,8 +13,6 @@ import io.github.classgraph.ScanResult;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -46,22 +44,21 @@ public class GenerateSql extends AbstractMojo {
 
     @Parameter(property = "dialect", required = true)
     private Dialect dialect;
-    @Parameter(property = "filePerTable", required = false, defaultValue = "false")
+    @Parameter(property = "filePerTable", defaultValue = "false")
     private boolean filePerTable;
     @Parameter(property = "packages", required = true)
     private Set<String> packages;
     @Parameter(property = "outputDir", required = true)
     private String outputDir;
-    @Component
-    private MavenProject project;
+    @Parameter( defaultValue = "${project}", readonly = true )    private MavenProject project;
     private ClassLoader globalClassLoader;
     private ClassLoader localClassLoader;
     private TableGenerator gen;
-    public GenerateSql() throws GeneratorException, DependencyResolutionRequiredException {
+    public GenerateSql() {
     }
 
     @Override
-    public void execute() throws MojoExecutionException, MojoFailureException {
+    public void execute() throws MojoExecutionException {
         setupClassLoader();
         switch (dialect) {
             case MYSQL:
@@ -87,7 +84,7 @@ public class GenerateSql extends AbstractMojo {
             StringBuilder sqlForDatabase = new StringBuilder();
             Database database = type.getConstructor().newInstance();
             info("Generating SQL for database %s", database.getSqlDatabase());
-            for (Table table : database.getTables()) {
+            for (Table<?> table : database.getTables()) {
                 if (!table.isAbstract()) {
                     String sqlForTable = processTable(table);
                     sqlForDatabase.append(sqlForTable);
@@ -103,7 +100,7 @@ public class GenerateSql extends AbstractMojo {
         }
     }
 
-    private String processTable(Table table) throws GeneratorException {
+    private String processTable(Table<?> table) throws GeneratorException {
         try {
             return gen.generateSchema(table);
         } catch (OrmSqlException ex) {
@@ -142,10 +139,9 @@ public class GenerateSql extends AbstractMojo {
     /**
      * Get a class loader that will load classes compiled during the build
      *
-     * @return The class loader
      */
     private void setupClassLoader() throws GeneratorException {
-        List<String> classpathElements = null;
+        List<String> classpathElements;
         try {
             classpathElements = project.getCompileClasspathElements();
         } catch (DependencyResolutionRequiredException e) {
@@ -164,12 +160,7 @@ public class GenerateSql extends AbstractMojo {
                 throw new GeneratorException(e.getMessage(), e);
             }
         }
-        debug("Classloader created from %d elements", classpathElements.size());
         return new URLClassLoader(projectClasspathList.toArray(new URL[]{}), Thread.currentThread().getContextClassLoader());
-    }
-
-    private void debug(String fmt, Object... args) {
-        getLog().debug(format(fmt, args));
     }
 
     private void info(String fmt, Object... args) {
@@ -177,6 +168,6 @@ public class GenerateSql extends AbstractMojo {
     }
 
     public enum Dialect {
-        MYSQL, POSTGRESQL;
+        MYSQL, POSTGRESQL
     }
 }

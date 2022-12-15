@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public final class IntegerListExpressionPart<T extends Table<O>, O> extends NumberListExpressionPart<T, O, Integer> {
+public final class IntegerListExpressionPart<T extends Table<O>, O> extends NumberListExpressionPart<O, Integer> {
 
     private final List<Integer> values;
 

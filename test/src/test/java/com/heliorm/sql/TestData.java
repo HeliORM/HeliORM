@@ -10,7 +10,6 @@ import test.pets.Pet;
 import test.place.Province;
 import test.place.Town;
 
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -137,8 +136,7 @@ class TestData {
             "Kwazulu-Natal"
     };
 
-    private static Random random = new Random();
-    private List<Province> provinces = new ArrayList<>();
+    private static final Random random = new Random();
 
     private TestData() {
     }
@@ -156,7 +154,7 @@ class TestData {
     static List<Town> makeTowns(List<Province> provinces) {
         List<Town> towns = new ArrayList<>();
         for (int i = 0; i < TOWN_NAMES.length; ++i) {
-            String names[] = TOWN_NAMES[i];
+            String[] names = TOWN_NAMES[i];
             Province province = provinces.get(i);
             for (String name : names) {
                 Town town = new Town();
@@ -187,7 +185,7 @@ class TestData {
         Bird bird = new Bird();
         bird = makePet(bird, person);
         bird.setType(random.nextBoolean() ? Bird.Type.CAGED : Bird.Type.FREERANGE);
-        bird.setSingTime(Duration.ofMinutes(random.nextInt(31)));
+        bird.setSingTime(random.nextInt(31));
         return bird;
     }
 

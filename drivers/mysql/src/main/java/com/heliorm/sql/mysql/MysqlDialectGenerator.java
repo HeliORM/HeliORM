@@ -14,21 +14,25 @@ import static java.lang.String.format;
 public class MysqlDialectGenerator implements TableGenerator {
 
     @Override
-    public String generateSchema(Table<?> table) throws OrmSqlException {
+    public <O> String generateSchema(Table<O> table) throws OrmSqlException {
         StringBuilder sql = new StringBuilder();
         sql.append(format("CREATE TABLE %s (\n", fullTableName(table)));
         boolean first = true;
+<<<<<<< HEAD
         for (Field field : table.getFields()) {
             if (field.isCollection()) {
                 continue;
             }
+=======
+        for (Field<?,?> field : table.getFields()) {
+>>>>>>> master
             if (first) {
                 first = false;
             } else {
                 sql.append(",\n");
             }
             sql.append(format("\t`%s` ", field.getSqlName()));
-            sql.append(generateFieldSql(table, field));
+            sql.append(generateFieldSql(field));
             if (!field.isNullable()) {
                 sql.append(" NOT NULL");
             }
@@ -36,14 +40,14 @@ public class MysqlDialectGenerator implements TableGenerator {
                 sql.append(" AUTO_INCREMENT");
             }
         }
-        Optional<Field> key = table.getPrimaryKey();
+        Optional<Field<O,?>> key = table.getPrimaryKey();
         if (key.isPresent()) {
             sql.append(",\n");
             sql.append(format("PRIMARY KEY (`%s`)", key.get().getSqlName()));
         }
 
         int num = 0;
-        for (Index<?, ?> index : table.getIndexes()) {
+        for (Index<?> index : table.getIndexes()) {
             sql.append(",\n");
             if (index.isUnique()) {
                 sql.append("UNIQUE ");
@@ -52,9 +56,7 @@ public class MysqlDialectGenerator implements TableGenerator {
             Optional<String> fields = index.getFields().stream()
                     .map(field -> "`" + field.getSqlName() + "`")
                     .reduce((s1, s2) -> s1 + "," + s2);
-            if (fields.isPresent()) {
-                sql.append(fields.get());
-            }
+            fields.ifPresent(sql::append);
             sql.append(")");
             num++;
         }
@@ -63,7 +65,7 @@ public class MysqlDialectGenerator implements TableGenerator {
         return sql.toString();
     }
 
-    private String generateFieldSql(Table table, Field field) throws OrmSqlException {
+    private String generateFieldSql(Field<?,?> field) throws OrmSqlException {
         switch (field.getFieldType()) {
             case BOOLEAN:
                 return "TINYINT(1)";
@@ -80,14 +82,14 @@ public class MysqlDialectGenerator implements TableGenerator {
             case FLOAT:
                 return "REAL";
             case ENUM:
-                return format("ENUM(%s)", getEnumValues(table, field));
+                return format("ENUM(%s)", getEnumValues(field));
             case STRING: {
                 int length = 255;
                 if (field.isPrimaryKey()) {
                     length = 36;
                 }
                 if (field.getLength().isPresent()) {
-                    length = (int) field.getLength().get();
+                    length = field.getLength().get();
                 }
                 return format("VARCHAR(%d)", length);
             }
@@ -95,26 +97,29 @@ public class MysqlDialectGenerator implements TableGenerator {
                 return "DATE";
             case INSTANT:
                 return "DATETIME";
+<<<<<<< HEAD
             case DURATION:
                 return "VARCHAR(32)";
             case SET:
             case LIST:
                 throw new OrmSqlException(format("Cannot generate SQL for field type '%s'. BUG!", field.getFieldType()));
+=======
+>>>>>>> master
             default:
                 throw new OrmSqlException(format("Unkown field type '%s'. BUG!", field.getFieldType()));
         }
     }
 
-    private String getEnumValues(Table table, Field<?, ?, ?> field) {
+    private String getEnumValues(Field<?, ?> field) {
         StringJoiner sql = new StringJoiner(",");
         Class<?> javaType = field.getJavaType();
         for (Object v : javaType.getEnumConstants()) {
-            sql.add(format("'%s'", ((Enum) v).name()));
+            sql.add(format("'%s'", ((Enum<?>) v).name()));
         }
         return sql.toString();
     }
 
-    private String fullTableName(Table table) {
+    private String fullTableName(Table<?> table) {
         return format("`%s`.`%s`", table.getDatabase().getSqlDatabase(), table.getSqlTable());
     }
 }

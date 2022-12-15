@@ -7,9 +7,7 @@ import com.heliorm.Table;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.time.Duration;
 import java.time.Instant;
-import java.time.format.DateTimeParseException;
 import java.util.function.Function;
 
 import static java.lang.String.format;
@@ -41,7 +39,7 @@ class ResultSetHelper {
      */
     <O> O makePojoFromResultSet(ResultSet rs, Table<O> table) throws OrmException {
         try {
-            O pojo = (O) pops.newPojoInstance(table);
+            O pojo = pops.newPojoInstance(table);
             for (Field field : table.getFields()) {
                 if (field.isCollection()) {
                     continue;
@@ -72,12 +70,15 @@ class ResultSetHelper {
             case INSTANT:
                 pops.setValue(pojo, field, getTimestamp(rs, column));
                 break;
+<<<<<<< HEAD
             case DURATION:
                 pops.setValue(pojo, field, getDuration(rs, column));
                 break;
             case SET :
             case LIST : // ignore set and list cause they are dealt with in separate queries
                 break;
+=======
+>>>>>>> master
             default:
                 throw new OrmException(format("Field type '%s' is unsupported. BUG!", field.getFieldType()));
         }
@@ -122,6 +123,7 @@ class ResultSetHelper {
                     return rs.getDate(column);
                 case INSTANT:
                     return rs.getTimestamp(column);
+<<<<<<< HEAD
                 case DURATION: {
                     Class javaType = field.getJavaType();
                     if (!Duration.class.isAssignableFrom(javaType)) {
@@ -140,6 +142,8 @@ class ResultSetHelper {
                 case SET :
                 case LIST:  // return null in case this is called since set and list should be populated elsewhere
                     return null;
+=======
+>>>>>>> master
                 default:
                     throw new OrmException(format("Field type '%s' is unsupported. BUG!", field.getFieldType()));
             }
@@ -164,28 +168,9 @@ class ResultSetHelper {
             if (!(value instanceof Timestamp)) {
                 throw new OrmException(format("Could not read Timestamp value from SQL for field '%s'", column));
             }
-            return ((Timestamp) value).toInstant();
+            return value.toInstant();
         } catch (SQLException ex) {
             throw new OrmException(format("Could not read timestamp value from SQL (%s)", ex.getMessage()), ex);
-        }
-    }
-
-    /**
-     * Get a duration value from SQL for the given POJO and field
-     *
-     * @param rs     The ResultSet
-     * @param column The SQL column field
-     * @return The correct value
-     */
-    private Duration getDuration(ResultSet rs, String column) throws OrmException {
-        try {
-            String value = rs.getString(column);
-            if (value == null) {
-                return null;
-            }
-            return Duration.parse(value);
-        } catch (SQLException ex) {
-            throw new OrmException(format("Could not read duration value from SQL (%s)", ex.getMessage()), ex);
         }
     }
 

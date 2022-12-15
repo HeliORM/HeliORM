@@ -1,11 +1,9 @@
 package com.heliorm.def;
 
-import com.heliorm.Table;
+public interface Where< O> {
 
-public interface Where<T extends Table<O>, O> {
+    Where<O> and(Continuation<O> cont);
 
-    Where<T, O> and(Continuation<T, O> cont);
-
-    Where<T, O> or(Continuation<T, O> cont);
+    Where<O> or(Continuation<O> cont);
 
 }

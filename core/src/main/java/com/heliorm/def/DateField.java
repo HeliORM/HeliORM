@@ -1,18 +1,16 @@
 package com.heliorm.def;
 
 import com.heliorm.Field;
-import com.heliorm.Table;
 
 import java.util.Date;
 
 /**
  * A field representing a Date value
  *
- * @param <T> Table type
  * @param <O> Object type
  * @author gideon
  */
-public interface DateField<T extends Table<O>, O> extends Field<T, O, Date>, WithRange<T, O, Date>, WithEquals<T, O, Date>, WithIn<T, O, Date>, WithIs<T, O, Date> {
+public interface DateField< O> extends Field< O, Date>, WithRange<O, Date>, WithEquals<O, Date>, WithIn<O, Date>, WithIs<O> {
 
     @Override
     default FieldType getFieldType() {

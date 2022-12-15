@@ -17,6 +17,7 @@ import test.place.Province;
 import test.place.Town;
 
 import javax.sql.DataSource;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -28,7 +29,6 @@ abstract class AbstractOrmTest {
 
     private static Orm orm;
     private static DataSource jdbcDataSource;
-    private static Class<? extends SqlDriver> driver;
     private static PojoOperations pops;
 
     private static Connection getConnection() {
@@ -43,6 +43,7 @@ abstract class AbstractOrmTest {
     public static void setup() throws Exception {
         String dbType = System.getenv("ORM_TEST_DB");
         dbType = (dbType == null) ? "" : dbType;
+        Class<? extends SqlDriver> driver;
         switch (dbType) {
             case "mysql":
                 jdbcDataSource = setupMysqlDataSource();
@@ -64,13 +65,6 @@ abstract class AbstractOrmTest {
                 .setRollbackOnUncommittedClose(false)
                 .setUseUnionAll(true)
                 .build();
-//        boolean useJson = false;
-//        String json = System.getenv("ORM_TEST_JSON");
-//        useJson = (json == null) ? false : true;
-//        if (useJson) {
-//            orm = new JsonOrm(orm);
-//            say("Testing JSON layer");
-//        }
         deleteAll(Cat.class);
         deleteAll(Dog.class);
         deleteAll(Person.class);
@@ -78,7 +72,7 @@ abstract class AbstractOrmTest {
         deleteAll(Province.class);
     }
 
-    protected static final <O> List<O> createAll(List<O> data) throws OrmException {
+    protected static <O> List<O> createAll(List<O> data) throws OrmException {
         List<O> res = new ArrayList<>();
         for (O object : data) {
             res.add(orm.create(object));
@@ -88,9 +82,8 @@ abstract class AbstractOrmTest {
 
     protected static <O> List<O> selectAll(Class<O> type) throws OrmException {
         try {
-            return orm.select(orm.tableFor(type.newInstance())).list();
-        } catch (InstantiationException | IllegalAccessException e) {
-
+            return orm.select(orm.tableFor(type.getConstructor().newInstance())).list();
+        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
             throw new OrmException(e.getMessage(), e);
         }
     }
@@ -101,7 +94,7 @@ abstract class AbstractOrmTest {
         }
     }
 
-    protected static final void say(String fmt, Object... args) {
+    protected static void say(String fmt, Object... args) {
         System.out.printf(fmt, args);
         System.out.println();
     }
@@ -112,22 +105,20 @@ abstract class AbstractOrmTest {
         return jdbcDataSource;
     }
 
-    private static DataSource setupMysqlDataSource() throws SQLException {
+    private static DataSource setupMysqlDataSource() {
         HikariConfig conf = new HikariConfig();
         conf.setJdbcUrl("jdbc:mysql://127.0.0.1:3306/petz");
         conf.setUsername("root");
         conf.setPassword("dev");
-        HikariDataSource ds = new HikariDataSource(conf);
-        return ds;
+        return new HikariDataSource(conf);
     }
 
-    private static DataSource setupPostgreSqlDatasource() throws SQLException {
+    private static DataSource setupPostgreSqlDatasource() {
         HikariConfig conf = new HikariConfig();
         conf.setJdbcUrl("jdbc:postgresql://127.0.0.1:5432/petz");
         conf.setUsername("postgres");
         conf.setPassword("dev");
-        HikariDataSource ds = new HikariDataSource(conf);
-        return ds;
+        return new HikariDataSource(conf);
     }
 
     protected Orm orm() {
@@ -185,7 +176,6 @@ abstract class AbstractOrmTest {
         if (l1.isEmpty()) {
             return true;
         }
-        Table<?> t1 = orm.tableFor(l1.get(0));
         for (int i = 0; i < l1.size(); ++i) {
             if (!pojoCompare(l1.get(i), l2.get(i))) {
                 return false;
@@ -206,7 +196,7 @@ abstract class AbstractOrmTest {
         if (data.size() < 2) {
             return data;
         }
-        Table<?> t1 = orm.tableFor(data.get(0));
+        Table<O> t1 = orm.tableFor(data.get(0));
         return data.stream().sorted((o1, o2) -> {
                     try {
                         int o = o1.getClass().getName().compareTo(o2.getClass().getName());

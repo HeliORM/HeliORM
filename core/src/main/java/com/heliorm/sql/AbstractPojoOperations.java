@@ -19,7 +19,7 @@ import static java.lang.String.format;
  */
 abstract class AbstractPojoOperations implements PojoOperations {
 
-    private Map<Class<?>, Map<String, java.lang.reflect.Field>> fields = new WeakHashMap();
+    private final Map<Class<?>, Map<String, java.lang.reflect.Field>> fields = new WeakHashMap();
 
     protected AbstractPojoOperations() {
     }
@@ -83,7 +83,6 @@ abstract class AbstractPojoOperations implements PojoOperations {
                 break;
             case DATE:
             case INSTANT:
-            case DURATION:
             case STRING:
             case SET:
             case LIST:
@@ -119,7 +118,6 @@ abstract class AbstractPojoOperations implements PojoOperations {
                 return getEnum(pojo, refField);
             case DATE:
             case INSTANT:
-            case DURATION:
             case STRING:
             case SET :
             case LIST:
@@ -184,7 +182,15 @@ abstract class AbstractPojoOperations implements PojoOperations {
             case STRING:
             case DATE:
             case INSTANT:
+<<<<<<< HEAD
             case DURATION:
+=======
+                Object val1 = getValue(pojo1, field);
+                Object val2 = getValue(pojo2, field);
+                if (val1 == val2) return 0;
+                if (val1 == null) return -1;
+                if (val2 == null) return 1;
+>>>>>>> master
                 if (val1 instanceof Comparable) {
                     return ((Comparable) val1).compareTo(val2);
                 } else {

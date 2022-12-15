@@ -8,7 +8,6 @@ import com.heliorm.def.BooleanField;
 import com.heliorm.def.ByteField;
 import com.heliorm.def.DateField;
 import com.heliorm.def.DoubleField;
-import com.heliorm.def.DurationField;
 import com.heliorm.def.EnumField;
 import com.heliorm.def.FloatField;
 import com.heliorm.def.InstantField;
@@ -130,7 +129,7 @@ class Output {
             out.println("public final class Tables implements Database {");
             out.println("");
             out.println("");
-            out.print(buf.toString());
+            out.print(buf);
             out.println("");
 
             StringJoiner sj = new StringJoiner(", ");
@@ -140,7 +139,7 @@ class Output {
 
             out.println("@Override");
             out.println("\tpublic final List<Table<?>> getTables() {");
-            out.printf("\t\treturn Arrays.asList(%s);", sj.toString());
+            out.printf("\t\treturn Arrays.asList(%s);", sj);
             out.println("\n\t}");
             out.println("");
 
@@ -164,7 +163,7 @@ class Output {
         }
     }
 
-    private void emit(Table<?> cm) throws OrmMetaDataException, GeneratorException {
+    private <O> void emit(Table<O> cm) throws OrmMetaDataException, GeneratorException {
         impt(cm.getObjectClass());
         emit("public static class %s implements Table<%s> {",
                 tableName(cm), getJavaName(cm));
@@ -188,18 +187,18 @@ class Output {
         impt(Arrays.class);
         emit("");
         emit("@Override");
-        emit("public List<Field> getFields() {");
+        emit("public List<Field<%s,?>> getFields() {", getJavaName(cm));
         push();
-        emit(format("return Arrays.asList(%s);", fieldNames.toString()));
+        emit(format("return Arrays.asList(%s);", fieldNames));
         pop();
         emit("}");
         // getPrimaryKey();
         impt(Optional.class);
         emit("");
         emit("@Override");
-        emit("public Optional<Field> getPrimaryKey() {");
+        emit("public Optional<Field<%s,?>> getPrimaryKey() {", getJavaName(cm));
         push();
-        Optional<Field> opt = cm.getPrimaryKey();
+        Optional<Field<O, ?>> opt = cm.getPrimaryKey();
         if (opt.isPresent()) {
             emit("return Optional.of(%s);", opt.get().getJavaName());
         } else {
@@ -280,9 +279,9 @@ class Output {
         impt(Index.class);
         emit("");
         emit("@Override");
-        emit("public List<Index> getIndexes() {");
+        emit("public List<Index<%s>> getIndexes() {", getJavaName(cm));
         push();
-        emit(format("return Arrays.asList(%s);", indexNames.toString()));
+        emit(format("return Arrays.asList(%s);", indexNames));
         pop();
         emit("}");
         pop();
@@ -330,9 +329,6 @@ class Output {
                 break;
             case INSTANT:
                 addTimestampField(cm, fm);
-                break;
-            case DURATION:
-                addDurationField(cm, fm);
                 break;
             case STRING:
                 addStringField(cm, fm);
@@ -390,9 +386,8 @@ class Output {
         } else {
             enumTypeName = format("%s.%s", cm.getObjectClass().getSimpleName(), fm.getJavaType().getSimpleName());
         }
-        emit("public final %s<%s, %s, %s> %s = builder.enumField(\"%s\", %s.class)",
+        emit("public final %s<%s, %s> %s = builder.enumField(\"%s\", %s.class)",
                 EnumField.class.getSimpleName(),
-                tableName(cm),
                 cm.getObjectClass().getSimpleName(),
                 enumTypeName,
                 fm.getJavaName(),
@@ -409,15 +404,11 @@ class Output {
         addField(cm, fm, InstantField.class, "timestampField");
     }
 
-    private void addDurationField(Table cm, Field fm) throws GeneratorException {
-        addField(cm, fm, DurationField.class, "durationField");
-
-    }
-
     private void addStringField(Table cm, Field fm) throws GeneratorException {
         addField(cm, fm, StringField.class, "stringField");
     }
 
+<<<<<<< HEAD
 
     private void addSetField(Table cm, Field fm) throws GeneratorException {
         addCollectionField(cm, fm, SetField.class, "setField");
@@ -443,6 +434,9 @@ class Output {
     }
 
     private String addIndexModel(Table tm, Index<?, ?> im) {
+=======
+    private String addIndexModel(Table tm, Index<?> im) {
+>>>>>>> master
         impt(IndexPart.class);
         StringJoiner sj = new StringJoiner(",");
         for (Field field : im.getFields()) {
@@ -458,7 +452,7 @@ class Output {
         return indexName;
     }
 
-    private String indexName(Table tm, Index<?, ?> im) {
+    private String indexName(Table tm, Index<?> im) {
         StringJoiner sj = new StringJoiner("_");
         for (Field field : im.getFields()) {
             sj.add(field.getJavaName());
@@ -467,11 +461,10 @@ class Output {
         return sj.toString();
     }
 
-    private void addField(Table<?> cm, Field<?, ?, ?> fm, Class<? extends Field> fieldType, String buildMethod) {
+    private void addField(Table<?> cm, Field<?, ?> fm, Class<? extends Field> fieldType, String buildMethod) {
         impt(fieldType);
-        emit("public final %s<%s, %s> %s = builder.%s(\"%s\")",
+        emit("public final %s<%s> %s = builder.%s(\"%s\")",
                 fieldType.getSimpleName(),
-                tableName(cm),
                 cm.getObjectClass().getSimpleName(),
                 fm.getJavaName(),
                 buildMethod,
@@ -479,7 +472,7 @@ class Output {
         completeField(fm);
     }
 
-    private void completeField(Field<?, ?, ?> fm) {
+    private void completeField(Field<?, ?> fm) {
         push();
         emit(".withPrimaryKey(%b)", fm.isPrimaryKey());
         emit(".withAutoNumber(%b)", fm.isAutoNumber());
@@ -512,7 +505,7 @@ class Output {
         return getJavaName(table).toUpperCase();
     }
 
-    private String fullFieldName(Table table) throws GeneratorException {
+    private String fullFieldName(Table table) {
         return gen.getTablesPackageFor(table) + ".Tables." + shortFieldName(table);
     }
 

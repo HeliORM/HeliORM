@@ -26,7 +26,7 @@ public final class MySqlDriver extends SqlDriver {
     }
 
     public MySqlDriver() {
-        super(Collections.EMPTY_MAP);
+        super(Collections.emptyMap());
     }
 
     @Override
@@ -40,7 +40,7 @@ public final class MySqlDriver extends SqlDriver {
     }
 
     @Override
-    protected String fieldName(Table table, Field field) throws OrmException {
+    protected String fieldName(Table table, Field field) {
         return format("`%s`", field.getSqlName());
     }
 
@@ -55,12 +55,12 @@ public final class MySqlDriver extends SqlDriver {
     }
 
     @Override
-    protected TableGenerator getTableGenerator() throws OrmException {
+    protected TableGenerator getTableGenerator() {
         return new MysqlDialectGenerator();
     }
 
     @Override
-    protected String castNull(Field field) throws OrmException {
+    protected String castNull(Field field) {
         return "NULL";
     }
 
@@ -93,9 +93,12 @@ public final class MySqlDriver extends SqlDriver {
                 case ENUM:
                 case DATE:
                 case INSTANT:
+<<<<<<< HEAD
                 case DURATION:
                 case SET:
                 case LIST:
+=======
+>>>>>>> master
                     throw new OrmException(format("Field type '%s' is not a supported primary key type", field.getFieldType()));
                 default:
                     throw new OrmException(format("Field type '%s' is unsupported. BUG!", field.getFieldType()));
@@ -106,7 +109,7 @@ public final class MySqlDriver extends SqlDriver {
     }
 
     @Override
-    protected String fieldType(Table table, Field field) throws OrmException {
+    protected String fieldType(Table<?> table, Field field) throws OrmException {
         switch (field.getFieldType()) {
             case BOOLEAN:
                 return "TINYINT(1)";
@@ -123,7 +126,7 @@ public final class MySqlDriver extends SqlDriver {
             case FLOAT:
                 return "REAL";
             case ENUM:
-                return format("ENUM(%s)", getEnumValues(table, field));
+                return format("ENUM(%s)", getEnumValues(field));
             case STRING: {
                 int length = 255;
                 if (field.isPrimaryKey()) {
@@ -138,17 +141,20 @@ public final class MySqlDriver extends SqlDriver {
                 return "DATE";
             case INSTANT:
                 return "DATETIME";
+<<<<<<< HEAD
             case DURATION:
                 return "VARCHAR(32)";
             case SET:
             case LIST:
                 throw new OrmSqlException(format("Cannot query SQL for field type '%s'. BUG!", field.getFieldType()));
+=======
+>>>>>>> master
             default:
                 throw new OrmSqlException(format("Unkown field type '%s'. BUG!", field.getFieldType()));
         }
     }
 
-    private String getEnumValues(Table table, Field<?, ?, ?> field) {
+    private String getEnumValues(Field<?, ?> field) {
         StringJoiner sql = new StringJoiner(",");
         Class<?> javaType = field.getJavaType();
         for (Object v : javaType.getEnumConstants()) {

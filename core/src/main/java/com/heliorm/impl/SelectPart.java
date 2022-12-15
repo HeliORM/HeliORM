@@ -19,20 +19,20 @@ import static java.lang.String.format;
 /**
  * @author gideon
  */
-public class SelectPart<DT extends Table<DO>, DO> extends ExecutablePart<DT, DO> implements Select<DT, DO> {
+public class SelectPart<DO> extends ExecutablePart<DO> implements Select<DO> {
 
     private final Selector selector;
-    private final DT table;
-    private final Optional<Where<DT, DO>> where;
-    private final List<JoinPart<?, ?, ?, ?>> joins;
-    private List<OrderPart<DT, DO>> order;
+    private final Table<DO> table;
+    private final Optional<Where<DO>> where;
+    private final List<JoinPart<?,?>> joins;
+    private List<OrderPart<DO>> order;
     private LimitPart<DO> limit;
 
-    public SelectPart(Selector orm, DT table) {
-        this(orm, table, Optional.empty(), Collections.EMPTY_LIST);
+    public SelectPart(Selector orm, Table<DO> table) {
+        this(orm, table, Optional.empty(), Collections.emptyList());
     }
 
-    public SelectPart(Selector orm, DT table, Optional<Where<DT, DO>> where, List<JoinPart<?, ?, ?, ?>> joins, List<OrderPart<DT, DO>> order, LimitPart<DO> limit) {
+    public SelectPart(Selector orm, Table<DO> table, Optional<Where<DO>> where, List<JoinPart<?, ?>> joins, List<OrderPart<DO>> order, LimitPart<DO> limit) {
         super(orm);
         this.table = table;
         this.where = where;
@@ -42,8 +42,8 @@ public class SelectPart<DT extends Table<DO>, DO> extends ExecutablePart<DT, DO>
         this.limit = limit;
     }
 
-    public SelectPart(Selector orm, DT table, Optional<Where<DT, DO>> where, List<JoinPart<?, ?, ?, ?>> joins) {
-        this(orm, table, where, joins, Collections.EMPTY_LIST, new LimitPart<>(-1, -1));
+    public SelectPart(Selector orm, Table<DO> table, Optional<Where<DO>> where, List<JoinPart<?, ?>> joins) {
+        this(orm, table, where, joins, Collections.emptyList(), new LimitPart<>(-1, -1));
     }
 
 
@@ -57,23 +57,23 @@ public class SelectPart<DT extends Table<DO>, DO> extends ExecutablePart<DT, DO>
     }
 
     @Override
-    public <F extends FieldOrder<DT, DO, ?>> Complete<DO> orderBy(F order, F... orders) {
-        List<OrderPart<DT, DO>> list = new ArrayList<>();
+    public <F extends FieldOrder<DO, ?>> Complete<DO> orderBy(F order, F... orders) {
+        List<OrderPart<DO>> list = new ArrayList<>();
         list.add(makePart(order));
         for (F o : orders) {
             list.add(makePart(o));
         }
         this.order = list;
-        return new OrderedPart<>(getSelector(), this, list, limit);
+        return new OrderedPart(getSelector(), this, list, limit);
     }
 
     @Override
-    public SelectPart<DT, DO> getSelect() {
+    public SelectPart<DO> getSelect() {
         return this;
     }
 
     @Override
-    public List<OrderPart<DT, DO>> getOrder() {
+    public List<OrderPart<DO>> getOrder() {
         return order == null ? Collections.EMPTY_LIST : order;
     }
 
@@ -106,11 +106,11 @@ public class SelectPart<DT extends Table<DO>, DO> extends ExecutablePart<DT, DO>
         return getSelector().optional(this);
     }
 
-    public Optional<Where<DT, DO>> getWhere() {
+    public Optional<Where< DO>> getWhere() {
         return where;
     }
 
-    public List<JoinPart<?, ?, ?, ?>> getJoins() {
+    public List<JoinPart<?, ?>> getJoins() {
         return joins;
     }
 
@@ -119,7 +119,7 @@ public class SelectPart<DT extends Table<DO>, DO> extends ExecutablePart<DT, DO>
         return format("SELECT %s", table.getSqlTable());
     }
 
-    private <F extends FieldOrder<DT, DO, ?>> OrderPart<DT, DO> makePart(F order) {
+    private <F extends FieldOrder<DO, ?>> OrderPart<DO> makePart(F order) {
         return new OrderPart(order.getDirection() == FieldOrder.Direction.ASC ? OrderPart.Direction.ASCENDING : OrderPart.Direction.DESCENDING,
                 (FieldPart) (order.getField()));
     }

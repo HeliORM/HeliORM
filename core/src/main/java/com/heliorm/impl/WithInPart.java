@@ -10,20 +10,20 @@ import java.util.List;
 /**
  * @author gideon
  */
-public interface WithInPart<T extends Table<O>, O, C> extends WithIn<T, O, C> {
+public interface WithInPart<O, C> extends WithIn<O, C> {
 
-    FieldPart<T, O, C> getThis() throws OrmException;
-
-    @Override
-    Continuation<T, O> in(List<C> values) throws OrmException;
+    FieldPart<O, C> getThis() throws OrmException;
 
     @Override
-    Continuation<T, O> notIn(List<C> values) throws OrmException;
+    Continuation<O> in(List<C> values) throws OrmException;
 
     @Override
-    Continuation<T, O> in(C... values) throws OrmException;
+    Continuation<O> notIn(List<C> values) throws OrmException;
 
     @Override
-    Continuation<T, O> notIn(C... values) throws OrmException;
+    Continuation<O> in(C... values) throws OrmException;
+
+    @Override
+    Continuation<O> notIn(C... values) throws OrmException;
 
 }

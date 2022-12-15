@@ -1,13 +1,12 @@
 package com.heliorm.impl;
 
 import com.heliorm.Field;
-import com.heliorm.Table;
 
-public final class BooleanValueExpressionPart<T extends Table<O>, O> extends ValueExpressionPart<T, O, Boolean> {
+public final class BooleanValueExpressionPart<O> extends ValueExpressionPart<O, Boolean> {
 
-    private Boolean value;
+    private final Boolean value;
 
-    public BooleanValueExpressionPart(FieldPart left, Operator op, Boolean value) {
+    public BooleanValueExpressionPart(FieldPart<O, Boolean> left, Operator op, Boolean value) {
         super(Field.FieldType.BOOLEAN, left, op);
         this.value = value;
     }

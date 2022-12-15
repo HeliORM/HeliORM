@@ -1,13 +1,12 @@
 package com.heliorm.impl;
 
 import com.heliorm.Field;
-import com.heliorm.Table;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public final class DoubleListExpressionPart<T extends Table<O>, O> extends NumberListExpressionPart<T, O, Double> {
+public final class DoubleListExpressionPart<O> extends NumberListExpressionPart<O, Double> {
 
     private final List<Double> values;
 

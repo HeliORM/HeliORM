@@ -27,14 +27,14 @@ class AbstractionHelper {
      * @param tail part
      * @return The expanded query parts lists.
      */
-    List<? extends ExecutablePart<?, ?>> explodeAbstractions(ExecutablePart<?, ?> tail) {
-        if (tail instanceof SelectPart<?, ?>) {
+    List<? extends ExecutablePart<?>> explodeAbstractions(ExecutablePart< ?> tail) {
+        if (tail instanceof SelectPart< ?>) {
             return explode(tail.getSelect());
         }
-        if (tail instanceof OrderedPart<?, ?>) {
-            return explode((OrderedPart<?, ?>) tail);
+        if (tail instanceof OrderedPart< ?>) {
+            return explode((OrderedPart< ?>) tail);
         }
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
 
     /**
@@ -44,7 +44,7 @@ class AbstractionHelper {
      * @param <O>
      * @return
      */
-    <T extends Table<O>, O> Comparator<PojoCompare<O>> makeComparatorForTail(List<OrderPart<T, O>> order) {
+    <T extends Table<O>, O> Comparator<PojoCompare<O>> makeComparatorForTail(List<OrderPart< O>> order) {
         List<Comparator<PojoCompare<O>>> comps = new LinkedList();
         for (OrderPart op : order) {
             comps.add((PojoCompare<O> w1, PojoCompare<O> w2) -> {
@@ -59,9 +59,9 @@ class AbstractionHelper {
         return new CompoundComparator(comps);
     }
 
-    private List<OrderedPart<?, ?>> explode(OrderedPart<?, ?> ordered) {
-        List<OrderedPart<?, ?>> res = new ArrayList<>();
-        SelectPart<?, ?> select = ordered.getSelect();
+    private List<OrderedPart< ?>> explode(OrderedPart<?> ordered) {
+        List<OrderedPart< ?>> res = new ArrayList<>();
+        SelectPart<?> select = ordered.getSelect();
         Table<?> table = select.getTable();
         Set<Table<?>> subTables = table.getSubTables();
         if (subTables.isEmpty()) {
@@ -78,8 +78,8 @@ class AbstractionHelper {
         return res;
     }
 
-    private List<SelectPart<?, ?>> explode(SelectPart<?, ?> select) {
-        List<SelectPart<?, ?>> res = new ArrayList<>();
+    private List<SelectPart< ?>> explode(SelectPart< ?> select) {
+        List<SelectPart<?>> res = new ArrayList<>();
         Table<?> table = select.getTable();
         Set<Table<?>> subTables = table.getSubTables();
         if (subTables.isEmpty()) {
@@ -92,9 +92,9 @@ class AbstractionHelper {
         return res;
     }
 
-    private List<JoinPart<?, ?, ?, ?>> explode(List<JoinPart<?, ?, ?, ?>> joins) {
-        List<JoinPart<?, ?, ?, ?>> res = new ArrayList<>();
-        for (JoinPart<?, ?, ?, ?> join : joins) {
+    private List<JoinPart<?, ?>> explode(List<JoinPart<?, ?>> joins) {
+        List<JoinPart<?, ?>> res = new ArrayList<>();
+        for (JoinPart<?, ?> join : joins) {
             Table<?> table = join.getTable();
             Set<Table<?>> subTables = table.getSubTables();
             if (subTables.isEmpty()) {

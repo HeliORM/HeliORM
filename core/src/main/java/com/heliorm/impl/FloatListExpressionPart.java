@@ -1,13 +1,12 @@
 package com.heliorm.impl;
 
 import com.heliorm.Field;
-import com.heliorm.Table;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public final class FloatListExpressionPart<T extends Table<O>, O> extends NumberListExpressionPart<T, O, Float> {
+public final class FloatListExpressionPart< O> extends NumberListExpressionPart<O, Float> {
 
     private final List<Float> values;
 

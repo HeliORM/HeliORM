@@ -4,7 +4,7 @@
 
 <plugin>
     <name>Generate SQL Maven Plugin</name>
-    <description></description>
+    <description/>
     <groupId>network.fivenines</groupId>
     <artifactId>generate-sql-maven-plugin</artifactId>
     <version>1.0-SNAPSHOT</version>
@@ -33,21 +33,21 @@
                     <type>java.util.Map</type>
                     <required>true</required>
                     <editable>true</editable>
-                    <description></description>
+                    <description/>
                 </parameter>
                 <parameter>
                     <name>rootDataClass</name>
                     <type>java.lang.String</type>
                     <required>true</required>
                     <editable>true</editable>
-                    <description></description>
+                    <description/>
                 </parameter>
                 <parameter>
                     <name>project</name>
                     <type>org.apache.maven.project.MavenProject</type>
                     <required>true</required>
                     <editable>false</editable>
-                    <description></description>
+                    <description/>
                 </parameter>
             </parameters>
             <configuration>

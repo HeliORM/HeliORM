@@ -1,7 +1,6 @@
 package com.heliorm.impl;
 
 import com.heliorm.OrmException;
-import com.heliorm.Table;
 import com.heliorm.def.Select;
 
 import java.util.List;
@@ -26,20 +25,19 @@ public interface Selector {
      * @throws OrmException Thrown if any of the large number of things that can
      *                      go wrong did go wrong.
      */
-    <T extends Table<O>, O> List<O> list(Select<T, O> tail) throws OrmException;
+    <O> List<O> list(Select<O> tail) throws OrmException;
 
     /**
      * Execute the supplied programmed query and return a stream of result
      * pojos.
      *
      * @param <O>  The type of POJO to return
-     * @param <T>  The rtpe of the table queried
      * @param tail The tail of the query
      * @return The stream of loaded Pojos
      * @throws OrmException Thrown if any of the large number of things that can
      *                      go wrong did go wrong.
      */
-    <T extends Table<O>, O> Stream<O> stream(Select<T, O> tail) throws OrmException;
+    <O> Stream<O> stream(Select< O> tail) throws OrmException;
 
     /**
      * Execute the supplied programmed query and return an optional with a
@@ -47,13 +45,12 @@ public interface Selector {
      * found, so more than one result will cause an error.
      *
      * @param <O>  The type of POJO to return
-     * @param <T>  The type of the table queried
      * @param tail The tail of the query
      * @return The optional found Pojo
      * @throws OrmException Thrown if any of the large number of things that can
      *                      go wrong did go wrong.
      */
-    <T extends Table<O>, O> Optional<O> optional(Select<T, O> tail) throws OrmException;
+    <O> Optional<O> optional(Select< O> tail) throws OrmException;
 
     /**
      * Execute the supplied programmed query and return exactly one matching
@@ -61,12 +58,11 @@ public interface Selector {
      * result or more than one result will cause an error.
      *
      * @param <O>  The type of POJO to return
-     * @param <T>  The type of the table queried
      * @param tail The tail of the query
      * @return The found Pojo
      * @throws OrmException Thrown if any of the large number of things that can
      *                      go wrong did go wrong.
      */
-    <T extends Table<O>, O> O one(Select<T, O> tail) throws OrmException;
+    <O> O one(Select<O> tail) throws OrmException;
 
 }

@@ -1,13 +1,12 @@
 package com.heliorm.impl;
 
 import com.heliorm.Field;
-import com.heliorm.Table;
 
-public final class DoubleValueExpressionPart<T extends Table<O>, O> extends NumberValueExpressionPart<T, O, Double> {
+public final class DoubleValueExpressionPart<O> extends NumberValueExpressionPart< O, Double> {
 
-    private Double value;
+    private final Double value;
 
-    public DoubleValueExpressionPart(DoubleFieldPart<T, O> left, Operator op, Double value) {
+    public DoubleValueExpressionPart(DoubleFieldPart<O> left, Operator op, Double value) {
         super(Field.FieldType.DOUBLE, left, op);
         this.value = value;
     }

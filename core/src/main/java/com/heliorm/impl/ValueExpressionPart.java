@@ -1,17 +1,15 @@
 package com.heliorm.impl;
 
 import com.heliorm.Field;
-import com.heliorm.Table;
 
 import static java.lang.String.format;
 
 /**
- * @param <T> Type of table
  * @param <O> Type of POJO
  * @param <C> Type of the field
  * @author gideon
  */
-public abstract class ValueExpressionPart<T extends Table<O>, O, C> extends ExpressionPart<T, O, C> {
+public abstract class ValueExpressionPart< O, C> extends ExpressionPart<O, C> {
 
     private final Field.FieldType dataType;
     private final Operator operator;
@@ -38,7 +36,7 @@ public abstract class ValueExpressionPart<T extends Table<O>, O, C> extends Expr
     }
 
     public enum Operator {
-        EQ, NOT_EQ, LT, LE, GT, GE, LIKE, NOT_LIKE;
+        EQ, NOT_EQ, LT, LE, GT, GE, LIKE, NOT_LIKE
     }
 
 }

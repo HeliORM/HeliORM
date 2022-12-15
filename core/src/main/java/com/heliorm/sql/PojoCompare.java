@@ -8,7 +8,7 @@ import com.heliorm.UncaughtOrmException;
 import java.util.Optional;
 
 /**
- * A comparable that compares two POJOs taking into account the meta data
+ * A comparable that compares two POJOs taking into account the metadata
  * available from a Table
  *
  * @author gideon
@@ -36,7 +36,7 @@ final class PojoCompare<O> implements Comparable<PojoCompare<O>> {
     @Override
     public int compareTo(PojoCompare<O> w) {
         if (table.equals(w.table)) {
-            Optional<Field> primaryKey = table.getPrimaryKey();
+            Optional<Field<O, ?>> primaryKey = table.getPrimaryKey();
             if (primaryKey.isPresent()) {
                 try {
                     return pops.compareTo(pojo, w.getPojo(), primaryKey.get());
@@ -45,7 +45,7 @@ final class PojoCompare<O> implements Comparable<PojoCompare<O>> {
                 }
             }
             if (pojo instanceof Comparable) {
-                return ((Comparable) pojo).compareTo(w.getPojo());
+                return ((Comparable<O>) pojo).compareTo(w.getPojo());
             }
         }
         return table.getSqlTable().compareTo(w.table.getSqlTable());
@@ -54,7 +54,7 @@ final class PojoCompare<O> implements Comparable<PojoCompare<O>> {
 
     @Override
     public int hashCode() {
-        Optional<Field> primaryKey = table.getPrimaryKey();
+        Optional<Field<O,?>> primaryKey = table.getPrimaryKey();
         if (primaryKey.isPresent()) {
             try {
                 return pops.getValue(pojo, primaryKey.get()).hashCode();
@@ -76,7 +76,7 @@ final class PojoCompare<O> implements Comparable<PojoCompare<O>> {
         return compareTo((PojoCompare<O>) obj) == 0;
     }
 
-    int compareTo(PojoCompare<O> w, Field<?, O, ?> field) throws UncaughtOrmException {
+    int compareTo(PojoCompare<O> w, Field<O, ?> field) throws UncaughtOrmException {
         try {
             return pops.compareTo(pojo, w.getPojo(), field);
         } catch (OrmException ex) {

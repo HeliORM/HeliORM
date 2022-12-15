@@ -25,14 +25,14 @@ public interface Table<O> {
      *
      * @return The fields
      */
-    List<Field> getFields();
+    List<Field< O,?>> getFields();
 
     /**
      * Return the primary key field (if defined) for this table.
      *
      * @return The primary key field
      */
-    Optional<Field> getPrimaryKey();
+    Optional<Field<O,?>> getPrimaryKey();
 
     /**
      * Return the SQL table name for this table.
@@ -69,5 +69,5 @@ public interface Table<O> {
      *
      * @return The indexes
      */
-    List<Index> getIndexes();
+    List<Index<O>> getIndexes();
 }

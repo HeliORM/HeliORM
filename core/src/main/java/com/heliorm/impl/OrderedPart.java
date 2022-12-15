@@ -1,6 +1,5 @@
 package com.heliorm.impl;
 
-import com.heliorm.Table;
 import com.heliorm.def.Complete;
 import com.heliorm.def.Executable;
 
@@ -9,13 +8,13 @@ import java.util.List;
 /**
  * @author gideon
  */
-public final class OrderedPart<DT extends Table<DO>, DO> extends ExecutablePart<DT, DO> implements Complete<DO> {
+public final class OrderedPart< DO> extends ExecutablePart<DO> implements Complete<DO> {
 
 
-    private final SelectPart<DT, DO> select;
-    private final List<OrderPart<DT, DO>> order;
+    private final SelectPart< DO> select;
+    private final List<OrderPart< DO>> order;
 
-    public OrderedPart(Selector selector, SelectPart<DT, DO> select, List<OrderPart<DT, DO>> order, LimitPart<DO> limit) {
+    public OrderedPart(Selector selector, SelectPart< DO> select, List<OrderPart< DO>> order, LimitPart<DO> limit) {
         super(selector);
         this.select = select;
         this.order = order;
@@ -23,12 +22,12 @@ public final class OrderedPart<DT extends Table<DO>, DO> extends ExecutablePart<
     }
 
     @Override
-    public SelectPart<DT, DO> getSelect() {
+    public SelectPart<DO> getSelect() {
         return select;
     }
 
     @Override
-    public List<OrderPart<DT, DO>> getOrder() {
+    public List<OrderPart< DO>> getOrder() {
         return order;
     }
 

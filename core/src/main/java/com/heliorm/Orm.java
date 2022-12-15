@@ -39,19 +39,46 @@ public interface Orm extends AutoCloseable {
     /**
      * Create a query builder pattern to select data from the database.
      *
-     * @param <T>   The type of the table to select on
      * @param <O>   The type of the POJOs selected
      * @param table The table to use as starting point for building the query.
      * @return The Select object that can be used to expand the query or to
      * query data.
      */
-    <T extends Table<O>, O> Select<T, O> select(T table);
+    <O> Select<O> select(Table<O> table);
 
-    <T extends Table<O>, O> Select<T, O> select(T table, Where<T, O> where);
+    /**
+     * Create a query builder pattern to select data from the database.
+     *
+     * @param <O>   The type of the POJOs selected
+     * @param table The table to use as starting point for building the query.
+     * @param where The where clause to use
+     * @return The Select object that can be used to expand the query or to
+     * query data.
+     */
+    <O> Select<O> select(Table<O> table, Where<O> where);
 
-    <T extends Table<O>, O> Select<T, O> select(T table, Join<T, O>... joins);
+    /**
+     * Create a query builder pattern to select data from the database.
+     *
+     * @param <O>   The type of the POJOs selected
+     * @param table The table to use as starting point for building the query.
+     * @param joins The joins to do
+     * @return The Select object that can be used to expand the query or to
+     * query data.
+     */
+    <O> Select<O> select(Table<O> table, Join<O>... joins);
 
-    <T extends Table<O>, O> Select<T, O> select(T table, Where<T, O> where, Join<T, O>... joins);
+    /**
+     * Create a query builder pattern to select data from the database.
+     *
+     * @param <O>   The type of the POJOs selected
+     * @param table The table to use as starting point for building the query.
+     * @param where The where clause to use
+     * @param joins The joins to do
+     * @return The Select object that can be used to expand the query or to
+     * query data.
+     */
+    <O> Select<O> select(Table<O> table, Where<O> where, Join<O>... joins);
 
     /**
      * Open a new transaction.
@@ -70,7 +97,7 @@ public interface Orm extends AutoCloseable {
      * @param <O>  The type of the POJO
      * @param pojo The pojo
      * @return The table
-     * @throws OrmException Thrown if there is an finding the table the POJO
+     * @throws OrmException Thrown if there is an error finding the table the POJO
      */
     <O> Table<O> tableFor(O pojo) throws OrmException;
 
@@ -80,7 +107,7 @@ public interface Orm extends AutoCloseable {
      * @param <O>  The type of the POJO
      * @param type The type of pojo
      * @return The table
-     * @throws OrmException Thrown if there is an finding the table the POJO
+     * @throws OrmException Thrown if there is an error finding the table the POJO
      */
     <O> Table<O> tableFor(Class<O> type) throws OrmException;
 

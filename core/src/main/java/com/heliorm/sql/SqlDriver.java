@@ -93,7 +93,7 @@ public abstract class SqlDriver {
      * @return The SQL table name
      * @throws OrmException Thrown if something goes wrong determining the table name
      */
-    protected abstract String fullTableName(Table table) throws OrmException;
+    protected abstract String fullTableName(Table<?> table) throws OrmException;
 
     /**
      * Work out the exact field name to use.
@@ -103,9 +103,9 @@ public abstract class SqlDriver {
      * @return The SQL field name
      * @throws OrmException Thrown if something goes wrong determining the field name
      */
-    protected abstract String fullFieldName(Table table, Field field) throws OrmException;
+    protected abstract String fullFieldName(Table<?> table, Field field) throws OrmException;
 
-    protected abstract String fieldType(Table table, Field field) throws OrmException;
+    protected abstract String fieldType(Table<?> table, Field field) throws OrmException;
 
     /**
      * Work out the short field name to use.

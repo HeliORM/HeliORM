@@ -30,7 +30,7 @@ public class AutoNumberTest extends AbstractOrmTest {
     private static List<Town> towns;
     private static List<Person> persons;
     private static List<CatBreed> catBreeds;
-    private static List<Cat> cats = new ArrayList<>();
+    private static final List<Cat> cats = new ArrayList<>();
 
     @BeforeAll
     public static void setupData() throws OrmException {

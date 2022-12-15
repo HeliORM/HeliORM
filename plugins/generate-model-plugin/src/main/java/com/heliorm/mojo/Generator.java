@@ -30,8 +30,8 @@ public interface Generator<T extends Table> {
      */
     T getPojoModel(Class clazz, Database database, Set<T> subTables);
 
-    public enum PojoStrategy {
-        annotated;
+    enum PojoStrategy {
+        annotated
     }
 
 }
