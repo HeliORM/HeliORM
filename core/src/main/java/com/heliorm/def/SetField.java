@@ -8,7 +8,7 @@ import com.heliorm.Table;
  * @param <O> Object type
  * @author gideon
  */
-public interface SetField<T extends Table<O>, O, P> extends Field<T, O, P> {
+public interface SetField<O, P> extends Field<O, P> {
 
     @Override
     default FieldType getFieldType() {

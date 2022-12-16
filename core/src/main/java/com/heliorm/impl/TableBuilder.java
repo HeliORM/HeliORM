@@ -3,7 +3,6 @@ package com.heliorm.impl;
 import com.heliorm.Field;
 import com.heliorm.Table;
 
-import java.time.Instant;
 import java.util.Date;
 
 public final class TableBuilder<T extends Table<O>, O> {
@@ -46,10 +45,6 @@ public final class TableBuilder<T extends Table<O>, O> {
         return new FieldBuilder<>(table, Field.FieldType.DATE, Date.class, javaName);
     }
 
-    public FieldBuilder<InstantFieldPart<O>> timestampField(String javaName) {
-        return new FieldBuilder<>(table, Field.FieldType.INSTANT, Instant.class, javaName);
-    }
-
     public FieldBuilder<StringFieldPart<O>> stringField(String javaName) {
         return new FieldBuilder<>(table, Field.FieldType.STRING, String.class, javaName);
     }
@@ -58,20 +53,15 @@ public final class TableBuilder<T extends Table<O>, O> {
         return new FieldBuilder<>(table, Field.FieldType.BOOLEAN, Boolean.class, javaName);
     }
 
-<<<<<<< HEAD
-    public <E extends Enum> FieldBuilder<EnumFieldPart<T,O,E>> enumField(String javaName, Class<E> enumType ) {
-        return new FieldBuilder<>(table, Field.FieldType.ENUM,  enumType, javaName);
-=======
     public <E extends Enum<E>> FieldBuilder<EnumFieldPart<O, E>> enumField(String javaName, Class<E> enumType) {
         return new FieldBuilder<>(table, Field.FieldType.ENUM, enumType, javaName);
->>>>>>> master
     }
 
     public <P> FieldBuilder<SetFieldPart<T,O, P>> setField(String javaName,Class<P> pojoType) {
         return new FieldBuilder<>(table, Field.FieldType.SET,  pojoType, javaName);
     }
 
-    public <P> FieldBuilder<ListFieldPart<T,O, P>> listField(String javaName,Class<P> pojoType) {
+    public <P> FieldBuilder<ListFieldPart<O, P>> listField(String javaName,Class<P> pojoType) {
         return new FieldBuilder<>(table, Field.FieldType.LIST,  pojoType, javaName);
     }
 

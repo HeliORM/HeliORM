@@ -11,28 +11,7 @@ import java.util.Optional;
  * @param <C> The data type of the field
  * @author gideon
  */
-<<<<<<< HEAD
-public interface Field<T extends Table<O>, O, C>  extends FieldOrder<T,O,C> {
-
-    enum FieldType {
-        LONG,
-        INTEGER,
-        SHORT,
-        BYTE,
-        DOUBLE,
-        FLOAT,
-        BOOLEAN,
-        ENUM,
-        STRING,
-        DATE,
-        INSTANT,
-        DURATION,
-        LIST,
-        SET;
-    }
-=======
 public interface Field<O, C> extends FieldOrder<O, C> {
->>>>>>> master
 
     Table<?> getTable();
 
@@ -101,9 +80,8 @@ public interface Field<O, C> extends FieldOrder<O, C> {
      *
      * @return True if it can be null
      */
-     boolean isNullable() ;
+     boolean    isNullable() ;
 
-<<<<<<< HEAD
     /** Return true if this field represents a collection of POJOs
      *
      * @return True if it is a collection
@@ -116,10 +94,6 @@ public interface Field<O, C> extends FieldOrder<O, C> {
      */
      Optional<Table<?>> getCollectionTable();
 
-     FieldOrder<T,O,C> asc();
-
-     FieldOrder<T,O,C> desc();
-=======
     FieldOrder<O, C> asc();
 
     FieldOrder<O, C> desc();
@@ -135,8 +109,8 @@ public interface Field<O, C> extends FieldOrder<O, C> {
         ENUM,
         STRING,
         DATE,
-        INSTANT
+        SET,
+        LIST
     }
->>>>>>> master
 
 }

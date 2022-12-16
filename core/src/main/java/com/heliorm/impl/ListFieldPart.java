@@ -9,9 +9,9 @@ import com.heliorm.def.ListField;
  * @param <P> Type of the POJO
  * @author gideon
  */
-public class ListFieldPart<T extends Table<O>, O, P> extends FieldPart<T, O, P> implements ListField<T, O, P> {
+public class ListFieldPart<O, P> extends FieldPart<O, P> implements ListField<O, P> {
 
-    public ListFieldPart(T table, String javaName, Class<P> javaType) {
+    public ListFieldPart(Table<O> table, String javaName, Class<P> javaType) {
         super(table, FieldType.LIST, javaType, javaName);
     }
 

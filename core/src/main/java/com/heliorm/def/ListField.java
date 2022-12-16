@@ -1,14 +1,13 @@
 package com.heliorm.def;
 
 import com.heliorm.Field;
-import com.heliorm.Table;
 
 /**
  * @param <T> Table type
  * @param <O> Object type
  * @author gideon
  */
-public interface ListField<T extends Table<O>, O, P> extends Field<T, O, P> {
+public interface ListField< O, P> extends Field<O, P> {
 
     @Override
     default FieldType getFieldType() {

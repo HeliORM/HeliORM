@@ -9,8 +9,6 @@ import com.heliorm.annotation.PrimaryKey;
 import com.heliorm.def.FieldOrder;
 
 import java.lang.annotation.Annotation;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -99,8 +97,6 @@ public class AnnotatedPojoField implements Field {
             return FieldType.STRING;
         } else if (Date.class.isAssignableFrom(type)) {
             return FieldType.DATE;
-        } else if (Instant.class.isAssignableFrom(type)) {
-            return FieldType.INSTANT;
         } else if (Enum.class.isAssignableFrom(type)) {
             return FieldType.ENUM;
         }
@@ -122,10 +118,7 @@ public class AnnotatedPojoField implements Field {
     @Override
     public boolean isAutoNumber() {
         Optional<PrimaryKey> pkA = getAnnotation(PrimaryKey.class);
-        if (pkA.isPresent()) {
-            return pkA.get().autoIncrement();
-        }
-        return false;
+        return pkA.map(PrimaryKey::autoIncrement).orElse(false);
     }
 
     @Override
@@ -142,10 +135,7 @@ public class AnnotatedPojoField implements Field {
     @Override
     public boolean isNullable() {
         Optional<Column> lA = getAnnotation(Column.class);
-        if (lA.isPresent()) {
-            return lA.get().nullable();
-        }
-        return false;
+        return lA.map(Column::nullable).orElse(false);
     }
 
     @Override
@@ -211,7 +201,6 @@ public class AnnotatedPojoField implements Field {
      *
      * @param <T>             The type of annotation
      * @param annotationClass The annotation class
-     * @return
      */
     private <T extends Annotation> Optional<T> getAnnotation(Class<T> annotationClass) {
         return Optional.ofNullable(pojoField.getAnnotation(annotationClass));

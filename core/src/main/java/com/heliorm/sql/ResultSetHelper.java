@@ -67,18 +67,9 @@ class ResultSetHelper {
             case DATE:
                 pops.setValue(pojo, field, getValue(rs, field));
                 break;
-            case INSTANT:
-                pops.setValue(pojo, field, getTimestamp(rs, column));
-                break;
-<<<<<<< HEAD
-            case DURATION:
-                pops.setValue(pojo, field, getDuration(rs, column));
-                break;
             case SET :
             case LIST : // ignore set and list cause they are dealt with in separate queries
                 break;
-=======
->>>>>>> master
             default:
                 throw new OrmException(format("Field type '%s' is unsupported. BUG!", field.getFieldType()));
         }
@@ -121,29 +112,9 @@ class ResultSetHelper {
                     return rs.getString(column);
                 case DATE:
                     return rs.getDate(column);
-                case INSTANT:
-                    return rs.getTimestamp(column);
-<<<<<<< HEAD
-                case DURATION: {
-                    Class javaType = field.getJavaType();
-                    if (!Duration.class.isAssignableFrom(javaType)) {
-                        throw new OrmException(format("Field %s is not a duration. BUG!", field.getJavaName()));
-                    }
-                    String val = rs.getString(column);
-                    if (val != null) {
-                        try {
-                            return Duration.parse(val);
-                        } catch (DateTimeParseException ex) {
-                            throw new OrmException(format("Cannot parse text to a duration (%s)", ex.getMessage()), ex);
-                        }
-                    }
-                    return null;
-                }
                 case SET :
                 case LIST:  // return null in case this is called since set and list should be populated elsewhere
                     return null;
-=======
->>>>>>> master
                 default:
                     throw new OrmException(format("Field type '%s' is unsupported. BUG!", field.getFieldType()));
             }

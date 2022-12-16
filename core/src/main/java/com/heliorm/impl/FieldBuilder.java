@@ -105,21 +105,12 @@ public class FieldBuilder<P extends FieldPart> {
             case DATE:
                 part = (P) new DateFieldPart(table, javaName);
                 break;
-            case INSTANT:
-                part = (P) new InstantFieldPart(table, javaName);
-                break;
-<<<<<<< HEAD
-            case DURATION:
-                part = (P) new DurationFieldPart(table, javaName);
-                break;
             case SET :
                 part = (P) new SetFieldPart(table, javaName, javaType);
                 break;
             case LIST :
                 part = (P) new ListFieldPart<>(table, javaName, javaType);
                 break;
-=======
->>>>>>> master
             default:
                 throw new UncaughtOrmException(format("Unexpected field type %s. BUG!", fieldType));
         }

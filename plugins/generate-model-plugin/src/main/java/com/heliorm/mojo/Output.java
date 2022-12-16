@@ -10,7 +10,6 @@ import com.heliorm.def.DateField;
 import com.heliorm.def.DoubleField;
 import com.heliorm.def.EnumField;
 import com.heliorm.def.FloatField;
-import com.heliorm.def.InstantField;
 import com.heliorm.def.IntegerField;
 import com.heliorm.def.ListField;
 import com.heliorm.def.LongField;
@@ -327,9 +326,6 @@ class Output {
             case DATE:
                 addDateField(cm, fm);
                 break;
-            case INSTANT:
-                addTimestampField(cm, fm);
-                break;
             case STRING:
                 addStringField(cm, fm);
                 break;
@@ -400,15 +396,9 @@ class Output {
         addField(cm, fm, DateField.class, "dateField");
     }
 
-    private void addTimestampField(Table cm, Field fm) throws GeneratorException {
-        addField(cm, fm, InstantField.class, "timestampField");
-    }
-
     private void addStringField(Table cm, Field fm) throws GeneratorException {
         addField(cm, fm, StringField.class, "stringField");
     }
-
-<<<<<<< HEAD
 
     private void addSetField(Table cm, Field fm) throws GeneratorException {
         addCollectionField(cm, fm, SetField.class, "setField");
@@ -418,12 +408,11 @@ class Output {
         addCollectionField(cm, fm, ListField.class, "listField");
     }
 
-    private void addCollectionField(Table<?> cm, Field<?,?,?> fm,  Class<? extends Field> fieldType,  String buildMethod) throws GeneratorException {
+    private void addCollectionField(Table<?> cm, Field<?,?> fm,  Class<? extends Field> fieldType,  String buildMethod) throws GeneratorException {
         impt(fieldType);
         impt(fm.getCollectionTable().get().getObjectClass());
-        emit("public final %s<%s, %s, %s> %s = builder.%s(\"%s\", %s.class)",
+        emit("public final %s<%s, %s> %s = builder.%s(\"%s\", %s.class)",
                 fieldType.getSimpleName(),
-                tableName(cm),
                 cm.getObjectClass().getSimpleName(),
                 fm.getCollectionTable().get().getObjectClass().getSimpleName(),
                 fm.getJavaName(),
@@ -433,10 +422,7 @@ class Output {
         completeField(fm);
     }
 
-    private String addIndexModel(Table tm, Index<?, ?> im) {
-=======
     private String addIndexModel(Table tm, Index<?> im) {
->>>>>>> master
         impt(IndexPart.class);
         StringJoiner sj = new StringJoiner(",");
         for (Field field : im.getFields()) {

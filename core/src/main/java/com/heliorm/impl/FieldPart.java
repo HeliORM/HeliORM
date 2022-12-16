@@ -68,15 +68,7 @@ public abstract class FieldPart<O, C> implements Field<O, C>, Cloneable {
         return autoNumber;
     }
 
-<<<<<<< HEAD
-    public final FieldPart<T, O, C> getThis() throws OrmException {
-=======
-    void setAutoNumber(boolean autoNumber) {
-        this.autoNumber = autoNumber;
-    }
-
     public final FieldPart<O, C> getThis() throws OrmException {
->>>>>>> master
         try {
             return (FieldPart<O, C>) clone();
         } catch (CloneNotSupportedException ex) {
@@ -119,7 +111,6 @@ public abstract class FieldPart<O, C> implements Field<O, C>, Cloneable {
         return collection;
     }
 
-<<<<<<< HEAD
     @Override
     public Optional<Table<?>> getCollectionTable() {
         if (collectionTable.isPresent()) {
@@ -128,32 +119,26 @@ public abstract class FieldPart<O, C> implements Field<O, C>, Cloneable {
                     .findFirst();
         }
         return Optional.empty();    }
-    public FieldOrder<T,O,C> asc() {
+    public FieldOrder<O,C> asc() {
         return () -> FieldPart.this;
     }
 
-    public FieldOrder<T,O,C> desc() {
-        return new FieldOrder<T, O, C>() {
-=======
-    public FieldOrder<O, C> asc() {
-        return () -> FieldPart.this;
-    }
-
-    public FieldOrder<O, C> desc() {
+    public FieldOrder<O,C> desc() {
         return new FieldOrder<O, C>() {
->>>>>>> master
 
-            @Override
-            public Direction getDirection() {
+                @Override
+                public Direction getDirection () {
                 return Direction.DESC;
             }
 
-            @Override
-            public Field<O, C> getField() {
+                @Override
+                public Field<O, C> getField () {
                 return FieldPart.this;
             }
+
         };
     }
+
 
     @Override
     public Field<O, C> getField() {
