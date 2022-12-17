@@ -164,7 +164,7 @@ final class UnsafePojoOperations extends AbstractPojoOperations {
         if (value != null) {
             Class<?> valueClass = value.getClass();
             if (valueClass.isEnum()) {
-                return ((Enum) value).name();
+                return ((Enum<?>) value).name();
             }
             throw new OrmException(format("Cannot read Pojo enum field from data of type %s", valueClass.getSimpleName()));
         }
