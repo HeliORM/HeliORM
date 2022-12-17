@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import test.persons.Person;
 import test.pets.Bird;
 import test.pets.Cat;
+import test.pets.CatBreed;
 import test.pets.Dog;
 import test.pets.Pet;
 import test.place.Province;
@@ -31,13 +32,15 @@ public class LazyLoadTest extends AbstractOrmTest {
     private static List<Bird> birds = new ArrayList<>();
     private static List<Province> provinces;
     private static List<Town> towns;
+    private static List<CatBreed> breeds;
 
     @BeforeAll
     public static void setupData() throws OrmException {
+        breeds = createAll(makeCatBreeds());
         provinces = createAll(makeProvinces());
         towns = createAll(makeTowns(provinces));
         persons = createAll(makePersons(towns));
-        cats = createAll(makeCats(persons.size() * 5, persons, makeCatBreeds()));
+        cats = createAll(makeCats(persons.size() * 5, persons, breeds));
         dogs = createAll(makeDogs(persons.size() * 4, persons));
         birds = createAll(makeBirds(persons.size() * 2, persons));
 
