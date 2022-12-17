@@ -470,7 +470,7 @@ class Output {
 
         }
         if (fm.getForeignTable().isPresent()) {
-            emit(".withForeignTable(\"%s\")",  fm.getForeignTable().get().getSqlTable());
+            emit(".withForeignTable(%s)",  shortFieldName(fm.getForeignTable().get()));
         }
         if (fm.isCollection()) {
             emit(".withCollection(\"%s\")", fm.getCollectionTable().get().getSqlTable());

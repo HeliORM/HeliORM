@@ -25,7 +25,7 @@ public abstract class FieldPart<O, C> implements Field<O, C>, Cloneable {
     private boolean autoNumber = false;
     private boolean foreignKey = false;
     private boolean nullable = false;
-    private Optional<String> foreignTable = Optional.empty();
+    private Optional<Table<?>> foreignTable = Optional.empty();
     private Optional<Integer> length = Optional.empty();
     private boolean collection = false;
     private Optional<String> collectionTable = Optional.empty();
@@ -165,8 +165,8 @@ public abstract class FieldPart<O, C> implements Field<O, C>, Cloneable {
         this.nullable = nullable;
     }
 
-    void setForeignTable(Optional<String> name) {
-        this.foreignTable = name;
+    void setForeignTable(Table<?> name) {
+        this.foreignTable = Optional.ofNullable(name);
     }
 
     void setCollection(boolean collection) {
