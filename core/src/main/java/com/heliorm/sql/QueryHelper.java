@@ -18,7 +18,6 @@ import com.heliorm.impl.WherePart;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -99,17 +98,13 @@ final class QueryHelper {
     String buildSelectQuery(ExecutablePart<?> exec) throws OrmException {
         SelectPart<?> root = exec.getSelect();
         StringBuilder tablesQuery = new StringBuilder();
-        tablesQuery.append("SELECT DISTINCT  ");
-        StringJoiner fieldList = new StringJoiner(",");
-        for (Field field : new ArrayList<Field<?, ?>>(root.getTable().getFields())) {
-            fieldList.add(format("%s AS %s", driver.fullFieldName(root.getTable(), field), driver.virtualFieldName(getFieldId(field))));
-        }
-        tablesQuery.append(fieldList);
-        tablesQuery.append(format(" FROM %s", fullTableName.apply(root.getTable()), fullTableName.apply(root.getTable())));
+        tablesQuery.append("SELECT DISTINCT ");
+        tablesQuery.append(makeFieldList(root.getTable()));
+        tablesQuery.append(makeTableList(root.getTable()));
         StringBuilder whereQuery = new StringBuilder();
         Optional<? extends Where<?>> where = root.getSelect().getWhere();
         if (where.isPresent()) {
-            whereQuery.append(expandCriteria(root.getSelect().getTable(), (WherePart< ?>) where.get()));
+            whereQuery.append(expandCriteria(root.getSelect().getTable(), (WherePart<?>) where.get()));
         }
         for (JoinPart<?, ?> join : root.getJoins()) {
             tablesQuery.append(expandLinkTables(root.getTable(), join));
@@ -187,6 +182,27 @@ final class QueryHelper {
             tablesQuery.append(whereQuery);
         }
         return tablesQuery.toString();
+    }
+
+    private <O> String makeFieldList(Table<O> table) throws OrmException {
+        StringJoiner fieldList = new StringJoiner(",");
+        for (Field field : table.getFields()) {
+            if (field.isCollection()) {
+                fieldList.add(makeFieldList(field.getCollectionTable()));
+            } else {
+                fieldList.add(format("%s AS %s", driver.fullFieldName(table, field), driver.virtualFieldName(getFieldId(field))));
+            }
+        }
+        return fieldList.toString();
+    }
+
+    private <O> String makeTableList(Table<O> table) throws OrmException {
+        StringJoiner tableList = new StringJoiner(",");
+        tableList.add(format(" FROM %s", fullTableName.apply(table), fullTableName.apply(table)));
+        for (Field<?, ?> field : table.getFields().stream().filter(field -> field.isCollection()).collect(Collectors.toList())) {
+            tableList.add(makeTableList(field.getCollectionTable()));
+        }
+        return tableList.toString();
     }
 
     private String expandLinkTables(Table table, JoinPart<?, ?> right) throws OrmException {

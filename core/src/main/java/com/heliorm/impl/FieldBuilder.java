@@ -22,6 +22,8 @@ public class FieldBuilder<P extends FieldPart> {
     private Optional<Table<?>> foreignTable = Optional.empty();
     private Optional<Integer> length = Optional.empty();
 
+    private Table<?> collectionTable = null;
+
     public FieldBuilder(Table<?> table, Field.FieldType fieldType, Class<?> javaType, String javaName) {
         this.table = table;
         this.fieldType = fieldType;
@@ -56,6 +58,11 @@ public class FieldBuilder<P extends FieldPart> {
 
     public FieldBuilder<P> withForeignTable(Table<?> value) {
         this.foreignTable = Optional.ofNullable(value);
+        return this;
+    }
+
+    public FieldBuilder<P> withCollectionTable(Table<?> collectionTable) {
+        this.collectionTable = collectionTable;
         return this;
     }
 
@@ -110,6 +117,7 @@ public class FieldBuilder<P extends FieldPart> {
         part.setPrimaryKey(primaryKey);
         part.setSqlName(sqlName);
         part.setLength(length);
+        part.setCollectionTable(collectionTable);
         return part;
     }
 

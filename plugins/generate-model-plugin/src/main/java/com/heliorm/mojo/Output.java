@@ -177,7 +177,9 @@ class Output {
         emit("");
         for (Field fm : cm.getFields()) {
             addFieldModel(cm, fm);
-            fieldNames.add(fm.getJavaName());
+            if (!fm.isCollection()) {
+                fieldNames.add(fm.getJavaName());
+            }
         }
         // getFields();
         impt(List.class);
@@ -334,6 +336,12 @@ class Output {
             case ENUM:
                 addEnumField(cm, fm);
                 break;
+            case SET:
+                addSetField(cm,fm);
+                break;
+            case LIST:
+                addListField(cm,fm);
+                break;
             default:
                 throw new OrmMetaDataException(format("Unsupported Pojo field type %s for field '%s' on class %s", fm.getFieldType(), fm.getJavaName(), getJavaName(cm)));
         }
@@ -387,6 +395,13 @@ class Output {
                 enumTypeName);
         completeField(fm);
     }
+
+    private void addListField(Table cm, Field fm) {
+    }
+    private void addSetField(Table cm, Field fm) {
+
+    }
+
 
     private void addDateField(Table cm, Field fm) throws GeneratorException {
         addField(cm, fm, DateField.class, "dateField");
@@ -449,6 +464,9 @@ class Output {
         }
         if (fm.getForeignTable().isPresent()) {
             emit(".withForeignTable(%s)", shortFieldName(fm.getForeignTable().get()));
+        }
+        if (fm.isCollection()) {
+            emit(".withCollectionTable(%s)", shortFieldName(fm.getCollectionTable()));
         }
         emit(".build();");
         pop();

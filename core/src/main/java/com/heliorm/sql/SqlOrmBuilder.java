@@ -29,6 +29,7 @@ public class SqlOrmBuilder {
     private boolean createMissingTables = false;
     private boolean useUnionAll = true;
 
+
     /**
      * Create a new ORM builder.
      *

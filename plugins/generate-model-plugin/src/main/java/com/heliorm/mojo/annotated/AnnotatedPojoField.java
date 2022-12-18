@@ -2,6 +2,7 @@ package com.heliorm.mojo.annotated;
 
 import com.heliorm.Field;
 import com.heliorm.Table;
+import com.heliorm.annotation.Collection;
 import com.heliorm.annotation.Column;
 import com.heliorm.annotation.ForeignKey;
 import com.heliorm.annotation.PrimaryKey;
@@ -181,6 +182,20 @@ public class AnnotatedPojoField implements Field {
     public boolean isCollection() {
         FieldType fieldType = getFieldType();
         return fieldType == FieldType.LIST || fieldType == FieldType.SET;
+    }
+
+    @Override
+    public Table<?> getCollectionTable() {
+        Optional<Collection> col = getAnnotation(Collection.class);
+        if (col.isPresent()) {
+            Class<?> type = col.get().pojo();
+            if (type != null) {
+                return table.getDatabase().getTables().stream()
+                        .filter(table -> table.getObjectClass().equals(type))
+                        .findFirst().orElse(null);
+            }
+        }
+        return null;
     }
 
     @Override

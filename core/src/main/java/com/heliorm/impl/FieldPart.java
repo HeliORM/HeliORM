@@ -29,6 +29,7 @@ public abstract class FieldPart<O, C> implements Field<O, C>, Cloneable {
     private boolean nullable = false;
     private Optional<Table<?>> foreignTable = Optional.empty();
     private Optional<Integer> length = Optional.empty();
+    private Table<?> collectionTable;
 
 
     public FieldPart(Table<O> table, FieldType fieldType, Class<C> javaType, String javaName) {
@@ -105,6 +106,11 @@ public abstract class FieldPart<O, C> implements Field<O, C>, Cloneable {
         return  fieldType == LIST || fieldType == SET;
     }
 
+    @Override
+    public Table<?> getCollectionTable() {
+        return collectionTable;
+    }
+
     void setForeignKey(boolean foreignKey) {
         this.foreignKey = foreignKey;
     }
@@ -116,6 +122,10 @@ public abstract class FieldPart<O, C> implements Field<O, C>, Cloneable {
 
     void setForeignTable(Optional<Table<?>> foreignTable) {
         this.foreignTable = foreignTable;
+    }
+
+    void setCollectionTable(Table<?> collectionTable) {
+        this.collectionTable = collectionTable;
     }
 
     @Override

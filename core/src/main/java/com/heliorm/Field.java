@@ -70,6 +70,8 @@ public interface Field<O, C> extends FieldOrder<O, C> {
      */
     boolean isCollection();
 
+    Table<?> getCollectionTable();
+
     /**
      * Return the table to which this field links if it is a foreign key.
      *
@@ -94,6 +96,8 @@ public interface Field<O, C> extends FieldOrder<O, C> {
     FieldOrder<O, C> asc();
 
     FieldOrder<O, C> desc();
+
+
 
     enum FieldType {
         LONG,
