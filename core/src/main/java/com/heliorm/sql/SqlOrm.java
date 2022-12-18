@@ -24,13 +24,11 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.ServiceLoader;
-import java.util.Set;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.UUID;
@@ -64,7 +62,6 @@ public final class SqlOrm implements Orm {
     private final PojoHelper pojoHelper;
     private final PreparedStatementHelper preparedStatementHelper;
     private final ResultSetHelper resultSetHelper;
-    private final Map<Field<?,?>, String> fieldIds = new ConcurrentHashMap<>();
     private SqlTransaction currentTransaction;
 
 
@@ -78,11 +75,11 @@ public final class SqlOrm implements Orm {
         this.driver = driver;
         this.connectionSupplier = connectionSupplier;
         this.pops = pops;
-        this.queryHelper = new QueryHelper(driver, this::getFieldId, this::fullTableName);
+        this.queryHelper = new QueryHelper(driver, this::getUniqueFieldName, this::fullTableName);
         this.pojoHelper = new PojoHelper(pops);
         this.abstractionHelper = new AbstractionHelper();
         this.preparedStatementHelper = new PreparedStatementHelper(pojoHelper, driver::setEnum);
-        this.resultSetHelper = new ResultSetHelper(pops, this::getFieldId);
+        this.resultSetHelper = new ResultSetHelper(pops, this::getUniqueFieldName);
         selector = new Selector() {
             @Override
             public <O> List<O> list(Select<O> tail) throws OrmException {
@@ -591,21 +588,13 @@ public final class SqlOrm implements Orm {
     }
 
     /**
-     * Get the unique field ID for a field
+     * Get the unique field name for a field
      *
      * @param field The field
      * @return The ID
      */
-    private String getFieldId(Field<?,?> field) {
-        return fieldIds.computeIfAbsent(field, k -> {
-            String uuid;
-            Set<String> set = new HashSet<>(fieldIds.values());
-            do { // very simple collision avoidance
-                uuid = UUID.randomUUID().toString().substring(0, 8);
-            }
-            while (set.contains(uuid));
-            return uuid;
-        });
+    private String getUniqueFieldName(Field<?,?> field) {
+        return format("%s_%s", field.getTable().getSqlTable(), field.getSqlName());
     }
 
 }
