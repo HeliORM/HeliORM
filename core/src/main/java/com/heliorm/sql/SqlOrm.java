@@ -120,11 +120,17 @@ public final class SqlOrm implements Orm {
         Connection con = getConnection();
         O newPojo = pops.newPojoInstance(table);
         for (Field<?,?> field : table.getFields()) {
+            if (field.isCollection()) {
+                continue;
+            }
             pops.setValue(newPojo, field, pops.getValue(pojo, field));
         }
         try (PreparedStatement stmt = con.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
             int par = 1;
             for (Field<?,?> field : table.getFields()) {
+                if (field.isCollection()) {
+                    continue;
+                }
                 if (field.isPrimaryKey()) {
                     if (field.isAutoNumber()) {
                         if (field.getFieldType() == Field.FieldType.STRING) {
@@ -180,6 +186,9 @@ public final class SqlOrm implements Orm {
         try (PreparedStatement stmt = con.prepareStatement(query)) {
             int par = 1;
             for (Field<?,?> field : table.getFields()) {
+                if (field.isCollection()) {
+                    continue;
+                }
                 if (!field.isPrimaryKey()) {
                     preparedStatementHelper.setValueInStatement(stmt, pojo, field, par);
                     par++;

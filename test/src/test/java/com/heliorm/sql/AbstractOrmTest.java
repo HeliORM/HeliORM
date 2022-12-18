@@ -22,6 +22,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 abstract class AbstractOrmTest {
@@ -185,6 +186,10 @@ abstract class AbstractOrmTest {
 
     protected final <O> boolean listCompareOrdered(List<O> l1, List<O> l2) throws OrmException {
         return listCompareAsIs(sort(l1), sort(l2));
+    }
+
+    protected final <O> boolean setCompareAsIs(Set<O> s1, Set<O> s2) throws OrmException {
+        return listCompareAsIs(new ArrayList<>(s1), new ArrayList<>(s2));
     }
 
     private <O> List<O> sort(List<O> data) throws OrmException {

@@ -8,10 +8,11 @@ import com.heliorm.annotation.PrimaryKey;
 import com.heliorm.def.FieldOrder;
 
 import java.lang.annotation.Annotation;
-import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static java.lang.String.format;
 
@@ -101,6 +102,12 @@ public class AnnotatedPojoField implements Field {
         } else if (Enum.class.isAssignableFrom(type)) {
             return FieldType.ENUM;
         }
+        else if (Set.class.isAssignableFrom(type)) {
+            return FieldType.SET;
+        }
+        else if (List.class.isAssignableFrom(type)) {
+            return FieldType.LIST;
+        }
         throw new AnnotatedPojoException(format("Unsuppored field type %s for field '%s' on %s",
                 type.getSimpleName(), pojoField.getName(), pojoField.getDeclaringClass().getCanonicalName()));
     }
@@ -168,6 +175,12 @@ public class AnnotatedPojoField implements Field {
     @Override
     public boolean isForeignKey() {
         return getAnnotation(ForeignKey.class).isPresent();
+    }
+
+    @Override
+    public boolean isCollection() {
+        FieldType fieldType = getFieldType();
+        return fieldType == FieldType.LIST || fieldType == FieldType.SET;
     }
 
     @Override

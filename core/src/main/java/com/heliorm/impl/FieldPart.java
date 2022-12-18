@@ -7,6 +7,8 @@ import com.heliorm.def.FieldOrder;
 
 import java.util.Optional;
 
+import static com.heliorm.Field.FieldType.LIST;
+import static com.heliorm.Field.FieldType.SET;
 import static java.lang.String.format;
 
 /**
@@ -95,6 +97,12 @@ public abstract class FieldPart<O, C> implements Field<O, C>, Cloneable {
     @Override
     public final boolean isForeignKey() {
         return foreignKey;
+    }
+
+
+    @Override
+    public boolean isCollection() {
+        return  fieldType == LIST || fieldType == SET;
     }
 
     void setForeignKey(boolean foreignKey) {

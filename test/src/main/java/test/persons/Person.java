@@ -1,10 +1,14 @@
 package test.persons;
 
+import com.heliorm.annotation.Collection;
 import com.heliorm.annotation.Column;
 import com.heliorm.annotation.ForeignKey;
 import com.heliorm.annotation.Pojo;
 import com.heliorm.annotation.PrimaryKey;
+import test.pets.Pet;
 import test.place.Town;
+
+import java.util.List;
 
 /**
  * @author gideon
@@ -25,6 +29,8 @@ public class Person {
     private String emailAddress;
     @Column(nullable = true)
     private Double income;
+    @Collection(pojo = Pet.class)
+    private List<Pet> pets;
 
     public Long getId() {
         return id;
@@ -72,6 +78,14 @@ public class Person {
 
     public void setIncome(Double income) {
         this.income = income;
+    }
+
+    public List<Pet> getPets() {
+        return pets;
+    }
+
+    public void setPets(List<Pet> pets) {
+        this.pets = pets;
     }
 
     @Override

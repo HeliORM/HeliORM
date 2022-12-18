@@ -64,6 +64,12 @@ public interface Field<O, C> extends FieldOrder<O, C> {
      */
     boolean isAutoNumber();
 
+    /** Return true if this field is a collection
+     *
+     * @return True if collection
+     */
+    boolean isCollection();
+
     /**
      * Return the table to which this field links if it is a foreign key.
      *
@@ -100,7 +106,9 @@ public interface Field<O, C> extends FieldOrder<O, C> {
         ENUM,
         STRING,
         DATE,
-        INSTANT
+        INSTANT,
+        SET,
+        LIST;
     }
 
 }
