@@ -5,7 +5,7 @@ import com.heliorm.Table;
 import com.heliorm.sql.OrmSqlException;
 import com.heliorm.sql.TableGenerator;
 import com.heliorm.sql.mysql.MysqlDialectGenerator;
-import com.heliorm.sql.postgresql.PostgresDialectGenerator;
+import com.heliorm.sql.postgres.PostgresDialectGenerator;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfo;
 import io.github.classgraph.ClassInfoList;

@@ -1,4 +1,4 @@
-package com.heliorm.sql.postgresql;
+package com.heliorm.sql.postgres;
 
 import com.heliorm.Field;
 import com.heliorm.Table;

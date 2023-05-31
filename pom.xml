@@ -5,13 +5,12 @@
     <groupId>com.heliorm</groupId>
     <artifactId>orm</artifactId>
     <name>[HeliORM]</name>
-    <version>0.99.3</version>
+    <version>0.99.4</version>
     <packaging>pom</packaging>
     <modules>
         <module>annotation</module>
         <module>core</module>
-        <module>drivers</module>
-        <module>plugins</module>
+            <module>plugins</module>
         <module>test</module>
     </modules>
     <properties>

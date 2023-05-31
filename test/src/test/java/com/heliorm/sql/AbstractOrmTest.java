@@ -5,7 +5,7 @@ import com.heliorm.Orm;
 import com.heliorm.OrmException;
 import com.heliorm.Table;
 import com.heliorm.sql.mysql.MySqlDriver;
-import com.heliorm.sql.postgresql.PostgreSqlDriver;
+import com.heliorm.sql.postgres.PostgreSqlDriver;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.h2.jdbcx.JdbcDataSource;
