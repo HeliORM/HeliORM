@@ -1,11 +1,9 @@
 package com.heliorm.impl;
 
-import com.heliorm.Field;
+import java.util.Collection;
 
-public abstract class NumberListExpressionPart< O, C extends Number> extends ListExpressionPart<O, C> {
-
-    protected NumberListExpressionPart(Field.FieldType dataType, NumberFieldPart left, Operator op) {
-        super(left, op);
+public abstract class NumberListExpressionPart<O, C extends Number> extends ListExpressionPart<O, C> {
+    protected NumberListExpressionPart(NumberFieldPart<O, C> left, Operator op, Collection<C> values) {
+        super(left, op, values);
     }
-
 }
