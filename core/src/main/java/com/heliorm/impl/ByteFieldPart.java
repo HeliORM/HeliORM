@@ -59,21 +59,21 @@ public final class ByteFieldPart<O> extends NumberFieldPart<O, Byte> implements 
 
     @Override
     public Continuation<O> in(List<Byte> values) throws OrmException {
-        return new ByteListExpressionPart((ByteFieldPart) getThis(), ListExpressionPart.Operator.IN, values);
+        return new ListExpressionPart<>(getThis(), ListExpressionPart.Operator.IN, values);
     }
 
     @Override
     public Continuation<O> notIn(List<Byte> values) throws OrmException {
-        return new ByteListExpressionPart((ByteFieldPart) getThis(), ListExpressionPart.Operator.NOT_IN, values);
+        return new ListExpressionPart<>(getThis(), ListExpressionPart.Operator.NOT_IN, values);
     }
 
     @Override
     public Continuation<O> in(Byte... values) throws OrmException {
-        return new ByteListExpressionPart((ByteFieldPart) getThis(), ListExpressionPart.Operator.IN, Arrays.asList(values));
+        return new ListExpressionPart<>(getThis(), ListExpressionPart.Operator.IN, Arrays.asList(values));
     }
 
     @Override
     public Continuation<O> notIn(Byte... values) throws OrmException {
-        return new ByteListExpressionPart((ByteFieldPart) getThis(), ListExpressionPart.Operator.NOT_IN, Arrays.asList(values));
+        return new ListExpressionPart<>(getThis(), ListExpressionPart.Operator.NOT_IN, Arrays.asList(values));
     }
 }

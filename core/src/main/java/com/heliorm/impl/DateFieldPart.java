@@ -66,22 +66,22 @@ public final class DateFieldPart<O> extends FieldPart<O, Date> implements
 
     @Override
     public Continuation<O> in(List<Date> values) throws OrmException {
-        return new DateListExpressionPart(getThis(), ListExpressionPart.Operator.IN, values);
+        return new ListExpressionPart<>(getThis(), ListExpressionPart.Operator.IN, values);
     }
 
     @Override
     public Continuation<O> notIn(List<Date> values) throws OrmException {
-        return new DateListExpressionPart(getThis(), ListExpressionPart.Operator.NOT_IN, values);
+        return new ListExpressionPart<>(getThis(), ListExpressionPart.Operator.NOT_IN, values);
     }
 
     @Override
     public Continuation<O> in(Date... values) throws OrmException {
-        return new DateListExpressionPart(getThis(), ListExpressionPart.Operator.IN, Arrays.asList(values));
+        return new ListExpressionPart<>(getThis(), ListExpressionPart.Operator.IN, Arrays.asList(values));
     }
 
     @Override
     public Continuation<O> notIn(Date... values) throws OrmException {
-        return new DateListExpressionPart(getThis(), ListExpressionPart.Operator.NOT_IN, Arrays.asList(values));
+        return new ListExpressionPart<>(getThis(), ListExpressionPart.Operator.NOT_IN, Arrays.asList(values));
     }
 
 }

@@ -20,7 +20,7 @@ public class LongFieldPart<O> extends NumberFieldPart<O, Long> implements LongFi
 
     @Override
     public Continuation<O> eq(Long value) throws OrmException {
-        return new LongValueExpressionPart((LongFieldPart) getThis(), ValueExpressionPart.Operator.EQ, value);
+        return new LongValueExpressionPart<>((LongFieldPart) getThis(), ValueExpressionPart.Operator.EQ, value);
     }
 
     @Override
@@ -61,21 +61,21 @@ public class LongFieldPart<O> extends NumberFieldPart<O, Long> implements LongFi
 
     @Override
     public Continuation<O> in(List<Long> values) throws OrmException {
-        return new LongListExpressionPart((LongFieldPart) getThis(), ListExpressionPart.Operator.IN, values);
+        return new ListExpressionPart<>((LongFieldPart) getThis(), ListExpressionPart.Operator.IN, values);
     }
 
     @Override
     public Continuation<O> notIn(List<Long> values) throws OrmException {
-        return new LongListExpressionPart((LongFieldPart) getThis(), ListExpressionPart.Operator.NOT_IN, values);
+        return new ListExpressionPart<>((LongFieldPart) getThis(), ListExpressionPart.Operator.NOT_IN, values);
     }
 
     @Override
     public Continuation<O> in(Long... values) throws OrmException {
-        return new LongListExpressionPart((LongFieldPart) getThis(), ListExpressionPart.Operator.IN, Arrays.asList(values));
+        return new ListExpressionPart<>((LongFieldPart) getThis(), ListExpressionPart.Operator.IN, Arrays.asList(values));
     }
 
     @Override
     public Continuation<O> notIn(Long... values) throws OrmException {
-        return new LongListExpressionPart((LongFieldPart) getThis(), ListExpressionPart.Operator.NOT_IN, Arrays.asList(values));
+        return new ListExpressionPart<>((LongFieldPart) getThis(), ListExpressionPart.Operator.NOT_IN, Arrays.asList(values));
     }
 }

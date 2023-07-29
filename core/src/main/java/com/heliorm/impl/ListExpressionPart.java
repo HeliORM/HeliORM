@@ -9,12 +9,12 @@ import static java.lang.String.format;
 /**
  * @author gideon
  */
-public abstract class ListExpressionPart< O, C> extends ExpressionPart<O, C> {
+public final class ListExpressionPart< O, C> extends ExpressionPart<O, C> {
 
     private final Operator operator;
     private final List<C> values;
 
-    protected ListExpressionPart(FieldPart<O,C> left, Operator op, Collection<C> values ) {
+    ListExpressionPart(FieldPart<O, C> left, Operator op, Collection<C> values) {
         super(Type.LIST_EXPRESSION, left);
         this.operator = op;
         this.values = new ArrayList<>(values);
@@ -24,7 +24,7 @@ public abstract class ListExpressionPart< O, C> extends ExpressionPart<O, C> {
         return operator;
     }
 
-    public final List<C> getValues() {
+    public List<C> getValues() {
         return values;
     }
 

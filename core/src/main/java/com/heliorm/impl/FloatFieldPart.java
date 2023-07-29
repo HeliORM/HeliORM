@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * @author gideon
  */
-public class FloatFieldPart< O> extends NumberFieldPart<O, Float> implements FloatField<O> {
+public class FloatFieldPart<O> extends NumberFieldPart<O, Float> implements FloatField<O> {
 
     public FloatFieldPart(Table<O> table, String javaName) {
         super(table, FieldType.FLOAT, Float.class, javaName);
@@ -19,12 +19,12 @@ public class FloatFieldPart< O> extends NumberFieldPart<O, Float> implements Flo
 
 
     @Override
-    public Continuation< O> eq(Float value) throws OrmException {
+    public Continuation<O> eq(Float value) throws OrmException {
         return new FloatValueExpressionPart((FloatFieldPart) getThis(), ValueExpressionPart.Operator.EQ, value);
     }
 
     @Override
-    public Continuation< O> notEq(Float value) throws OrmException {
+    public Continuation<O> notEq(Float value) throws OrmException {
         return new FloatValueExpressionPart((FloatFieldPart) getThis(), ValueExpressionPart.Operator.NOT_EQ, value);
     }
 
@@ -60,21 +60,21 @@ public class FloatFieldPart< O> extends NumberFieldPart<O, Float> implements Flo
 
     @Override
     public Continuation<O> in(List<Float> values) throws OrmException {
-        return new FloatListExpressionPart((FloatFieldPart) getThis(), ListExpressionPart.Operator.IN, values);
+        return new ListExpressionPart<>(getThis(), ListExpressionPart.Operator.IN, values);
     }
 
     @Override
     public Continuation<O> notIn(List<Float> values) throws OrmException {
-        return new FloatListExpressionPart((FloatFieldPart) getThis(), ListExpressionPart.Operator.NOT_IN, values);
+        return new ListExpressionPart<>(getThis(), ListExpressionPart.Operator.NOT_IN, values);
     }
 
     @Override
     public Continuation<O> in(Float... values) throws OrmException {
-        return new FloatListExpressionPart((FloatFieldPart) getThis(), ListExpressionPart.Operator.IN, Arrays.asList(values));
+        return new ListExpressionPart<>(getThis(), ListExpressionPart.Operator.IN, Arrays.asList(values));
     }
 
     @Override
     public Continuation<O> notIn(Float... values) throws OrmException {
-        return new FloatListExpressionPart((FloatFieldPart) getThis(), ListExpressionPart.Operator.NOT_IN, Arrays.asList(values));
+        return new ListExpressionPart<>(getThis(), ListExpressionPart.Operator.NOT_IN, Arrays.asList(values));
     }
 }

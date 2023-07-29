@@ -59,22 +59,22 @@ public class ShortFieldPart<O> extends NumberFieldPart<O, Short> implements Shor
 
     @Override
     public Continuation<O> in(List<Short> values) throws OrmException {
-        return new ShortListExpressionPart((ShortFieldPart) getThis(), ListExpressionPart.Operator.IN, values);
+        return new ListExpressionPart<>(getThis(), ListExpressionPart.Operator.IN, values);
     }
 
     @Override
     public Continuation<O> notIn(List<Short> values) throws OrmException {
-        return new ShortListExpressionPart((ShortFieldPart) getThis(), ListExpressionPart.Operator.NOT_IN, values);
+        return new ListExpressionPart<>(getThis(), ListExpressionPart.Operator.NOT_IN, values);
     }
 
     @Override
     public Continuation<O> in(Short... values) throws OrmException {
-        return new ShortListExpressionPart((ShortFieldPart) getThis(), ListExpressionPart.Operator.IN, Arrays.asList(values));
+        return new ListExpressionPart<>(getThis(), ListExpressionPart.Operator.IN, Arrays.asList(values));
     }
 
     @Override
     public Continuation<O> notIn(Short... values) throws OrmException {
-        return new ShortListExpressionPart((ShortFieldPart) getThis(), ListExpressionPart.Operator.NOT_IN, Arrays.asList(values));
+        return new ListExpressionPart<>(getThis(), ListExpressionPart.Operator.NOT_IN, Arrays.asList(values));
     }
 
 }

@@ -64,22 +64,22 @@ public final class InstantFieldPart<O> extends FieldPart<O, Instant> implements 
 
     @Override
     public Continuation<O> in(List<Instant> values) throws OrmException {
-        return new InstantListExpressionPart<>(getThis(), ListExpressionPart.Operator.IN, values);
+        return new ListExpressionPart<>(getThis(), ListExpressionPart.Operator.IN, values);
     }
 
     @Override
     public Continuation<O> notIn(List<Instant> values) throws OrmException {
-        return new InstantListExpressionPart<>(getThis(), ListExpressionPart.Operator.NOT_IN, values);
+        return new ListExpressionPart<>(getThis(), ListExpressionPart.Operator.NOT_IN, values);
     }
 
     @Override
     public Continuation<O> in(Instant... values) throws OrmException {
-        return new InstantListExpressionPart<>(getThis(), ListExpressionPart.Operator.IN, Arrays.asList(values));
+        return new ListExpressionPart<>(getThis(), ListExpressionPart.Operator.IN, Arrays.asList(values));
     }
 
     @Override
     public Continuation<O> notIn(Instant... values) throws OrmException {
-        return new InstantListExpressionPart<>(getThis(), ListExpressionPart.Operator.NOT_IN, Arrays.asList(values));
+        return new ListExpressionPart<>(getThis(), ListExpressionPart.Operator.NOT_IN, Arrays.asList(values));
     }
 
 }

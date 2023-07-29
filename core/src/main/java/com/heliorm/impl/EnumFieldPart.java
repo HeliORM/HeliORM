@@ -13,7 +13,7 @@ import java.util.List;
  * @param <E> Type of the enum
  * @author gideon
  */
-public class EnumFieldPart<O, E extends Enum<E>> extends FieldPart<O, E> implements
+public final class EnumFieldPart<O, E extends Enum<E>> extends FieldPart<O, E> implements
         EnumField<O, E>,
         WithEqualsPart<O, E>,
         WithInPart<O, E>, WithIsPart<O, E> {
@@ -29,7 +29,7 @@ public class EnumFieldPart<O, E extends Enum<E>> extends FieldPart<O, E> impleme
 
     @Override
     public Continuation<O> notEq(E value) throws OrmException {
-        return new EnumValueExpressionPart(getThis(), ValueExpressionPart.Operator.NOT_EQ, value);
+        return new EnumValueExpressionPart<>(getThis(), ValueExpressionPart.Operator.NOT_EQ, value);
     }
 
     @Override
@@ -44,22 +44,24 @@ public class EnumFieldPart<O, E extends Enum<E>> extends FieldPart<O, E> impleme
 
     @Override
     public Continuation<O> in(List<E> values) throws OrmException {
-        return new EnumListExpressionPart(getThis(), ListExpressionPart.Operator.IN, values);
+        return new ListExpressionPart<>(getThis(), ListExpressionPart.Operator.IN, values);
     }
 
     @Override
     public Continuation<O> notIn(List<E> values) throws OrmException {
-        return new EnumListExpressionPart(getThis(), ListExpressionPart.Operator.NOT_IN, values);
+        return new ListExpressionPart<>(getThis(), ListExpressionPart.Operator.NOT_IN, values);
     }
 
+    @SafeVarargs
     @Override
-    public Continuation<O> in(E... values) throws OrmException {
-        return new EnumListExpressionPart(getThis(), ListExpressionPart.Operator.IN, Arrays.asList(values));
+    public final Continuation<O> in(E... values) throws OrmException {
+        return new ListExpressionPart<>(getThis(), ListExpressionPart.Operator.IN, Arrays.asList(values));
     }
 
+    @SafeVarargs
     @Override
-    public Continuation<O> notIn(E... values) throws OrmException {
-        return new EnumListExpressionPart(getThis(), ListExpressionPart.Operator.NOT_IN, Arrays.asList(values));
+    public final Continuation<O> notIn(E... values) throws OrmException {
+        return new ListExpressionPart<>(getThis(), ListExpressionPart.Operator.NOT_IN, Arrays.asList(values));
     }
 
 }

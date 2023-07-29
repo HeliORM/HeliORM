@@ -61,21 +61,21 @@ public class IntegerFieldPart<O> extends NumberFieldPart<O, Integer> implements 
 
     @Override
     public Continuation<O> in(List<Integer> values) throws OrmException {
-        return new IntegerListExpressionPart((IntegerFieldPart) getThis(), ListExpressionPart.Operator.IN, values);
+        return new ListExpressionPart<>(getThis(), ListExpressionPart.Operator.IN, values);
     }
 
     @Override
     public Continuation<O> notIn(List<Integer> values) throws OrmException {
-        return new IntegerListExpressionPart((IntegerFieldPart) getThis(), ListExpressionPart.Operator.NOT_IN, values);
+        return new ListExpressionPart<>( getThis(), ListExpressionPart.Operator.NOT_IN, values);
     }
 
     @Override
     public Continuation<O> in(Integer... values) throws OrmException {
-        return new IntegerListExpressionPart((IntegerFieldPart) getThis(), ListExpressionPart.Operator.IN, Arrays.asList(values));
+        return new ListExpressionPart<>(getThis(), ListExpressionPart.Operator.IN, Arrays.asList(values));
     }
 
     @Override
     public Continuation<O> notIn(Integer... values) throws OrmException {
-        return new IntegerListExpressionPart((IntegerFieldPart) getThis(), ListExpressionPart.Operator.NOT_IN, Arrays.asList(values));
+        return new ListExpressionPart<>(getThis(), ListExpressionPart.Operator.NOT_IN, Arrays.asList(values));
     }
 }

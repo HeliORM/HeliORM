@@ -76,21 +76,21 @@ public class StringFieldPart<O> extends FieldPart<O, String> implements
 
     @Override
     public Continuation<O> in(List<String> values) throws OrmException {
-        return new StringListExpressionPart(getThis(), ListExpressionPart.Operator.IN, values);
+        return new ListExpressionPart<>(getThis(), ListExpressionPart.Operator.IN, values);
     }
 
     @Override
     public Continuation<O> notIn(List<String> values) throws OrmException {
-        return new StringListExpressionPart(getThis(), ListExpressionPart.Operator.NOT_IN, values);
+        return new ListExpressionPart<>(getThis(), ListExpressionPart.Operator.NOT_IN, values);
     }
 
     @Override
     public Continuation<O> in(String... values) throws OrmException {
-        return new StringListExpressionPart(getThis(), ListExpressionPart.Operator.IN, Arrays.asList(values));
+        return new ListExpressionPart<>(getThis(), ListExpressionPart.Operator.IN, Arrays.asList(values));
     }
 
     @Override
     public Continuation<O> notIn(String... values) throws OrmException {
-        return new StringListExpressionPart(getThis(), ListExpressionPart.Operator.NOT_IN, Arrays.asList(values));
+        return new ListExpressionPart<>(getThis(), ListExpressionPart.Operator.NOT_IN, Arrays.asList(values));
     }
 }

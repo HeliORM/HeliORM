@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * @author gideon
  */
-public final class DoubleFieldPart< O> extends NumberFieldPart<O, Double> implements DoubleField<O> {
+public final class DoubleFieldPart<O> extends NumberFieldPart<O, Double> implements DoubleField<O> {
 
     public DoubleFieldPart(Table<O> table, String javaName) {
         super(table, FieldType.DOUBLE, Double.class, javaName);
@@ -60,21 +60,21 @@ public final class DoubleFieldPart< O> extends NumberFieldPart<O, Double> implem
 
     @Override
     public Continuation<O> in(List<Double> values) throws OrmException {
-        return new DoubleListExpressionPart((DoubleFieldPart) getThis(), ListExpressionPart.Operator.IN, values);
+        return new ListExpressionPart<>(getThis(), ListExpressionPart.Operator.IN, values);
     }
 
     @Override
     public Continuation<O> notIn(List<Double> values) throws OrmException {
-        return new DoubleListExpressionPart((DoubleFieldPart) getThis(), ListExpressionPart.Operator.NOT_IN, values);
+        return new ListExpressionPart<>(getThis(), ListExpressionPart.Operator.NOT_IN, values);
     }
 
     @Override
     public Continuation<O> in(Double... values) throws OrmException {
-        return new DoubleListExpressionPart((DoubleFieldPart) getThis(), ListExpressionPart.Operator.IN, Arrays.asList(values));
+        return new ListExpressionPart<>(getThis(), ListExpressionPart.Operator.IN, Arrays.asList(values));
     }
 
     @Override
     public Continuation<O> notIn(Double... values) throws OrmException {
-        return new DoubleListExpressionPart((DoubleFieldPart) getThis(), ListExpressionPart.Operator.NOT_IN, Arrays.asList(values));
+        return new ListExpressionPart<>(getThis(), ListExpressionPart.Operator.NOT_IN, Arrays.asList(values));
     }
 }
