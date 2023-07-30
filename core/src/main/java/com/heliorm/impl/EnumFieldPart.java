@@ -24,12 +24,12 @@ public final class EnumFieldPart<O, E extends Enum<E>> extends FieldPart<O, E> i
 
     @Override
     public Continuation<O> eq(E value) throws OrmException {
-        return new ValueExpressionPart<>(FieldType.ENUM, getThis(), ValueExpressionPart.Operator.EQ, value);
+        return new ValueExpressionPart<>(getThis(), ValueExpressionPart.Operator.EQ, value);
     }
 
     @Override
     public Continuation<O> notEq(E value) throws OrmException {
-        return new ValueExpressionPart<>(FieldType.ENUM, getThis(), ValueExpressionPart.Operator.NOT_EQ, value);
+        return new ValueExpressionPart<>(getThis(), ValueExpressionPart.Operator.NOT_EQ, value);
     }
 
     @Override

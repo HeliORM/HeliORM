@@ -26,32 +26,32 @@ public final class InstantFieldPart<O> extends FieldPart<O, Instant> implements 
 
     @Override
     public Continuation<O> eq(Instant value) throws OrmException {
-        return new ValueExpressionPart<>(INSTANT, getThis(), ValueExpressionPart.Operator.EQ, value);
+        return new ValueExpressionPart<>(getThis(), ValueExpressionPart.Operator.EQ, value);
     }
 
     @Override
     public Continuation<O> notEq(Instant value) throws OrmException {
-        return new ValueExpressionPart<>(INSTANT,   getThis(), ValueExpressionPart.Operator.NOT_EQ, value);
+        return new ValueExpressionPart<>(getThis(), ValueExpressionPart.Operator.NOT_EQ, value);
     }
 
     @Override
     public Continuation<O> lt(Instant value) throws OrmException {
-        return new ValueExpressionPart<>(INSTANT, getThis(), ValueExpressionPart.Operator.LT, value);
+        return new ValueExpressionPart<>(getThis(), ValueExpressionPart.Operator.LT, value);
     }
 
     @Override
     public Continuation<O> le(Instant value) throws OrmException {
-        return new ValueExpressionPart<>(INSTANT, getThis(), ValueExpressionPart.Operator.LE, value);
+        return new ValueExpressionPart<>(getThis(), ValueExpressionPart.Operator.LE, value);
     }
 
     @Override
     public Continuation<O> gt(Instant value) throws OrmException {
-        return new ValueExpressionPart<>(INSTANT, getThis(), ValueExpressionPart.Operator.GT, value);
+        return new ValueExpressionPart<>(getThis(), ValueExpressionPart.Operator.GT, value);
     }
 
     @Override
     public Continuation<O> ge(Instant value) throws OrmException {
-        return new ValueExpressionPart<>(INSTANT, getThis(), ValueExpressionPart.Operator.GE, value);
+        return new ValueExpressionPart<>(getThis(), ValueExpressionPart.Operator.GE, value);
     }
 
     @Override

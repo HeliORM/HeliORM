@@ -19,12 +19,12 @@ BooleanFieldPart<O> extends FieldPart<O, Boolean> implements
 
     @Override
     public Continuation<O> eq(Boolean value) throws OrmException {
-        return new ValueExpressionPart<>(FieldType.BOOLEAN, getThis(), ValueExpressionPart.Operator.EQ, value);
+        return new ValueExpressionPart<>(getThis(), ValueExpressionPart.Operator.EQ, value);
     }
 
     @Override
     public Continuation<O> notEq(Boolean value) throws OrmException {
-        return new ValueExpressionPart<>(FieldType.BOOLEAN, getThis(), ValueExpressionPart.Operator.NOT_EQ, value);
+        return new ValueExpressionPart<>(getThis(), ValueExpressionPart.Operator.NOT_EQ, value);
     }
 
     @Override

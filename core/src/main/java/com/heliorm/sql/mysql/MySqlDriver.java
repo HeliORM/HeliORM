@@ -30,12 +30,12 @@ public final class MySqlDriver extends SqlDriver {
     }
 
     @Override
-    protected String fullTableName(Table table) throws OrmException {
+    protected String fullTableName(Table table) {
         return format("%s.%s", databaseName(table), tableName(table));
     }
 
     @Override
-    protected String fullFieldName(Table table, Field field) throws OrmException {
+    protected String fullFieldName(Table table, Field field) {
         return format("%s.`%s`", fullTableName(table), field.getSqlName());
     }
 

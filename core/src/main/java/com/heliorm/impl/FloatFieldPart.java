@@ -20,32 +20,32 @@ public class FloatFieldPart<O> extends NumberFieldPart<O, Float> implements Floa
 
     @Override
     public Continuation<O> eq(Float value) throws OrmException {
-        return new ValueExpressionPart<>(FieldType.FLOAT, getThis(), ValueExpressionPart.Operator.EQ, value);
+        return new ValueExpressionPart<>(getThis(), ValueExpressionPart.Operator.EQ, value);
     }
 
     @Override
     public Continuation<O> notEq(Float value) throws OrmException {
-        return new ValueExpressionPart<>(FieldType.FLOAT, getThis(), ValueExpressionPart.Operator.NOT_EQ, value);
+        return new ValueExpressionPart<>(getThis(), ValueExpressionPart.Operator.NOT_EQ, value);
     }
 
     @Override
     public Continuation<O> lt(Float value) throws OrmException {
-        return new ValueExpressionPart<>(FieldType.FLOAT, getThis(), ValueExpressionPart.Operator.LT, value);
+        return new ValueExpressionPart<>(getThis(), ValueExpressionPart.Operator.LT, value);
     }
 
     @Override
     public Continuation<O> le(Float value) throws OrmException {
-        return new ValueExpressionPart<>(FieldType.FLOAT, getThis(), ValueExpressionPart.Operator.LE, value);
+        return new ValueExpressionPart<>(getThis(), ValueExpressionPart.Operator.LE, value);
     }
 
     @Override
     public Continuation<O> gt(Float value) throws OrmException {
-        return new ValueExpressionPart<>(FieldType.FLOAT, getThis(), ValueExpressionPart.Operator.GT, value);
+        return new ValueExpressionPart<>(getThis(), ValueExpressionPart.Operator.GT, value);
     }
 
     @Override
     public Continuation<O> ge(Float value) throws OrmException {
-        return new ValueExpressionPart<>(FieldType.FLOAT, getThis(), ValueExpressionPart.Operator.GE, value);
+        return new ValueExpressionPart<>(getThis(), ValueExpressionPart.Operator.GE, value);
     }
 
     @Override

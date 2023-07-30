@@ -22,33 +22,33 @@ public class LongFieldPart<O> extends NumberFieldPart<O, Long> implements LongFi
 
     @Override
     public Continuation<O> eq(Long value) throws OrmException {
-        return new ValueExpressionPart<>(LONG, getThis(), ValueExpressionPart.Operator.EQ, value);
+        return new ValueExpressionPart<>(getThis(), ValueExpressionPart.Operator.EQ, value);
     }
 
     @Override
     public Continuation<O> notEq(Long value) throws OrmException {
-        return new ValueExpressionPart<>(LONG, getThis(), ValueExpressionPart.Operator.NOT_EQ, value);
+        return new ValueExpressionPart<>(getThis(), ValueExpressionPart.Operator.NOT_EQ, value);
     }
 
 
     @Override
     public Continuation<O> lt(Long value) throws OrmException {
-        return new ValueExpressionPart<>(LONG, getThis(), ValueExpressionPart.Operator.LT, value);
+        return new ValueExpressionPart<>(getThis(), ValueExpressionPart.Operator.LT, value);
     }
 
     @Override
     public Continuation<O> le(Long value) throws OrmException {
-        return new ValueExpressionPart<>(LONG, getThis(), ValueExpressionPart.Operator.LE, value);
+        return new ValueExpressionPart<>(getThis(), ValueExpressionPart.Operator.LE, value);
     }
 
     @Override
     public Continuation<O> gt(Long value) throws OrmException {
-        return new ValueExpressionPart<>(LONG, getThis(), ValueExpressionPart.Operator.GT, value);
+        return new ValueExpressionPart<>(getThis(), ValueExpressionPart.Operator.GT, value);
     }
 
     @Override
     public Continuation<O> ge(Long value) throws OrmException {
-        return new ValueExpressionPart<>(LONG, getThis(), ValueExpressionPart.Operator.GE, value);
+        return new ValueExpressionPart<>(getThis(), ValueExpressionPart.Operator.GE, value);
     }
 
     @Override

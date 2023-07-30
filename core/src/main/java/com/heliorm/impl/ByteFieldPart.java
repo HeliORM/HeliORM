@@ -19,32 +19,32 @@ public final class ByteFieldPart<O> extends NumberFieldPart<O, Byte> implements 
 
     @Override
     public Continuation<O> eq(Byte value) throws OrmException {
-        return new ValueExpressionPart<>(FieldType.BYTE, getThis(), ValueExpressionPart.Operator.EQ, value);
+        return new ValueExpressionPart<>(getThis(), ValueExpressionPart.Operator.EQ, value);
     }
 
     @Override
     public Continuation<O> notEq(Byte value) throws OrmException {
-        return new ValueExpressionPart<>(FieldType.BYTE, getThis(), ValueExpressionPart.Operator.NOT_EQ, value);
+        return new ValueExpressionPart<>(getThis(), ValueExpressionPart.Operator.NOT_EQ, value);
     }
 
     @Override
     public Continuation<O> lt(Byte value) throws OrmException {
-        return new ValueExpressionPart<>(FieldType.BYTE, getThis(), ValueExpressionPart.Operator.LT, value);
+        return new ValueExpressionPart<>(getThis(), ValueExpressionPart.Operator.LT, value);
     }
 
     @Override
     public Continuation<O> le(Byte value) throws OrmException {
-        return new ValueExpressionPart<>(FieldType.BYTE, getThis(), ValueExpressionPart.Operator.LE, value);
+        return new ValueExpressionPart<>(getThis(), ValueExpressionPart.Operator.LE, value);
     }
 
     @Override
     public Continuation<O> gt(Byte value) throws OrmException {
-        return new ValueExpressionPart<>(FieldType.BYTE, getThis(), ValueExpressionPart.Operator.GT, value);
+        return new ValueExpressionPart<>(getThis(), ValueExpressionPart.Operator.GT, value);
     }
 
     @Override
     public Continuation<O> ge(Byte value) throws OrmException {
-        return new ValueExpressionPart<>(FieldType.BYTE, getThis(), ValueExpressionPart.Operator.GE, value);
+        return new ValueExpressionPart<>(getThis(), ValueExpressionPart.Operator.GE, value);
     }
 
     @Override

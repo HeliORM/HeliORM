@@ -27,33 +27,33 @@ public final class DateFieldPart<O> extends FieldPart<O, Date> implements
 
     @Override
     public Continuation<O> eq(Date value) throws OrmException {
-        return new ValueExpressionPart<>(DATE, getThis(), ValueExpressionPart.Operator.EQ, value);
+        return new ValueExpressionPart<>(getThis(), ValueExpressionPart.Operator.EQ, value);
     }
 
     @Override
     public Continuation<O> notEq(Date value) throws OrmException {
-        return new ValueExpressionPart<>(DATE, getThis(), ValueExpressionPart.Operator.NOT_EQ, value);
+        return new ValueExpressionPart<>(getThis(), ValueExpressionPart.Operator.NOT_EQ, value);
     }
 
 
     @Override
     public Continuation<O> lt(Date value) throws OrmException {
-        return new ValueExpressionPart<>(DATE, getThis(), ValueExpressionPart.Operator.LT, value);
+        return new ValueExpressionPart<>(getThis(), ValueExpressionPart.Operator.LT, value);
     }
 
     @Override
     public Continuation<O> le(Date value) throws OrmException {
-        return new ValueExpressionPart<>(DATE, getThis(), ValueExpressionPart.Operator.LE, value);
+        return new ValueExpressionPart<>(getThis(), ValueExpressionPart.Operator.LE, value);
     }
 
     @Override
     public Continuation<O> gt(Date value) throws OrmException {
-        return new ValueExpressionPart<>(DATE, getThis(), ValueExpressionPart.Operator.GT, value);
+        return new ValueExpressionPart<>(getThis(), ValueExpressionPart.Operator.GT, value);
     }
 
     @Override
     public Continuation<O> ge(Date value) throws OrmException {
-        return new ValueExpressionPart<>(DATE, getThis(), ValueExpressionPart.Operator.GE, value);
+        return new ValueExpressionPart<>(getThis(), ValueExpressionPart.Operator.GE, value);
     }
 
     @Override

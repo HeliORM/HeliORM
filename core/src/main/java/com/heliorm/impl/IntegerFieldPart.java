@@ -22,33 +22,33 @@ public class IntegerFieldPart<O> extends NumberFieldPart<O, Integer> implements 
 
     @Override
     public Continuation<O> eq(Integer value) throws OrmException {
-        return new ValueExpressionPart<>(INTEGER,  getThis(), ValueExpressionPart.Operator.EQ, value);
+        return new ValueExpressionPart<>(getThis(), ValueExpressionPart.Operator.EQ, value);
     }
 
     @Override
     public Continuation<O> notEq(Integer value) throws OrmException {
-        return new ValueExpressionPart<>(INTEGER,  getThis(), ValueExpressionPart.Operator.NOT_EQ, value);
+        return new ValueExpressionPart<>(getThis(), ValueExpressionPart.Operator.NOT_EQ, value);
     }
 
 
     @Override
     public Continuation<O> lt(Integer value) throws OrmException {
-        return new ValueExpressionPart<>(INTEGER,  getThis(), ValueExpressionPart.Operator.LT, value);
+        return new ValueExpressionPart<>(getThis(), ValueExpressionPart.Operator.LT, value);
     }
 
     @Override
     public Continuation<O> le(Integer value) throws OrmException {
-        return new ValueExpressionPart<>(INTEGER,  getThis(), ValueExpressionPart.Operator.LE, value);
+        return new ValueExpressionPart<>(getThis(), ValueExpressionPart.Operator.LE, value);
     }
 
     @Override
     public Continuation<O> gt(Integer value) throws OrmException {
-        return new ValueExpressionPart<>(INTEGER,  getThis(), ValueExpressionPart.Operator.GT, value);
+        return new ValueExpressionPart<>(getThis(), ValueExpressionPart.Operator.GT, value);
     }
 
     @Override
     public Continuation<O> ge(Integer value) throws OrmException {
-        return new ValueExpressionPart<>(INTEGER,  getThis(), ValueExpressionPart.Operator.GE, value);
+        return new ValueExpressionPart<>(getThis(), ValueExpressionPart.Operator.GE, value);
     }
 
     @Override
