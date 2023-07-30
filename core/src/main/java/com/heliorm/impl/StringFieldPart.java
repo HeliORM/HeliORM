@@ -8,6 +8,8 @@ import com.heliorm.def.StringField;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.heliorm.Field.FieldType.STRING;
+
 /**
  * @author gideon
  */
@@ -20,58 +22,58 @@ public class StringFieldPart<O> extends FieldPart<O, String> implements
         WithIsPart<O, String> {
 
     public StringFieldPart(Table<O> table, String javaName) {
-        super(table, FieldType.STRING, String.class, javaName);
+        super(table, STRING, String.class, javaName);
     }
 
     @Override
     public Continuation<O> eq(String value) throws OrmException {
-        return new StringValueExpressionPart(getThis(), ValueExpressionPart.Operator.EQ, value);
+        return new ValueExpressionPart<>(STRING, getThis(), ValueExpressionPart.Operator.EQ, value);
     }
 
     @Override
     public Continuation<O> notEq(String value) throws OrmException {
-        return new StringValueExpressionPart(getThis(), ValueExpressionPart.Operator.NOT_EQ, value);
+        return new ValueExpressionPart<>(STRING, getThis(), ValueExpressionPart.Operator.NOT_EQ, value);
     }
 
 
     @Override
     public Continuation<O> lt(String value) throws OrmException {
-        return new StringValueExpressionPart(getThis(), ValueExpressionPart.Operator.LT, value);
+        return new ValueExpressionPart<>(STRING, getThis(), ValueExpressionPart.Operator.LT, value);
     }
 
     @Override
     public Continuation<O> le(String value) throws OrmException {
-        return new StringValueExpressionPart(getThis(), ValueExpressionPart.Operator.LE, value);
+        return new ValueExpressionPart<>(STRING, getThis(), ValueExpressionPart.Operator.LE, value);
     }
 
     @Override
     public Continuation<O> gt(String value) throws OrmException {
-        return new StringValueExpressionPart(getThis(), ValueExpressionPart.Operator.GT, value);
+        return new ValueExpressionPart<>(STRING, getThis(), ValueExpressionPart.Operator.GT, value);
     }
 
     @Override
     public Continuation<O> ge(String value) throws OrmException {
-        return new StringValueExpressionPart(getThis(), ValueExpressionPart.Operator.GE, value);
+        return new ValueExpressionPart<>(STRING, getThis(), ValueExpressionPart.Operator.GE, value);
     }
 
     @Override
     public Continuation<O> like(String value) throws OrmException {
-        return new StringValueExpressionPart(getThis(), ValueExpressionPart.Operator.LIKE, value);
+        return new ValueExpressionPart<>(STRING, getThis(), ValueExpressionPart.Operator.LIKE, value);
     }
 
     @Override
     public Continuation<O> notLike(String value) throws OrmException {
-        return new StringValueExpressionPart(getThis(), ValueExpressionPart.Operator.NOT_LIKE, value);
+        return new ValueExpressionPart<>(STRING, getThis(), ValueExpressionPart.Operator.NOT_LIKE, value);
     }
 
     @Override
     public Continuation<O> isNull() throws OrmException {
-        return new IsExpressionPart(getThis(), IsExpressionPart.Operator.IS_NULL);
+        return new IsExpressionPart<>(getThis(), IsExpressionPart.Operator.IS_NULL);
     }
 
     @Override
     public Continuation<O> isNotNull() throws OrmException {
-        return new IsExpressionPart(getThis(), IsExpressionPart.Operator.IS_NOT_NULL);
+        return new IsExpressionPart<>(getThis(), IsExpressionPart.Operator.IS_NOT_NULL);
     }
 
     @Override

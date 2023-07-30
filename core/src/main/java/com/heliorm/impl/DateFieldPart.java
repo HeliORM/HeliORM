@@ -9,6 +9,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import static com.heliorm.Field.FieldType.DATE;
+
 /**
  * @author gideon
  */
@@ -19,49 +21,49 @@ public final class DateFieldPart<O> extends FieldPart<O, Date> implements
         WithInPart<O, Date>, WithIsPart<O, Date> {
 
     public DateFieldPart(Table<O> table, String javaName) {
-        super(table, FieldType.DATE, Date.class, javaName);
+        super(table, DATE, Date.class, javaName);
     }
 
 
     @Override
     public Continuation<O> eq(Date value) throws OrmException {
-        return new DateValueExpressionPart(getThis(), ValueExpressionPart.Operator.EQ, value);
+        return new ValueExpressionPart<>(DATE, getThis(), ValueExpressionPart.Operator.EQ, value);
     }
 
     @Override
     public Continuation<O> notEq(Date value) throws OrmException {
-        return new DateValueExpressionPart(getThis(), ValueExpressionPart.Operator.NOT_EQ, value);
+        return new ValueExpressionPart<>(DATE, getThis(), ValueExpressionPart.Operator.NOT_EQ, value);
     }
 
 
     @Override
     public Continuation<O> lt(Date value) throws OrmException {
-        return new DateValueExpressionPart(getThis(), ValueExpressionPart.Operator.LT, value);
+        return new ValueExpressionPart<>(DATE, getThis(), ValueExpressionPart.Operator.LT, value);
     }
 
     @Override
     public Continuation<O> le(Date value) throws OrmException {
-        return new DateValueExpressionPart(getThis(), ValueExpressionPart.Operator.LE, value);
+        return new ValueExpressionPart<>(DATE, getThis(), ValueExpressionPart.Operator.LE, value);
     }
 
     @Override
     public Continuation<O> gt(Date value) throws OrmException {
-        return new DateValueExpressionPart(getThis(), ValueExpressionPart.Operator.GT, value);
+        return new ValueExpressionPart<>(DATE, getThis(), ValueExpressionPart.Operator.GT, value);
     }
 
     @Override
     public Continuation<O> ge(Date value) throws OrmException {
-        return new DateValueExpressionPart(getThis(), ValueExpressionPart.Operator.GE, value);
+        return new ValueExpressionPart<>(DATE, getThis(), ValueExpressionPart.Operator.GE, value);
     }
 
     @Override
     public Continuation<O> isNull() throws OrmException {
-        return new IsExpressionPart(getThis(), IsExpressionPart.Operator.IS_NULL);
+        return new IsExpressionPart<>(getThis(), IsExpressionPart.Operator.IS_NULL);
     }
 
     @Override
     public Continuation<O> isNotNull() throws OrmException {
-        return new IsExpressionPart(getThis(), IsExpressionPart.Operator.IS_NOT_NULL);
+        return new IsExpressionPart<>(getThis(), IsExpressionPart.Operator.IS_NOT_NULL);
     }
 
     @Override

@@ -9,29 +9,34 @@ import static java.lang.String.format;
  * @param <C> Type of the field
  * @author gideon
  */
-public abstract class ValueExpressionPart< O, C> extends ExpressionPart<O, C> {
+public final class ValueExpressionPart<O, C> extends ExpressionPart<O, C> {
 
     private final Field.FieldType dataType;
     private final Operator operator;
 
-    protected ValueExpressionPart(Field.FieldType dataType, FieldPart left, Operator op) {
+    private final C value;
+
+    ValueExpressionPart(Field.FieldType dataType, FieldPart<O, C> left, Operator op, C value) {
         super(Type.VALUE_EXPRESSION, left);
         this.dataType = dataType;
         this.operator = op;
+        this.value = value;
     }
 
-    public final Operator getOperator() {
+    public Operator getOperator() {
         return operator;
     }
 
-    public final Field.FieldType getDataType() {
+    public Field.FieldType getDataType() {
         return dataType;
     }
 
-    public abstract C getValue();
+    public C getValue() {
+        return value;
+    }
 
     @Override
-    public final String toString() {
+    public String toString() {
         return format("%s '%s'", operator.name(), getValue());
     }
 

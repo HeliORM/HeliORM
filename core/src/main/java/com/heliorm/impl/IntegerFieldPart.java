@@ -8,55 +8,57 @@ import com.heliorm.def.IntegerField;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.heliorm.Field.FieldType.INTEGER;
+
 /**
  * @author gideon
  */
 public class IntegerFieldPart<O> extends NumberFieldPart<O, Integer> implements IntegerField<O> {
 
     public IntegerFieldPart(Table<O> table, String javaName) {
-        super(table, FieldType.INTEGER, Integer.class, javaName);
+        super(table, INTEGER, Integer.class, javaName);
     }
 
 
     @Override
     public Continuation<O> eq(Integer value) throws OrmException {
-        return new IntegerValueExpressionPart((IntegerFieldPart) getThis(), ValueExpressionPart.Operator.EQ, value);
+        return new ValueExpressionPart<>(INTEGER,  getThis(), ValueExpressionPart.Operator.EQ, value);
     }
 
     @Override
     public Continuation<O> notEq(Integer value) throws OrmException {
-        return new IntegerValueExpressionPart((IntegerFieldPart) getThis(), ValueExpressionPart.Operator.NOT_EQ, value);
+        return new ValueExpressionPart<>(INTEGER,  getThis(), ValueExpressionPart.Operator.NOT_EQ, value);
     }
 
 
     @Override
     public Continuation<O> lt(Integer value) throws OrmException {
-        return new IntegerValueExpressionPart((IntegerFieldPart) getThis(), ValueExpressionPart.Operator.LT, value);
+        return new ValueExpressionPart<>(INTEGER,  getThis(), ValueExpressionPart.Operator.LT, value);
     }
 
     @Override
     public Continuation<O> le(Integer value) throws OrmException {
-        return new IntegerValueExpressionPart((IntegerFieldPart) getThis(), ValueExpressionPart.Operator.LE, value);
+        return new ValueExpressionPart<>(INTEGER,  getThis(), ValueExpressionPart.Operator.LE, value);
     }
 
     @Override
     public Continuation<O> gt(Integer value) throws OrmException {
-        return new IntegerValueExpressionPart((IntegerFieldPart) getThis(), ValueExpressionPart.Operator.GT, value);
+        return new ValueExpressionPart<>(INTEGER,  getThis(), ValueExpressionPart.Operator.GT, value);
     }
 
     @Override
     public Continuation<O> ge(Integer value) throws OrmException {
-        return new IntegerValueExpressionPart((IntegerFieldPart) getThis(), ValueExpressionPart.Operator.GE, value);
+        return new ValueExpressionPart<>(INTEGER,  getThis(), ValueExpressionPart.Operator.GE, value);
     }
 
     @Override
     public Continuation<O> isNull() throws OrmException {
-        return new IsExpressionPart(getThis(), IsExpressionPart.Operator.IS_NULL);
+        return new IsExpressionPart<>(getThis(), IsExpressionPart.Operator.IS_NULL);
     }
 
     @Override
     public Continuation<O> isNotNull() throws OrmException {
-        return new IsExpressionPart(getThis(), IsExpressionPart.Operator.IS_NOT_NULL);
+        return new IsExpressionPart<>(getThis(), IsExpressionPart.Operator.IS_NOT_NULL);
     }
 
     @Override

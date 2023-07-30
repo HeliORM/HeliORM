@@ -9,6 +9,8 @@ import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.heliorm.Field.FieldType.INSTANT;
+
 /**
  * @author gideon
  */
@@ -18,38 +20,38 @@ public final class InstantFieldPart<O> extends FieldPart<O, Instant> implements 
         WithInPart<O, Instant>, WithIsPart<O, Instant> {
 
     public InstantFieldPart(Table<O> table, String javaName) {
-        super(table, FieldType.INSTANT, Instant.class, javaName);
+        super(table, INSTANT, Instant.class, javaName);
     }
 
 
     @Override
     public Continuation<O> eq(Instant value) throws OrmException {
-        return new InstantValueExpressionPart<>((InstantFieldPart<O>) getThis(), ValueExpressionPart.Operator.EQ, value);
+        return new ValueExpressionPart<>(INSTANT, getThis(), ValueExpressionPart.Operator.EQ, value);
     }
 
     @Override
     public Continuation<O> notEq(Instant value) throws OrmException {
-        return new InstantValueExpressionPart<>((InstantFieldPart<O>) getThis(), ValueExpressionPart.Operator.NOT_EQ, value);
+        return new ValueExpressionPart<>(INSTANT,   getThis(), ValueExpressionPart.Operator.NOT_EQ, value);
     }
 
     @Override
     public Continuation<O> lt(Instant value) throws OrmException {
-        return new InstantValueExpressionPart<>((InstantFieldPart<O>) getThis(), ValueExpressionPart.Operator.LT, value);
+        return new ValueExpressionPart<>(INSTANT, getThis(), ValueExpressionPart.Operator.LT, value);
     }
 
     @Override
     public Continuation<O> le(Instant value) throws OrmException {
-        return new InstantValueExpressionPart<>((InstantFieldPart<O>) getThis(), ValueExpressionPart.Operator.LE, value);
+        return new ValueExpressionPart<>(INSTANT, getThis(), ValueExpressionPart.Operator.LE, value);
     }
 
     @Override
     public Continuation<O> gt(Instant value) throws OrmException {
-        return new InstantValueExpressionPart<>((InstantFieldPart<O>) getThis(), ValueExpressionPart.Operator.GT, value);
+        return new ValueExpressionPart<>(INSTANT, getThis(), ValueExpressionPart.Operator.GT, value);
     }
 
     @Override
     public Continuation<O> ge(Instant value) throws OrmException {
-        return new InstantValueExpressionPart<>((InstantFieldPart<O>) getThis(), ValueExpressionPart.Operator.GE, value);
+        return new ValueExpressionPart<>(INSTANT, getThis(), ValueExpressionPart.Operator.GE, value);
     }
 
     @Override

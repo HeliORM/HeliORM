@@ -19,43 +19,43 @@ public final class DoubleFieldPart<O> extends NumberFieldPart<O, Double> impleme
 
     @Override
     public Continuation<O> eq(Double value) throws OrmException {
-        return new DoubleValueExpressionPart((DoubleFieldPart) getThis(), ValueExpressionPart.Operator.EQ, value);
+        return new ValueExpressionPart<>(FieldType.DOUBLE, getThis(), ValueExpressionPart.Operator.EQ, value);
     }
 
     @Override
     public Continuation<O> notEq(Double value) throws OrmException {
-        return new DoubleValueExpressionPart((DoubleFieldPart) getThis(), ValueExpressionPart.Operator.NOT_EQ, value);
+        return new ValueExpressionPart<>(FieldType.DOUBLE, getThis(), ValueExpressionPart.Operator.NOT_EQ, value);
     }
 
 
     @Override
     public Continuation<O> lt(Double value) throws OrmException {
-        return new DoubleValueExpressionPart((DoubleFieldPart) getThis(), ValueExpressionPart.Operator.LT, value);
+        return new ValueExpressionPart<>(FieldType.DOUBLE, getThis(), ValueExpressionPart.Operator.LT, value);
     }
 
     @Override
     public Continuation<O> le(Double value) throws OrmException {
-        return new DoubleValueExpressionPart((DoubleFieldPart) getThis(), ValueExpressionPart.Operator.LE, value);
+        return new ValueExpressionPart<>(FieldType.DOUBLE, getThis(), ValueExpressionPart.Operator.LE, value);
     }
 
     @Override
     public Continuation<O> gt(Double value) throws OrmException {
-        return new DoubleValueExpressionPart((DoubleFieldPart) getThis(), ValueExpressionPart.Operator.GT, value);
+        return new ValueExpressionPart<>(FieldType.DOUBLE, getThis(), ValueExpressionPart.Operator.GT, value);
     }
 
     @Override
     public Continuation<O> ge(Double value) throws OrmException {
-        return new DoubleValueExpressionPart((DoubleFieldPart) getThis(), ValueExpressionPart.Operator.GE, value);
+        return new ValueExpressionPart<>(FieldType.DOUBLE, getThis(), ValueExpressionPart.Operator.GE, value);
     }
 
     @Override
     public Continuation<O> isNull() throws OrmException {
-        return new IsExpressionPart(getThis(), IsExpressionPart.Operator.IS_NULL);
+        return new IsExpressionPart<>(getThis(), IsExpressionPart.Operator.IS_NULL);
     }
 
     @Override
     public Continuation<O> isNotNull() throws OrmException {
-        return new IsExpressionPart(getThis(), IsExpressionPart.Operator.IS_NOT_NULL);
+        return new IsExpressionPart<>(getThis(), IsExpressionPart.Operator.IS_NOT_NULL);
     }
 
     @Override
