@@ -244,7 +244,7 @@ public final class SqlOrm implements Orm {
 
     @Override
     public <O> Select<O> select(Table<O> table, Where<O> where) {
-        return new SelectPart<>(selector(), table, Optional.of(where), Collections.emptyList());
+        return new SelectPart<>(selector(), table, where, Collections.emptyList());
     }
 
     @SafeVarargs
@@ -252,7 +252,7 @@ public final class SqlOrm implements Orm {
     public final <O> Select<O> select(Table<O> table, Join<O>... joins) {
         List<JoinPart<?, ?>> list = Arrays.stream(joins)
                 .map(join -> (JoinPart<?, ?>) join).collect(Collectors.toList());
-        return new SelectPart<>(selector(), table, Optional.empty(), list);
+        return new SelectPart<>(selector(), table, null, list);
     }
 
     @SafeVarargs
@@ -260,7 +260,7 @@ public final class SqlOrm implements Orm {
     public final <O> Select<O> select(Table<O> table, Where<O> where, Join<O>... joins) {
         List<JoinPart<?, ?>> list = Arrays.stream(joins)
                 .map(join -> (JoinPart<?, ?>) join).collect(Collectors.toList());
-        return new SelectPart<>(selector(), table, Optional.of(where), list);
+        return new SelectPart<>(selector(), table, where, list);
     }
 
     @Override

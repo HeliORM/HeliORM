@@ -65,13 +65,13 @@ class AbstractionHelper {
         Table<?> table = select.getTable();
         Set<Table<?>> subTables = table.getSubTables();
         if (subTables.isEmpty()) {
-            SelectPart selectPart = new SelectPart(select.getSelector(), select.getTable(), select.getWhere(), explode(select.getJoins()));
+            SelectPart selectPart = new SelectPart(select.getSelector(), select.getTable(), select.getWhere().orElse(null), explode(select.getJoins()));
             res.add(new OrderedPart(select.getSelector(), selectPart,
                     ordered.getOrder(), ordered.getLimit()));
         } else {
             for (Table<?> subTable : subTables) {
                 res.add(new OrderedPart(select.getSelector(),
-                        new SelectPart(select.getSelector(), subTable, select.getWhere(), explode(select.getJoins())),
+                        new SelectPart(select.getSelector(), subTable, select.getWhere().orElse(null), explode(select.getJoins())),
                         ordered.getOrder(), ordered.getLimit()));
             }
         }
@@ -83,10 +83,10 @@ class AbstractionHelper {
         Table<?> table = select.getTable();
         Set<Table<?>> subTables = table.getSubTables();
         if (subTables.isEmpty()) {
-            res.add(new SelectPart(select.getSelector(), select.getTable(), select.getWhere(), explode(select.getJoins()), select.getOrder(), select.getLimit()));
+            res.add(new SelectPart(select.getSelector(), select.getTable(), select.getWhere().orElse(null), explode(select.getJoins()), select.getOrder(), select.getLimit()));
         } else {
             for (Table<?> subTable : subTables) {
-                res.add(new SelectPart(select.getSelector(), subTable, select.getWhere(), explode(select.getJoins()), select.getOrder(), select.getLimit()));
+                res.add(new SelectPart(select.getSelector(), subTable, select.getWhere().orElse(null), explode(select.getJoins()), select.getOrder(), select.getLimit()));
             }
         }
         return res;
@@ -98,10 +98,10 @@ class AbstractionHelper {
             Table<?> table = join.getTable();
             Set<Table<?>> subTables = table.getSubTables();
             if (subTables.isEmpty()) {
-                res.add(new JoinPart(join.getTable(), join.getOn(), join.getWhere(), explode(join.getJoins())));
+                res.add(new JoinPart(join.getTable(), join.getOn(), join.getWhere().orElse(null), explode(join.getJoins())));
             } else {
                 for (Table<?> subTable : subTables) {
-                    res.add(new JoinPart(subTable, join.getOn(), join.getWhere(), explode(join.getJoins())));
+                    res.add(new JoinPart(subTable, join.getOn(), join.getWhere().orElse(null), explode(join.getJoins())));
                 }
             }
         }

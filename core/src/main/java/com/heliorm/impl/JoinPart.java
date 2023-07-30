@@ -14,10 +14,10 @@ public class JoinPart<LO, RO> implements Join<LO> {
 
     private final Table<RO> table;
     private final OnPart<LO, RO> on;
-    private final Optional<WherePart<RO>> where;
+    private final WherePart<RO> where;
     private final List<JoinPart<?, ?>> joins;
 
-    public JoinPart(Table<RO> table, OnPart<LO, RO> on, Optional<WherePart<RO>> where, List<JoinPart<RO, ?>> joins) {
+    public JoinPart(Table<RO> table, OnPart<LO, RO> on, WherePart<RO> where, List<JoinPart<RO, ?>> joins) {
         this.table = table;
         this.on = on;
         this.where = where;
@@ -33,7 +33,7 @@ public class JoinPart<LO, RO> implements Join<LO> {
     }
 
     public Optional<WherePart<RO>> getWhere() {
-        return where;
+        return Optional.ofNullable(where);
     }
 
     public List<JoinPart<?, ?>> getJoins() {

@@ -11,7 +11,7 @@ public class IsExpressionPart< O, C> extends ExpressionPart<O, C> {
 
     private final Operator operator;
 
-    public IsExpressionPart(FieldPart left, Operator op) {
+    public IsExpressionPart(FieldPart<O,C> left, Operator op) {
         super(Type.IS_EXPRESSION, left);
         this.operator = op;
     }
