@@ -132,9 +132,6 @@ class ResultSetHelper {
             if (value == null) {
                 return null;
             }
-            if (!(value instanceof Timestamp)) {
-                throw new OrmException(format("Could not read Timestamp value from SQL for field '%s'", column));
-            }
             return value.toInstant();
         } catch (SQLException ex) {
             throw new OrmException(format("Could not read timestamp value from SQL (%s)", ex.getMessage()), ex);
