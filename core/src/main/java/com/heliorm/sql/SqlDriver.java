@@ -53,7 +53,6 @@ public abstract class SqlDriver {
      * Set the driver to rollback or commit data on an un-committed auto-close
      * s
      *
-     * @param rollback
      */
     public final void setRollbackOnUncommittedClose(boolean rollback) {
         rollbackOnUncommittedClose = rollback;
@@ -71,7 +70,7 @@ public abstract class SqlDriver {
 
     protected abstract boolean supportsTransactions();
 
-    protected abstract String castNull(Field field) throws OrmException;
+    protected abstract String castNull(Field<?,?> field) throws OrmException;
 
     /**
      * Retrieve the returned key value from a result set (used for updating
@@ -148,7 +147,7 @@ public abstract class SqlDriver {
      * @param table The table we're referencing
      * @return The SQL table name
      */
-    protected final String tableName(Table table) throws OrmException {
+    protected final String tableName(Table table) {
         return makeTableName(table);
     }
 

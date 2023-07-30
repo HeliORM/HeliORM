@@ -19,11 +19,11 @@ import static java.lang.String.format;
  */
 public final class BeanPojoOperations extends AbstractPojoOperations {
 
-    public BeanPojoOperations() throws OrmException {
+    public BeanPojoOperations() {
     }
 
     @Override
-    public Object newPojoInstance(Class<?> type) throws OrmException {
+    public <O> O newPojoInstance(Class<O> type) throws OrmException {
         try {
             return type.getConstructor(new Class[]{}).newInstance();
         } catch (NoSuchMethodException e) {

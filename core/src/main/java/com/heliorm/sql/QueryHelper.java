@@ -1,6 +1,7 @@
 package com.heliorm.sql;
 
 import com.heliorm.Field;
+import com.heliorm.Field.FieldType;
 import com.heliorm.OrmException;
 import com.heliorm.Table;
 import com.heliorm.def.Where;
@@ -20,6 +21,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.StringJoiner;
@@ -39,10 +41,10 @@ final class QueryHelper {
     static final String POJO_NAME_FIELD = "pojo_field_name";
     private static final DateFormat dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
     private final SqlDriver driver;
-    private final Function<Field, String> getFieldId;
+    private final Function<Field<?,?>, String> getFieldId;
     private final FullTableName fullTableName;
 
-    QueryHelper(SqlDriver driver, Function<Field, String> getFieldId, FullTableName fullTableName) {
+    QueryHelper(SqlDriver driver, Function<Field<?,?>, String> getFieldId, FullTableName fullTableName) {
         this.driver = driver;
         this.getFieldId = getFieldId;
         this.fullTableName = fullTableName;
@@ -53,7 +55,7 @@ final class QueryHelper {
         query.append(format("INSERT INTO %s(", fullTableName.apply(table)));
         StringJoiner fields = new StringJoiner(",");
         StringJoiner values = new StringJoiner(",");
-        for (Field field : table.getFields()) {
+        for (Field<?,?> field : table.getFields()) {
             if (field.isPrimaryKey()) {
                 if (field.isAutoNumber()) {
                     if (field.getFieldType() != Field.FieldType.STRING) {
@@ -105,7 +107,7 @@ final class QueryHelper {
             fieldList.add(format("%s AS %s", driver.fullFieldName(root.getTable(), field), driver.virtualFieldName(getFieldId(field))));
         }
         tablesQuery.append(fieldList);
-        tablesQuery.append(format(" FROM %s", fullTableName.apply(root.getTable()), fullTableName.apply(root.getTable())));
+        tablesQuery.append(format(" FROM %s", fullTableName.apply(root.getTable())));
         StringBuilder whereQuery = new StringBuilder();
         Optional<? extends Where<?>> where = root.getSelect().getWhere();
         if (where.isPresent()) {
@@ -169,7 +171,7 @@ final class QueryHelper {
         }
         tablesQuery.append(format("SELECT %s", fieldsQuery));
         tablesQuery.append(format(",%s AS %s", driver.virtualValue(select.getTable().getObjectClass().getName()), driver.virtualFieldName(POJO_NAME_FIELD)));
-        tablesQuery.append(format(" FROM %s", fullTableName.apply(select.getTable()), fullTableName.apply(select.getTable())));
+        tablesQuery.append(format(" FROM %s", fullTableName.apply(select.getTable())));
         StringBuilder whereQuery = new StringBuilder();
         Optional<? extends Where<?>> where = select.getWhere();
         if (where.isPresent()) {
@@ -202,21 +204,21 @@ final class QueryHelper {
     }
 
     private String expandLinkWheres(JoinPart<?, ?> join) throws OrmException {
-        String query = "";
+        StringBuilder query = new StringBuilder();
         Optional<? extends WherePart<?>> where = join.getWhere();
         if (where.isPresent()) {
-            query = expandCriteria(join.getTable(), where.get());
+            query = new StringBuilder(expandCriteria(join.getTable(), where.get()));
         }
         for (JoinPart<?, ?> next : join.getJoins()) {
             String linkWheres = expandLinkWheres(next);
             if (!linkWheres.isEmpty()) {
-                if (!query.isEmpty()) {
-                    query = query + " AND ";
+                if (query.length() > 0) {
+                    query.append(" AND ");
                 }
-                query = query + linkWheres;
+                query.append(linkWheres);
             }
         }
-        return query;
+        return query.toString();
     }
 
     private String expandCriteria(Table<?> table, WherePart<?> where) throws OrmException {
@@ -239,14 +241,14 @@ final class QueryHelper {
         return query.toString();
     }
 
-    private String expandExpression(Table table, ExpressionPart expr) throws OrmException {
+    private String expandExpression(Table<?> table, ExpressionPart<?,?> expr) throws OrmException {
         switch (expr.getType()) {
             case LIST_EXPRESSION:
-                return expandListFieldCriteria(table, ((ListExpressionPart) expr));
+                return expandListFieldCriteria(table, ((ListExpressionPart<?,?>) expr));
             case VALUE_EXPRESSION:
-                return expandValueFieldCriteria(table, (ValueExpressionPart) expr);
+                return expandValueFieldCriteria(table, (ValueExpressionPart<?,?>) expr);
             case IS_EXPRESSION:
-                return expandIsFieldCriteria(table, (IsExpressionPart) expr);
+                return expandIsFieldCriteria(table, (IsExpressionPart<?,?>) expr);
             default:
                 throw new OrmException(format("Unknown expression type '%s'. BUG!", expr.getType()));
         }
@@ -275,9 +277,7 @@ final class QueryHelper {
     }
 
     private String expandIsFieldCriteria(Table table, IsExpressionPart crit) throws OrmException {
-        StringBuilder query = new StringBuilder();
-        query.append(format("%s%s", driver.fullFieldName(table, crit.getField()), isOperator(crit)));
-        return query.toString();
+        return format("%s%s", driver.fullFieldName(table, crit.getField()), isOperator(crit));
     }
 
     /**
@@ -319,12 +319,10 @@ final class QueryHelper {
     }
 
     private String sqlValue(Field field, Object object) {
-        switch (field.getFieldType()) {
-            case DATE:
-                return dateTimeFormat.format(object);
-            default:
-                return object.toString();
+        if (Objects.requireNonNull(field.getFieldType()) == FieldType.DATE) {
+            return dateTimeFormat.format(object);
         }
+        return object.toString();
     }
 
     /**
@@ -332,7 +330,6 @@ final class QueryHelper {
      *
      * @param part The part
      * @return The operator
-     * @throws OrmException
      */
     private String listOperator(ListExpressionPart part) throws OrmException {
         switch (part.getOperator()) {
@@ -350,7 +347,6 @@ final class QueryHelper {
      *
      * @param part The part
      * @return The operator
-     * @throws OrmException
      */
     private String valueOperator(ValueExpressionPart part) throws OrmException {
         switch (part.getOperator()) {

@@ -41,10 +41,8 @@ class AbstractionHelper {
      * Create a comparator based on the tail of the query that will compare
      * Pojos on their fields.
      *
-     * @param <O>
-     * @return
      */
-    <T extends Table<O>, O> Comparator<PojoCompare<O>> makeComparatorForTail(List<OrderPart<O>> order) {
+    <O> Comparator<PojoCompare<O>> makeComparatorForTail(List<OrderPart<O>> order) {
         List<Comparator<PojoCompare<O>>> comps = new LinkedList();
         for (OrderPart op : order) {
             comps.add((PojoCompare<O> w1, PojoCompare<O> w2) -> {

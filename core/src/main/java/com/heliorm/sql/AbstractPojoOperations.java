@@ -18,16 +18,16 @@ import static java.lang.String.format;
  */
 abstract class AbstractPojoOperations implements PojoOperations {
 
-    private final Map<Class<?>, Map<String, java.lang.reflect.Field>> fields = new WeakHashMap();
+    private final Map<Class<?>, Map<String, java.lang.reflect.Field>> fields = new WeakHashMap<>();
 
     protected AbstractPojoOperations() {
     }
 
     @Override
-    public final Object newPojoInstance(Table table) throws OrmException {
+    public final <O> O newPojoInstance(Table<O> table) throws OrmException {
         Class clazz = table.getObjectClass();
         try {
-            for (Constructor cons : clazz.getConstructors()) {
+            for (Constructor<O> cons : clazz.getConstructors()) {
                 if (cons.getParameterCount() == 0) {
                     return cons.newInstance();
                 }
@@ -188,7 +188,7 @@ abstract class AbstractPojoOperations implements PojoOperations {
 
     }
 
-    protected abstract Object newPojoInstance(Class<?> type) throws OrmException;
+    protected abstract <O> O newPojoInstance(Class<O> type) throws OrmException;
 
     /**
      * Recursively find the reflected field or the given field name on the given

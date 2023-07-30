@@ -23,7 +23,7 @@ public class SqlOrmBuilder {
 
     private final Supplier<Connection> con;
     private final Class<? extends SqlDriver> driverClass;
-    private final Map<Database, String> databases = new HashMap();
+    private final Map<Database, String> databases = new HashMap<>();
     private PojoOperations pops;
     private boolean rollbackOnUncommittedClose = false;
     private boolean createMissingTables = false;
@@ -115,7 +115,7 @@ public class SqlOrmBuilder {
      * @throws OrmException Thrown if there is an error building the ORM
      */
     public Orm build() throws OrmException {
-        Map<Database, Database> aliases = new HashMap();
+        Map<Database, Database> aliases = new HashMap<>();
         for (Database database : databases.keySet()) {
             aliases.put(database, new AliasDatabase(database, databases.get(database)));
         }

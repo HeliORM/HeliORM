@@ -333,9 +333,9 @@ final class UnsafePojoOperations extends AbstractPojoOperations {
     }
 
     @Override
-    protected Object newPojoInstance(Class<?> type) throws OrmException {
+    protected <O> O newPojoInstance(Class<O> type) throws OrmException {
         try {
-            return unsafe.allocateInstance(type);
+            return (O) unsafe.allocateInstance(type);
         } catch (InstantiationException ex) {
             throw new OrmException(ex.getMessage(), ex);
         }

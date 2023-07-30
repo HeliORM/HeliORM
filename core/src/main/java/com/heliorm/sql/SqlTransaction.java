@@ -25,7 +25,6 @@ final class SqlTransaction implements OrmTransaction, AutoCloseable {
      *
      * @param driver     The driver for this transaction
      * @param connection the SQL Connection for this transaction
-     * @throws OrmTransactionException
      */
     SqlTransaction(SqlDriver driver, Connection connection) throws OrmTransactionException {
         this.driver = driver;
@@ -42,7 +41,7 @@ final class SqlTransaction implements OrmTransaction, AutoCloseable {
     public void commit() throws OrmException {
         try {
             if (!open) {
-                throw new OrmTransactionException(format("Cannot commit an already committed or rolled back SQL transaction"));
+                throw new OrmTransactionException("Cannot commit an already committed or rolled back SQL transaction");
             }
             connection.commit();
             open = false;
@@ -56,7 +55,7 @@ final class SqlTransaction implements OrmTransaction, AutoCloseable {
     public void rollback() throws OrmException {
         try {
             if (!open) {
-                throw new OrmTransactionException(format("Cannot commit an already committed or rolled back SQL transaction"));
+                throw new OrmTransactionException("Cannot commit an already committed or rolled back SQL transaction");
             }
             connection.rollback();
             open = false;
