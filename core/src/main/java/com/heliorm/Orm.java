@@ -7,15 +7,28 @@ import com.heliorm.impl.Selector;
 
 public interface Orm extends AutoCloseable {
 
-    /**
-     * Persist a new POJO to the database.
+    /** Create a new (uncommitted) instance of the given type of POJO
      *
-     * @param <O>  The type of the POJO
-     * @param pojo The POJO to persist
-     * @return The updated POJO
-     * @throws OrmException Thrown if there is an error creating the POJO
+     * @param table The table for the POJO
+     * @return The new POJO
+     * @param <O> The type of the POJO
      */
-    <O> O create(O pojo) throws OrmException;
+    <O> Builder<O> create(Table<O> table) throws OrmException;
+
+    <O> Builder<O> createCopy(O pojo) throws OrmException;
+
+    <O> Builder<O> updateCopy(O pojo) throws OrmException;
+
+
+    /**
+         * Persist a new POJO to the database.
+         *
+         * @param <O>  The type of the POJO
+         * @param pojo The POJO to persist
+         * @return The updated POJO
+         * @throws OrmException Thrown if there is an error creating the POJO
+         */
+            <O> O create(O pojo) throws OrmException;
 
     /**
      * Persist an existing POJO to the database.

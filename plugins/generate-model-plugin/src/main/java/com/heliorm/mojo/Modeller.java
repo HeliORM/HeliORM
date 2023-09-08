@@ -65,12 +65,17 @@ class Modeller<T extends Table> {
         List<Entry> root = new ArrayList<>();
         for (String name : entryMap.keySet()) {
             Entry entry = entryMap.get(name);
-            Class<?> superClass = entry.clazz.getSuperclass();
-            String parentName = superClass.getName();
-            if (entryMap.containsKey(parentName)) {
-                Entry parentEntry = entryMap.get(parentName);
-                parentEntry.add(entry);
-            } else {
+            if (!entry.clazz.isInterface()) {
+                Class<?> superClass = entry.clazz.getSuperclass();
+                String parentName = superClass.getName();
+                if (entryMap.containsKey(parentName)) {
+                    Entry parentEntry = entryMap.get(parentName);
+                    parentEntry.add(entry);
+                } else {
+                    root.add(entry);
+                }
+            }
+            else {
                 root.add(entry);
             }
         }

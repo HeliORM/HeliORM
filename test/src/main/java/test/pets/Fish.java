@@ -3,7 +3,7 @@ package test.pets;
 import com.heliorm.annotation.Pojo;
 
 @Pojo
-public class Fish extends Pet {
+public interface Fish extends Pet {
 
 
 }

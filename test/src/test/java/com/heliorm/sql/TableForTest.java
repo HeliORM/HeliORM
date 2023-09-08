@@ -20,6 +20,7 @@ import static com.heliorm.sql.TestData.makeProvinces;
 import static com.heliorm.sql.TestData.makeTowns;
 import static java.lang.String.format;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static test.Tables.CAT;
 
 public class TableForTest extends AbstractOrmTest {
 
@@ -32,11 +33,11 @@ public class TableForTest extends AbstractOrmTest {
 
     @BeforeAll
     public static void setupData() throws OrmException {
-        provinces = createAll(makeProvinces());
-        towns = createAll(makeTowns(provinces));
-        persons = createAll(makePersons(towns));
-        catBreeds = createAll(makeCatBreeds());
-        cats = createAll(makeCats(persons.size() * 5, persons, catBreeds));
+        provinces = createAll(makeProvinces(orm()));
+        towns = createAll(makeTowns(orm(), provinces));
+        persons = createAll(makePersons(orm(), towns));
+        catBreeds = createAll(makeCatBreeds(orm()));
+        cats = createAll(makeCats(orm(),persons.size() * 5, persons, catBreeds));
     }
 
     @AfterAll
@@ -57,7 +58,7 @@ public class TableForTest extends AbstractOrmTest {
     @Test
     public void testTableForObject() throws Exception {
         say("Testing tableFor for object");
-        List<?> all = orm().select(orm().tableFor(new Cat())).list();
+        List<?> all = orm().select(orm().tableFor(orm().create(CAT))).list();
         assertTrue(all.stream().filter(o -> o instanceof Cat).count() == all.size(), format("All the objects loaded are of type cat (%d)", all.size()));
     }
 }

@@ -36,10 +36,10 @@ public class CrudTest extends AbstractOrmTest {
 
     @BeforeAll
     public static void setupData() throws OrmException {
-        List<Province> provinces = createAll(makeProvinces());
-        List<Town> towns = createAll(makeTowns(provinces));
-        persons = createAll(makePersons(towns));
-        catBreeds = createAll(makeCatBreeds());
+        List<Province> provinces = createAll(makeProvinces(orm()));
+        List<Town> towns = createAll(makeTowns(orm(), provinces));
+        persons = createAll(makePersons(orm(), towns));
+        catBreeds = createAll(makeCatBreeds(orm()));
     }
 
     @AfterAll
@@ -53,23 +53,25 @@ public class CrudTest extends AbstractOrmTest {
     @Test
     public void testCreate() throws Exception {
         say("Testing create with auto-number Long key");
-        Person person = orm().select(PERSON, where(PERSON.id.eq(persons.get(0).getId()))).one();
-        Cat cat = makeCat(person, catBreeds.get(0));
+        Person person = orm().select(PERSON, where(PERSON.id.eq(persons.get(0).id()))).one();
+        Cat cat = makeCat(orm(), person, catBreeds.get(0));
         Cat saved = orm().create(cat);
         cats.add(saved);
         assertNotNull(saved, "The object returned by create should not be null");
-        assertNull(cat.getId(), "The id of the new object must be null before create");
-        assertNotNull(saved.getId(), "The id of the new object must be not-null after create");
+        assertNull(cat.id(), "The id of the new object must be null before create");
+        assertNotNull(saved.id(), "The id of the new object must be not-null after create");
         assertTrue(pojoCompareExcludingKey(cat, saved), "The new and created objects must be the same apart from the key");
     }
 
     @Test
     public void testUpdate() throws Exception {
         say("Testing update with auto-number Long key");
-        Long id = persons.get(0).getId();
+        Long id = persons.get(0).id();
         Person person = orm().select(PERSON, where(PERSON.id.eq(id))).one();
-        person.setFirstName(person.getFirstName() == null ? "Bob" : person.getFirstName().toUpperCase());
-        person.setLastName(person.getLastName() == null ? "Smith" : person.getLastName().toLowerCase());
+        person = orm().updateCopy(person)
+                .with(PERSON.lastName, person.lastName() == null ? "Bob" : person.firstName().toUpperCase())
+                .with(PERSON.lastName, person.lastName() == null ? "Smith" : person.firstName().toLowerCase())
+                .build();
         Person updated = orm().update(person);
         Person loaded = orm().select(PERSON, where(PERSON.id.eq(id))).one();
         assertNotNull(updated, "The object returned by update should not be null");
@@ -81,7 +83,7 @@ public class CrudTest extends AbstractOrmTest {
     @Test
     public void testUpdateWithNoChange() throws Exception {
         say("Testing update with auto-number Long key where nothing changes");
-        Long id = persons.get(0).getId();
+        Long id = persons.get(0).id();
         Person person = orm().select(PERSON, where(PERSON.id.eq(id))).one();
         Person updated = orm().update(person);
         Person loaded = orm().select(PERSON, where(PERSON.id.eq(id))).one();
@@ -94,12 +96,14 @@ public class CrudTest extends AbstractOrmTest {
     @Test
     public void testUpdateWithNullKey() throws Exception {
         say("Testing update with null key");
-        Long id = persons.get(0).getId();
+        Long id = persons.get(0).id();
         Person person = orm().select(PERSON, where(PERSON.id.eq(id))).one();
-        person.setId(null);
+        person = orm().updateCopy(person)
+                .with(PERSON.id, null)
+                .build();
         boolean failed = false;
         try {
-           orm().update(person);
+            orm().update(person);
         } catch (OrmException ex) {
             failed = true;
         }
@@ -109,10 +113,12 @@ public class CrudTest extends AbstractOrmTest {
     @Test
     public void testUpdateWithBadKey() throws Exception {
         say("Testing update with bad key");
-        Long id = persons.get(0).getId();
+        Long id = persons.get(0).id();
         Person person = orm().select(PERSON, where(PERSON.id.eq(id))).one();
         Long newKey = 10000000L;
-        person.setId(newKey);
+        person = orm().updateCopy(person)
+                .with(PERSON.id, newKey)
+                .build();
         boolean failed = false;
         try {
             orm().update(person);
@@ -128,7 +134,7 @@ public class CrudTest extends AbstractOrmTest {
         say("Testing delete with Long key");
         Cat cat = cats.remove(0);
         orm().delete(cat);
-        Optional<Cat> opt = orm().select(CAT, where(CAT.id.eq(cat.getId()))).optional();
+        Optional<Cat> opt = orm().select(CAT, where(CAT.id.eq(cat.id()))).optional();
         assertFalse(opt.isPresent(), "No object for delete id must be in the database");
     }
 }

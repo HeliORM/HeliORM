@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
  * @author gideon
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.FIELD)
+@Target({ElementType.FIELD, ElementType.METHOD})
 public @interface Column {
 
     /**

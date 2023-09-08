@@ -24,8 +24,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class AutoNumberTest extends AbstractOrmTest {
 
-    private static final int MAX_PERSONS = 3;
-
     private static List<Province> provinces;
     private static List<Town> towns;
     private static List<Person> persons;
@@ -34,10 +32,10 @@ public class AutoNumberTest extends AbstractOrmTest {
 
     @BeforeAll
     public static void setupData() throws OrmException {
-        catBreeds = createAll(makeCatBreeds());
-        provinces = createAll(makeProvinces());
-        towns = createAll(makeTowns(provinces));
-        persons = createAll(makePersons(towns));
+        catBreeds = createAll(makeCatBreeds(orm()));
+        provinces = createAll(makeProvinces(orm()));
+        towns = createAll(makeTowns(orm(), provinces));
+        persons = createAll(makePersons(orm(), towns));
     }
 
     @AfterAll
@@ -65,12 +63,12 @@ public class AutoNumberTest extends AbstractOrmTest {
     public void testCreateWithLongKey() throws Exception {
         say("Testing create with auto-number Long key");
         Person person = persons.get(0);
-        Cat cat = makeCat(person, catBreeds.get(0));
+        Cat cat = makeCat(orm(), person, catBreeds.get(0));
         Cat saved = orm().create(cat);
         cats.add(saved);
         assertNotNull(saved, "The object returned by create should not be null");
-        assertTrue(cat.getId() == null, "The id of the new object must be null before create");
-        assertTrue(saved.getId() != null, "The id of the new object must be not-null after create");
+        assertTrue(cat.id() == null, "The id of the new object must be null before create");
+        assertTrue(saved.id() != null, "The id of the new object must be not-null after create");
         assertTrue(pojoCompareExcludingKey(cat, saved), "The new and created objects must be the same apart from the key");
     }
 }

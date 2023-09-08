@@ -15,60 +15,18 @@ import java.util.Date;
 @Pojo
 @Index(columns = {"name", "age"}, unique = false)
 @Index(columns = {"personId"}, unique = false)
-public abstract class Pet {
+public interface Pet {
 
     @PrimaryKey(autoIncrement = true)
-    private Long id;
+    Long id();
 
     @ForeignKey(pojo = Person.class)
-    private Long personId;
+    Long personId();
+
     @Column(length = 32)
-    private String name;
-    private int age;
-    private Date birthday;
+    String name();
 
-    public Long getPersonId() {
-        return personId;
-    }
+    int age();
+    Date birthday();
 
-    public void setPersonId(Long personId) {
-        this.personId = personId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getAge() {
-        return age;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
-    }
-
-    @Override
-    public String toString() {
-        return "" + getClass().getSimpleName() + "{" + "name=" + name + ", age=" + age + '}';
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Date getBirthday() {
-        return birthday;
-    }
-
-    public void setBirthday(Date birthday) {
-        this.birthday = birthday;
-    }
 }

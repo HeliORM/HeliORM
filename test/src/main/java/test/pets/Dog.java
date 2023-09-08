@@ -6,7 +6,7 @@ import com.heliorm.annotation.Pojo;
  * @author gideon
  */
 @Pojo
-public class Dog extends Mamal {
+public interface Dog extends Mamal {
 
 
 }

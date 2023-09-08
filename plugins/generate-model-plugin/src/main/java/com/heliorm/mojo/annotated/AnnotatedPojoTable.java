@@ -22,7 +22,7 @@ import java.util.Set;
  *
  * @author gideon
  */
-public final class AnnotatedPojoTable implements Table {
+public abstract class AnnotatedPojoTable implements Table {
 
     private final Database database;
     private final Class<?> pojoClass;
@@ -152,7 +152,7 @@ public final class AnnotatedPojoTable implements Table {
     private <T extends Annotation> List<T> getAnnotations(Class<T> annotationClass) {
         Class<?> target = pojoClass;
         List<T> annotations = new ArrayList<>();
-        while (!Object.class.equals(target)) {
+        while (target != null && !Object.class.equals(target)) {
             T[] found = target.getAnnotationsByType(annotationClass);
             annotations.addAll(Arrays.asList(found));
             target = target.getSuperclass();
@@ -174,6 +174,7 @@ public final class AnnotatedPojoTable implements Table {
         }
         res.addAll(Arrays.asList(clazz.getDeclaredFields()));
         return res;
+
     }
 
     private Set<Table> unrollSubTables(Set<AnnotatedPojoTable> subs) {

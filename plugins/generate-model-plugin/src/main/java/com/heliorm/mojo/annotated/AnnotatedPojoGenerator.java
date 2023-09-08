@@ -51,7 +51,10 @@ public class AnnotatedPojoGenerator implements Generator<AnnotatedPojoTable> {
 
     @Override
     public AnnotatedPojoTable getPojoModel(Class clazz, Database database, Set<AnnotatedPojoTable> subTables) {
-        return new AnnotatedPojoTable(database, clazz, subTables);
+        if (clazz.isInterface()) {
+            return new AnnotatedPojoInterfaceTable( database, clazz, subTables);
+        }
+        return new AnnotatedPojoClassTable(database, clazz, subTables);
     }
 
     /**

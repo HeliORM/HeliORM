@@ -71,13 +71,13 @@ public class SelectTest extends AbstractOrmTest {
 
     @BeforeAll
     public static void setupData() throws OrmException {
-        provinces = createAll(makeProvinces());
-        towns = createAll(makeTowns(provinces));
-        persons = createAll(makePersons(towns));
-        catBreeds = createAll(makeCatBreeds());
-        cats = createAll(makeCats(persons.size() * 5, persons, catBreeds));
-        dogs = createAll(makeDogs(persons.size() * 4, persons));
-        birds = createAll(makeBirds(persons.size() * 2, persons));
+        provinces = createAll(makeProvinces(orm()));
+        towns = createAll(makeTowns(orm(), provinces));
+        persons = createAll(makePersons(orm(), towns));
+        catBreeds = createAll(makeCatBreeds(orm()));
+        cats = createAll(makeCats(orm(), persons.size() * 5, persons, catBreeds));
+        dogs = createAll(makeDogs(orm(), persons.size() * 4, persons));
+        birds = createAll(makeBirds(orm(),persons.size() * 2, persons));
     }
 
     @AfterAll
@@ -110,7 +110,7 @@ public class SelectTest extends AbstractOrmTest {
     public void testSelectWhereEq() throws Exception {
         say("Testing select with a simple where x = y clause");
         List<Cat> wanted = cats.stream()
-                .filter(cat -> cat.getAge() == 5)
+                .filter(cat -> cat.age() == 5)
                 .collect(Collectors.toList());
         List<Cat> all = orm().select(CAT, where(CAT.age.eq(5))).list();
         check(all, wanted);
@@ -121,7 +121,7 @@ public class SelectTest extends AbstractOrmTest {
     public void testSelectWhereNotEq() throws Exception {
         say("Testing select with a simple where x != y clause");
         List<Cat> wanted = cats.stream()
-                .filter(cat -> cat.getAge() != 5)
+                .filter(cat -> cat.age() != 5)
                 .collect(Collectors.toList());
         List<Cat> all = orm().select(CAT, where(CAT.age.notEq(5)))
                 .list();
@@ -133,7 +133,7 @@ public class SelectTest extends AbstractOrmTest {
     public void testSelectWhereLt() throws Exception {
         say("Testing select with a simple where x < y clause");
         List<Cat> wanted = cats.stream()
-                .filter(cat -> cat.getAge() < 5)
+                .filter(cat -> cat.age() < 5)
                 .collect(Collectors.toList());
         List<Cat> all = orm().select(CAT, where(CAT.age.lt(5)))
                 .list();
@@ -145,7 +145,7 @@ public class SelectTest extends AbstractOrmTest {
     public void testSelectWhereGt() throws Exception {
         say("Testing select with a simple where x > y clause");
         List<Cat> wanted = cats.stream()
-                .filter(cat -> cat.getAge() > 5)
+                .filter(cat -> cat.age() > 5)
                 .collect(Collectors.toList());
         List<Cat> all = orm().select(CAT, where(CAT.age.gt(5)))
                 .list();
@@ -157,7 +157,7 @@ public class SelectTest extends AbstractOrmTest {
     public void testSelectWhereLe() throws Exception {
         say("Testing select with a simple where x <= y clause");
         List<Cat> wanted = cats.stream()
-                .filter(cat -> cat.getAge() <= 5)
+                .filter(cat -> cat.age() <= 5)
                 .collect(Collectors.toList());
         List<Cat> all = orm().select(CAT, where(CAT.age.le(5)))
                 .list();
@@ -169,7 +169,7 @@ public class SelectTest extends AbstractOrmTest {
     public void testSelectWhereGe() throws Exception {
         say("Testing select with a simple where x >= y clause");
         List<Cat> wanted = cats.stream()
-                .filter(cat -> cat.getAge() >= 5)
+                .filter(cat -> cat.age() >= 5)
                 .collect(Collectors.toList());
         List<Cat> all = orm().select(CAT, where(CAT.age.ge(5)))
                 .list();
@@ -182,7 +182,7 @@ public class SelectTest extends AbstractOrmTest {
         say("Testing select with a simple where x in (a,b,c) clause");
         List<Integer> ages = Arrays.asList(4, 5, 6);
         List<Cat> wanted = cats.stream()
-                .filter(cat -> ages.contains(cat.getAge()))
+                .filter(cat -> ages.contains(cat.age()))
                 .collect(Collectors.toList());
         List<Cat> all = orm().select(CAT, where(CAT.age.in(ages)))
                 .list();
@@ -195,7 +195,7 @@ public class SelectTest extends AbstractOrmTest {
         say("Testing select with a simple where x not in (a,b,c) clause");
         List<Integer> ages = Arrays.asList(4, 5, 6);
         List<Cat> wanted = cats.stream()
-                .filter(cat -> !ages.contains(cat.getAge()))
+                .filter(cat -> !ages.contains(cat.age()))
                 .collect(Collectors.toList());
         List<Cat> all = orm().select(CAT, where(CAT.age.notIn(ages)))
                 .list();
@@ -207,7 +207,7 @@ public class SelectTest extends AbstractOrmTest {
     public void testSelectWhereLike() throws Exception {
         say("Testing select with a simple where x like a clause");
         List<Cat> wanted = cats.stream()
-                .filter(cat -> cat.getName().startsWith("M"))
+                .filter(cat -> cat.name().startsWith("M"))
                 .collect(Collectors.toList());
         List<Cat> all = orm().select(CAT, where(CAT.name.like("M%")))
                 .list();
@@ -219,7 +219,7 @@ public class SelectTest extends AbstractOrmTest {
     public void testSelectWhereNotLike() throws Exception {
         say("Testing select with a simple where x not like a clause");
         List<Cat> wanted = cats.stream()
-                .filter(cat -> !cat.getName().startsWith("M"))
+                .filter(cat -> !cat.name().startsWith("M"))
                 .collect(Collectors.toList());
         List<Cat> all = orm().select(CAT, where(CAT.name.notLike("M%")))
                 .list();
@@ -231,7 +231,7 @@ public class SelectTest extends AbstractOrmTest {
     public void testSelectWhereOrWithOneField() throws Exception {
         say("Testing select with a simple where clause with or over one field");
         List<Cat> wanted = cats.stream()
-                .filter(cat -> (cat.getAge() == 5) || (cat.getAge() == 10))
+                .filter(cat -> (cat.age() == 5) || (cat.age() == 10))
                 .collect(Collectors.toList());
         List<Cat> all = orm().select(CAT,
                         where(CAT.age.eq(5)).or(CAT.age.eq(10)))
@@ -244,8 +244,8 @@ public class SelectTest extends AbstractOrmTest {
     public void testSelectWhereAndWithRange() throws Exception {
         say("Testing select with a simple where clause with and over one field");
         List<Cat> wanted = cats.stream()
-                .filter(cat -> cat.getAge() > 5)
-                .filter(cat -> cat.getAge() < 10)
+                .filter(cat -> cat.age() > 5)
+                .filter(cat -> cat.age() < 10)
                 .collect(Collectors.toList());
         List<Cat> all = orm().select(CAT,
                         where(CAT.age.gt(5))
@@ -261,8 +261,8 @@ public class SelectTest extends AbstractOrmTest {
     public void testSelectWhereAndWithTwoFields() throws Exception {
         say("Testing select with a simple where clause with and over two fields");
         List<Cat> wanted = cats.stream()
-                .filter(cat -> cat.getAge() < 5)
-                .filter(cat -> cat.getType().equals(CatType.INDOOR))
+                .filter(cat -> cat.age() < 5)
+                .filter(cat -> cat.type().equals(CatType.INDOOR))
                 .collect(Collectors.toList());
         List<Cat> all = orm().select(CAT,
                         where(CAT.age.lt(5)).and(CAT.type.eq(CatType.INDOOR)))
@@ -271,13 +271,12 @@ public class SelectTest extends AbstractOrmTest {
         assertEquals(all.size(), wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
         assertTrue(listCompareOrdered(all, wanted), "The items loaded are exactly the same as the ones we expected");
     }
-
     @Test
     @Order(150)
     public void testSelectWhereOrWithOneFieldRange() throws Exception {
         say("Testing select with a where clause with or");
         List<Cat> wanted = cats.stream()
-                .filter(cat -> cat.getAge() < 5 || cat.getAge() > 10)
+                .filter(cat -> cat.age() < 5 || cat.age() > 10)
                 .collect(Collectors.toList());
         List<Cat> all = orm().select(CAT, where(CAT.age.lt(5)).or(CAT.age.gt(10)))
                 .list();
@@ -291,7 +290,7 @@ public class SelectTest extends AbstractOrmTest {
     public void testSelectWhereOrTwoFields() throws Exception {
         say("Testing select with a where clause with or on two fields");
         List<Cat> wanted = cats.stream()
-                .filter(cat -> cat.getAge() < 5 || cat.getType().equals(CatType.OUTDOOR))
+                .filter(cat -> cat.age() < 5 || cat.type().equals(CatType.OUTDOOR))
                 .collect(Collectors.toList());
         List<Cat> all = orm().select(CAT, where(CAT.age.lt(5)).or(CAT.type.eq(CatType.OUTDOOR)))
                 .list();
@@ -305,7 +304,7 @@ public class SelectTest extends AbstractOrmTest {
     public void testSelectWhereAndTwoFields() throws Exception {
         say("Testing select with a where clause with and on two fields");
         List<Cat> wanted = cats.stream()
-                .filter(cat -> cat.getAge() < 5 && cat.getType().equals(CatType.OUTDOOR))
+                .filter(cat -> cat.age() < 5 && cat.type().equals(CatType.OUTDOOR))
                 .collect(Collectors.toList());
         List<Cat> all = orm().select(CAT, where(CAT.age.lt(5)).and(CAT.type.eq(CatType.OUTDOOR)))
                 .list();
@@ -322,7 +321,7 @@ public class SelectTest extends AbstractOrmTest {
         cal.add(Calendar.YEAR, -5);
         Date then = cal.getTime();
         List<Cat> wanted = cats.stream()
-                .filter(cat -> cat.getBirthday().before(then))
+                .filter(cat -> cat.birthday().before(then))
                 .collect(Collectors.toList());
         List<Cat> all = orm().select(CAT, where(CAT.birthday.lt(then)))
                 .list();
@@ -340,7 +339,7 @@ public class SelectTest extends AbstractOrmTest {
         cal.add(Calendar.YEAR, -5);
         Date then = cal.getTime();
         List<Cat> wanted = cats.stream()
-                .filter(cat -> cat.getBirthday().after(then) && cat.getBirthday().before(today))
+                .filter(cat -> cat.birthday().after(then) && cat.birthday().before(today))
                 .collect(Collectors.toList());
         List<Cat> all = orm().select(CAT, where(CAT.birthday.gt(then)).and(CAT.birthday.lt(today)))
                 .list();
@@ -354,7 +353,7 @@ public class SelectTest extends AbstractOrmTest {
     public void testSelectOrder() throws Exception {
         say("Testing select with a simple ordering");
         List<Town> wanted = towns.stream()
-                .sorted(Comparator.comparing(Town::getName))
+                .sorted(Comparator.comparing(Town::name))
                 .collect(Collectors.toList());
         List<Town> all = orm().select(TOWN)
                 .orderBy(TOWN.name)
@@ -369,10 +368,10 @@ public class SelectTest extends AbstractOrmTest {
     public void testSelectOrderDesc() throws Exception {
         say("Testing select with a descending ordering");
         List<Cat> wanted = cats.stream()
-                .sorted(Comparator.comparing(Cat::getName)
-                        .thenComparing(Cat::getAge)
-                        .thenComparing(Cat::getType)
-                        .thenComparing(Cat::getPersonId)
+                .sorted(Comparator.comparing(Cat::name)
+                        .thenComparing(Cat::age)
+                        .thenComparing(Cat::type)
+                        .thenComparing(Cat::personId)
                         .reversed())
                 .collect(Collectors.toList());
         List<Cat> all = orm().select(CAT)
@@ -388,10 +387,10 @@ public class SelectTest extends AbstractOrmTest {
     public void testSelectOrderThen() throws Exception {
         say("Testing select with a complex ordering");
         List<Cat> wanted = cats.stream()
-                .sorted(Comparator.comparing(Cat::getAge)
-                        .thenComparing(Cat::getName)
-                        .thenComparing(Cat::getPersonId)
-                        .thenComparing(Cat::getId))
+                .sorted(Comparator.comparing(Cat::age)
+                        .thenComparing(Cat::name)
+                        .thenComparing(Cat::personId)
+                        .thenComparing(Cat::id))
                 .collect(Collectors.toList());
         List<Cat> all = orm().select(CAT)
                 .orderBy(CAT.age, CAT.name, CAT.personId, CAT.id)
@@ -418,7 +417,7 @@ public class SelectTest extends AbstractOrmTest {
     public void testSelectOrderWithLimit() throws Exception {
         say("Testing select with a order and limit");
         List<Town> wanted = towns.stream()
-                .sorted(Comparator.comparing(Town::getName))
+                .sorted(Comparator.comparing(Town::name))
                 .limit(2)
                 .collect(Collectors.toList());
         List<Town> all = orm().select(TOWN)
@@ -437,7 +436,7 @@ public class SelectTest extends AbstractOrmTest {
         int batchSize = 10;
         AtomicInteger counter = new AtomicInteger();
         Map<Integer, List<Cat>> wanted = cats.stream()
-                .sorted(Comparator.comparing(Cat::getId))
+                .sorted(Comparator.comparing(Cat::id))
                 .collect(Collectors.groupingBy(cat -> counter.getAndIncrement() / batchSize));
         Map<Integer, List<Cat>> all = new HashMap<>();
         for (int i = 0; i < counter.get() / batchSize; ++i) {
@@ -477,9 +476,9 @@ public class SelectTest extends AbstractOrmTest {
         say("Testing select on an abstract object with where");
 
         List<Pet> wanted = new ArrayList<>();
-        wanted.addAll(cats.stream().filter(cat -> cat.getAge() < 6).collect(Collectors.toList()));
-        wanted.addAll(dogs.stream().filter(cat -> cat.getAge() < 6).collect(Collectors.toList()));
-        wanted.addAll(birds.stream().filter(cat -> cat.getAge() < 6).collect(Collectors.toList()));
+        wanted.addAll(cats.stream().filter(cat -> cat.age() < 6).collect(Collectors.toList()));
+        wanted.addAll(dogs.stream().filter(cat -> cat.age() < 6).collect(Collectors.toList()));
+        wanted.addAll(birds.stream().filter(cat -> cat.age() < 6).collect(Collectors.toList()));
 
         List<Pet> all = orm().select(PET, where(PET.age.lt(6))).list();
 
@@ -494,13 +493,13 @@ public class SelectTest extends AbstractOrmTest {
         say("Testing select on an abstract object with where and order");
 
         List<Pet> wanted = new ArrayList<>();
-        wanted.addAll(cats.stream().filter(cat -> cat.getAge() < 6).collect(Collectors.toList()));
-        wanted.addAll(dogs.stream().filter(cat -> cat.getAge() < 6).collect(Collectors.toList()));
-        wanted.addAll(birds.stream().filter(cat -> cat.getAge() < 6).collect(Collectors.toList()));
+        wanted.addAll(cats.stream().filter(cat -> cat.age() < 6).collect(Collectors.toList()));
+        wanted.addAll(dogs.stream().filter(cat -> cat.age() < 6).collect(Collectors.toList()));
+        wanted.addAll(birds.stream().filter(cat -> cat.age() < 6).collect(Collectors.toList()));
         wanted = wanted.stream()
-                .sorted(Comparator.comparing(Pet::getAge)
-                        .thenComparing(Pet::getName)
-                        .thenComparing(Pet::getPersonId))
+                .sorted(Comparator.comparing(Pet::age)
+                        .thenComparing(Pet::name)
+                        .thenComparing(Pet::personId))
                 .collect(Collectors.toList());
 
         List<Pet> all = orm().select(PET,
@@ -519,13 +518,13 @@ public class SelectTest extends AbstractOrmTest {
         say("Testing select with a join");
         Person person = persons.get(0);
         List<Cat> wanted = cats.stream()
-                .filter(cat -> cat.getType() == CatType.INDOOR)
-                .filter(cat -> cat.getPersonId().equals(person.getId()))
+                .filter(cat -> cat.type() == CatType.INDOOR)
+                .filter(cat -> cat.personId().equals(person.id()))
                 .collect(Collectors.toList());
         List<Cat> all = orm().select(CAT,
                         where(CAT.type.eq(CatType.INDOOR)),
                         join(PERSON, on(CAT.personId, PERSON.id),
-                                where(PERSON.emailAddress.eq(person.getEmailAddress()))))
+                                where(PERSON.emailAddress.eq(person.emailAddress()))))
                 .list();
         assertNotNull(all, "The list returned by list() should be non-null");
         assertEquals(all.size(), wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
@@ -536,10 +535,10 @@ public class SelectTest extends AbstractOrmTest {
     @Order(211)
     public void testJoinNoWhere() throws Exception {
         say("Testing select with a join without a where");
-        Set<Long> personIds = persons.stream().map(Person::getId).collect(Collectors.toSet());
+        Set<Long> personIds = persons.stream().map(Person::id).collect(Collectors.toSet());
         List<Cat> wanted = cats.stream()
-                .filter(cat -> cat.getType() == CatType.INDOOR)
-                .filter(cat -> personIds.contains(cat.getPersonId()))
+                .filter(cat -> cat.type() == CatType.INDOOR)
+                .filter(cat -> personIds.contains(cat.personId()))
                 .collect(Collectors.toList());
         List<Cat> all = orm().select(CAT,
                         where(CAT.type.eq(CatType.INDOOR)),
@@ -555,20 +554,20 @@ public class SelectTest extends AbstractOrmTest {
     public void testJoinThenJoin() throws Exception {
         say("Testing select with a join and then join");
         Optional<Town> opt = towns.stream()
-                .filter(t -> t.getName().equals("Durban"))
+                .filter(t -> t.name().equals("Durban"))
                 .findFirst();
         if (!opt.isPresent()) {
             throw new NoSuchElementException("No town found in test");
         }
         Town town = opt.get();
         List<Long> fromThere = persons.stream()
-                .filter(p -> p.getTownId().equals(town.getId()))
-                .filter(p -> p.getIncome() > 5000)
-                .map(Person::getId)
+                .filter(p -> p.townId().equals(town.id()))
+                .filter(p -> p.income() > 5000)
+                .map(Person::id)
                 .collect(Collectors.toList());
         List<Cat> wanted = cats.stream()
-                .filter(cat -> cat.getType() == CatType.INDOOR)
-                .filter(cat -> fromThere.contains(cat.getPersonId()))
+                .filter(cat -> cat.type() == CatType.INDOOR)
+                .filter(cat -> fromThere.contains(cat.personId()))
                 .collect(Collectors.toList());
         List<Cat> all = orm().select(CAT,
                         where(CAT.type.eq(CatType.INDOOR)),
@@ -587,20 +586,20 @@ public class SelectTest extends AbstractOrmTest {
     public void testJoinThenJoinThenJoin() throws Exception {
         say("Testing select with a join and then join and then join");
         Province province = provinces.stream()
-                .filter(p -> p.getName().equals("Western Cape"))
+                .filter(p -> p.name().equals("Western Cape"))
                 .findFirst().get();
         List<Long> towns = SelectTest.towns.stream()
-                .filter(t -> t.getProvinceId().equals(province.getProvinceId()))
-                .map(Town::getId)
+                .filter(t -> t.provinceId().equals(province.provinceId()))
+                .map(Town::id)
                 .collect(Collectors.toList());
         List<Long> fromThere = persons.stream()
-                .filter(p -> towns.contains(p.getTownId()))
-                .filter(p -> p.getIncome() > 5000)
-                .map(Person::getId)
+                .filter(p -> towns.contains(p.townId()))
+                .filter(p -> p.income() > 5000)
+                .map(Person::id)
                 .collect(Collectors.toList());
         List<Cat> wanted = cats.stream()
-                .filter(cat -> cat.getType() == CatType.INDOOR)
-                .filter(cat -> fromThere.contains(cat.getPersonId()))
+                .filter(cat -> cat.type() == CatType.INDOOR)
+                .filter(cat -> fromThere.contains(cat.personId()))
                 .collect(Collectors.toList());
 
         List<Cat> all = orm().select(CAT,
@@ -623,11 +622,11 @@ public class SelectTest extends AbstractOrmTest {
         say("Testing select with a join with same key names");
         List<Town> selected = orm().select(TOWN,
                         join(PROVINCE, on(TOWN.provinceId, PROVINCE.provinceId),
-                                where(PROVINCE.name.eq(provinces.get(0).getName()))))
+                                where(PROVINCE.name.eq(provinces.get(0).name()))))
                 .list();
 
         List<Town> wanted = towns.stream()
-                .filter(town -> town.getProvinceId().equals(provinces.get(0).getProvinceId()))
+                .filter(town -> town.provinceId().equals(provinces.get(0).provinceId()))
                 .collect(Collectors.toList());
 
         assertNotNull(selected, "The list returned by list() should be non-null");
@@ -641,15 +640,15 @@ public class SelectTest extends AbstractOrmTest {
         say("Testing select of abstract type with a join with same key names");
         List<Pet> selected = orm().select(PET,
                         join(PERSON, on(PET.personId, PERSON.id),
-                                where(PERSON.firstName.eq(persons.get(0).getFirstName()))))
+                                where(PERSON.firstName.eq(persons.get(0).firstName()))))
                 .list();
 
         Map<Long, Person> personMap = persons.stream()
-                .filter(person -> person.getFirstName().equals(persons.get(0).getFirstName()))
-                .collect(Collectors.toMap(Person::getId, person -> person));
+                .filter(person -> person.firstName().equals(persons.get(0).firstName()))
+                .collect(Collectors.toMap(Person::id, person -> person));
 
         List<Pet> wanted = Stream.concat(Stream.concat(cats.stream(), dogs.stream()), birds.stream())
-                .filter(pet -> personMap.containsKey(pet.getPersonId()))
+                .filter(pet -> personMap.containsKey(pet.personId()))
                 .collect(Collectors.toList());
 
         assertNotNull(selected, "The list returned by list() should be non-null");
@@ -668,12 +667,12 @@ public class SelectTest extends AbstractOrmTest {
                 .list();
 
         Map<Long, Person> personMap = persons.stream()
-                .filter(person -> person.getFirstName().equals("Bob"))
-                .collect(Collectors.toMap(Person::getId, person -> person));
-        CatBreed persian = catBreeds.stream().filter(breed -> breed.getName().equals("Persian")).findFirst().get();
+                .filter(person -> person.firstName().equals("Bob"))
+                .collect(Collectors.toMap(Person::id, person -> person));
+        CatBreed persian = catBreeds.stream().filter(breed -> breed.name().equals("Persian")).findFirst().get();
 
-        List<Cat> wanted = cats.stream().filter(cat -> cat.getBreedId().equals(persian.getId()))
-                .filter(cat -> personMap.containsKey(cat.getPersonId()))
+        List<Cat> wanted = cats.stream().filter(cat -> cat.breedId().equals(persian.id()))
+                .filter(cat -> personMap.containsKey(cat.personId()))
                 .collect(Collectors.toList());
 
         assertNotNull(selected, "The list returned by list() should be non-null");
@@ -689,7 +688,7 @@ public class SelectTest extends AbstractOrmTest {
                         where(PERSON.lastName.isNull()))
                 .list();
         List<Person> wanted = persons.stream()
-                .filter(person -> person.getLastName() == null)
+                .filter(person -> person.lastName() == null)
                 .collect(Collectors.toList());
         assertNotNull(selected, "The list returned by list() should be non-null");
         assertEquals(selected.size(), wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", selected.size(), wanted.size()));
@@ -705,7 +704,7 @@ public class SelectTest extends AbstractOrmTest {
                         where(PERSON.lastName.isNotNull()))
                 .list();
         List<Person> wanted = persons.stream()
-                .filter(person -> person.getLastName() != null)
+                .filter(person -> person.lastName() != null)
                 .collect(Collectors.toList());
         assertNotNull(selected, "The list returned by list() should be non-null");
         assertEquals(selected.size(), wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", selected.size(), wanted.size()));

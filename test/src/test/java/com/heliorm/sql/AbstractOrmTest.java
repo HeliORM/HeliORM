@@ -17,7 +17,6 @@ import test.place.Province;
 import test.place.Town;
 
 import javax.sql.DataSource;
-import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -80,11 +79,7 @@ abstract class AbstractOrmTest {
     }
 
     protected static <O> List<O> selectAll(Class<O> type) throws OrmException {
-        try {
-            return orm.select(orm.tableFor(type.getConstructor().newInstance())).list();
-        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
-            throw new OrmException(e.getMessage(), e);
-        }
+        return orm.select(orm.tableFor(type)).list();
     }
 
     protected static <O> void deleteAll(Class<O> type) throws OrmException {
@@ -120,7 +115,7 @@ abstract class AbstractOrmTest {
         return new HikariDataSource(conf);
     }
 
-    protected Orm orm() {
+     static Orm orm() {
         return orm;
     }
 

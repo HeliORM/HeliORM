@@ -1,5 +1,6 @@
 package com.heliorm.sql;
 
+import com.heliorm.Builder;
 import com.heliorm.Database;
 import com.heliorm.Field;
 import com.heliorm.Orm;
@@ -104,6 +105,65 @@ public final class SqlOrm implements Orm {
     }
 
     @Override
+    public <O> Builder<O> create(Table<O> table) throws OrmException {
+        O pojo = pops.newPojoInstance(table);
+        return new Builder<O>() {
+            @Override
+            public <C> Builder<O> with(Field<O, C> field, C value) throws OrmException {
+                pops.setValue(pojo, field, value);
+                return this;
+            }
+
+            @Override
+            public O build() {
+                return pojo;
+            }
+        };
+    }
+
+    @Override
+    public <O> Builder<O> createCopy(O pojo) throws OrmException {
+        O copy = pops.newPojoInstance(tableFor(pojo));
+        for (Field<O, ?> field : tableFor(pojo).getFields()) {
+            if (!field.isPrimaryKey()) {
+                pops.setValue(copy, field, pops.getValue(pojo, field));
+            }
+        }
+        return new Builder<O>() {
+            @Override
+            public <C> Builder<O> with(Field<O, C> field, C value) throws OrmException {
+                pops.setValue(copy, field, value);
+                return this;
+            }
+
+            @Override
+            public O build() {
+                return copy;
+            }
+        };
+    }
+
+    @Override
+    public <O> Builder<O> updateCopy(O pojo) throws OrmException {
+        O copy = pops.newPojoInstance(tableFor(pojo));
+        for (Field<O, ?> field : tableFor(pojo).getFields()) {
+            pops.setValue(copy, field, pops.getValue(pojo, field));
+        }
+        return new Builder<O>() {
+            @Override
+            public <C> Builder<O> with(Field<O, C> field, C value) throws OrmException {
+                pops.setValue(copy, field, value);
+                return this;
+            }
+
+            @Override
+            public O build() {
+                return copy;
+            }
+        };
+    }
+
+    @Override
     public <O> O create(O pojo) throws OrmException {
         if (pojo == null) {
             throw new OrmException("Attempt to create a null POJO");
@@ -116,12 +176,12 @@ public final class SqlOrm implements Orm {
         }
         Connection con = getConnection();
         O newPojo = pops.newPojoInstance(table);
-        for (Field<?,?> field : table.getFields()) {
+        for (Field<?, ?> field : table.getFields()) {
             pops.setValue(newPojo, field, pops.getValue(pojo, field));
         }
         try (PreparedStatement stmt = con.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
             int par = 1;
-            for (Field<?,?> field : table.getFields()) {
+            for (Field<?, ?> field : table.getFields()) {
                 if (field.isPrimaryKey()) {
                     if (field.isAutoNumber()) {
                         if (field.getFieldType() == Field.FieldType.STRING) {
@@ -143,7 +203,7 @@ public final class SqlOrm implements Orm {
             stmt.executeUpdate();
             Optional<Field<O, ?>> opt = table.getPrimaryKey();
             if (opt.isPresent()) {
-                Field<?,?> keyField = opt.get();
+                Field<?, ?> keyField = opt.get();
                 if (keyField.isAutoNumber()) {
                     if (keyField.getFieldType() != Field.FieldType.STRING) {
                         try (ResultSet rs = stmt.getGeneratedKeys()) {
@@ -176,7 +236,7 @@ public final class SqlOrm implements Orm {
         Connection con = getConnection();
         try (PreparedStatement stmt = con.prepareStatement(query)) {
             int par = 1;
-            for (Field<?,?> field : table.getFields()) {
+            for (Field<?, ?> field : table.getFields()) {
                 if (!field.isPrimaryKey()) {
                     preparedStatementHelper.setValueInStatement(stmt, pojo, field, par);
                     par++;
@@ -225,8 +285,7 @@ public final class SqlOrm implements Orm {
             Optional<Field<O, ?>> primaryKey = table.getPrimaryKey();
             if (primaryKey.isPresent()) {
                 preparedStatementHelper.setValueInStatement(stmt, pojo, primaryKey.get(), 1);
-            }
-            else {
+            } else {
                 throw new OrmException(format("No primary key for %s in delete", table.getObjectClass().getSimpleName()));
             }
             stmt.executeUpdate();
@@ -500,9 +559,9 @@ public final class SqlOrm implements Orm {
      * Cleanup SQL Connection, Statement and ResultSet insuring that
      * errors will not result in aborted cleanup.
      *
-     * @param con The SQL connection
+     * @param con  The SQL connection
      * @param stmt The SQL statement
-     * @param rs The SQL result set
+     * @param rs   The SQL result set
      */
     private void cleanup(Connection con, Statement stmt, ResultSet rs) {
         Exception error = null;
@@ -593,7 +652,7 @@ public final class SqlOrm implements Orm {
      * @param field The field
      * @return The ID
      */
-    private String getUniqueFieldName(Field<?,?> field) {
+    private String getUniqueFieldName(Field<?, ?> field) {
         return format("%s_%s", field.getTable().getSqlTable(), field.getSqlName());
     }
 

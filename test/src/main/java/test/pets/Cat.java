@@ -7,25 +7,11 @@ import com.heliorm.annotation.Pojo;
  * @author gideon
  */
 @Pojo
-public class Cat extends Mamal {
+public interface Cat extends Mamal {
 
-    private CatType type;
+    CatType type();
+
     @ForeignKey(pojo = CatBreed.class)
-    private Long breedId;
+    Long breedId();
 
-    public CatType getType() {
-        return type;
-    }
-
-    public void setType(CatType type) {
-        this.type = type;
-    }
-
-    public Long getBreedId() {
-        return breedId;
-    }
-
-    public void setBreedId(Long breedId) {
-        this.breedId = breedId;
-    }
 }

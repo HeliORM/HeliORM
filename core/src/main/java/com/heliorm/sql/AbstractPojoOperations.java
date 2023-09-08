@@ -5,9 +5,11 @@ import com.heliorm.OrmException;
 import com.heliorm.Table;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 import java.util.WeakHashMap;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 
@@ -26,6 +28,16 @@ abstract class AbstractPojoOperations implements PojoOperations {
     @Override
     public final <O> O newPojoInstance(Table<O> table) throws OrmException {
         Class clazz = table.getObjectClass();
+        if (clazz.isInterface()) {
+            return (O) (InvocationHandler) (proxy, method, args) -> {
+                 Map<String, ? extends Field<O, ?>> fieldMap = table.getFields().stream()
+                        .collect(Collectors.toMap(Field::getJavaName, field -> field));
+                if (fieldMap.containsKey(method.getName())) {
+                    return method.invoke(proxy, args);
+                }
+                return null;
+            };
+        }
         try {
             for (Constructor<O> cons : clazz.getConstructors()) {
                 if (cons.getParameterCount() == 0) {
