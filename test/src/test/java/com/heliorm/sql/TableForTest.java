@@ -58,7 +58,7 @@ public class TableForTest extends AbstractOrmTest {
     @Test
     public void testTableForObject() throws Exception {
         say("Testing tableFor for object");
-        List<?> all = orm().select(orm().tableFor(orm().create(CAT))).list();
+        List<?> all = orm().select(orm().tableFor(orm().create(CAT).build())).list();
         assertTrue(all.stream().filter(o -> o instanceof Cat).count() == all.size(), format("All the objects loaded are of type cat (%d)", all.size()));
     }
 }

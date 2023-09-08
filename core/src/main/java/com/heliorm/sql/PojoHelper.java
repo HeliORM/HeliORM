@@ -27,7 +27,6 @@ class PojoHelper {
      * @param pojo  The POJO from which to read the object.
      * @param field The field to read.
      * @return The object value.
-     * @throws OrmException
      */
     Object getValueFromPojo(Object pojo, Field field) throws OrmException {
         return pops.getValue(pojo, field);
@@ -39,12 +38,14 @@ class PojoHelper {
      * @param pojo  The POJO from which to read the string.
      * @param field The field to read.
      * @return The string value.
-     * @throws OrmException
      */
     String getStringFromPojo(Object pojo, Field field) throws OrmException {
         Object value = getValueFromPojo(pojo, field);
         if (value == null) {
             return null;
+        }
+        if (value instanceof Enum<?>) {
+            return ((Enum<?>) value).name();
         }
         if (!(value instanceof String)) {
             throw new OrmException(format("Could not read String value for field type '%s'.", field.getFieldType()));
@@ -58,7 +59,6 @@ class PojoHelper {
      * @param pojo  The POJO from which to read the date.
      * @param field The field to read.
      * @return The date value.
-     * @throws OrmException
      */
     java.sql.Date getDateFromPojo(Object pojo, Field field) throws OrmException {
         Object value = getValueFromPojo(pojo, field);
@@ -77,7 +77,6 @@ class PojoHelper {
      * @param pojo  The POJO from which to read the timestamp.
      * @param field The field to read.
      * @return The timestamp value.
-     * @throws OrmException
      */
     java.sql.Timestamp getTimestampFromPojo(Object pojo, Field field) throws OrmException {
         Object value = getValueFromPojo(pojo, field);
@@ -99,7 +98,6 @@ class PojoHelper {
      * @param pojo  The POJO from which to read the timestamp.
      * @param field The field to read.
      * @return The duration string value.
-     * @throws OrmException
      */
     String getDurationFromPojo(Object pojo, Field field) throws OrmException {
         Object value = getValueFromPojo(pojo, field);

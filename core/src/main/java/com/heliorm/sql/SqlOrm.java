@@ -17,6 +17,7 @@ import com.heliorm.impl.JoinPart;
 import com.heliorm.impl.SelectPart;
 import com.heliorm.impl.Selector;
 
+import java.lang.reflect.Proxy;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
@@ -342,6 +343,9 @@ public final class SqlOrm implements Orm {
 
     @Override
     public <O> Table<O> tableFor(O pojo) throws OrmException {
+        if (Proxy.isProxyClass(pojo.getClass())) {
+            return tableFor(((InterfacePojo)Proxy.getInvocationHandler(pojo)).getType());
+        }
         return tableFor((Class<O>) pojo.getClass());
     }
 
