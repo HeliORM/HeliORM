@@ -226,32 +226,54 @@ final class QueryHelper {
         StringBuilder query = new StringBuilder();
         query.append(expandExpression(table, expr));
         for (ExpressionContinuationPart<?> ec : where.getContinuations()) {
-            switch (ec.getType()) {
-                case AND:
-                    query.append(" AND ");
-                    break;
-                case OR:
-                    query.append(" OR ");
-                    break;
-                default:
-                    throw new OrmException(format("Unknown continuation type '%s'. BUG!", expr.getType()));
-            }
-            query.append(expandExpression(table, ec.getExpression()));
+            query.append(expandContinuation(table, ec));
         }
         return query.toString();
     }
 
     private String expandExpression(Table<?> table, ExpressionPart<?,?> expr) throws OrmException {
+        StringBuilder query = new StringBuilder();
+        List<? extends ExpressionContinuationPart<?>> conts = expr.getContinuations();
+        if (!conts.isEmpty()) {
+            query.append("(");
+        }
         switch (expr.getType()) {
             case LIST_EXPRESSION:
-                return expandListFieldCriteria(table, ((ListExpressionPart<?,?>) expr));
+                query.append(expandListFieldCriteria(table, ((ListExpressionPart<?,?>) expr)));
+                break;
             case VALUE_EXPRESSION:
-                return expandValueFieldCriteria(table, (ValueExpressionPart<?,?>) expr);
+                query.append(expandValueFieldCriteria(table, (ValueExpressionPart<?,?>) expr));
+                break;
             case IS_EXPRESSION:
-                return expandIsFieldCriteria(table, (IsExpressionPart<?,?>) expr);
+                query.append(expandIsFieldCriteria(table, (IsExpressionPart<?,?>) expr));
+                break;
             default:
                 throw new OrmException(format("Unknown expression type '%s'. BUG!", expr.getType()));
         }
+        if (!conts.isEmpty()) {
+            for (ExpressionContinuationPart<?> cont : conts) {
+                query.append(" ");
+                query.append(expandContinuation(table, cont));
+            }
+            query.append(")");
+        }
+        return query.toString();
+    }
+
+    private String expandContinuation(Table<?> table, ExpressionContinuationPart<?> ec) throws OrmException {
+        StringBuilder query = new StringBuilder();
+        switch (ec.getType()) {
+            case AND:
+                query.append(" AND ");
+                break;
+            case OR:
+                query.append(" OR ");
+                break;
+            default:
+                throw new OrmException(format("Unknown continuation type '%s'. BUG!", ec.getType()));
+        }
+        query.append(expandExpression(table, ec.getExpression()));
+        return query.toString();
     }
 
     private String expandListFieldCriteria(Table table, ListExpressionPart crit) throws OrmException {
