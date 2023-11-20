@@ -302,6 +302,22 @@ public class SelectTest extends AbstractOrmTest {
 
     @Test
     @Order(161)
+    public void testSelectWhereOrTwoFieldsInner() throws Exception {
+        say("Testing select with a where clause with or on two fields");
+        List<Cat> wanted = cats.stream()
+                .filter(cat -> cat.getAge() < 5 || cat.getType().equals(CatType.OUTDOOR))
+                .collect(Collectors.toList());
+        List<Cat> all = orm().select(CAT, where(CAT.age.lt(5)
+                        .or(CAT.type.eq(CatType.OUTDOOR))))
+                .list();
+        assertNotNull(all, "The list returned by list() should be non-null");
+        assertEquals(all.size(), wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
+        assertTrue(listCompareOrdered(all, wanted), "The items loaded are exactly the same as the ones we expected");
+    }
+
+
+    @Test
+    @Order(162)
     public void testSelectWhereAndTwoFields() throws Exception {
         say("Testing select with a where clause with and on two fields");
         List<Cat> wanted = cats.stream()
@@ -314,8 +330,23 @@ public class SelectTest extends AbstractOrmTest {
         assertTrue(listCompareOrdered(all, wanted), "The items loaded are exactly the same as the ones we expected");
     }
 
-//    @Test
-    @Order(162)
+    @Test
+    @Order(163)
+    public void testSelectWhereAndTwoFieldsInner() throws Exception {
+        say("Testing select with a where clause with and on two fields");
+        List<Cat> wanted = cats.stream()
+                .filter(cat -> cat.getAge() < 5 && cat.getType().equals(CatType.OUTDOOR))
+                .collect(Collectors.toList());
+        List<Cat> all = orm().select(CAT, where(CAT.age.lt(5).and(CAT.type.eq(CatType.OUTDOOR))))
+                .list();
+        assertNotNull(all, "The list returned by list() should be non-null");
+        assertEquals(all.size(), wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
+        assertTrue(listCompareOrdered(all, wanted), "The items loaded are exactly the same as the ones we expected");
+    }
+
+
+    //    @Test
+    @Order(165)
     public void testSelectWhereDateField() throws Exception {
         say("Testing select with a where clause with and on two fields");
         Calendar cal = new GregorianCalendar();
@@ -332,7 +363,7 @@ public class SelectTest extends AbstractOrmTest {
     }
 
 //    @Test
-    @Order(163)
+    @Order(166)
     public void testSelectWhereAndTwoDateFields() throws Exception {
         say("Testing select with a where clause with and on two fields");
         Date today = new Date();
