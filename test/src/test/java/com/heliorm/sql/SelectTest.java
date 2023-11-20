@@ -361,8 +361,29 @@ public class SelectTest extends AbstractOrmTest {
         assertTrue(listCompareOrdered(all, wanted), "The items loaded are exactly the same as the ones we expected");
     }
 
-    //    @Test
+    @Test
     @Order(165)
+    public void testSelectWhereNestedMore() throws Exception {
+        say("Testing select with a where clause with more nesting");
+        List<Cat> some = cats.stream()
+                .filter(cat -> cat.getAge() < 5 && cat.getType().equals(CatType.INDOOR))
+                .collect(Collectors.toList());
+        List<Cat> other = cats.stream()
+                .filter(cat ->cat .getAge() > 8 &&  cat.getType().equals(CatType.OUTDOOR))
+                .collect(Collectors.toList());
+        List<Cat>wanted = new ArrayList<>();
+        wanted.addAll(some);
+        wanted.addAll(other);
+        List<Cat> all = orm().select(CAT,
+                        where(CAT.age.lt(5).and(CAT.type.eq(CatType.INDOOR)))
+                                .or(CAT.age.gt(8).and(CAT.type.eq(CatType.OUTDOOR))))
+                .list();
+        assertNotNull(all, "The list returned by list() should be non-null");
+        assertEquals(all.size(), wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
+        assertTrue(listCompareOrdered(all, wanted), "The items loaded are exactly the same as the ones we expected");
+    }
+    //    @Test
+    @Order(167)
     public void testSelectWhereDateField() throws Exception {
         say("Testing select with a where clause with and on two fields");
         Calendar cal = new GregorianCalendar();
@@ -378,8 +399,9 @@ public class SelectTest extends AbstractOrmTest {
         assertTrue(listCompareOrdered(all, wanted), "The items loaded are exactly the same as the ones we expected");
     }
 
+
     //    @Test
-    @Order(166)
+    @Order(168)
     public void testSelectWhereAndTwoDateFields() throws Exception {
         say("Testing select with a where clause with and on two fields");
         Date today = new Date();
