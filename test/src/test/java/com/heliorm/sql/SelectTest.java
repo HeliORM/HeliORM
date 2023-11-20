@@ -344,6 +344,22 @@ public class SelectTest extends AbstractOrmTest {
         assertTrue(listCompareOrdered(all, wanted), "The items loaded are exactly the same as the ones we expected");
     }
 
+    @Test
+    @Order(164)
+    public void testSelectWhereNestedAndOr() throws Exception {
+        say("Testing select with a where clause with nested and and or");
+        List<Cat> wanted = cats.stream()
+                .filter(cat -> cat.getAge() < 5 || cat.getAge() > 8)
+                .filter(cat -> cat.getType().equals(CatType.OUTDOOR))
+                .collect(Collectors.toList());
+        List<Cat> all = orm().select(CAT,
+                        where(CAT.age.lt(5).or(CAT.age.gt(8)))
+                                .and(CAT.type.eq(CatType.OUTDOOR)))
+                .list();
+        assertNotNull(all, "The list returned by list() should be non-null");
+        assertEquals(all.size(), wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
+        assertTrue(listCompareOrdered(all, wanted), "The items loaded are exactly the same as the ones we expected");
+    }
 
     //    @Test
     @Order(165)
@@ -362,7 +378,7 @@ public class SelectTest extends AbstractOrmTest {
         assertTrue(listCompareOrdered(all, wanted), "The items loaded are exactly the same as the ones we expected");
     }
 
-//    @Test
+    //    @Test
     @Order(166)
     public void testSelectWhereAndTwoDateFields() throws Exception {
         say("Testing select with a where clause with and on two fields");
