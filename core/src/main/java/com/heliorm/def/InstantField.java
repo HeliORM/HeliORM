@@ -9,9 +9,7 @@ import java.time.Instant;
  *
  * @param <O> Object type
  * @author gideon
- * @deprecated Duration is a good candidate to rather use a type adapter for
  */
-@Deprecated
 public interface InstantField<O> extends Field<O, Instant>, WithRange<O, Instant>, WithEquals<O, Instant>, WithIn<O, Instant>, WithIs<O> {
 
     @Override
