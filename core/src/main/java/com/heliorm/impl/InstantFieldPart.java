@@ -24,6 +24,7 @@ public final class InstantFieldPart<O> extends FieldPart<O, Instant> implements 
     }
 
 
+
     @Override
     public Continuation<O> eq(Instant value) throws OrmException {
         return new ValueExpressionPart<>(getThis(), ValueExpressionPart.Operator.EQ, value);

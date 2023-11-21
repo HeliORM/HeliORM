@@ -12,8 +12,4 @@ import java.time.Instant;
  */
 public interface InstantField<O> extends Field<O, Instant>, WithRange<O, Instant>, WithEquals<O, Instant>, WithIn<O, Instant>, WithIs<O> {
 
-    @Override
-    default FieldType getFieldType() {
-        return FieldType.INSTANT;
-    }
 }
