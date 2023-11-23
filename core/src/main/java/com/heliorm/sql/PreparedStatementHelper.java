@@ -31,7 +31,6 @@ class PreparedStatementHelper {
      * @param pojo  The POJO from which to obtain the value
      * @param field The field for which to get the value from the POJO
      * @param par   The position in the prepared statement for the value
-     * @throws OrmException
      */
     void setValueInStatement(PreparedStatement stmt, Object pojo, Field field, int par) throws OrmException {
         try {
@@ -55,8 +54,6 @@ class PreparedStatementHelper {
                     stmt.setDate(par, pojoHelper.getDateFromPojo(pojo, field));
                     break;
                 case INSTANT:
-                    stmt.setTimestamp(par, pojoHelper.getTimestampFromPojo(pojo, field));
-                    break;
                 case LOCAL_DATE_TIME:
                     stmt.setTimestamp(par, pojoHelper.getTimestampFromPojo(pojo, field));
                     break;
