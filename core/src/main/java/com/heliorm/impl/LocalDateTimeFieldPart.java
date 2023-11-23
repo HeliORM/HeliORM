@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.heliorm.Field.FieldType.DATE;
+import static com.heliorm.Field.FieldType.LOCAL_DATE_TIME;
 
 /**
  * @author gideon
@@ -21,7 +21,7 @@ public final class LocalDateTimeFieldPart<O> extends FieldPart<O, LocalDateTime>
         WithInPart<O, LocalDateTime>, WithIsPart<O, LocalDateTime> {
 
     public LocalDateTimeFieldPart(Table<O> table, String javaName) {
-        super(table, DATE, LocalDateTime.class, javaName);
+        super(table, LOCAL_DATE_TIME, LocalDateTime.class, javaName);
     }
 
 
