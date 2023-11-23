@@ -70,6 +70,7 @@ class ResultSetHelper {
                 break;
             case LOCAL_DATE_TIME:
                 pops.setValue(pojo, field, getLocalDateTime(rs, column));
+                break;
             default:
                 throw new OrmException(format("Field type '%s' is unsupported. BUG!", field.getFieldType()));
         }
@@ -113,7 +114,6 @@ class ResultSetHelper {
                 case DATE:
                     return rs.getDate(column);
                 case INSTANT:
-                    return rs.getTimestamp(column);
                 case LOCAL_DATE_TIME:
                     return rs.getTimestamp(column);
                 default:
