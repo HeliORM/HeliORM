@@ -82,6 +82,7 @@ abstract class AbstractPojoOperations implements PojoOperations {
                 break;
             case DATE:
             case INSTANT:
+            case LOCAL_DATE_TIME:
             case STRING:
                 setObject(pojo, refField, value);
                 break;
@@ -115,6 +116,7 @@ abstract class AbstractPojoOperations implements PojoOperations {
                 return getEnum(pojo, refField);
             case DATE:
             case INSTANT:
+            case LOCAL_DATE_TIME:
             case STRING:
                 return getObject(pojo, refField);
             default:
@@ -171,6 +173,7 @@ abstract class AbstractPojoOperations implements PojoOperations {
             case ENUM:
             case STRING:
             case DATE:
+            case LOCAL_DATE_TIME:
             case INSTANT:
                 Object val1 = getValue(pojo1, field);
                 Object val2 = getValue(pojo2, field);

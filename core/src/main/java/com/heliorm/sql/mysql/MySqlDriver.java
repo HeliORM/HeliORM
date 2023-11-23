@@ -93,6 +93,7 @@ public final class MySqlDriver extends SqlDriver {
                 case ENUM:
                 case DATE:
                 case INSTANT:
+                case LOCAL_DATE_TIME:
                     throw new OrmException(format("Field type '%s' is not a supported primary key type", field.getFieldType()));
                 default:
                     throw new OrmException(format("Field type '%s' is unsupported. BUG!", field.getFieldType()));
@@ -134,6 +135,8 @@ public final class MySqlDriver extends SqlDriver {
             case DATE:
                 return "DATE";
             case INSTANT:
+                return "DATETIME";
+            case LOCAL_DATE_TIME:
                 return "DATETIME";
             default:
                 throw new OrmSqlException(format("Unkown field type '%s'. BUG!", field.getFieldType()));

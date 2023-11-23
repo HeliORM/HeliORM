@@ -12,6 +12,7 @@ import com.heliorm.def.EnumField;
 import com.heliorm.def.FloatField;
 import com.heliorm.def.InstantField;
 import com.heliorm.def.IntegerField;
+import com.heliorm.def.LocalDateTimeField;
 import com.heliorm.def.LongField;
 import com.heliorm.def.ShortField;
 import com.heliorm.def.StringField;
@@ -326,7 +327,10 @@ class Output {
                 addDateField(cm, fm);
                 break;
             case INSTANT:
-                addTimestampField(cm, fm);
+                addInstantField(cm, fm);
+                break;
+            case LOCAL_DATE_TIME:
+                addLocalDateTimeField(cm, fm);
                 break;
             case STRING:
                 addStringField(cm, fm);
@@ -340,37 +344,37 @@ class Output {
 
     }
 
-    private void addLongField(Table cm, Field fm) throws GeneratorException {
+    private void addLongField(Table cm, Field fm) {
         addField(cm, fm, LongField.class, "longField");
     }
 
-    private void addIntegerField(Table cm, Field fm) throws GeneratorException {
+    private void addIntegerField(Table cm, Field fm) {
         addField(cm, fm, IntegerField.class, "integerField");
 
     }
 
-    private void addShortField(Table cm, Field fm) throws GeneratorException {
+    private void addShortField(Table cm, Field fm) {
         addField(cm, fm, ShortField.class, "shortField");
     }
 
-    private void addByteField(Table cm, Field fm) throws GeneratorException {
+    private void addByteField(Table cm, Field fm) {
         addField(cm, fm, ByteField.class, "byteField");
     }
 
 
-    private void addDoubleField(Table cm, Field fm) throws GeneratorException {
+    private void addDoubleField(Table cm, Field fm) {
         addField(cm, fm, DoubleField.class, "doubleField");
     }
 
-    private void addFloatField(Table cm, Field fm) throws GeneratorException {
+    private void addFloatField(Table cm, Field fm) {
         addField(cm, fm, FloatField.class, "floatField");
     }
 
-    private void addBooleanField(Table cm, Field fm) throws GeneratorException {
+    private void addBooleanField(Table cm, Field fm) {
         addField(cm, fm, BooleanField.class, "booleanField");
     }
 
-    private void addEnumField(Table cm, Field fm) throws GeneratorException {
+    private void addEnumField(Table cm, Field fm) {
         impt(EnumField.class);
         String enumTypeName;
         if (fm.getJavaType().getEnclosingClass() == null) {
@@ -388,15 +392,19 @@ class Output {
         completeField(fm);
     }
 
-    private void addDateField(Table cm, Field fm) throws GeneratorException {
+    private void addDateField(Table cm, Field fm) {
         addField(cm, fm, DateField.class, "dateField");
     }
 
-    private void addTimestampField(Table cm, Field fm) throws GeneratorException {
-        addField(cm, fm, InstantField.class, "timestampField");
+    private void addInstantField(Table cm, Field fm) {
+        addField(cm, fm, InstantField.class, "instantField");
     }
 
-    private void addStringField(Table cm, Field fm) throws GeneratorException {
+    private void addLocalDateTimeField(Table cm, Field fm) {
+        addField(cm, fm, LocalDateTimeField.class, "localDateTimeField");
+    }
+
+    private void addStringField(Table cm, Field fm) {
         addField(cm, fm, StringField.class, "stringField");
     }
 

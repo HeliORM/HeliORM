@@ -57,6 +57,9 @@ class PreparedStatementHelper {
                 case INSTANT:
                     stmt.setTimestamp(par, pojoHelper.getTimestampFromPojo(pojo, field));
                     break;
+                case LOCAL_DATE_TIME:
+                    stmt.setTimestamp(par, pojoHelper.getTimestampFromPojo(pojo, field));
+                    break;
                 default:
                     throw new OrmException(format("Field type '%s' is unsupported. BUG!", field.getFieldType()));
             }

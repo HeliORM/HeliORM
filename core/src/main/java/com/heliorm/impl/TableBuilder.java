@@ -1,6 +1,7 @@
 package com.heliorm.impl;
 
 import com.heliorm.Field;
+import com.heliorm.Field.FieldType;
 import com.heliorm.Table;
 
 import java.time.Instant;
@@ -46,9 +47,14 @@ public final class TableBuilder<T extends Table<O>, O> {
         return new FieldBuilder<>(table, Field.FieldType.DATE, Date.class, javaName);
     }
 
-    public FieldBuilder<InstantFieldPart<O>> timestampField(String javaName) {
+    public FieldBuilder<InstantFieldPart<O>> instantField(String javaName) {
         return new FieldBuilder<>(table, Field.FieldType.INSTANT, Instant.class, javaName);
     }
+
+    public FieldBuilder<LocalDateTimeFieldPart<O>> localDateTimeField(String javaName) {
+        return new FieldBuilder<>(table, FieldType.LOCAL_DATE_TIME, Instant.class, javaName);
+    }
+
 
     public FieldBuilder<StringFieldPart<O>> stringField(String javaName) {
         return new FieldBuilder<>(table, Field.FieldType.STRING, String.class, javaName);

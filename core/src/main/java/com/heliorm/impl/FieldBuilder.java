@@ -8,7 +8,7 @@ import java.util.Optional;
 
 import static java.lang.String.format;
 
-public class FieldBuilder<P extends FieldPart> {
+public class FieldBuilder<P extends FieldPart<?,?>> {
 
     private final Table<?> table;
     private final Field.FieldType fieldType;
@@ -65,7 +65,7 @@ public class FieldBuilder<P extends FieldPart> {
     }
 
     public P build() {
-        P part = null;
+        P part;
         switch (fieldType) {
             case STRING:
                 part = (P) new StringFieldPart(table, javaName);
@@ -99,6 +99,9 @@ public class FieldBuilder<P extends FieldPart> {
                 break;
             case INSTANT:
                 part = (P) new InstantFieldPart(table, javaName);
+                break;
+            case LOCAL_DATE_TIME:
+                part = (P) new LocalDateTimeFieldPart<>(table, javaName);
                 break;
             default:
                 throw new UncaughtOrmException(format("Unexpected field type %s. BUG!", fieldType));

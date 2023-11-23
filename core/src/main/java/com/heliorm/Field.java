@@ -100,7 +100,8 @@ public interface Field<O, C> extends FieldOrder<O, C> {
         ENUM,
         STRING,
         DATE,
-        INSTANT
+        INSTANT,
+        LOCAL_DATE_TIME;
     }
 
 }

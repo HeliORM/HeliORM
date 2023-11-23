@@ -5,6 +5,7 @@ import com.heliorm.OrmException;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDateTime;
 
 import static java.lang.String.format;
 
@@ -89,6 +90,9 @@ class PojoHelper {
         }
         if (value instanceof java.util.Date) {
             return new java.sql.Timestamp(((java.util.Date) value).getTime());
+        }
+        if (value instanceof LocalDateTime) {
+            return java.sql.Timestamp.valueOf((LocalDateTime) value);
         }
         throw new OrmException(format("Could not read Instant value for field '%s' with type '%s'.", field.getJavaName(), field.getFieldType()));
     }

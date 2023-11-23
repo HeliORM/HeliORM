@@ -8,6 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.function.Function;
 
 import static java.lang.String.format;
@@ -65,8 +66,10 @@ class ResultSetHelper {
                 pops.setValue(pojo, field, getValue(rs, field));
                 break;
             case INSTANT:
-                pops.setValue(pojo, field, getTimestamp(rs, column));
+                pops.setValue(pojo, field, getInstant(rs, column));
                 break;
+            case LOCAL_DATE_TIME:
+                pops.setValue(pojo, field, getLocalDateTime(rs, column));
             default:
                 throw new OrmException(format("Field type '%s' is unsupported. BUG!", field.getFieldType()));
         }
@@ -111,6 +114,8 @@ class ResultSetHelper {
                     return rs.getDate(column);
                 case INSTANT:
                     return rs.getTimestamp(column);
+                case LOCAL_DATE_TIME:
+                    return rs.getTimestamp(column);
                 default:
                     throw new OrmException(format("Field type '%s' is unsupported. BUG!", field.getFieldType()));
             }
@@ -119,14 +124,19 @@ class ResultSetHelper {
         }
     }
 
-    /**
-     * Get a timestamp value from SQL for the given POJO and field
-     *
-     * @param rs     The ResultSet
-     * @param column The SQL column
-     * @return The correct value
-     */
-    private Instant getTimestamp(ResultSet rs, String column) throws OrmException {
+    private LocalDateTime getLocalDateTime(ResultSet rs, String column) throws OrmException {
+        try {
+            Timestamp value = rs.getTimestamp(column);
+            if (value == null) {
+                return null;
+            }
+            return value.toLocalDateTime();
+        } catch (SQLException ex) {
+            throw new OrmException(format("Could not read timestamp value from SQL (%s)", ex.getMessage()), ex);
+        }
+    }
+
+    private Instant getInstant(ResultSet rs, String column) throws OrmException {
         try {
             Timestamp value = rs.getTimestamp(column);
             if (value == null) {

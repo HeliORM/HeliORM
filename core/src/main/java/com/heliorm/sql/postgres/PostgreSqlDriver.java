@@ -99,6 +99,8 @@ public final class PostgreSqlDriver extends SqlDriver {
                 return "DATE";
             case INSTANT:
                 return "TIMESTAMP";
+            case LOCAL_DATE_TIME:
+                return "TIMESTAMP";
             default:
                 throw new OrmSqlException(format("Unkown field type '%s'. BUG!", field.getFieldType()));
         }
@@ -126,6 +128,7 @@ public final class PostgreSqlDriver extends SqlDriver {
                 case ENUM:
                 case DATE:
                 case INSTANT:
+                case LOCAL_DATE_TIME:
                     throw new OrmException(format("Field type '%s' is not a supported primary key type", field.getFieldType()));
                 default:
                     throw new OrmException(format("Field type '%s' is unsupported. BUG!", field.getFieldType()));
