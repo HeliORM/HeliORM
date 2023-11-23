@@ -84,7 +84,6 @@ public class PostgresDialectGenerator implements TableGenerator {
             case DATE:
                 return "DATE";
             case INSTANT:
-                return "TIMESTAMP";
             case LOCAL_DATE_TIME:
                 return "TIMESTAMP";
             default:

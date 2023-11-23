@@ -89,6 +89,7 @@ public class MysqlDialectGenerator implements TableGenerator {
             case DATE:
                 return "DATE";
             case INSTANT:
+            case LOCAL_DATE_TIME:
                 return "DATETIME";
             default:
                 throw new OrmSqlException(format("Unkown field type '%s'. BUG!", field.getFieldType()));
