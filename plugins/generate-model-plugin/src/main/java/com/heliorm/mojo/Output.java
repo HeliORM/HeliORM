@@ -45,10 +45,10 @@ class Output {
     private final GenerateModel gen;
     private final Database database;
     private final String packageName;
-    private final Map<Table, Set<Table>> tables = new HashMap();
+    private final Map<Table<?>, Set<Table<?>>> tables = new HashMap<>();
 
     private final StringBuilder buf = new StringBuilder();
-    private final Set<String> imports = new HashSet();
+    private final Set<String> imports = new HashSet<>();
     private int depth;
     private PrintWriter out;
 
@@ -58,12 +58,8 @@ class Output {
         this.gen = gen;
     }
 
-    void addTable(Table table) {
+    void addTable(Table<?> table) {
         tables.put(table, table.getSubTables());
-    }
-
-    String getPackageName() {
-        return packageName;
     }
 
     void push() {
@@ -94,7 +90,7 @@ class Output {
         imports.add(name);
     }
 
-    void impt(Class clazz) {
+    void impt(Class<?> clazz) {
         if (!clazz.getPackage().getName().equals(packageName) && (!clazz.isEnum() || (clazz.getEnclosingClass() == null))) {
             imports.add(clazz.getCanonicalName());
         }
@@ -110,7 +106,7 @@ class Output {
         }
         String fileName = path + "/Tables.java";
         try {
-            for (Table table : tables.keySet()) {
+            for (Table<?> table : tables.keySet()) {
                 push();
                 emit(table);
                 pop();
@@ -132,7 +128,7 @@ class Output {
             out.println("");
 
             StringJoiner sj = new StringJoiner(", ");
-            for (Table table : tables.keySet()) {
+            for (Table<?> table : tables.keySet()) {
                 sj.add(shortFieldName(table));
             }
 
@@ -149,7 +145,7 @@ class Output {
             out.println("");
 
             out.printf("\tpublic final static Tables %s = new Tables();\n", shortDatabaseName());
-            for (Table table : tables.keySet()) {
+            for (Table<?> table : tables.keySet()) {
                 out.printf("\tpublic final static %s %s = new %s();\n", tableName(table), shortFieldName(table), tableName(table));
             }
             out.println("\n}");
@@ -162,7 +158,7 @@ class Output {
         }
     }
 
-    private <O> void emit(Table<O> cm) throws OrmMetaDataException, GeneratorException {
+    private <O> void emit(Table<O> cm) throws OrmMetaDataException {
         impt(cm.getObjectClass());
         emit("public static class %s implements Table<%s> {",
                 tableName(cm), getJavaName(cm));
@@ -176,7 +172,7 @@ class Output {
         impt(FieldBuilder.class);
         emit("private transient TableBuilder<%s,%s> builder = TableBuilder.create(this, %s.class);", tableName(cm), getJavaName(cm), getJavaName(cm));
         emit("");
-        for (Field fm : cm.getFields()) {
+        for (Field<?,?> fm : cm.getFields()) {
             addFieldModel(cm, fm);
             fieldNames.add(fm.getJavaName());
         }
@@ -226,7 +222,7 @@ class Output {
         emit("@Override");
         emit("public Set<Table<?>> getSubTables() {", getJavaName(cm));
         push();
-        Set<Table> subs = tables.get(cm);
+        Set<Table<?>> subs = tables.get(cm);
         impt(List.class);
         impt(Set.class);
         if (subs.isEmpty()) {
@@ -236,8 +232,8 @@ class Output {
             impt(Arrays.class);
             impt(HashSet.class);
             StringJoiner sj = new StringJoiner(",");
-            Set<Table> all = explodeSubs(subs);
-            for (Table sub : all) {
+            Set<Table<?>> all = explodeSubs(subs);
+            for (Table<?> sub : all) {
                 impts(fullFieldName(sub));
                 sj.add(shortFieldName(sub));
             }
@@ -271,8 +267,8 @@ class Output {
 
         // getIndexes()
         StringJoiner indexNames = new StringJoiner(",");
-        for (Index im : cm.getIndexes()) {
-            String idxName = addIndexModel(cm, im);
+        for (Index<?> im : cm.getIndexes()) {
+            String idxName = addIndexModel(im);
             indexNames.add(idxName);
         }
         impt(Index.class);
@@ -292,15 +288,15 @@ class Output {
 
     }
 
-    private Set<Table> explodeSubs(Set<Table> subs) {
-        Set<Table> res = new HashSet(subs);
-        for (Table sub : subs) {
+    private Set<Table<?>> explodeSubs(Set<Table<?>> subs) {
+        Set<Table<?>> res = new HashSet<>(subs);
+        for (Table<?> sub : subs) {
             res.addAll(explodeSubs(sub.getSubTables()));
         }
         return res;
     }
 
-    private void addFieldModel(Table cm, Field fm) throws OrmMetaDataException, GeneratorException {
+    private void addFieldModel(Table<?> cm, Field<?,?> fm) throws OrmMetaDataException {
         switch (fm.getFieldType()) {
             case BYTE:
                 addByteField(cm, fm);
@@ -344,37 +340,37 @@ class Output {
 
     }
 
-    private void addLongField(Table cm, Field fm) {
+    private void addLongField(Table<?> cm, Field<?,?> fm) {
         addField(cm, fm, LongField.class, "longField");
     }
 
-    private void addIntegerField(Table cm, Field fm) {
+    private void addIntegerField(Table<?> cm, Field<?,?> fm) {
         addField(cm, fm, IntegerField.class, "integerField");
 
     }
 
-    private void addShortField(Table cm, Field fm) {
+    private void addShortField(Table<?> cm, Field<?,?> fm) {
         addField(cm, fm, ShortField.class, "shortField");
     }
 
-    private void addByteField(Table cm, Field fm) {
+    private void addByteField(Table<?> cm, Field<?,?> fm) {
         addField(cm, fm, ByteField.class, "byteField");
     }
 
 
-    private void addDoubleField(Table cm, Field fm) {
+    private void addDoubleField(Table<?> cm, Field<?,?> fm) {
         addField(cm, fm, DoubleField.class, "doubleField");
     }
 
-    private void addFloatField(Table cm, Field fm) {
+    private void addFloatField(Table<?> cm, Field<?,?> fm) {
         addField(cm, fm, FloatField.class, "floatField");
     }
 
-    private void addBooleanField(Table cm, Field fm) {
+    private void addBooleanField(Table<?> cm, Field<?,?> fm) {
         addField(cm, fm, BooleanField.class, "booleanField");
     }
 
-    private void addEnumField(Table cm, Field fm) {
+    private void addEnumField(Table<?> cm, Field<?,?> fm) {
         impt(EnumField.class);
         String enumTypeName;
         if (fm.getJavaType().getEnclosingClass() == null) {
@@ -392,29 +388,29 @@ class Output {
         completeField(fm);
     }
 
-    private void addDateField(Table cm, Field fm) {
+    private void addDateField(Table<?> cm, Field<?,?> fm) {
         addField(cm, fm, DateField.class, "dateField");
     }
 
-    private void addInstantField(Table cm, Field fm) {
+    private void addInstantField(Table<?> cm, Field<?,?> fm) {
         addField(cm, fm, InstantField.class, "instantField");
     }
 
-    private void addLocalDateTimeField(Table cm, Field fm) {
+    private void addLocalDateTimeField(Table<?> cm, Field<?,?> fm) {
         addField(cm, fm, LocalDateTimeField.class, "localDateTimeField");
     }
 
-    private void addStringField(Table cm, Field fm) {
+    private void addStringField(Table<?> cm, Field<?,?> fm) {
         addField(cm, fm, StringField.class, "stringField");
     }
 
-    private String addIndexModel(Table tm, Index<?> im) {
+    private String addIndexModel(Index<?> im) {
         impt(IndexPart.class);
         StringJoiner sj = new StringJoiner(",");
-        for (Field field : im.getFields()) {
+        for (Field<?,?> field : im.getFields()) {
             sj.add(field.getJavaName());
         }
-        String indexName = indexName(tm, im);
+        String indexName = indexName(im);
         emit("private final %s %s = new %s(%s,Arrays.asList(%s));",
                 IndexPart.class.getSimpleName(),
                 indexName,
@@ -424,9 +420,9 @@ class Output {
         return indexName;
     }
 
-    private String indexName(Table tm, Index<?> im) {
+    private String indexName(Index<?> im) {
         StringJoiner sj = new StringJoiner("_");
-        for (Field field : im.getFields()) {
+        for (Field<?,?> field : im.getFields()) {
             sj.add(field.getJavaName());
         }
         sj.add("idx");
@@ -462,19 +458,19 @@ class Output {
         pop();
     }
 
-    private String tableName(Table table) {
+    private String tableName(Table<?> table) {
         return table.getObjectClass().getSimpleName() + "Table";
     }
 
-    private String getJavaName(Table table) {
+    private String getJavaName(Table<?> table) {
         return table.getObjectClass().getSimpleName();
     }
 
-    private String shortFieldName(Table table) {
+    private String shortFieldName(Table<?> table) {
         return getJavaName(table).toUpperCase();
     }
 
-    private String fullFieldName(Table table) {
+    private String fullFieldName(Table<?> table) {
         return gen.getTablesPackageFor(table) + ".Tables." + shortFieldName(table);
     }
 

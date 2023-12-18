@@ -15,7 +15,6 @@ public interface Generator<T extends Table> {
      * Get all the PJO classes detected by this generator.
      *
      * @return The set of POJO classes.
-     * @throws GeneratorException
      */
     Set<Class<?>> getAllPojoClasses() throws GeneratorException;
 

@@ -15,13 +15,12 @@ import java.util.List;
 public class PackageDatabase implements Database {
 
     private final String packageName;
-    private final List<Table<?>> tables = new ArrayList();
+    private final List<Table<?>> tables = new ArrayList<>();
     private String sqlDatabase;
 
     /**
      * Create a database package with the given package name.
      *
-     * @param packageName
      */
     public PackageDatabase(String packageName) {
         this.packageName = packageName;
@@ -61,7 +60,7 @@ public class PackageDatabase implements Database {
      *
      * @param table The table to add
      */
-    void addTable(Table table) {
+    void addTable(Table<?> table) {
         tables.add(table);
     }
 

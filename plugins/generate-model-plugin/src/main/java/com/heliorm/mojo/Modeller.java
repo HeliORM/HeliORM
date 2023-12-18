@@ -2,11 +2,7 @@ package com.heliorm.mojo;
 
 import com.heliorm.Table;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
@@ -14,7 +10,7 @@ import static java.lang.String.format;
 /**
  * @author gideon
  */
-class Modeller<T extends Table> {
+class Modeller<T extends Table<?>> {
 
     private final Generator<T> gen;
     private Map<String, String> classPackageMap;
@@ -36,8 +32,7 @@ class Modeller<T extends Table> {
     private void generate(Set<String> topLevelPackages) throws GeneratorException {
         Set<Class<?>> allPojoClasses = gen.getAllPojoClasses();
         classPackageMap = makeDatabaseMap(topLevelPackages, allPojoClasses);
-        Set<String> uniquePackages = classPackageMap.values().stream()
-                .collect(Collectors.toSet());
+        Set<String> uniquePackages = new HashSet<>(classPackageMap.values());
         packageDatabases = makeDatabases(uniquePackages);
         List<Entry> roots = buildTree(allPojoClasses);
         for (Entry entry : roots) {
@@ -47,7 +42,7 @@ class Modeller<T extends Table> {
 
     private T generate(Entry entry) {
         Set<T> subTables = entry.kids.stream()
-                .map(e -> generate(e)).collect(Collectors.toSet());
+                .map(this::generate).collect(Collectors.toSet());
         Class<?> pojoClass = entry.clazz;
         PackageDatabase db = packageDatabases.get(classPackageMap.get(pojoClass.getCanonicalName()));
         T table = gen.getPojoModel(pojoClass, db, subTables);
@@ -57,7 +52,7 @@ class Modeller<T extends Table> {
 
     private List<Entry> buildTree(Set<Class<?>> classes) {
         Map<String, Entry> classMap = classes.stream()
-                .collect(Collectors.toMap(clazz -> clazz.getName(), clazz -> new Entry(clazz)));
+                .collect(Collectors.toMap(Class::getName, Entry::new));
         return buildTree(classMap);
     }
 
@@ -78,13 +73,16 @@ class Modeller<T extends Table> {
     }
 
     private Map<String, String> makeDatabaseMap(Set<String> topLevelPackages, Set<Class<?>> allPojoClasses) throws GeneratorException {
-        Map<String, String> map = new HashMap();
+        Map<String, String> map = new HashMap<>();
         for (Class<?> clazz : allPojoClasses) {
             for (String tlp : topLevelPackages) {
                 String name = clazz.getCanonicalName();
                 if (name.startsWith(tlp)) {
                     if (map.containsKey(name)) {
-                        throw new GeneratorException(format("Class '%s' matches more than one top level package (%s and %s)", tlp, map.get(name)));
+                        throw new GeneratorException(format("Class '%s' matches more than one top level package (%s and %s)",
+                                name,
+                                tlp,
+                                map.get(name)));
                     }
                     map.put(name, tlp);
                     break;
@@ -96,13 +94,13 @@ class Modeller<T extends Table> {
 
     private Map<String, PackageDatabase> makeDatabases(Set<String> packages) {
         return packages.stream()
-                .collect(Collectors.toMap(pkg -> pkg, pkg -> new PackageDatabase(pkg)));
+                .collect(Collectors.toMap(pkg -> pkg, PackageDatabase::new));
     }
 
     private static class Entry {
 
         private final Class<?> clazz;
-        private final List<Entry> kids = new ArrayList();
+        private final List<Entry> kids = new ArrayList<>();
 
         Entry(Class<?> clazz) {
             this.clazz = clazz;

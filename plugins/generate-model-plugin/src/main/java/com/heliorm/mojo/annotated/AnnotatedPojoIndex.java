@@ -19,7 +19,7 @@ public class AnnotatedPojoIndex implements Index {
         unique = ann.unique();
         fields = new ArrayList<>();
         Map<String, Field> fields = table.getFields().stream()
-                .collect(Collectors.toMap(field -> field.getJavaName(), field -> field));
+                .collect(Collectors.toMap(Field::getJavaName, field -> field));
         for (String indexField : ann.columns()) {
             Field field = fields.get(indexField);
             if (field == null) {

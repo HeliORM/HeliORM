@@ -59,7 +59,7 @@ public final class AnnotatedPojoTable implements Table {
     public List<Field> getFields() {
         if (fieldModels == null) {
             List<java.lang.reflect.Field> fields = getAllFields(pojoClass);
-            fieldModels = new ArrayList();
+            fieldModels = new ArrayList<>();
             for (java.lang.reflect.Field field : fields) {
                 if (isDataField(field)) {
                     fieldModels.add(new AnnotatedPojoField(this, field));
@@ -71,7 +71,7 @@ public final class AnnotatedPojoTable implements Table {
 
     @Override
     public Optional<Field> getPrimaryKey() {
-        return getFields().stream().filter(field -> field.isPrimaryKey()).findAny();
+        return getFields().stream().filter(Field::isPrimaryKey).findAny();
     }
 
     @Override
@@ -86,7 +86,7 @@ public final class AnnotatedPojoTable implements Table {
 
     @Override
     public Set<Table> getSubTables() {
-        return new HashSet(subs);
+        return new HashSet<>(subs);
     }
 
     @Override
@@ -168,7 +168,7 @@ public final class AnnotatedPojoTable implements Table {
      * @return The list of fields
      */
     private List<java.lang.reflect.Field> getAllFields(Class<?> clazz) {
-        List<java.lang.reflect.Field> res = new LinkedList();
+        List<java.lang.reflect.Field> res = new LinkedList<>();
         if (clazz.getSuperclass() != Object.class) {
             res.addAll(getAllFields(clazz.getSuperclass()));
         }
@@ -177,7 +177,7 @@ public final class AnnotatedPojoTable implements Table {
     }
 
     private Set<Table> unrollSubTables(Set<AnnotatedPojoTable> subs) {
-        Set<Table> res = new HashSet();
+        Set<Table> res = new HashSet<>();
         for (Table sub : subs) {
             if (!sub.isAbstract()) {
                 res.add(sub);

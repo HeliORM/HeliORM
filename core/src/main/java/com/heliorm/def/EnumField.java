@@ -8,7 +8,7 @@ import com.heliorm.Field;
  * @param <O> Object type
  * @author gideon
  */
-public interface EnumField< O, C extends Enum> extends Field<O, C>, WithEquals<O, C>, WithIn<O, C>, WithIs<O> {
+public interface EnumField< O, C extends Enum<?>> extends Field<O, C>, WithEquals<O, C>, WithIn<O, C>, WithIs<O> {
 
     @Override
     default FieldType getFieldType() {

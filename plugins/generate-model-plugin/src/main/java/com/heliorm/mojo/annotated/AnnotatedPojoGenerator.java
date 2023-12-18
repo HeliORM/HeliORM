@@ -36,7 +36,7 @@ public class AnnotatedPojoGenerator implements Generator<AnnotatedPojoTable> {
     @Override
     public Set<Class<?>> getAllPojoClasses() throws GeneratorException {
         try {
-            HashSet<Class<?>> res = new HashSet();
+            HashSet<Class<?>> res = new HashSet<>();
             ClassInfoList all = scan.getAllClasses().getStandardClasses();
             ClassInfoList anno = scan.getClassesWithAnnotation(Pojo.class.getName());
             for (ClassInfo info : findMissingSubClasses(anno, all)) {
@@ -78,7 +78,7 @@ public class AnnotatedPojoGenerator implements Generator<AnnotatedPojoTable> {
      * @return The list containing the missing classes
      */
     private List<ClassInfo> findMissingSubClasses(ClassInfo superClass, ClassInfoList possibleSubClasses) {
-        List<ClassInfo> subClasses = new ArrayList();
+        List<ClassInfo> subClasses = new ArrayList<>();
         for (ClassInfo info : possibleSubClasses) {
             if (info.hasAnnotation(Pojo.class.getName())) {
                 continue;

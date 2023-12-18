@@ -13,8 +13,4 @@ public class OrmMetaDataException extends OrmException {
         super(message);
     }
 
-    public OrmMetaDataException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
 }
