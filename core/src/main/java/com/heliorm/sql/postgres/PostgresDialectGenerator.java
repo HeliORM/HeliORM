@@ -87,7 +87,7 @@ public class PostgresDialectGenerator implements TableGenerator {
             case LOCAL_DATE_TIME:
                 return "TIMESTAMP";
             default:
-                throw new OrmSqlException(format("Unkown field type '%s'. BUG!", field.getFieldType()));
+                throw new OrmSqlException(format("Unknown field type '%s'. BUG!", field.getFieldType()));
         }
     }
 

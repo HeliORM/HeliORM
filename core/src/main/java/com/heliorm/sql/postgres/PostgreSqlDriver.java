@@ -28,17 +28,17 @@ public final class PostgreSqlDriver extends SqlDriver {
     }
 
     @Override
-    protected String fullTableName(Table table) {
+    protected String fullTableName(Table<?> table) {
         return format("\"%s\".public.\"%s\"", databaseName(table), tableName(table));
     }
 
     @Override
-    protected String fullFieldName(Table table, Field field) {
+    protected String fullFieldName(Table<?> table, Field<?,?> field) {
         return format("%s.\"%s\"", fullTableName(table), field.getSqlName());
     }
 
     @Override
-    protected String fieldName(Table table, Field field) {
+    protected String fieldName(Table<?> table, Field<?,?> field) {
         return format("\"%s\"", field.getSqlName());
     }
 
@@ -63,12 +63,12 @@ public final class PostgreSqlDriver extends SqlDriver {
     }
 
     @Override
-    protected String castNull(Field field) throws OrmException {
+    protected String castNull(Field<?,?> field) throws OrmException {
         return format("CAST(NULL AS %s)", fieldType(field.getTable(), field));
     }
 
     @Override
-    protected String fieldType(Table table, Field field) throws OrmException {
+    protected String fieldType(Table<?> table, Field<?,?> field) throws OrmException {
         switch (field.getFieldType()) {
             case BOOLEAN:
                 return "BIT";
@@ -98,7 +98,6 @@ public final class PostgreSqlDriver extends SqlDriver {
             case DATE:
                 return "DATE";
             case INSTANT:
-                return "TIMESTAMP";
             case LOCAL_DATE_TIME:
                 return "TIMESTAMP";
             default:
@@ -106,12 +105,12 @@ public final class PostgreSqlDriver extends SqlDriver {
         }
     }
 
-    private String enumTypeName(Table table, Field field) {
+    private String enumTypeName(Table<?> table, Field<?,?> field) {
         return format("%s_%s", table.getSqlTable(), field.getSqlName());
     }
 
 
-    protected Object getKeyValueFromResultSet(ResultSet rs, Field field) throws OrmException {
+    protected Object getKeyValueFromResultSet(ResultSet rs, Field<?,?> field) throws OrmException {
         try {
             switch (field.getFieldType()) {
                 case LONG:

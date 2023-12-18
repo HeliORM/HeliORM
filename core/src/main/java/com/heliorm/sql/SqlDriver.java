@@ -114,7 +114,7 @@ public abstract class SqlDriver {
      * @return The SQL field name
      * @throws OrmException Thrown if something goes wrong determining the field name
      */
-    protected abstract String fieldName(Table table, Field<?,?> field) throws OrmException;
+    protected abstract String fieldName(Table<?> table, Field<?,?> field) throws OrmException;
 
     /**
      * Create a virtual field name based on the supplied value
