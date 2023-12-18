@@ -42,7 +42,7 @@ public interface Table<O> {
     String getSqlTable();
 
     /**
-     * Return tables which support POJOs which are concrete sub-classes of the POJO
+     * Return tables which support POJOs which are concrete subclasses of the POJO
      * supported by this table.
      *
      * @return The sub tables

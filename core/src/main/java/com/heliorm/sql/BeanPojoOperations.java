@@ -102,7 +102,7 @@ public final class BeanPojoOperations extends AbstractPojoOperations {
     private Object getObject(Object pojo, java.lang.reflect.Field field, Class<?> type) throws OrmException {
         String name = toCamel("get", field.getName());
         Optional<Method> method = findMethod(pojo.getClass(), name, new Class[]{});
-        if (!method.isPresent()) {
+        if (method.isEmpty()) {
             if (Boolean.class.isAssignableFrom(type) || Boolean.TYPE.isAssignableFrom(type)) {
                 name = toCamel("is", field.getName());
                 method = findMethod(pojo.getClass(), name, new Class[]{});

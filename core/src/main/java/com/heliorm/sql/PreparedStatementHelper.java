@@ -32,7 +32,7 @@ class PreparedStatementHelper {
      * @param field The field for which to get the value from the POJO
      * @param par   The position in the prepared statement for the value
      */
-    void setValueInStatement(PreparedStatement stmt, Object pojo, Field field, int par) throws OrmException {
+    void setValueInStatement(PreparedStatement stmt, Object pojo, Field<?,?> field, int par) throws OrmException {
         try {
             switch (field.getFieldType()) {
                 case LONG:

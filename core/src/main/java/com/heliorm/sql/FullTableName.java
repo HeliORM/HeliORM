@@ -7,7 +7,7 @@ import com.heliorm.Table;
 @FunctionalInterface
 interface FullTableName {
 
-    String apply(Table table) throws OrmException;
+    String apply(Table<?> table) throws OrmException;
 
 
 }

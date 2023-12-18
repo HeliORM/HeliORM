@@ -41,7 +41,7 @@ final class PojoCompare<O> implements Comparable<PojoCompare<O>> {
                 }
             }
             if (pojo instanceof Comparable) {
-                return ((Comparable<O>) pojo).compareTo(w.getPojo());
+                return ((Comparable)pojo).compareTo(w.getPojo());
             }
         }
         return table.getSqlTable().compareTo(w.table.getSqlTable());

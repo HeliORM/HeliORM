@@ -21,9 +21,9 @@ import static java.lang.String.format;
 class ResultSetHelper {
 
     private final PojoOperations pops;
-    private final Function<Field, String> getFieldId;
+    private final Function<Field<?,?>, String> getFieldId;
 
-    ResultSetHelper(PojoOperations pops, Function<Field, String> getFieldId) {
+    ResultSetHelper(PojoOperations pops, Function<Field<?,?>, String> getFieldId) {
         this.pops = pops;
         this.getFieldId = getFieldId;
     }
@@ -41,7 +41,7 @@ class ResultSetHelper {
     <O> O makePojoFromResultSet(ResultSet rs, Table<O> table) throws OrmException {
         try {
             O pojo = pops.newPojoInstance(table);
-            for (Field field : table.getFields()) {
+            for (Field<?,?> field : table.getFields()) {
                 setValueInPojo(pojo, field, rs);
             }
             return pojo;
@@ -50,7 +50,7 @@ class ResultSetHelper {
         }
     }
 
-    private void setValueInPojo(Object pojo, Field field, ResultSet rs) throws OrmException {
+    private void setValueInPojo(Object pojo, Field<?,?> field, ResultSet rs) throws OrmException {
         String column = getFieldId(field);
         switch (field.getFieldType()) {
             case LONG:
@@ -86,7 +86,7 @@ class ResultSetHelper {
      * @throws OrmException Thrown if we cannot work out how to extract the
      *                      data.
      */
-    private Object getValue(ResultSet rs, Field field) throws OrmException {
+    private Object getValue(ResultSet rs, Field<?,?> field) throws OrmException {
         String column = getFieldId(field);
         try {
             switch (field.getFieldType()) {
@@ -148,7 +148,7 @@ class ResultSetHelper {
         }
     }
 
-    private String getFieldId(Field field) {
+    private String getFieldId(Field<?,?> field) {
         return getFieldId.apply(field);
     }
 

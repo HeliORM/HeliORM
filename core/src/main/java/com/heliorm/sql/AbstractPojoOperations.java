@@ -56,38 +56,16 @@ abstract class AbstractPojoOperations implements PojoOperations {
             throw new OrmException(format("Null value for primitive %s field %s. BUG", refField.getType().getSimpleName(), field.getJavaName()));
         }
         switch (field.getFieldType()) {
-            case LONG:
-                setLong(pojo, refField, value);
-                break;
-            case INTEGER:
-                setInteger(pojo, refField, value);
-                break;
-            case SHORT:
-                setShort(pojo, refField, value);
-                break;
-            case BYTE:
-                setByte(pojo, refField, value);
-                break;
-            case DOUBLE:
-                setDouble(pojo, refField, value);
-                break;
-            case FLOAT:
-                setFloat(pojo, refField, value);
-                break;
-            case BOOLEAN:
-                setBoolean(pojo, refField, value);
-                break;
-            case ENUM:
-                setEnum(pojo, refField, value);
-                break;
-            case DATE:
-            case INSTANT:
-            case LOCAL_DATE_TIME:
-            case STRING:
-                setObject(pojo, refField, value);
-                break;
-            default:
-                throw new OrmException(format("Unsupported field type '%s'. BUG!", field.getFieldType()));
+            case LONG -> setLong(pojo, refField, value);
+            case INTEGER -> setInteger(pojo, refField, value);
+            case SHORT -> setShort(pojo, refField, value);
+            case BYTE -> setByte(pojo, refField, value);
+            case DOUBLE -> setDouble(pojo, refField, value);
+            case FLOAT -> setFloat(pojo, refField, value);
+            case BOOLEAN -> setBoolean(pojo, refField, value);
+            case ENUM -> setEnum(pojo, refField, value);
+            case DATE, INSTANT, LOCAL_DATE_TIME, STRING -> setObject(pojo, refField, value);
+            default -> throw new OrmException(format("Unsupported field type '%s'. BUG!", field.getFieldType()));
         }
     }
 
@@ -97,31 +75,17 @@ abstract class AbstractPojoOperations implements PojoOperations {
             throw new OrmException("Null field type passed to getValue(). BUG!");
         }
         java.lang.reflect.Field refField = getDeclaredField(pojo.getClass(), field.getJavaName());
-        switch (field.getFieldType()) {
-            case LONG:
-                return getLong(pojo, refField);
-            case INTEGER:
-                return getInteger(pojo, refField);
-            case SHORT:
-                return getShort(pojo, refField);
-            case BYTE:
-                return getByte(pojo, refField);
-            case DOUBLE:
-                return getDouble(pojo, refField);
-            case FLOAT:
-                return getFloat(pojo, refField);
-            case BOOLEAN:
-                return getBoolean(pojo, refField);
-            case ENUM:
-                return getEnum(pojo, refField);
-            case DATE:
-            case INSTANT:
-            case LOCAL_DATE_TIME:
-            case STRING:
-                return getObject(pojo, refField);
-            default:
-                throw new OrmException(format("Unsupported field type '%s'. BUG!", field.getFieldType()));
-        }
+        return switch (field.getFieldType()) {
+            case LONG -> getLong(pojo, refField);
+            case INTEGER -> getInteger(pojo, refField);
+            case SHORT -> getShort(pojo, refField);
+            case BYTE -> getByte(pojo, refField);
+            case DOUBLE -> getDouble(pojo, refField);
+            case FLOAT -> getFloat(pojo, refField);
+            case BOOLEAN -> getBoolean(pojo, refField);
+            case ENUM -> getEnum(pojo, refField);
+            case DATE, INSTANT, LOCAL_DATE_TIME, STRING -> getObject(pojo, refField);
+        };
     }
 
     protected abstract Object getByte(Object pojo, java.lang.reflect.Field refField) throws OrmException;
@@ -163,18 +127,8 @@ abstract class AbstractPojoOperations implements PojoOperations {
     @Override
     public final int compareTo(Object pojo1, Object pojo2, Field field) throws OrmException {
         switch (field.getFieldType()) {
-            case LONG:
-            case INTEGER:
-            case SHORT:
-            case BYTE:
-            case DOUBLE:
-            case FLOAT:
-            case BOOLEAN:
-            case ENUM:
-            case STRING:
-            case DATE:
-            case LOCAL_DATE_TIME:
-            case INSTANT:
+            case LONG, INTEGER, SHORT, BYTE, DOUBLE, FLOAT, BOOLEAN,
+                    ENUM, STRING, DATE, LOCAL_DATE_TIME, INSTANT -> {
                 Object val1 = getValue(pojo1, field);
                 Object val2 = getValue(pojo2, field);
                 if (val1 == val2) return 0;
@@ -185,8 +139,8 @@ abstract class AbstractPojoOperations implements PojoOperations {
                 } else {
                     throw new OrmException(format("Non-comparable type %s for field %s", field.getJavaType(), field.getJavaName()));
                 }
-            default:
-                throw new OrmException(format("Unsupported field type '%s'. BUG!", field.getFieldType()));
+            }
+            default -> throw new OrmException(format("Unsupported field type '%s'. BUG!", field.getFieldType()));
         }
 
     }

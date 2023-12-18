@@ -11,7 +11,4 @@ public class OrmTransactionException extends OrmException {
         super(message);
     }
 
-    public OrmTransactionException(String message, Throwable cause) {
-        super(message, cause);
-    }
 }
