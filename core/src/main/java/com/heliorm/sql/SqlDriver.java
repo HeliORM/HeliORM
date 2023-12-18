@@ -147,11 +147,11 @@ public abstract class SqlDriver {
      * @param table The table we're referencing
      * @return The SQL table name
      */
-    protected final String tableName(Table table) {
+    protected final String tableName(Table<?> table) {
         return makeTableName(table);
     }
 
-    final String makeTableName(Table table) {
+    final String makeTableName(Table<?> table) {
         return format("%s", table.getSqlTable());
     }
 
@@ -161,7 +161,7 @@ public abstract class SqlDriver {
      * @param table The table we're referencing
      * @return The SQL table name
      */
-    protected final String databaseName(Table table) {
+    protected final String databaseName(Table<?> table) {
         Database database = table.getDatabase();
         Database alias = aliases.get(database);
         if (alias == null) {

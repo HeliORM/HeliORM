@@ -30,17 +30,17 @@ public final class MySqlDriver extends SqlDriver {
     }
 
     @Override
-    protected String fullTableName(Table table) {
+    protected String fullTableName(Table<?> table) {
         return format("%s.%s", databaseName(table), tableName(table));
     }
 
     @Override
-    protected String fullFieldName(Table table, Field field) {
+    protected String fullFieldName(Table<?> table, Field<?,?> field) {
         return format("%s.`%s`", fullTableName(table), field.getSqlName());
     }
 
     @Override
-    protected String fieldName(Table table, Field field) {
+    protected String fieldName(Table<?> table, Field<?,?> field) {
         return format("`%s`", field.getSqlName());
     }
 
@@ -60,7 +60,7 @@ public final class MySqlDriver extends SqlDriver {
     }
 
     @Override
-    protected String castNull(Field field) {
+    protected String castNull(Field<?,?> field) {
         return "NULL";
     }
 
@@ -75,7 +75,7 @@ public final class MySqlDriver extends SqlDriver {
      *                      data.
      */
     @Override
-    protected Object getKeyValueFromResultSet(ResultSet rs, Field field) throws OrmException {
+    protected Object getKeyValueFromResultSet(ResultSet rs, Field<?,?> field) throws OrmException {
         try {
             int idx = 1;
             switch (field.getFieldType()) {

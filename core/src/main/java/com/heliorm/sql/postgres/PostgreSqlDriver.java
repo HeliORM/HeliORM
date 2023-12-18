@@ -91,7 +91,7 @@ public final class PostgreSqlDriver extends SqlDriver {
                     length = 36;
                 }
                 if (field.getLength().isPresent()) {
-                    length = (int) field.getLength().get();
+                    length = field.getLength().get();
                 }
                 return format("VARCHAR(%d)", length);
             }
