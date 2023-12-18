@@ -21,7 +21,7 @@ final class SqlTransaction implements OrmTransaction, AutoCloseable {
     private boolean open;
 
     /**
-     * Create a new transactoion for the given driver.
+     * Create a new transaction for the given driver.
      *
      * @param driver     The driver for this transaction
      * @param connection the SQL Connection for this transaction
@@ -47,7 +47,7 @@ final class SqlTransaction implements OrmTransaction, AutoCloseable {
             open = false;
             connection.close();
         } catch (SQLException ex) {
-            throw new OrmException(format("Error commiting transaction (%s)", ex.getMessage()));
+            throw new OrmException(format("Error committing transaction (%s)", ex.getMessage()));
         }
     }
 

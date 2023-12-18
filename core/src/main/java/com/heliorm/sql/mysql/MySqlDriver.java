@@ -104,7 +104,7 @@ public final class MySqlDriver extends SqlDriver {
     }
 
     @Override
-    protected String fieldType(Table<?> table, Field field) throws OrmException {
+    protected String fieldType(Table<?> table, Field<?,?> field) throws OrmException {
         switch (field.getFieldType()) {
             case BOOLEAN:
                 return "TINYINT(1)";
@@ -128,18 +128,17 @@ public final class MySqlDriver extends SqlDriver {
                     length = 36;
                 }
                 if (field.getLength().isPresent()) {
-                    length = (int) field.getLength().get();
+                    length = field.getLength().get();
                 }
                 return format("VARCHAR(%d)", length);
             }
             case DATE:
                 return "DATE";
             case INSTANT:
-                return "DATETIME";
             case LOCAL_DATE_TIME:
                 return "DATETIME";
             default:
-                throw new OrmSqlException(format("Unkown field type '%s'. BUG!", field.getFieldType()));
+                throw new OrmSqlException(format("Unknown field type '%s'. BUG!", field.getFieldType()));
         }
     }
 

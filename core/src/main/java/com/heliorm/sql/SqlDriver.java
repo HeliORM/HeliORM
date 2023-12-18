@@ -82,7 +82,7 @@ public abstract class SqlDriver {
      * @throws OrmException Thrown if we cannot work out how to extract the
      *                      data.
      */
-    protected abstract Object getKeyValueFromResultSet(ResultSet rs, Field field) throws OrmException;
+    protected abstract Object getKeyValueFromResultSet(ResultSet rs, Field<?,?> field) throws OrmException;
 
 
     /**
@@ -102,9 +102,9 @@ public abstract class SqlDriver {
      * @return The SQL field name
      * @throws OrmException Thrown if something goes wrong determining the field name
      */
-    protected abstract String fullFieldName(Table<?> table, Field field) throws OrmException;
+    protected abstract String fullFieldName(Table<?> table, Field<?,?> field) throws OrmException;
 
-    protected abstract String fieldType(Table<?> table, Field field) throws OrmException;
+    protected abstract String fieldType(Table<?> table, Field<?,?> field) throws OrmException;
 
     /**
      * Work out the short field name to use.
@@ -114,7 +114,7 @@ public abstract class SqlDriver {
      * @return The SQL field name
      * @throws OrmException Thrown if something goes wrong determining the field name
      */
-    protected abstract String fieldName(Table table, Field field) throws OrmException;
+    protected abstract String fieldName(Table table, Field<?,?> field) throws OrmException;
 
     /**
      * Create a virtual field name based on the supplied value
