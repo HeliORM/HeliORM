@@ -1,14 +1,14 @@
 package com.heliorm.sql;
 
-import test.persons.Person;
-import test.pets.Bird;
-import test.pets.Cat;
-import test.pets.CatBreed;
-import test.pets.CatType;
-import test.pets.Dog;
-import test.pets.Pet;
-import test.place.Province;
-import test.place.Town;
+import com.heliorm.test.persons.Person;
+import com.heliorm.test.pets.Bird;
+import com.heliorm.test.pets.Cat;
+import com.heliorm.test.pets.CatBreed;
+import com.heliorm.test.pets.CatType;
+import com.heliorm.test.pets.Dog;
+import com.heliorm.test.pets.Pet;
+import com.heliorm.test.place.Province;
+import com.heliorm.test.place.Town;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -167,8 +167,7 @@ class TestData {
     }
 
     static Cat makeCat(Person person, CatBreed breed) {
-        Cat cat = new Cat();
-        cat = makePet(cat, person);
+        Cat cat = makePet(new Cat(), person);
         cat.setType(random.nextBoolean() ? CatType.INDOOR : CatType.OUTDOOR);
         cat.setBreedId(breed.getId());
         return cat;
@@ -176,30 +175,14 @@ class TestData {
 
 
     static Dog makeDog(Person person) {
-        Dog dog = new Dog();
-        dog = makePet(dog, person);
-        return dog;
+        return makePet(new Dog(), person);
     }
 
     static Bird makeBird(Person person) {
-        Bird bird = new Bird();
-        bird = makePet(bird, person);
+        Bird bird = makePet(new Bird(), person);
         bird.setType(random.nextBoolean() ? Bird.Type.CAGED : Bird.Type.FREERANGE);
         bird.setSingTime(random.nextInt(31));
         return bird;
-    }
-
-    static Person makePerson(int n) {
-        Person person = new Person();
-        person.setFirstName(PEOPLE_NAMES[random.nextInt(PEOPLE_NAMES.length)]);
-        if (random.nextInt(5) == 0) {
-            person.setLastName(null);
-        } else {
-            person.setLastName(PEOPLE_NAMES[random.nextInt(PEOPLE_NAMES.length)]);
-        }
-        person.setEmailAddress(PEOPLE_NAMES[random.nextInt(PEOPLE_NAMES.length)].toLowerCase() + n + "@gmail.com");
-        person.setIncome(random.nextDouble() * 10000);
-        return person;
     }
 
     static List<Person> makePersons(List<Town> towns) {

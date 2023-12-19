@@ -1,10 +1,10 @@
-package test.persons;
+package com.heliorm.test.persons;
 
 import com.heliorm.annotation.Column;
 import com.heliorm.annotation.ForeignKey;
 import com.heliorm.annotation.Pojo;
 import com.heliorm.annotation.PrimaryKey;
-import test.place.Town;
+import com.heliorm.test.place.Town;
 
 /**
  * @author gideon

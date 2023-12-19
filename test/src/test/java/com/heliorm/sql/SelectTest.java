@@ -8,15 +8,15 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import test.persons.Person;
-import test.pets.Bird;
-import test.pets.Cat;
-import test.pets.CatBreed;
-import test.pets.CatType;
-import test.pets.Dog;
-import test.pets.Pet;
-import test.place.Province;
-import test.place.Town;
+import com.heliorm.test.persons.Person;
+import com.heliorm.test.pets.Bird;
+import com.heliorm.test.pets.Cat;
+import com.heliorm.test.pets.CatBreed;
+import com.heliorm.test.pets.CatType;
+import com.heliorm.test.pets.Dog;
+import com.heliorm.test.pets.Pet;
+import com.heliorm.test.place.Province;
+import com.heliorm.test.place.Town;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -51,12 +51,12 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static test.Tables.CAT;
-import static test.Tables.CATBREED;
-import static test.Tables.PERSON;
-import static test.Tables.PET;
-import static test.Tables.PROVINCE;
-import static test.Tables.TOWN;
+import static com.heliorm.test.Tables.CAT;
+import static com.heliorm.test.Tables.CATBREED;
+import static com.heliorm.test.Tables.PERSON;
+import static com.heliorm.test.Tables.PET;
+import static com.heliorm.test.Tables.PROVINCE;
+import static com.heliorm.test.Tables.TOWN;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class SelectTest extends AbstractOrmTest {

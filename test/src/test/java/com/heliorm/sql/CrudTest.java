@@ -5,11 +5,11 @@ import com.heliorm.OrmException;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import test.persons.Person;
-import test.pets.Cat;
-import test.pets.CatBreed;
-import test.place.Province;
-import test.place.Town;
+import com.heliorm.test.persons.Person;
+import com.heliorm.test.pets.Cat;
+import com.heliorm.test.pets.CatBreed;
+import com.heliorm.test.place.Province;
+import com.heliorm.test.place.Town;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,8 +25,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static test.Tables.CAT;
-import static test.Tables.PERSON;
+import static com.heliorm.test.Tables.CAT;
+import static com.heliorm.test.Tables.PERSON;
 
 public class CrudTest extends AbstractOrmTest {
 
@@ -53,8 +53,8 @@ public class CrudTest extends AbstractOrmTest {
     @Test
     public void testCreate() throws Exception {
         say("Testing create with auto-number Long key");
-        Person person = orm().select(PERSON, where(PERSON.id.eq(persons.get(0).getId()))).one();
-        Cat cat = makeCat(person, catBreeds.get(0));
+        Person person = orm().select(PERSON, where(PERSON.id.eq(persons.getFirst().getId()))).one();
+        Cat cat = makeCat(person, catBreeds.getFirst());
         Cat saved = orm().create(cat);
         cats.add(saved);
         assertNotNull(saved, "The object returned by create should not be null");
@@ -66,7 +66,7 @@ public class CrudTest extends AbstractOrmTest {
     @Test
     public void testUpdate() throws Exception {
         say("Testing update with auto-number Long key");
-        Long id = persons.get(0).getId();
+        Long id = persons.getFirst().getId();
         Person person = orm().select(PERSON, where(PERSON.id.eq(id))).one();
         person.setFirstName(person.getFirstName() == null ? "Bob" : person.getFirstName().toUpperCase());
         person.setLastName(person.getLastName() == null ? "Smith" : person.getLastName().toLowerCase());
@@ -81,7 +81,7 @@ public class CrudTest extends AbstractOrmTest {
     @Test
     public void testUpdateWithNoChange() throws Exception {
         say("Testing update with auto-number Long key where nothing changes");
-        Long id = persons.get(0).getId();
+        Long id = persons.getFirst().getId();
         Person person = orm().select(PERSON, where(PERSON.id.eq(id))).one();
         Person updated = orm().update(person);
         Person loaded = orm().select(PERSON, where(PERSON.id.eq(id))).one();
@@ -94,7 +94,7 @@ public class CrudTest extends AbstractOrmTest {
     @Test
     public void testUpdateWithNullKey() throws Exception {
         say("Testing update with null key");
-        Long id = persons.get(0).getId();
+        Long id = persons.getFirst().getId();
         Person person = orm().select(PERSON, where(PERSON.id.eq(id))).one();
         person.setId(null);
         boolean failed = false;
@@ -109,7 +109,7 @@ public class CrudTest extends AbstractOrmTest {
     @Test
     public void testUpdateWithBadKey() throws Exception {
         say("Testing update with bad key");
-        Long id = persons.get(0).getId();
+        Long id = persons.getFirst().getId();
         Person person = orm().select(PERSON, where(PERSON.id.eq(id))).one();
         Long newKey = 10000000L;
         person.setId(newKey);
@@ -126,7 +126,7 @@ public class CrudTest extends AbstractOrmTest {
     @Test
     public void testDelete() throws Exception {
         say("Testing delete with Long key");
-        Cat cat = cats.remove(0);
+        Cat cat = cats.removeFirst();
         orm().delete(cat);
         Optional<Cat> opt = orm().select(CAT, where(CAT.id.eq(cat.getId()))).optional();
         assertFalse(opt.isPresent(), "No object for delete id must be in the database");

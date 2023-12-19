@@ -1,26 +1,23 @@
-package test.pets;
+package com.heliorm.test.place;
 
 import com.heliorm.annotation.Column;
 import com.heliorm.annotation.Pojo;
 import com.heliorm.annotation.PrimaryKey;
 
-/**
- * @author gideon
- */
 @Pojo
-public class CatBreed {
+public class Province {
 
-    @PrimaryKey(autoIncrement = true)
-    private Long id;
-    @Column(length = 32, nullable = false)
+    @PrimaryKey
+    private Long provinceId;
+    @Column(length = 30)
     private String name;
 
-    public Long getId() {
-        return id;
+    public Long getProvinceId() {
+        return provinceId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setProvinceId(Long provinceId) {
+        this.provinceId = provinceId;
     }
 
     public String getName() {

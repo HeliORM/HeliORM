@@ -10,11 +10,11 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.h2.jdbcx.JdbcDataSource;
 import org.junit.jupiter.api.BeforeAll;
-import test.persons.Person;
-import test.pets.Cat;
-import test.pets.Dog;
-import test.place.Province;
-import test.place.Town;
+import com.heliorm.test.persons.Person;
+import com.heliorm.test.pets.Cat;
+import com.heliorm.test.pets.Dog;
+import com.heliorm.test.place.Province;
+import com.heliorm.test.place.Town;
 
 import javax.sql.DataSource;
 import java.lang.reflect.InvocationTargetException;
@@ -42,21 +42,20 @@ abstract class AbstractOrmTest {
     public static void setup() throws Exception {
         String dbType = System.getenv("ORM_TEST_DB");
         dbType = (dbType == null) ? "" : dbType;
-        Class<? extends SqlDriver> driver;
-        switch (dbType) {
-            case "mysql":
+        Class<? extends SqlDriver> driver = switch (dbType) {
+            case "mysql" -> {
                 jdbcDataSource = setupMysqlDataSource();
-                driver = MySqlDriver.class;
-                break;
-            case "postgresql":
+                yield MySqlDriver.class;
+            }
+            case "postgresql" -> {
                 jdbcDataSource = setupPostgreSqlDatasource();
-                driver = PostgreSqlDriver.class;
-                break;
-            case "h2":
-            default:
+                yield PostgreSqlDriver.class;
+            }
+            default -> {
                 jdbcDataSource = setupH2DataSource();
-                driver = MySqlDriver.class;
-        }
+                yield MySqlDriver.class;
+            }
+        };
         say("Using %s data source with driver %s", dbType, driver.getSimpleName());
         pops = new UnsafePojoOperations();
         orm = SqlOrmBuilder.create(AbstractOrmTest::getConnection, driver)
@@ -127,10 +126,6 @@ abstract class AbstractOrmTest {
     /**
      * Compare two POJOs to see that they are the same type and all their fields are the same.
      *
-     * @param o1
-     * @param o2
-     * @return
-     * @throws OrmException
      */
     protected final boolean pojoCompare(Object o1, Object o2) throws OrmException {
         Table<Object> t1 = orm.tableFor(o1);
@@ -147,10 +142,6 @@ abstract class AbstractOrmTest {
      * Compare two POJOs to see that they are the same type and all their fields are the same, apart from
      * their primary keys.
      *
-     * @param o1
-     * @param o2
-     * @return
-     * @throws OrmException
      */
     protected final boolean pojoCompareExcludingKey(Object o1, Object o2) throws OrmException {
         Table<Object> t1 = orm.tableFor(o1);
@@ -191,7 +182,7 @@ abstract class AbstractOrmTest {
         if (data.size() < 2) {
             return data;
         }
-        Table<O> t1 = orm.tableFor(data.get(0));
+        Table<O> t1 = orm.tableFor(data.getFirst());
         return data.stream().sorted((o1, o2) -> {
                     try {
                         int o = o1.getClass().getName().compareTo(o2.getClass().getName());

@@ -1,4 +1,4 @@
-package test.pets;
+package com.heliorm.test.pets;
 
 import com.heliorm.annotation.ForeignKey;
 import com.heliorm.annotation.Pojo;

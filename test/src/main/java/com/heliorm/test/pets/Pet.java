@@ -1,11 +1,11 @@
-package test.pets;
+package com.heliorm.test.pets;
 
 import com.heliorm.annotation.Column;
 import com.heliorm.annotation.ForeignKey;
 import com.heliorm.annotation.Index;
 import com.heliorm.annotation.Pojo;
 import com.heliorm.annotation.PrimaryKey;
-import test.persons.Person;
+import com.heliorm.test.persons.Person;
 
 import java.util.Date;
 
