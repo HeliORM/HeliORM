@@ -7,7 +7,6 @@
         <artifactId>plugins</artifactId>
         <version>0.99.7</version>
     </parent>
-    <groupId>com.heliorm</groupId>
     <artifactId>generate-sql-plugin</artifactId>
     <packaging>maven-plugin</packaging>
     <name>[HeliORM] SQL Generation Plugin</name>

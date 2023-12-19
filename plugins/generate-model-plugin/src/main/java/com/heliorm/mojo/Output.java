@@ -4,18 +4,7 @@ import com.heliorm.Database;
 import com.heliorm.Field;
 import com.heliorm.Index;
 import com.heliorm.Table;
-import com.heliorm.def.BooleanField;
-import com.heliorm.def.ByteField;
-import com.heliorm.def.DateField;
-import com.heliorm.def.DoubleField;
-import com.heliorm.def.EnumField;
-import com.heliorm.def.FloatField;
-import com.heliorm.def.InstantField;
-import com.heliorm.def.IntegerField;
-import com.heliorm.def.LocalDateTimeField;
-import com.heliorm.def.LongField;
-import com.heliorm.def.ShortField;
-import com.heliorm.def.StringField;
+import com.heliorm.def.*;
 import com.heliorm.impl.FieldBuilder;
 import com.heliorm.impl.IndexPart;
 import com.heliorm.impl.TableBuilder;
@@ -24,15 +13,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.StringJoiner;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
@@ -60,40 +41,6 @@ class Output {
 
     void addTable(Table<?> table) {
         tables.put(table, table.getSubTables());
-    }
-
-    void push() {
-        depth++;
-    }
-
-    void pop() {
-        depth--;
-    }
-
-    void emit(String fmt, Object... args) {
-        for (int i = 0; i < depth; ++i) {
-            buf.append("    ");
-        }
-        buf.append(format(fmt, args));
-        if (!fmt.endsWith("\n")) {
-            buf.append("\n");
-        }
-    }
-
-    private void impts(String name) {
-        if (!name.startsWith(packageName)) {
-            imports.add("static " + name);
-        }
-    }
-
-    void impt(String name) {
-        imports.add(name);
-    }
-
-    void impt(Class<?> clazz) {
-        if (!clazz.getPackage().getName().equals(packageName) && (!clazz.isEnum() || (clazz.getEnclosingClass() == null))) {
-            imports.add(clazz.getCanonicalName());
-        }
     }
 
     void output(String directory) throws GeneratorException, OrmMetaDataException {
@@ -158,6 +105,38 @@ class Output {
         }
     }
 
+    private void push() {
+        depth++;
+    }
+
+    private void pop() {
+        depth--;
+    }
+
+    private void emit(String fmt, Object... args) {
+        buf.append(String.join("",Collections.nCopies(depth*4," ")));
+        buf.append(format(fmt, args));
+        if (!fmt.endsWith("\n")) {
+            buf.append("\n");
+        }
+    }
+
+    private void impts(String name) {
+        if (!name.startsWith(packageName)) {
+            imports.add("static " + name);
+        }
+    }
+
+    private void impt(String name) {
+        imports.add(name);
+    }
+
+    private void impt(Class<?> clazz) {
+        if (!clazz.getPackage().getName().equals(packageName) && (!clazz.isEnum() || (clazz.getEnclosingClass() == null))) {
+            imports.add(clazz.getCanonicalName());
+        }
+    }
+
     private <O> void emit(Table<O> cm) throws OrmMetaDataException {
         impt(cm.getObjectClass());
         emit("public static class %s implements Table<%s> {",
@@ -172,7 +151,7 @@ class Output {
         impt(FieldBuilder.class);
         emit("private transient TableBuilder<%s,%s> builder = TableBuilder.create(this, %s.class);", tableName(cm), getJavaName(cm), getJavaName(cm));
         emit("");
-        for (Field<?,?> fm : cm.getFields()) {
+        for (Field<?, ?> fm : cm.getFields()) {
             addFieldModel(cm, fm);
             fieldNames.add(fm.getJavaName());
         }
@@ -296,7 +275,7 @@ class Output {
         return res;
     }
 
-    private void addFieldModel(Table<?> cm, Field<?,?> fm) throws OrmMetaDataException {
+    private void addFieldModel(Table<?> cm, Field<?, ?> fm) throws OrmMetaDataException {
         switch (fm.getFieldType()) {
             case BYTE:
                 addByteField(cm, fm);
@@ -340,37 +319,37 @@ class Output {
 
     }
 
-    private void addLongField(Table<?> cm, Field<?,?> fm) {
+    private void addLongField(Table<?> cm, Field<?, ?> fm) {
         addField(cm, fm, LongField.class, "longField");
     }
 
-    private void addIntegerField(Table<?> cm, Field<?,?> fm) {
+    private void addIntegerField(Table<?> cm, Field<?, ?> fm) {
         addField(cm, fm, IntegerField.class, "integerField");
 
     }
 
-    private void addShortField(Table<?> cm, Field<?,?> fm) {
+    private void addShortField(Table<?> cm, Field<?, ?> fm) {
         addField(cm, fm, ShortField.class, "shortField");
     }
 
-    private void addByteField(Table<?> cm, Field<?,?> fm) {
+    private void addByteField(Table<?> cm, Field<?, ?> fm) {
         addField(cm, fm, ByteField.class, "byteField");
     }
 
 
-    private void addDoubleField(Table<?> cm, Field<?,?> fm) {
+    private void addDoubleField(Table<?> cm, Field<?, ?> fm) {
         addField(cm, fm, DoubleField.class, "doubleField");
     }
 
-    private void addFloatField(Table<?> cm, Field<?,?> fm) {
+    private void addFloatField(Table<?> cm, Field<?, ?> fm) {
         addField(cm, fm, FloatField.class, "floatField");
     }
 
-    private void addBooleanField(Table<?> cm, Field<?,?> fm) {
+    private void addBooleanField(Table<?> cm, Field<?, ?> fm) {
         addField(cm, fm, BooleanField.class, "booleanField");
     }
 
-    private void addEnumField(Table<?> cm, Field<?,?> fm) {
+    private void addEnumField(Table<?> cm, Field<?, ?> fm) {
         impt(EnumField.class);
         String enumTypeName;
         if (fm.getJavaType().getEnclosingClass() == null) {
@@ -388,26 +367,26 @@ class Output {
         completeField(fm);
     }
 
-    private void addDateField(Table<?> cm, Field<?,?> fm) {
+    private void addDateField(Table<?> cm, Field<?, ?> fm) {
         addField(cm, fm, DateField.class, "dateField");
     }
 
-    private void addInstantField(Table<?> cm, Field<?,?> fm) {
+    private void addInstantField(Table<?> cm, Field<?, ?> fm) {
         addField(cm, fm, InstantField.class, "instantField");
     }
 
-    private void addLocalDateTimeField(Table<?> cm, Field<?,?> fm) {
+    private void addLocalDateTimeField(Table<?> cm, Field<?, ?> fm) {
         addField(cm, fm, LocalDateTimeField.class, "localDateTimeField");
     }
 
-    private void addStringField(Table<?> cm, Field<?,?> fm) {
+    private void addStringField(Table<?> cm, Field<?, ?> fm) {
         addField(cm, fm, StringField.class, "stringField");
     }
 
     private String addIndexModel(Index<?> im) {
         impt(IndexPart.class);
         StringJoiner sj = new StringJoiner(",");
-        for (Field<?,?> field : im.getFields()) {
+        for (Field<?, ?> field : im.getFields()) {
             sj.add(field.getJavaName());
         }
         String indexName = indexName(im);
@@ -422,7 +401,7 @@ class Output {
 
     private String indexName(Index<?> im) {
         StringJoiner sj = new StringJoiner("_");
-        for (Field<?,?> field : im.getFields()) {
+        for (Field<?, ?> field : im.getFields()) {
             sj.add(field.getJavaName());
         }
         sj.add("idx");
@@ -442,15 +421,15 @@ class Output {
 
     private void completeField(Field<?, ?> fm) {
         push();
-        emit(".withPrimaryKey(%b)", fm.isPrimaryKey());
-        emit(".withAutoNumber(%b)", fm.isAutoNumber());
-        emit(".withForeignKey(%b)", fm.isForeignKey());
-        emit(".withNullable(%b)", fm.isNullable());
         emit(".withSqlName(\"%s\")", fm.getSqlName());
         if (fm.getLength().isPresent()) {
             emit(".withLength(%s)", fm.getLength().get());
 
         }
+        emit(".withNullable(%b)", fm.isNullable());
+        emit(".withPrimaryKey(%b)", fm.isPrimaryKey());
+        emit(".withAutoNumber(%b)", fm.isAutoNumber());
+        emit(".withForeignKey(%b)", fm.isForeignKey());
         if (fm.getForeignTable().isPresent()) {
             emit(".withForeignTable(%s)", shortFieldName(fm.getForeignTable().get()));
         }

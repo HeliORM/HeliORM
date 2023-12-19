@@ -10,7 +10,6 @@
     </parent>
     <packaging>pom</packaging>
     <name>[HeliORM] Plugins</name>
-    <groupId>com.heliorm</groupId>
     <artifactId>plugins</artifactId>
     <modules>
         <module>generate-model-plugin</module>
