@@ -50,10 +50,12 @@ public class GenerateSql extends AbstractMojo {
     private Set<String> packages;
     @Parameter(property = "outputDir", required = true)
     private String outputDir;
-    @Parameter( defaultValue = "${project}", readonly = true )    private MavenProject project;
+    @Parameter(defaultValue = "${project}", readonly = true)
+    private MavenProject project;
     private ClassLoader globalClassLoader;
     private ClassLoader localClassLoader;
     private TableGenerator gen;
+
     public GenerateSql() {
     }
 
@@ -95,7 +97,8 @@ public class GenerateSql extends AbstractMojo {
                 }
             }
             writeSqlFile(database.getSqlDatabase(), sqlForDatabase.toString());
-        } catch (InstantiationException | NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+        } catch (InstantiationException | NoSuchMethodException | InvocationTargetException |
+                 IllegalAccessException e) {
             throw new GeneratorException(format("Cannot instantiate table of type '%s' (%s)", type.getCanonicalName(), e.getMessage()), e);
         }
     }
@@ -119,26 +122,26 @@ public class GenerateSql extends AbstractMojo {
     }
 
     private Set<Class<Database>> getDatabaseClasses() throws GeneratorException {
-        ScanResult scan = new ClassGraph()
+        try (ScanResult scan = new ClassGraph()
                 .enableAllInfo()
                 .addClassLoader(localClassLoader)
                 .whitelistPackages(packages.toArray(new String[]{}))
-                .scan();
-        ClassInfoList infos = scan.getClassesImplementing(Database.class.getCanonicalName());
-        Set<Class<Database>> res = new HashSet<>();
-        for (ClassInfo info : infos) {
-            try {
-                res.add((Class<Database>) globalClassLoader.loadClass(info.getName()));
-            } catch (ClassNotFoundException e) {
-                throw new GeneratorException(format("Error loading classes '%s' from custom class loader (%s)", info.getName(), e.getMessage()), e);
+                .scan()) {
+            ClassInfoList infos = scan.getClassesImplementing(Database.class.getCanonicalName());
+            Set<Class<Database>> res = new HashSet<>();
+            for (ClassInfo info : infos) {
+                try {
+                    res.add((Class<Database>) globalClassLoader.loadClass(info.getName()));
+                } catch (ClassNotFoundException e) {
+                    throw new GeneratorException(format("Error loading classes '%s' from custom class loader (%s)", info.getName(), e.getMessage()), e);
+                }
             }
+            return res;
         }
-        return res;
     }
 
     /**
      * Get a class loader that will load classes compiled during the build
-     *
      */
     private void setupClassLoader() throws GeneratorException {
         List<String> classpathElements;
