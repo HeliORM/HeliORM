@@ -41,7 +41,7 @@ public interface PojoOperations {
      * @return The value read
      * @throws OrmException Thrown if there is an error reading the value
      */
-    <O> Object getValue(Object pojo, Field< O, ?> field) throws OrmException;
+    <O> Object getValue(O pojo, Field< O, ?> field) throws OrmException;
 
     /**
      * Compare the given field value on two POJOs

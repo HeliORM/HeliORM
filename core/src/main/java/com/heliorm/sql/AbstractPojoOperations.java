@@ -4,7 +4,6 @@ import com.heliorm.Field;
 import com.heliorm.OrmException;
 import com.heliorm.Table;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -25,11 +24,12 @@ abstract class AbstractPojoOperations implements PojoOperations {
 
     @Override
     public final <O> O newPojoInstance(Table<O> table) throws OrmException {
-        Class clazz = table.getObjectClass();
+        var clazz = table.getObjectClass();
         try {
-            for (Constructor<O> cons : clazz.getConstructors()) {
+            for (var cons : clazz.getConstructors()) {
                 if (cons.getParameterCount() == 0) {
-                    return cons.newInstance();
+                    //noinspection unchecked
+                    return (O)cons.newInstance();
                 }
             }
             return newPojoInstance(table.getObjectClass());
@@ -47,7 +47,7 @@ abstract class AbstractPojoOperations implements PojoOperations {
     }
 
     @Override
-    public final void setValue(Object pojo, Field field, Object value) throws OrmException {
+    public final <O> void setValue(O pojo, Field<O,?> field, Object value) throws OrmException {
         if (field == null) {
             throw new OrmException("Null field type passed to setValue(). BUG!");
         }
@@ -70,7 +70,7 @@ abstract class AbstractPojoOperations implements PojoOperations {
     }
 
     @Override
-    public final Object getValue(Object pojo, Field field) throws OrmException {
+    public final <O> Object getValue(O pojo, Field<O,?> field) throws OrmException {
         if (field == null) {
             throw new OrmException("Null field type passed to getValue(). BUG!");
         }
@@ -125,7 +125,7 @@ abstract class AbstractPojoOperations implements PojoOperations {
     protected abstract void setObject(Object pojo, java.lang.reflect.Field refField, Object value) throws OrmException;
 
     @Override
-    public final int compareTo(Object pojo1, Object pojo2, Field field) throws OrmException {
+    public final <O> int compareTo(O pojo1, O pojo2, Field<O,?> field) throws OrmException {
         switch (field.getFieldType()) {
             case LONG, INTEGER, SHORT, BYTE, DOUBLE, FLOAT, BOOLEAN,
                     ENUM, STRING, DATE, LOCAL_DATE_TIME, INSTANT -> {
