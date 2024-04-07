@@ -15,7 +15,7 @@ public final class TableBuilder<T extends Table<O>, O> {
         this.table = table;
     }
 
-    public static <T extends Table<O>, O> TableBuilder<T, O> create(T table, Class<O> pojoType) {
+    public static <T extends Table<O>, O> TableBuilder<T, O> create(T table) {
         return new TableBuilder<>(table);
     }
 
