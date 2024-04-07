@@ -31,7 +31,7 @@ public interface PojoOperations {
      * @param value The value to set
      * @throws OrmException Thrown if there is an error setting the value
      */
-    <O> void setValue(Object pojo, Field<O, ?> field, Object value) throws OrmException;
+    <O> void setValue(O pojo, Field<O, ?> field, Object value) throws OrmException;
 
     /**
      * Read the value of the given field on the given POJO.

@@ -116,12 +116,12 @@ public final class SqlOrm implements Orm {
         }
         Connection con = getConnection();
         O newPojo = pops.newPojoInstance(table);
-        for (Field<?,?> field : table.getFields()) {
+        for (var field : table.getFields()) {
             pops.setValue(newPojo, field, pops.getValue(pojo, field));
         }
         try (PreparedStatement stmt = con.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
             int par = 1;
-            for (Field<?,?> field : table.getFields()) {
+            for (var field : table.getFields()) {
                 if (field.isPrimaryKey()) {
                     if (field.isAutoNumber()) {
                         if (field.getFieldType() == Field.FieldType.STRING) {
@@ -143,7 +143,7 @@ public final class SqlOrm implements Orm {
             stmt.executeUpdate();
             Optional<Field<O, ?>> opt = table.getPrimaryKey();
             if (opt.isPresent()) {
-                Field<?,?> keyField = opt.get();
+                var keyField = opt.get();
                 if (keyField.isAutoNumber()) {
                     if (keyField.getFieldType() != Field.FieldType.STRING) {
                         try (ResultSet rs = stmt.getGeneratedKeys()) {

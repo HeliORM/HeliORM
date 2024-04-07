@@ -41,7 +41,7 @@ class ResultSetHelper {
     <O> O makePojoFromResultSet(ResultSet rs, Table<O> table) throws OrmException {
         try {
             O pojo = pops.newPojoInstance(table);
-            for (Field<?,?> field : table.getFields()) {
+            for (var field : table.getFields()) {
                 setValueInPojo(pojo, field, rs);
             }
             return pojo;
@@ -50,7 +50,7 @@ class ResultSetHelper {
         }
     }
 
-    private void setValueInPojo(Object pojo, Field<?,?> field, ResultSet rs) throws OrmException {
+    private <O> void setValueInPojo(O pojo, Field<O,?> field, ResultSet rs) throws OrmException {
         String column = getFieldId(field);
         switch (field.getFieldType()) {
             case LONG:
