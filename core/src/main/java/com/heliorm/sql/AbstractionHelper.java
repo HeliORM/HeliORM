@@ -27,12 +27,12 @@ final class AbstractionHelper {
      * @param tail part
      * @return The expanded query parts lists.
      */
-   static List<? extends ExecutablePart<?>> explodeAbstractions(ExecutablePart<?> tail) {
-        if (tail instanceof SelectPart<?>) {
-            return explode(tail.getSelect());
+   static <O> List<? extends ExecutablePart<O>> explodeAbstractions(ExecutablePart<O> tail) {
+        if (tail instanceof SelectPart<O> sp) {
+            return explode(sp.getSelect());
         }
-        if (tail instanceof OrderedPart<?>) {
-            return explode((OrderedPart<?>) tail);
+        if (tail instanceof OrderedPart<O> op) {
+            return explode(op);
         }
         return Collections.emptyList();
     }
@@ -57,10 +57,10 @@ final class AbstractionHelper {
         return new CompoundComparator<>(comps);
     }
 
-    private static List<OrderedPart<?>> explode(OrderedPart<?> ordered) {
-        List<OrderedPart<?>> res = new ArrayList<>();
-        SelectPart<?> select = ordered.getSelect();
-        Table<?> table = select.getTable();
+    private static <O> List<OrderedPart<O>> explode(OrderedPart<O> ordered) {
+        List<OrderedPart<O>> res = new ArrayList<>();
+        SelectPart<O> select = ordered.getSelect();
+        Table<O> table = select.getTable();
         Set<Table<?>> subTables = table.getSubTables();
         if (subTables.isEmpty()) {
             var selectPart = new SelectPart<>(select.getSelector(), select.getTable(), select.getWhere().orElse(null), explode(select.getJoins()));
@@ -76,8 +76,8 @@ final class AbstractionHelper {
         return res;
     }
 
-    private static List<SelectPart<?>> explode(SelectPart<?> select) {
-        List<SelectPart<?>> res = new ArrayList<>();
+    private static <O> List<SelectPart<O>> explode(SelectPart<O> select) {
+        List<SelectPart<O>> res = new ArrayList<>();
         Table<?> table = select.getTable();
         Set<Table<?>> subTables = table.getSubTables();
         if (subTables.isEmpty()) {

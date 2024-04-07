@@ -98,7 +98,7 @@ final class QueryHelper {
         }
     }
 
-    String buildSelectQuery(ExecutablePart<?> exec) throws OrmException {
+    <O> String buildSelectQuery(ExecutablePart<O> exec) throws OrmException {
         SelectPart<?> root = exec.getSelect();
         StringBuilder tablesQuery = new StringBuilder();
         tablesQuery.append("SELECT DISTINCT  ");
@@ -157,9 +157,9 @@ final class QueryHelper {
     }
 
     private String buildPartialUnionQuery(SelectPart<?> select, Set<Field> allFields) throws OrmException {
-        StringBuilder tablesQuery = new StringBuilder();
-        StringJoiner fieldsQuery = new StringJoiner(",");
-        List<Field> tableFields = select.getTable().getFields();
+        var tablesQuery = new StringBuilder();
+        var fieldsQuery = new StringJoiner(",");
+        var tableFields = select.getTable().getFields();
         for (Field field : allFields) {
             String fieldId = getFieldId(field);
             if (tableFields.contains(field)) {

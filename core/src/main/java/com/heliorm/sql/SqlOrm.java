@@ -318,12 +318,12 @@ public final class SqlOrm implements Orm {
     }
 
     private <O> Stream<O> stream(ExecutablePart<O> tail) throws OrmException {
-        List<? extends ExecutablePart<?>> queries = explodeAbstractions(tail);
+        List<? extends ExecutablePart<O>> queries = explodeAbstractions(tail);
         if (queries.isEmpty()) {
             throw new OrmException("Could not build query from parts. BUG!");
         }
         if (queries.size() == 1) {
-            SelectPart<?> query = queries.getFirst().getSelect();
+            var query = queries.getFirst().getSelect();
             Stream<PojoCompare<O>> res = streamSingle(query.getTable(), queryHelper.buildSelectQuery(tail));
             return res.map(PojoCompare::getPojo);
         } else {
@@ -332,7 +332,7 @@ public final class SqlOrm implements Orm {
                         .map(query -> query.getSelect().getTable())
                         .collect(Collectors.toMap(table -> table.getObjectClass().getName(), table -> table));
                 Stream<PojoCompare<O>> sorted = streamUnion(queryHelper.buildSelectUnionQuery(queries.stream().map(ExecutablePart::getSelect).collect(Collectors.toList())), tableMap)
-                        .map(pojo -> new PojoCompare<O>(pops, tail.getSelect().getTable(), pojo))
+                        .map(pojo -> new PojoCompare<>(pops, tail.getSelect().getTable(), pojo))
                         .sorted(makeComparatorForTail(tail.getOrder()));
                 return sorted.map(PojoCompare::getPojo);
             } else {

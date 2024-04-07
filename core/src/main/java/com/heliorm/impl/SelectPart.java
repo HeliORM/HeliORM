@@ -52,7 +52,7 @@ public class SelectPart<DO> extends ExecutablePart<DO> implements Select<DO> {
     }
 
 
-    public Table getTable() {
+    public Table<DO> getTable() {
         return table;
     }
 
