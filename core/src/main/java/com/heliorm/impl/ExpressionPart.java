@@ -13,6 +13,11 @@ import java.util.List;
  */
 public abstract class ExpressionPart<O, C> implements Continuation<O> {
 
+    public enum Type {
+        VALUE_EXPRESSION,
+        LIST_EXPRESSION, IS_EXPRESSION
+    }
+
     private final Type type;
     private final Field<O, C> field;
     private final List<ExpressionContinuationPart<O>> continuations = new LinkedList<>();
@@ -45,8 +50,4 @@ public abstract class ExpressionPart<O, C> implements Continuation<O> {
         return continuations;
     }
 
-    public enum Type {
-        VALUE_EXPRESSION,
-        LIST_EXPRESSION, IS_EXPRESSION
-    }
 }

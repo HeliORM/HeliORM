@@ -50,10 +50,10 @@ final class QueryHelper {
     }
 
     String buildInsertQuery(Table<?> table) throws OrmException {
-        var query = new StringBuilder();
+        StringBuilder query = new StringBuilder();
         query.append(format("INSERT INTO %s(", fullTableName.apply(table)));
-        var fields = new StringJoiner(",");
-        var values = new StringJoiner(",");
+        StringJoiner fields = new StringJoiner(",");
+        StringJoiner values = new StringJoiner(",");
         for (Field<?, ?> field : table.getFields()) {
             if (field.isPrimaryKey()) {
                 if (field.isAutoNumber()) {
@@ -78,8 +78,8 @@ final class QueryHelper {
         }
         StringBuilder query = new StringBuilder();
         query.append(format("UPDATE %s SET ", fullTableName.apply(table)));
-        var fields = new StringJoiner(",");
-        for (var field : table.getFields()) {
+        StringJoiner fields = new StringJoiner(",");
+        for (Field<O, ?> field : table.getFields()) {
             if (!field.isPrimaryKey()) {
                 fields.add(format("%s=?", driver.fieldName(table, field)));
             }
@@ -102,7 +102,7 @@ final class QueryHelper {
         StringBuilder tablesQuery = new StringBuilder();
         tablesQuery.append("SELECT DISTINCT  ");
         StringJoiner fieldList = new StringJoiner(",");
-        for (var field : new ArrayList<Field<?, ?>>(root.getTable().getFields())) {
+        for (Field<?, ?> field : new ArrayList<Field<?, ?>>(root.getTable().getFields())) {
             fieldList.add(format("%s AS %s", driver.fullFieldName(root.getTable(), field), driver.virtualFieldName(getFieldId(field))));
         }
         tablesQuery.append(fieldList);
@@ -112,7 +112,7 @@ final class QueryHelper {
         if (where.isPresent()) {
             whereQuery.append(expandCriteria(root.getSelect().getTable(), (WherePart<?>) where.get()));
         }
-        for (var join : root.getJoins()) {
+        for (JoinPart<?, ?> join : root.getJoins()) {
             tablesQuery.append(expandLinkTables(root.getTable(), join));
             String joinWhere = expandLinkWheres(join);
             if (!joinWhere.isEmpty()) {
@@ -137,13 +137,13 @@ final class QueryHelper {
     }
 
     <O> String buildSelectUnionQuery(List<ExecutablePart<O>> queries) throws OrmException {
-       var allFields = queries.stream()
+        Set<Field<O, ?>> allFields = queries.stream()
                 .map(query -> query.getSelect().getTable())
                 .flatMap(table -> table.getFields().stream())
                 .collect(Collectors.toSet());
         StringJoiner buf = new StringJoiner(" UNION ALL ");
         ExecutablePart<?> root = null;
-        for (var query : queries) {
+        for (ExecutablePart<O> query : queries) {
             if (root == null) {
                 root = query;
             }
@@ -155,11 +155,11 @@ final class QueryHelper {
         return buf.toString();
     }
 
-    private <O> String buildPartialUnionQuery(SelectPart<?> select, Set<Field<O,?>> allFields) throws OrmException {
-        var tablesQuery = new StringBuilder();
-        var fieldsQuery = new StringJoiner(",");
+    private <O> String buildPartialUnionQuery(SelectPart<?> select, Set<Field<O, ?>> allFields) throws OrmException {
+        StringBuilder tablesQuery = new StringBuilder();
+        StringJoiner fieldsQuery = new StringJoiner(",");
         var tableFields = select.getTable().getFields();
-        for (var field : allFields) {
+        for (Field<O, ?> field : allFields) {
             String fieldId = getFieldId(field);
             if (tableFields.contains(field)) {
                 fieldsQuery.add(format("%s AS %s", driver.fullFieldName(select.getTable(), field), driver.virtualFieldName(fieldId)));
@@ -236,19 +236,12 @@ final class QueryHelper {
         if (!conts.isEmpty()) {
             query.append("(");
         }
-        switch (expr.getType()) {
-            case LIST_EXPRESSION:
-                query.append(expandListFieldCriteria(table, ((ListExpressionPart<?, ?>) expr)));
-                break;
-            case VALUE_EXPRESSION:
-                query.append(expandValueFieldCriteria(table, (ValueExpressionPart<?, ?>) expr));
-                break;
-            case IS_EXPRESSION:
-                query.append(expandIsFieldCriteria(table, (IsExpressionPart<?, ?>) expr));
-                break;
-            default:
-                throw new OrmException(format("Unknown expression type '%s'. BUG!", expr.getType()));
-        }
+        query.append(
+                switch (expr.getType()) {
+                    case LIST_EXPRESSION -> expandListFieldCriteria(table, ((ListExpressionPart<?, ?>) expr));
+                    case VALUE_EXPRESSION -> expandValueFieldCriteria(table, (ValueExpressionPart<?, ?>) expr);
+                    case IS_EXPRESSION -> expandIsFieldCriteria(table, (IsExpressionPart<?, ?>) expr);
+                });
         if (!conts.isEmpty()) {
             for (ExpressionContinuationPart<?> cont : conts) {
                 query.append(" ");
@@ -260,22 +253,13 @@ final class QueryHelper {
     }
 
     private String expandContinuation(Table<?> table, ExpressionContinuationPart<?> ec) throws OrmException {
-        StringBuilder query = new StringBuilder();
-        switch (ec.getType()) {
-            case AND:
-                query.append(" AND ");
-                break;
-            case OR:
-                query.append(" OR ");
-                break;
-            default:
-                throw new OrmException(format("Unknown continuation type '%s'. BUG!", ec.getType()));
-        }
-        query.append(expandExpression(table, ec.getExpression()));
-        return query.toString();
+        return switch (ec.getType()) {
+            case AND -> " AND ";
+            case OR -> " OR ";
+        } + expandExpression(table, ec.getExpression());
     }
 
-    private String expandListFieldCriteria(Table<?> table, ListExpressionPart<?,?> crit) throws OrmException {
+    private String expandListFieldCriteria(Table<?> table, ListExpressionPart<?, ?> crit) throws OrmException {
         StringJoiner list = new StringJoiner(",");
         if (crit.getValues().isEmpty()) {
             throw new OrmException(format("Empty %s list for field %s in table %s", crit.getOperator(),
@@ -287,7 +271,7 @@ final class QueryHelper {
         return format("%s %s (%s)", driver.fullFieldName(table, crit.getField()), listOperator(crit), list);
     }
 
-    private String expandValueFieldCriteria(Table<?> table, ValueExpressionPart<?,?> crit) throws OrmException {
+    private String expandValueFieldCriteria(Table<?> table, ValueExpressionPart<?, ?> crit) throws OrmException {
         StringBuilder query = new StringBuilder();
         if (crit.getValue() == null) {
             throw new OrmException(format("Null %s value for field %s in table %s", crit.getOperator(),
@@ -297,7 +281,7 @@ final class QueryHelper {
         return query.toString();
     }
 
-    private String expandIsFieldCriteria(Table<?> table, IsExpressionPart<?,?> crit) throws OrmException {
+    private String expandIsFieldCriteria(Table<?> table, IsExpressionPart<?, ?> crit) throws OrmException {
         return format("%s%s", driver.fullFieldName(table, crit.getField()), isOperator(crit));
     }
 
@@ -327,7 +311,7 @@ final class QueryHelper {
     }
 
     private String expandLimit(LimitPart<?> limit) {
-        StringBuilder query = new StringBuilder();
+        var query = new StringBuilder();
         if (limit.getNumber() > -1) {
             query.append(" LIMIT ");
             if (limit.getFrom() > 0) {
@@ -339,7 +323,7 @@ final class QueryHelper {
         return query.toString();
     }
 
-    private String sqlValue(Field<?,?> field, Object object) {
+    private String sqlValue(Field<?, ?> field, Object object) {
         if (Objects.requireNonNull(field.getFieldType()) == FieldType.DATE) {
             return dateTimeFormat.format(object);
         }
@@ -352,7 +336,7 @@ final class QueryHelper {
      * @param part The part
      * @return The operator
      */
-    private String listOperator(ListExpressionPart<?,?> part) {
+    private String listOperator(ListExpressionPart<?, ?> part) {
         return switch (part.getOperator()) {
             case IN -> " IN";
             case NOT_IN -> " NOT IN";
@@ -365,7 +349,7 @@ final class QueryHelper {
      * @param part The part
      * @return The operator
      */
-    private String valueOperator(ValueExpressionPart<?,?> part) {
+    private String valueOperator(ValueExpressionPart<?, ?> part) {
         return switch (part.getOperator()) {
             case EQ -> "=";
             case NOT_EQ -> "<>";
@@ -378,14 +362,14 @@ final class QueryHelper {
         };
     }
 
-    private String isOperator(IsExpressionPart<?,?> part) {
+    private String isOperator(IsExpressionPart<?, ?> part) {
         return switch (part.getOperator()) {
             case IS_NULL -> " IS NULL";
             case IS_NOT_NULL -> " IS NOT NULL";
         };
     }
 
-    private String getFieldId(Field<?,?> field) {
+    private String getFieldId(Field<?, ?> field) {
         return getFieldId.apply(field);
     }
 

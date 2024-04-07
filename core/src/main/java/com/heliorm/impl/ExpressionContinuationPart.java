@@ -8,6 +8,9 @@ import com.heliorm.def.Continuation;
  */
 public class ExpressionContinuationPart< O> implements Continuation<O> {
 
+    public enum Type {
+        AND, OR
+    }
     private final Type type;
     private final ExpressionPart expression;
     public ExpressionContinuationPart(Type type, Continuation expr) {
@@ -33,8 +36,5 @@ public class ExpressionContinuationPart< O> implements Continuation<O> {
         return type;
     }
 
-    public enum Type {
-        AND, OR
-    }
 }
 
