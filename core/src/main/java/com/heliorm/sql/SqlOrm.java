@@ -283,6 +283,7 @@ public final class SqlOrm implements Orm {
 
     @Override
     public <O> Table<O> tableFor(O pojo) throws OrmException {
+        //noinspection unchecked
         return tableFor((Class<O>) pojo.getClass());
     }
 
@@ -299,7 +300,8 @@ public final class SqlOrm implements Orm {
                 }
             }
         }
-        Table<O> table = (Table<O>) tables.get(type);
+        @SuppressWarnings("unchecked")
+        var table = (Table<O>) tables.get(type);
         if (table == null) {
             throw new OrmException("Cannot find table for pojo of type " + type.getCanonicalName());
         }
