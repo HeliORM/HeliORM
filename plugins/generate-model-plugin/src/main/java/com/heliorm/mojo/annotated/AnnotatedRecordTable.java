@@ -76,7 +76,7 @@ public final class AnnotatedRecordTable<O> implements Table<O> {
     public List<Index<O>> getIndexes() {
         return new ArrayList<>(Arrays.stream(type.getAnnotations())
                 .filter(ann -> ann.annotationType().equals(com.heliorm.annotation.Index.class))
-                .map(ann -> new AnnotatedRecordIndex(this, (com.heliorm.annotation.Index) ann))
+                .map(ann -> new AnnotatedRecordIndex<>(this, (com.heliorm.annotation.Index) ann))
                 .toList());
     }
 }

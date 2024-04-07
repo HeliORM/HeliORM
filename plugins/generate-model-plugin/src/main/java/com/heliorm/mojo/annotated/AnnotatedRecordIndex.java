@@ -10,12 +10,12 @@ import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 
-public class AnnotatedRecordIndex implements Index {
+public class AnnotatedRecordIndex<O> implements Index<O> {
 
     private final boolean unique;
-    private final List<Field> fields;
+    private final List<Field<O,?>> fields;
 
-    public AnnotatedRecordIndex(AnnotatedRecordTable<?> table, com.heliorm.annotation.Index ann) {
+    public AnnotatedRecordIndex(AnnotatedRecordTable<O> table, com.heliorm.annotation.Index ann) {
         unique = ann.unique();
         fields = new ArrayList<>();
         Map<String, Field> fields = table.getFields().stream()
@@ -30,7 +30,7 @@ public class AnnotatedRecordIndex implements Index {
     }
 
     @Override
-    public List<Field> getFields() {
+    public List<Field<O,?>> getFields() {
         return fields;
     }
 
