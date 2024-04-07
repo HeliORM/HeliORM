@@ -143,12 +143,7 @@ class TestData {
 
     static List<Province> makeProvinces() {
         return Arrays.stream(PROVINCE_NAMES)
-                .map(name -> {
-                    Province province = new Province();
-                    province.setName(name);
-                    return province;
-
-                }).collect(Collectors.toList());
+                .map(name -> new Province(null, name)).collect(Collectors.toList());
     }
 
     static List<Town> makeTowns(List<Province> provinces) {
@@ -158,7 +153,7 @@ class TestData {
             Province province = provinces.get(i);
             for (String name : names) {
                 Town town = new Town();
-                town.setProvinceId(province.getProvinceId());
+                town.setProvinceId(province.provinceId());
                 town.setName(name);
                 towns.add(town);
             }

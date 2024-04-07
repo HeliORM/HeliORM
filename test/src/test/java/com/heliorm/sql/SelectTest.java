@@ -656,10 +656,10 @@ public class SelectTest extends AbstractOrmTest {
     public void testJoinThenJoinThenJoin() throws Exception {
         say("Testing select with a join and then join and then join");
         Province province = provinces.stream()
-                .filter(p -> p.getName().equals("Western Cape"))
+                .filter(p -> p.name().equals("Western Cape"))
                 .findFirst().get();
         List<Long> towns = SelectTest.towns.stream()
-                .filter(t -> t.getProvinceId().equals(province.getProvinceId()))
+                .filter(t -> t.getProvinceId().equals(province.provinceId()))
                 .map(Town::getId)
                 .collect(Collectors.toList());
         List<Long> fromThere = persons.stream()
@@ -692,11 +692,11 @@ public class SelectTest extends AbstractOrmTest {
         say("Testing select with a join with same key names");
         List<Town> selected = orm().select(TOWN,
                         join(PROVINCE, on(TOWN.provinceId, PROVINCE.provinceId),
-                                where(PROVINCE.name.eq(provinces.get(0).getName()))))
+                                where(PROVINCE.name.eq(provinces.get(0).name()))))
                 .list();
 
         List<Town> wanted = towns.stream()
-                .filter(town -> town.getProvinceId().equals(provinces.get(0).getProvinceId()))
+                .filter(town -> town.getProvinceId().equals(provinces.get(0).provinceId()))
                 .collect(Collectors.toList());
 
         assertNotNull(selected, "The list returned by list() should be non-null");

@@ -15,6 +15,7 @@ import java.util.List;
 
 import static com.heliorm.sql.TestData.*;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class AutoNumberTest extends AbstractOrmTest {
@@ -46,8 +47,8 @@ public class AutoNumberTest extends AbstractOrmTest {
         Cat cat = makeCat(person, catBreeds.getFirst());
         Cat saved = orm().create(cat);
         assertNotNull(saved, "The object returned by create should not be null");
-        assertTrue(cat.getId() == null, "The id of the new object must be null before create");
-        assertTrue(saved.getId() != null, "The id of the new object must be not-null after create");
+        assertNull(cat.getId(), "The id of the new object must be null before create");
+        assertNotNull(saved.getId(), "The id of the new object must be not-null after create");
         assertTrue(pojoCompareExcludingKey(cat, saved), "The new and created objects must be the same apart from the key");
     }
 }
