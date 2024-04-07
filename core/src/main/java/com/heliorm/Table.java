@@ -64,6 +64,12 @@ public interface Table<O> {
      */
     boolean isAbstract();
 
+    /** Return true if this table refers to a Java Record and not a POJO
+     *
+     * @return True if the underlying type is a record
+     */
+    boolean isRecord();
+
     /**
      * Return the indexes for this POJO
      *

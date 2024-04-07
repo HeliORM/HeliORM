@@ -243,6 +243,16 @@ class Output {
         pop();
         emit("}");
 
+        // isRecord()
+        push();
+        emit("");
+        emit("@Override");
+        emit("public boolean isRecord() {");
+        push();
+        emit("return %b;", cm.isRecord());
+        pop();
+        emit("}");
+
 
         // getIndexes()
         StringJoiner indexNames = new StringJoiner(",");

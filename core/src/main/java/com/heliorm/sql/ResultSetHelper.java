@@ -3,6 +3,7 @@ package com.heliorm.sql;
 import com.heliorm.Field;
 import com.heliorm.OrmException;
 import com.heliorm.Table;
+import com.heliorm.UncaughtOrmException;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -21,9 +22,9 @@ import static java.lang.String.format;
 class ResultSetHelper {
 
     private final PojoOperations pops;
-    private final Function<Field<?,?>, String> getFieldId;
+    private final Function<Field<?, ?>, String> getFieldId;
 
-    ResultSetHelper(PojoOperations pops, Function<Field<?,?>, String> getFieldId) {
+    ResultSetHelper(PojoOperations pops, Function<Field<?, ?>, String> getFieldId) {
         this.pops = pops;
         this.getFieldId = getFieldId;
     }
@@ -38,7 +39,21 @@ class ResultSetHelper {
      * @return The pojo
      * @throws OrmException Thrown if there is an error building the Pojo.
      */
-    <O> O makePojoFromResultSet(ResultSet rs, Table<O> table) throws OrmException {
+    <O> O makeObjectFromResultSet(ResultSet rs, Table<O> table) throws OrmException {
+        return !table.isRecord() ? makePojoFromResultSet(rs, table) : makeRecordFromResultSet(rs, table);
+    }
+
+    /**
+     * Creates a Pojo for the given table from the element currently at the
+     * result set cursor.
+     *
+     * @param <O>   The type of Pojo
+     * @param rs    The result set
+     * @param table The table
+     * @return The pojo
+     * @throws OrmException Thrown if there is an error building the Pojo.
+     */
+    private <O> O makePojoFromResultSet(ResultSet rs, Table<O> table) throws OrmException {
         try {
             O pojo = pops.newPojoInstance(table);
             for (var field : table.getFields()) {
@@ -50,7 +65,11 @@ class ResultSetHelper {
         }
     }
 
-    private <O> void setValueInPojo(O pojo, Field<O,?> field, ResultSet rs) throws OrmException {
+    private <O> O makeRecordFromResultSet(ResultSet rs, Table<O> table) throws OrmException {
+        throw new UncaughtOrmException("Not yet implemented");
+    }
+
+    private <O> void setValueInPojo(O pojo, Field<O, ?> field, ResultSet rs) throws OrmException {
         String column = getFieldId(field);
         switch (field.getFieldType()) {
             case LONG:
@@ -83,10 +102,10 @@ class ResultSetHelper {
      * @param rs    The result set
      * @param field The field for which we're reading data
      * @return The data
-     * @throws OrmException Thrown if we cannot work out how to extract the
+     * @throws UncaughtOrmException Thrown if we cannot work out how to extract the
      *                      data.
      */
-    private Object getValue(ResultSet rs, Field<?,?> field) throws OrmException {
+    private Object getValue(ResultSet rs, Field<?, ?> field) throws UncaughtOrmException {
         String column = getFieldId(field);
         try {
             switch (field.getFieldType()) {
@@ -101,7 +120,7 @@ class ResultSetHelper {
                 case ENUM: {
                     Class javaType = field.getJavaType();
                     if (!javaType.isEnum()) {
-                        throw new OrmException(format("Field %s is not an enum. BUG!", field.getJavaName()));
+                        throw new UncaughtOrmException(format("Field %s is not an enum. BUG!", field.getJavaName()));
                     }
                     String val = rs.getString(column);
                     if (val != null) {
@@ -117,10 +136,10 @@ class ResultSetHelper {
                 case LOCAL_DATE_TIME:
                     return rs.getTimestamp(column);
                 default:
-                    throw new OrmException(format("Field type '%s' is unsupported. BUG!", field.getFieldType()));
+                    throw new UncaughtOrmException(format("Field type '%s' is unsupported. BUG!", field.getFieldType()));
             }
         } catch (SQLException ex) {
-            throw new OrmSqlException(format("Error reading field value from SQL for '%s' (%s)", field.getJavaName(), ex.getMessage()), ex);
+            throw new UncaughtOrmException(format("Error reading field value from SQL for '%s' (%s)", field.getJavaName(), ex.getMessage()), ex);
         }
     }
 
@@ -148,7 +167,7 @@ class ResultSetHelper {
         }
     }
 
-    private String getFieldId(Field<?,?> field) {
+    private String getFieldId(Field<?, ?> field) {
         return getFieldId.apply(field);
     }
 

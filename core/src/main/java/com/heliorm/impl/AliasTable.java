@@ -66,6 +66,11 @@ public class AliasTable<O> implements Table<O> {
     }
 
     @Override
+    public boolean isRecord() {
+        return table.isRecord();
+    }
+
+    @Override
     public List<Index<O>> getIndexes() {
         return table.getIndexes();
     }

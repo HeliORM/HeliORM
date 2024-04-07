@@ -389,7 +389,7 @@ public final class SqlOrm implements Orm {
                                                             @Override
                                                             public PojoCompare<O> next() {
                                                                 try {
-                                                                    return new PojoCompare<>(pops, table, resultSetHelper.makePojoFromResultSet(rs, table));
+                                                                    return new PojoCompare<>(pops, table, resultSetHelper.makeObjectFromResultSet(rs, table));
                                                                 } catch (OrmException ex) {
                                                                     throw new UncaughtOrmException(ex.getMessage(), ex);
                                                                 }
@@ -422,7 +422,7 @@ public final class SqlOrm implements Orm {
                         @Override
                         public O next() {
                             try {
-                                return resultSetHelper.makePojoFromResultSet(rs, tables.get(rs.getString(QueryHelper.POJO_NAME_FIELD)));
+                                return resultSetHelper.makeObjectFromResultSet(rs, tables.get(rs.getString(QueryHelper.POJO_NAME_FIELD)));
                             } catch (OrmException | SQLException ex) {
                                 throw new UncaughtOrmException(ex.getMessage(), ex);
                             }

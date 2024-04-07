@@ -95,6 +95,11 @@ public final class AnnotatedPojoTable implements Table {
     }
 
     @Override
+    public boolean isRecord() {
+        return pojoClass.isRecord();
+    }
+
+    @Override
     public List<Index> getIndexes() {
         if (indexes == null) {
             indexes = new ArrayList<>();
