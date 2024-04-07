@@ -38,7 +38,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import static com.heliorm.sql.AbstractionHelper.explodeAbstractions;
 import static java.lang.String.format;
+import static com.heliorm.sql.AbstractionHelper.makeComparatorForTail;
 
 /**
  * A SQL implementation of the ORM.
@@ -58,7 +60,6 @@ public final class SqlOrm implements Orm {
     private final Map<Table<?>, String> deletes = new ConcurrentHashMap<>();
     private final Map<Table<?>, Boolean> exists = new ConcurrentHashMap<>();
     private final QueryHelper queryHelper;
-    private final AbstractionHelper abstractionHelper;
     private final PojoHelper pojoHelper;
     private final PreparedStatementHelper preparedStatementHelper;
     private final ResultSetHelper resultSetHelper;
@@ -77,7 +78,6 @@ public final class SqlOrm implements Orm {
         this.pops = pops;
         this.queryHelper = new QueryHelper(driver, this::getUniqueFieldName, this::fullTableName);
         this.pojoHelper = new PojoHelper(pops);
-        this.abstractionHelper = new AbstractionHelper();
         this.preparedStatementHelper = new PreparedStatementHelper(pojoHelper, driver::setEnum);
         this.resultSetHelper = new ResultSetHelper(pops, this::getUniqueFieldName);
         selector = new Selector() {
@@ -318,12 +318,12 @@ public final class SqlOrm implements Orm {
     }
 
     private <O> Stream<O> stream(ExecutablePart<O> tail) throws OrmException {
-        List<? extends ExecutablePart<?>> queries = abstractionHelper.explodeAbstractions(tail);
+        List<? extends ExecutablePart<?>> queries = explodeAbstractions(tail);
         if (queries.isEmpty()) {
             throw new OrmException("Could not build query from parts. BUG!");
         }
         if (queries.size() == 1) {
-            SelectPart<?> query = queries.get(0).getSelect();
+            SelectPart<?> query = queries.getFirst().getSelect();
             Stream<PojoCompare<O>> res = streamSingle(query.getTable(), queryHelper.buildSelectQuery(tail));
             return res.map(PojoCompare::getPojo);
         } else {
@@ -333,13 +333,13 @@ public final class SqlOrm implements Orm {
                         .collect(Collectors.toMap(table -> table.getObjectClass().getName(), table -> table));
                 Stream<PojoCompare<O>> sorted = streamUnion(queryHelper.buildSelectUnionQuery(queries.stream().map(ExecutablePart::getSelect).collect(Collectors.toList())), tableMap)
                         .map(pojo -> new PojoCompare<O>(pops, tail.getSelect().getTable(), pojo))
-                        .sorted(abstractionHelper.makeComparatorForTail(tail.getOrder()));
+                        .sorted(makeComparatorForTail(tail.getOrder()));
                 return sorted.map(PojoCompare::getPojo);
             } else {
                 Stream<PojoCompare<O>> res = queries.stream()
                         .flatMap(select -> {
                             try {
-                                return streamSingle(queries.get(0).getSelect().getTable(), queryHelper.buildSelectQuery(select));
+                                return streamSingle(queries.getFirst().getSelect().getTable(), queryHelper.buildSelectQuery(select));
                             } catch (OrmException ex) {
                                 throw new UncaughtOrmException(ex.getMessage(), ex);
                             }
@@ -347,7 +347,7 @@ public final class SqlOrm implements Orm {
                 res = res.distinct();
                 if (queries.size() > 1) {
                     if (!tail.getOrder().isEmpty()) {
-                        res = res.sorted(abstractionHelper.makeComparatorForTail(tail.getOrder()));
+                        res = res.sorted(makeComparatorForTail(tail.getOrder()));
                     } else {
                         res = res.sorted();
                     }
@@ -374,7 +374,7 @@ public final class SqlOrm implements Orm {
             Statement stmt = con.createStatement();
             ResultSet rs = stmt.executeQuery(query);
             Stream<PojoCompare<O>> stream = StreamSupport.stream(
-                    Spliterators.spliteratorUnknownSize(new Iterator<PojoCompare<O>>() {
+                    Spliterators.spliteratorUnknownSize(new Iterator<>() {
                                                             @Override
                                                             public boolean hasNext() {
                                                                 try {
@@ -407,7 +407,7 @@ public final class SqlOrm implements Orm {
             Statement stmt = con.createStatement();
             ResultSet rs = stmt.executeQuery(query);
             Stream<O> stream = StreamSupport.stream(
-                    Spliterators.spliteratorUnknownSize(new Iterator<O>() {
+                    Spliterators.spliteratorUnknownSize(new Iterator<>() {
                         @Override
                         public boolean hasNext() {
                             try {

@@ -17,7 +17,7 @@ import java.util.Set;
 /**
  * Helper class that deals with creating concrete selection hierarchies from ones containing abstract classes.
  */
-class AbstractionHelper {
+final class AbstractionHelper {
 
     /**
      * Expand the query parts in the list so that the query branches into
@@ -27,7 +27,7 @@ class AbstractionHelper {
      * @param tail part
      * @return The expanded query parts lists.
      */
-    List<? extends ExecutablePart<?>> explodeAbstractions(ExecutablePart<?> tail) {
+   static List<? extends ExecutablePart<?>> explodeAbstractions(ExecutablePart<?> tail) {
         if (tail instanceof SelectPart<?>) {
             return explode(tail.getSelect());
         }
@@ -42,9 +42,9 @@ class AbstractionHelper {
      * Pojos on their fields.
      *
      */
-    <O> Comparator<PojoCompare<O>> makeComparatorForTail(List<OrderPart<O>> order) {
-        List<Comparator<PojoCompare<O>>> comps = new LinkedList();
-        for (OrderPart op : order) {
+    static <O> Comparator<PojoCompare<O>> makeComparatorForTail(List<OrderPart<O>> order) {
+        List<Comparator<PojoCompare<O>>> comps = new LinkedList<>();
+        for (OrderPart<O> op : order) {
             comps.add((PojoCompare<O> w1, PojoCompare<O> w2) -> {
                 if (op.getDirection() == OrderPart.Direction.ASCENDING) {
                     return w1.compareTo(w2, op.getField());
@@ -54,16 +54,16 @@ class AbstractionHelper {
                 }
             });
         }
-        return new CompoundComparator(comps);
+        return new CompoundComparator<>(comps);
     }
 
-    private List<OrderedPart<?>> explode(OrderedPart<?> ordered) {
+    private static List<OrderedPart<?>> explode(OrderedPart<?> ordered) {
         List<OrderedPart<?>> res = new ArrayList<>();
         SelectPart<?> select = ordered.getSelect();
         Table<?> table = select.getTable();
         Set<Table<?>> subTables = table.getSubTables();
         if (subTables.isEmpty()) {
-            SelectPart selectPart = new SelectPart(select.getSelector(), select.getTable(), select.getWhere().orElse(null), explode(select.getJoins()));
+            var selectPart = new SelectPart<>(select.getSelector(), select.getTable(), select.getWhere().orElse(null), explode(select.getJoins()));
             res.add(new OrderedPart(select.getSelector(), selectPart,
                     ordered.getOrder(), ordered.getLimit()));
         } else {
@@ -76,7 +76,7 @@ class AbstractionHelper {
         return res;
     }
 
-    private List<SelectPart<?>> explode(SelectPart<?> select) {
+    private static List<SelectPart<?>> explode(SelectPart<?> select) {
         List<SelectPart<?>> res = new ArrayList<>();
         Table<?> table = select.getTable();
         Set<Table<?>> subTables = table.getSubTables();
@@ -90,7 +90,7 @@ class AbstractionHelper {
         return res;
     }
 
-    private List<JoinPart<?, ?>> explode(List<JoinPart<?, ?>> joins) {
+    private static List<JoinPart<?, ?>> explode(List<JoinPart<?, ?>> joins) {
         List<JoinPart<?, ?>> res = new ArrayList<>();
         for (JoinPart<?, ?> join : joins) {
             Table<?> table = join.getTable();
@@ -106,4 +106,5 @@ class AbstractionHelper {
         return res;
     }
 
+    private AbstractionHelper() {}
 }
