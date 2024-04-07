@@ -112,26 +112,13 @@ public final class PostgreSqlDriver extends SqlDriver {
 
     protected Object getKeyValueFromResultSet(ResultSet rs, Field<?,?> field) throws OrmException {
         try {
-            switch (field.getFieldType()) {
-                case LONG:
-                    return rs.getLong(field.getSqlName());
-                case INTEGER:
-                    return rs.getInt(field.getSqlName());
-                case STRING:
-                    return rs.getString(field.getSqlName());
-                case SHORT:
-                case BYTE:
-                case DOUBLE:
-                case FLOAT:
-                case BOOLEAN:
-                case ENUM:
-                case DATE:
-                case INSTANT:
-                case LOCAL_DATE_TIME:
-                    throw new OrmException(format("Field type '%s' is not a supported primary key type", field.getFieldType()));
-                default:
-                    throw new OrmException(format("Field type '%s' is unsupported. BUG!", field.getFieldType()));
-            }
+            return switch (field.getFieldType()) {
+                case LONG -> rs.getLong(field.getSqlName());
+                case INTEGER -> rs.getInt(field.getSqlName());
+                case STRING -> rs.getString(field.getSqlName());
+                case SHORT, BYTE, DOUBLE, FLOAT, BOOLEAN, ENUM, DATE, INSTANT, LOCAL_DATE_TIME ->
+                        throw new OrmException(format("Field type '%s' is not a supported primary key type", field.getFieldType()));
+            };
         } catch (SQLException ex) {
             throw new OrmSqlException(ex.getMessage(), ex);
         }

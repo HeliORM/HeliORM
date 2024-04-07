@@ -51,10 +51,10 @@ final class QueryHelper {
     }
 
     String buildInsertQuery(Table<?> table) throws OrmException {
-        StringBuilder query = new StringBuilder();
+        var query = new StringBuilder();
         query.append(format("INSERT INTO %s(", fullTableName.apply(table)));
-        StringJoiner fields = new StringJoiner(",");
-        StringJoiner values = new StringJoiner(",");
+        var fields = new StringJoiner(",");
+        var values = new StringJoiner(",");
         for (Field<?,?> field : table.getFields()) {
             if (field.isPrimaryKey()) {
                 if (field.isAutoNumber()) {
@@ -74,12 +74,12 @@ final class QueryHelper {
     }
 
     String buildUpdateQuery(Table<?> table) throws OrmException {
-        if (!table.getPrimaryKey().isPresent()) {
+        if (table.getPrimaryKey().isEmpty()) {
             throw new OrmException("A table needs primary key for objects to be updated");
         }
         StringBuilder query = new StringBuilder();
         query.append(format("UPDATE %s SET ", fullTableName.apply(table)));
-        StringJoiner fields = new StringJoiner(",");
+        var fields = new StringJoiner(",");
         for (Field field : table.getFields()) {
             if (!field.isPrimaryKey()) {
                 fields.add(format("%s=?", driver.fieldName(table, field)));
@@ -117,7 +117,7 @@ final class QueryHelper {
             tablesQuery.append(expandLinkTables(root.getTable(), join));
             String joinWhere = expandLinkWheres(join);
             if (!joinWhere.isEmpty()) {
-                if (whereQuery.length() > 0) {
+                if (!whereQuery.isEmpty()) {
                     whereQuery.append(" AND ");
                 }
                 whereQuery.append(expandLinkWheres(join));
@@ -126,7 +126,7 @@ final class QueryHelper {
         // finalize the query
         StringBuilder query = new StringBuilder();
         query.append(tablesQuery);
-        if (whereQuery.length() > 0) {
+        if (!whereQuery.isEmpty()) {
             query.append(" WHERE ");
             query.append(whereQuery);
         }
@@ -179,12 +179,12 @@ final class QueryHelper {
         }
         for (JoinPart<?, ?> join : select.getJoins()) {
             tablesQuery.append(expandLinkTables(select.getTable(), join));
-            if (whereQuery.length() > 0) {
+            if (!whereQuery.isEmpty()) {
                 whereQuery.append(" AND ");
             }
             whereQuery.append(expandLinkWheres(join));
         }
-        if (whereQuery.length() > 0) {
+        if (!whereQuery.isEmpty()) {
             tablesQuery.append(" WHERE ");
             tablesQuery.append(whereQuery);
         }
@@ -212,7 +212,7 @@ final class QueryHelper {
         for (JoinPart<?, ?> next : join.getJoins()) {
             String linkWheres = expandLinkWheres(next);
             if (!linkWheres.isEmpty()) {
-                if (query.length() > 0) {
+                if (!query.isEmpty()) {
                     query.append(" AND ");
                 }
                 query.append(linkWheres);
@@ -315,7 +315,7 @@ final class QueryHelper {
         }
         StringBuilder body = new StringBuilder();
         for (OrderPart<?> order : orders) {
-            if (body.length() > 0) {
+            if (!body.isEmpty()) {
                 body.append(", ");
             }
             body.append(format("%s", driver.fieldName(table, order.getField())));
@@ -353,15 +353,11 @@ final class QueryHelper {
      * @param part The part
      * @return The operator
      */
-    private String listOperator(ListExpressionPart part) throws OrmException {
-        switch (part.getOperator()) {
-            case IN:
-                return " IN";
-            case NOT_IN:
-                return " NOT IN";
-            default:
-                throw new OrmException(format("Unsupported operator '%s'. BUG!", part.getOperator()));
-        }
+    private String listOperator(ListExpressionPart part) {
+        return switch (part.getOperator()) {
+            case IN -> " IN";
+            case NOT_IN -> " NOT IN";
+        };
     }
 
     /**
@@ -370,38 +366,24 @@ final class QueryHelper {
      * @param part The part
      * @return The operator
      */
-    private String valueOperator(ValueExpressionPart part) throws OrmException {
-        switch (part.getOperator()) {
-            case EQ:
-                return "=";
-            case NOT_EQ:
-                return "<>";
-            case GE:
-                return ">=";
-            case LE:
-                return "<=";
-            case GT:
-                return ">";
-            case LT:
-                return "<";
-            case LIKE:
-                return " LIKE ";
-            case NOT_LIKE:
-                return " NOT LIKE ";
-            default:
-                throw new OrmException(format("Unsupported operator '%s'. BUG!", part.getOperator()));
-        }
+    private String valueOperator(ValueExpressionPart part) {
+        return switch (part.getOperator()) {
+            case EQ -> "=";
+            case NOT_EQ -> "<>";
+            case GE -> ">=";
+            case LE -> "<=";
+            case GT -> ">";
+            case LT -> "<";
+            case LIKE -> " LIKE ";
+            case NOT_LIKE -> " NOT LIKE ";
+        };
     }
 
-    private String isOperator(IsExpressionPart part) throws OrmException {
-        switch (part.getOperator()) {
-            case IS_NULL:
-                return " IS NULL";
-            case IS_NOT_NULL:
-                return " IS NOT NULL";
-            default:
-                throw new OrmException(format("Unsupported operator '%s'. BUG!", part.getOperator()));
-        }
+    private String isOperator(IsExpressionPart part) {
+        return switch (part.getOperator()) {
+            case IS_NULL -> " IS NULL";
+            case IS_NOT_NULL -> " IS NOT NULL";
+        };
     }
 
     private String getFieldId(Field field) {
