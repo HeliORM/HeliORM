@@ -118,6 +118,13 @@ public final class SqlOrm implements Orm {
         }
         var con = getConnection();
         try (var stmt = con.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+            int par = 1;
+            for (var field : table.getFields()) {
+                if (!field.isPrimaryKey() || !field.isAutoNumber()) {
+                    preparedStatementHelper.setValueInStatement(stmt, pojo, field, par);
+                    par++;
+                }
+            }
             stmt.executeUpdate();
             var opt = table.getPrimaryKey();
             if (opt.isPresent()) {

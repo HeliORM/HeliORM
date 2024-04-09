@@ -3,8 +3,10 @@ package com.heliorm.sql;
 import com.heliorm.Field;
 import com.heliorm.OrmException;
 import com.heliorm.Table;
+import com.heliorm.UncaughtOrmException;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.WeakHashMap;
 
@@ -73,6 +75,9 @@ abstract class AbstractPojoOperations implements PojoOperations {
     public final <O> Object getValue(O pojo, Field<O,?> field) throws OrmException {
         if (field == null) {
             throw new OrmException("Null field type passed to getValue(). BUG!");
+        }
+        if (pojo.getClass().isRecord()) {
+            return getComponentValue(pojo, field);
         }
         java.lang.reflect.Field refField = getDeclaredField(pojo.getClass(), field.getJavaName());
         return switch (field.getFieldType()) {
@@ -189,5 +194,18 @@ abstract class AbstractPojoOperations implements PojoOperations {
         throw new OrmException(format("Could not find field '%s' on class '%s'", fieldName, clazz.getName()));
     }
 
-
+    private static <O> Object getComponentValue(O obj, Field<O, ?> field) {
+        var opt = Arrays.stream(obj.getClass().getRecordComponents())
+                .filter(com -> com.getName().equals(field.getJavaName()))
+                .findFirst();
+        if (opt.isEmpty()) {
+            throw new UncaughtOrmException(format("Cannot find record component for field '%s' on %s", field.getJavaName(), obj.getClass().getSimpleName()));
+        }
+        var meth = opt.get().getAccessor();
+        try {
+            return meth.invoke(obj);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            throw new UncaughtOrmException(e.getMessage(), e);
+        }
+    }
 }
