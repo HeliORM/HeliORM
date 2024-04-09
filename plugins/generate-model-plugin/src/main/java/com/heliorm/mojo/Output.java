@@ -4,7 +4,18 @@ import com.heliorm.Database;
 import com.heliorm.Field;
 import com.heliorm.Index;
 import com.heliorm.Table;
-import com.heliorm.def.*;
+import com.heliorm.def.BooleanField;
+import com.heliorm.def.ByteField;
+import com.heliorm.def.DateField;
+import com.heliorm.def.DoubleField;
+import com.heliorm.def.EnumField;
+import com.heliorm.def.FloatField;
+import com.heliorm.def.InstantField;
+import com.heliorm.def.IntegerField;
+import com.heliorm.def.LocalDateTimeField;
+import com.heliorm.def.LongField;
+import com.heliorm.def.ShortField;
+import com.heliorm.def.StringField;
 import com.heliorm.impl.FieldBuilder;
 import com.heliorm.impl.IndexPart;
 import com.heliorm.impl.TableBuilder;
@@ -13,8 +24,15 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.StringJoiner;
 
 import static java.lang.String.format;
 
@@ -64,7 +82,7 @@ class Output {
             impt(Table.class.getCanonicalName());
             out.printf("package %s;\n", packageName);
             out.println("");
-            for (String imp : imports.stream().sorted().collect(Collectors.toList())) {
+            for (String imp : imports.stream().sorted().toList()) {
                 out.printf("import %s;\n", imp);
             }
             out.println("");
@@ -79,13 +97,13 @@ class Output {
                 sj.add(shortFieldName(table));
             }
 
-            out.println("@Override");
+            out.println("\t@Override");
             out.println("\tpublic final List<Table<?>> getTables() {");
             out.printf("\t\treturn Arrays.asList(%s);", sj);
             out.println("\n\t}");
             out.println("");
 
-            out.println("@Override");
+            out.println("\t@Override");
             out.println("\tpublic final String getSqlDatabase() {");
             out.printf("\t\treturn \"%s\";", database.getSqlDatabase());
             out.println("\n\t}");
@@ -287,44 +305,20 @@ class Output {
 
     private void addFieldModel(Table<?> cm, Field<?, ?> fm) throws OrmMetaDataException {
         switch (fm.getFieldType()) {
-            case BYTE:
-                addByteField(cm, fm);
-                break;
-            case SHORT:
-                addShortField(cm, fm);
-                break;
-            case INTEGER:
-                addIntegerField(cm, fm);
-                break;
-            case LONG:
-                addLongField(cm, fm);
-                break;
-            case FLOAT:
-                addFloatField(cm, fm);
-                break;
-            case DOUBLE:
-                addDoubleField(cm, fm);
-                break;
-            case BOOLEAN:
-                addBooleanField(cm, fm);
-                break;
-            case DATE:
-                addDateField(cm, fm);
-                break;
-            case INSTANT:
-                addInstantField(cm, fm);
-                break;
-            case LOCAL_DATE_TIME:
-                addLocalDateTimeField(cm, fm);
-                break;
-            case STRING:
-                addStringField(cm, fm);
-                break;
-            case ENUM:
-                addEnumField(cm, fm);
-                break;
-            default:
-                throw new OrmMetaDataException(format("Unsupported Pojo field type %s for field '%s' on class %s", fm.getFieldType(), fm.getJavaName(), getJavaName(cm)));
+            case BYTE -> addByteField(cm, fm);
+            case SHORT -> addShortField(cm, fm);
+            case INTEGER -> addIntegerField(cm, fm);
+            case LONG -> addLongField(cm, fm);
+            case FLOAT -> addFloatField(cm, fm);
+            case DOUBLE -> addDoubleField(cm, fm);
+            case BOOLEAN -> addBooleanField(cm, fm);
+            case DATE -> addDateField(cm, fm);
+            case INSTANT -> addInstantField(cm, fm);
+            case LOCAL_DATE_TIME -> addLocalDateTimeField(cm, fm);
+            case STRING -> addStringField(cm, fm);
+            case ENUM -> addEnumField(cm, fm);
+            default ->
+                    throw new OrmMetaDataException(format("Unsupported Pojo field type %s for field '%s' on class %s", fm.getFieldType(), fm.getJavaName(), getJavaName(cm)));
         }
 
     }

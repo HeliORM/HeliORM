@@ -18,12 +18,12 @@ import static java.lang.String.format;
 /**
  * @author gideon
  */
-public class AnnotatedPojoField implements Field {
+public class AnnotatedPojoField<O, C> implements Field<O,C> {
 
-    private final Table table;
+    private final Table<O> table;
     private final java.lang.reflect.Field pojoField;
 
-    public AnnotatedPojoField(Table table, java.lang.reflect.Field pojoField) {
+    public AnnotatedPojoField(Table<O> table, java.lang.reflect.Field pojoField) {
         this.table = table;
         this.pojoField = pojoField;
     }
@@ -51,8 +51,9 @@ public class AnnotatedPojoField implements Field {
     }
 
     @Override
-    public Class getJavaType() {
-        return pojoField.getType();
+    public Class<C> getJavaType() {
+        //noinspection unchecked
+        return (Class<C>) pojoField.getType();
     }
 
     @Override
@@ -136,7 +137,7 @@ public class AnnotatedPojoField implements Field {
     }
 
     @Override
-    public Field getField() {
+    public Field<O,C> getField() {
         return this;
     }
 

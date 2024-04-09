@@ -18,7 +18,7 @@ import java.util.Set;
 /**
  * @author gideon
  */
-public class AnnotatedPojoGenerator implements Generator<AnnotatedPojoTable> {
+public final class AnnotatedPojoGenerator implements Generator<AnnotatedPojoTable> {
 
     private final GenerateModel generator;
     private final ScanResult scan;
