@@ -5,11 +5,15 @@ import com.heliorm.OrmException;
 import com.heliorm.Table;
 import com.heliorm.UncaughtOrmException;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.RecordComponent;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.function.Function;
 
 import static java.lang.String.format;
@@ -66,7 +70,14 @@ class ResultSetHelper {
     }
 
     private <O> O makeRecordFromResultSet(ResultSet rs, Table<O> table) throws OrmException {
-        throw new UncaughtOrmException("Not yet implemented");
+        var cons = findCanononicalConstructor(table);
+        try {
+            return cons.newInstance(table.getFields().stream()
+                    .map(field -> getValue(rs, field))
+                    .toArray());
+        } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
+            throw new OrmException(e.getMessage(), e);
+        }
     }
 
     private <O> void setValueInPojo(O pojo, Field<O, ?> field, ResultSet rs) throws OrmException {
@@ -169,6 +180,15 @@ class ResultSetHelper {
 
     private String getFieldId(Field<?, ?> field) {
         return getFieldId.apply(field);
+    }
+
+    private static <O> Constructor<O> findCanononicalConstructor(Table<O> table) throws OrmException {
+        try {
+            return table.getObjectClass().getDeclaredConstructor(Arrays.stream(table.getObjectClass().getRecordComponents())
+                    .map(RecordComponent::getType).toList().toArray(new Class<?>[]{}));
+        } catch (NoSuchMethodException e) {
+            throw new OrmException(e.getMessage(), e);
+        }
     }
 
 }

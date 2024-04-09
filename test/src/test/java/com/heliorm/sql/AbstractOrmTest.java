@@ -6,18 +6,17 @@ import com.heliorm.OrmException;
 import com.heliorm.Table;
 import com.heliorm.sql.mysql.MySqlDriver;
 import com.heliorm.sql.postgres.PostgreSqlDriver;
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
-import org.h2.jdbcx.JdbcDataSource;
-import org.junit.jupiter.api.BeforeAll;
 import com.heliorm.test.persons.Person;
 import com.heliorm.test.pets.Cat;
 import com.heliorm.test.pets.Dog;
 import com.heliorm.test.place.Province;
 import com.heliorm.test.place.Town;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+import org.h2.jdbcx.JdbcDataSource;
+import org.junit.jupiter.api.BeforeAll;
 
 import javax.sql.DataSource;
-import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -79,11 +78,7 @@ abstract class AbstractOrmTest {
     }
 
     protected static <O> List<O> selectAll(Class<O> type) throws OrmException {
-        try {
-            return orm.select(orm.tableFor(type.getConstructor().newInstance())).list();
-        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
-            throw new OrmException(e.getMessage(), e);
-        }
+        return orm.select(orm.tableFor(type)).list();
     }
 
     protected static <O> void deleteAll(Class<O> type) throws OrmException {

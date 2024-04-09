@@ -16,6 +16,9 @@ import com.heliorm.impl.JoinPart;
 import com.heliorm.impl.SelectPart;
 import com.heliorm.impl.Selector;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.RecordComponent;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
@@ -31,7 +34,6 @@ import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.Spliterator;
 import java.util.Spliterators;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -39,8 +41,8 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import static com.heliorm.sql.AbstractionHelper.explodeAbstractions;
-import static java.lang.String.format;
 import static com.heliorm.sql.AbstractionHelper.makeComparatorForTail;
+import static java.lang.String.format;
 
 /**
  * A SQL implementation of the ORM.
@@ -108,53 +110,30 @@ public final class SqlOrm implements Orm {
         if (pojo == null) {
             throw new OrmException("Attempt to create a null POJO");
         }
-        Table<O> table = tableFor(pojo);
-        String query = inserts.get(table);
+        var table = tableFor(pojo);
+        var query = inserts.get(table);
         if (query == null) {
             query = queryHelper.buildInsertQuery(table);
             inserts.put(table, query);
         }
-        Connection con = getConnection();
-        O newPojo = pops.newPojoInstance(table);
-        for (var field : table.getFields()) {
-            pops.setValue(newPojo, field, pops.getValue(pojo, field));
-        }
-        try (PreparedStatement stmt = con.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
-            int par = 1;
-            for (var field : table.getFields()) {
-                if (field.isPrimaryKey()) {
-                    if (field.isAutoNumber()) {
-                        if (field.getFieldType() == Field.FieldType.STRING) {
-                            if (pops.getValue(newPojo, field) == null) {
-                                pops.setValue(newPojo, field, UUID.randomUUID().toString());
-                            }
-                            preparedStatementHelper.setValueInStatement(stmt, newPojo, field, par);
-                            par++;
-                        }
-                    } else {
-                        preparedStatementHelper.setValueInStatement(stmt, newPojo, field, par);
-                        par++;
-                    }
-                } else {
-                    preparedStatementHelper.setValueInStatement(stmt, newPojo, field, par);
-                    par++;
-                }
-            }
+        var con = getConnection();
+        try (var stmt = con.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
             stmt.executeUpdate();
-            Optional<Field<O, ?>> opt = table.getPrimaryKey();
+            var opt = table.getPrimaryKey();
             if (opt.isPresent()) {
                 var keyField = opt.get();
                 if (keyField.isAutoNumber()) {
-                    if (keyField.getFieldType() != Field.FieldType.STRING) {
-                        try (ResultSet rs = stmt.getGeneratedKeys()) {
-                            if (rs.next()) {
-                                pops.setValue(newPojo, keyField, driver.getKeyValueFromResultSet(rs, opt.get()));
-                            }
+                    try (ResultSet rs = stmt.getGeneratedKeys()) {
+                        if (rs.next()) {
+                            var keyValue = driver.getKeyValueFromResultSet(rs, keyField);
+                            return table.isRecord()
+                                    ? newRecordFrom(pojo, keyField, keyValue)
+                                    : newPojoFrom(pojo, keyField, keyValue);
                         }
                     }
                 }
             }
-            return newPojo;
+            return table.isRecord() ? newRecordFrom(pojo) : newPojoFrom(pojo);
         } catch (SQLException ex) {
             throw new OrmSqlException(ex.getMessage(), ex);
         } finally {
@@ -176,7 +155,7 @@ public final class SqlOrm implements Orm {
         Connection con = getConnection();
         try (PreparedStatement stmt = con.prepareStatement(query)) {
             int par = 1;
-            for (Field<?,?> field : table.getFields()) {
+            for (Field<?, ?> field : table.getFields()) {
                 if (!field.isPrimaryKey()) {
                     preparedStatementHelper.setValueInStatement(stmt, pojo, field, par);
                     par++;
@@ -225,8 +204,7 @@ public final class SqlOrm implements Orm {
             Optional<Field<O, ?>> primaryKey = table.getPrimaryKey();
             if (primaryKey.isPresent()) {
                 preparedStatementHelper.setValueInStatement(stmt, pojo, primaryKey.get(), 1);
-            }
-            else {
+            } else {
                 throw new OrmException(format("No primary key for %s in delete", table.getObjectClass().getSimpleName()));
             }
             stmt.executeUpdate();
@@ -502,9 +480,9 @@ public final class SqlOrm implements Orm {
      * Cleanup SQL Connection, Statement and ResultSet insuring that
      * errors will not result in aborted cleanup.
      *
-     * @param con The SQL connection
+     * @param con  The SQL connection
      * @param stmt The SQL statement
-     * @param rs The SQL result set
+     * @param rs   The SQL result set
      */
     private void cleanup(Connection con, Statement stmt, ResultSet rs) {
         Exception error = null;
@@ -595,8 +573,78 @@ public final class SqlOrm implements Orm {
      * @param field The field
      * @return The ID
      */
-    private String getUniqueFieldName(Field<?,?> field) {
+    private String getUniqueFieldName(Field<?, ?> field) {
         return format("%s_%s", field.getTable().getSqlTable(), field.getSqlName());
+    }
+
+    private <O> O newRecordFrom(O obj, Field<O, ?> field, Object value) throws OrmException {
+        var table = tableFor(obj);
+        var cons = findCanononicalConstructor(table);
+        try {
+            return cons.newInstance(table.getFields().stream()
+                    .map(f -> f.getJavaName().equals(field.getJavaName()) ? value : getComponentValue(obj, f))
+                    .toArray());
+        } catch (InstantiationException | InvocationTargetException | IllegalAccessException | UncaughtOrmException e) {
+            throw new OrmException(e.getMessage(), e);
+        }
+    }
+
+    private <O> O newRecordFrom(O obj) throws OrmException {
+        var table = tableFor(obj);
+        var cons = findCanononicalConstructor(table);
+        try {
+            return cons.newInstance(table.getFields().stream()
+                    .map(f -> getComponentValue(obj, f))
+                    .toArray());
+        } catch (InstantiationException | InvocationTargetException | IllegalAccessException | UncaughtOrmException e) {
+            throw new OrmException(e.getMessage(), e);
+        }
+    }
+
+    private <O> O newPojoFrom(O obj) throws OrmException {
+        var table = tableFor(obj);
+        var newPojo = pops.newPojoInstance(table);
+        for (var f : table.getFields()) {
+            pops.setValue(newPojo, f, pops.getValue(obj, f));
+        }
+        return newPojo;
+    }
+
+    private <O> O newPojoFrom(O obj, Field<O, ?> field, Object value) throws OrmException {
+        var table = tableFor(obj);
+        var newPojo = pops.newPojoInstance(table);
+        for (var f : table.getFields()) {
+            if (f.getJavaName().equals(field.getJavaName())) {
+                pops.setValue(newPojo, f, value);
+            } else {
+                pops.setValue(newPojo, f, pops.getValue(obj, f));
+            }
+        }
+        return newPojo;
+    }
+
+    private static <O> Constructor<O> findCanononicalConstructor(Table<O> table) throws OrmException {
+        try {
+            return table.getObjectClass().getDeclaredConstructor(Arrays.stream(table.getObjectClass().getRecordComponents())
+                    .map(RecordComponent::getType).toList().toArray(new Class<?>[]{}));
+        } catch (NoSuchMethodException e) {
+            throw new OrmException(e.getMessage(), e);
+        }
+    }
+
+    private static <O> Object getComponentValue(O obj, Field<O, ?> field) {
+        var opt = Arrays.stream(obj.getClass().getRecordComponents())
+                .filter(com -> com.getName().equals(field.getJavaName()))
+                .findFirst();
+        if (opt.isEmpty()) {
+            throw new UncaughtOrmException(format("Cannot find record component for field '%s' on %s", field.getJavaName(), obj.getClass().getSimpleName()));
+        }
+        var meth = opt.get().getAccessor();
+        try {
+            return meth.invoke(obj);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            throw new UncaughtOrmException(e.getMessage(), e);
+        }
     }
 
 }
