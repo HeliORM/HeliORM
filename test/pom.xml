@@ -5,11 +5,11 @@
     <parent>
         <groupId>com.heliorm</groupId>
         <artifactId>orm</artifactId>
-        <version>0.99.8</version>
+        <version>0.9.99</version>
     </parent>
     <artifactId>test</artifactId>
     <name>[HeliORM] Test</name>
-    <version>0.99.8</version>
+    <version>0.9.99</version>
 
     <packaging>jar</packaging>
 

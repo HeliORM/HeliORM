@@ -326,7 +326,7 @@ public final class SqlOrm implements Orm {
                 Stream<PojoCompare<O>> res = queries.stream()
                         .flatMap(select -> {
                             try {
-                                return streamSingle(queries.getFirst().getSelect().getTable(), queryHelper.buildSelectQuery(select));
+                                return streamSingle(select.getSelect().getTable(), queryHelper.buildSelectQuery(select));
                             } catch (OrmException ex) {
                                 throw new UncaughtOrmException(ex.getMessage(), ex);
                             }
