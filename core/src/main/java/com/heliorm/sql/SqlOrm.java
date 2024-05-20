@@ -278,12 +278,12 @@ public final class SqlOrm implements Orm {
             throw new OrmException("Attempt to do table lookup for a null class");
         }
         if (tables.isEmpty()) {
-            ServiceLoader<Database> svl = ServiceLoader.load(Database.class);
-            for (Database database : svl) {
-                for (Table<?> table : database.getTables()) {
-                    tables.put(table.getObjectClass(), table);
-                }
-            }
+            tables.putAll(ServiceLoader.load(Database.class)
+                    .stream()
+                    .map(ServiceLoader.Provider::get)
+                    .map(Database::getTables)
+                    .flatMap(List::stream)
+                    .collect(Collectors.toMap(Table::getObjectClass, table -> table)));
         }
         @SuppressWarnings("unchecked")
         var table = (Table<O>) tables.get(type);
