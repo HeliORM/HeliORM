@@ -291,7 +291,7 @@ class Output {
         emit("");
         emit("}");
         emit("");
-
+        pop();
 
     }
 
