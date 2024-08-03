@@ -13,7 +13,7 @@ import static com.heliorm.Field.FieldType.LONG;
 /**
  * @author gideon
  */
-public class LongFieldPart<O> extends NumberFieldPart<O, Long> implements LongField<O> {
+public final class LongFieldPart<O> extends NumberFieldPart<O, Long> implements LongField<O> {
 
     public LongFieldPart(Table<O> table, String javaName) {
         super(table, LONG, Long.class, javaName);

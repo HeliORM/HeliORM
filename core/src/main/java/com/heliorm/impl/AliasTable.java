@@ -13,7 +13,7 @@ import java.util.Set;
 /**
  * @author gideon
  */
-public class AliasTable<O> implements Table<O> {
+public final class AliasTable<O> implements Table<O> {
 
     private final Database database;
     private final Table<O> table;

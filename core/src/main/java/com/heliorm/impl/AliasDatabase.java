@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * @author gideon
  */
-public class AliasDatabase implements Database {
+public final class AliasDatabase implements Database {
 
     private final Database database;
     private final String sqlDatabase;

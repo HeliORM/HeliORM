@@ -6,7 +6,7 @@ import com.heliorm.def.Continuation;
  * @param <O> Type of POJO
  * @author gideon
  */
-public class ExpressionContinuationPart< O> implements Continuation<O> {
+public final class ExpressionContinuationPart< O> implements Continuation<O> {
 
     public enum Type {
         AND, OR

@@ -10,7 +10,7 @@ import java.util.Optional;
 /**
  * @author gideon
  */
-public class JoinPart<LO, RO> implements Join<LO> {
+public final class JoinPart<LO, RO> implements Join<LO> {
 
     private final Table<RO> table;
     private final OnPart<LO, RO> on;

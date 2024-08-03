@@ -7,7 +7,7 @@ import static java.lang.String.format;
  * @param <C> Type of the field
  * @author gideon
  */
-public class IsExpressionPart< O, C> extends ExpressionPart<O, C> {
+public final class IsExpressionPart< O, C> extends ExpressionPart<O, C> {
 
     private final Operator operator;
 

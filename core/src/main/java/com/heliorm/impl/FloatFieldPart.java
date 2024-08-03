@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * @author gideon
  */
-public class FloatFieldPart<O> extends NumberFieldPart<O, Float> implements FloatField<O> {
+public final class FloatFieldPart<O> extends NumberFieldPart<O, Float> implements FloatField<O> {
 
     public FloatFieldPart(Table<O> table, String javaName) {
         super(table, FieldType.FLOAT, Float.class, javaName);

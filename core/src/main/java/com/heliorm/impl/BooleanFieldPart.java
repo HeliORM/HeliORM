@@ -8,8 +8,7 @@ import com.heliorm.def.Continuation;
 /**
  * @author gideon
  */
-public class
-BooleanFieldPart<O> extends FieldPart<O, Boolean> implements
+public final class BooleanFieldPart<O> extends FieldPart<O, Boolean> implements
         BooleanField<O>,
         WithEqualsPart<O, Boolean>, WithIsPart<O, Boolean> {
 

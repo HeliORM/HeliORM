@@ -19,7 +19,7 @@ import static java.lang.String.format;
 /**
  * @author gideon
  */
-public class SelectPart<DO> extends ExecutablePart<DO> implements Select<DO> {
+public final class SelectPart<DO> extends ExecutablePart<DO> implements Select<DO> {
 
     private final Selector selector;
     private final Table<DO> table;

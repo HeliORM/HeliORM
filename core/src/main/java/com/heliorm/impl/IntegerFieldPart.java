@@ -13,7 +13,7 @@ import static com.heliorm.Field.FieldType.INTEGER;
 /**
  * @author gideon
  */
-public class IntegerFieldPart<O> extends NumberFieldPart<O, Integer> implements IntegerField<O> {
+public final class IntegerFieldPart<O> extends NumberFieldPart<O, Integer> implements IntegerField<O> {
 
     public IntegerFieldPart(Table<O> table, String javaName) {
         super(table, INTEGER, Integer.class, javaName);

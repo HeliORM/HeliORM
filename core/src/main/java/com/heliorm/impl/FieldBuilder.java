@@ -8,7 +8,7 @@ import java.util.Optional;
 
 import static java.lang.String.format;
 
-public class FieldBuilder<P extends FieldPart<?,?>> {
+public final class FieldBuilder<P extends FieldPart<?,?>> {
 
     private final Table<?> table;
     private final Field.FieldType fieldType;
