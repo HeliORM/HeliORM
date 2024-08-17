@@ -19,7 +19,7 @@ import static java.lang.String.format;
  *
  * @author gideon
  */
-public class SqlOrmBuilder {
+public final class SqlOrmBuilder {
 
     private final Supplier<Connection> con;
     private final Class<? extends SqlDriver> driverClass;

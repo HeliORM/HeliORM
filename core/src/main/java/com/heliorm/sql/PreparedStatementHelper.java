@@ -13,7 +13,7 @@ import static java.lang.String.format;
  *
  * @author gideon
  */
-class PreparedStatementHelper {
+final class PreparedStatementHelper {
 
     private final PojoHelper pojoHelper;
     private final SetEnum setEnum;

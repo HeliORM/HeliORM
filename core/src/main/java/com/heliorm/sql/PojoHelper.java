@@ -14,7 +14,7 @@ import static java.lang.String.format;
  *
  * @author gideon
  */
-class PojoHelper {
+final class PojoHelper {
 
     private final PojoOperations pops;
 

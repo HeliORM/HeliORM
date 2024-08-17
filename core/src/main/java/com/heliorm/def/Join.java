@@ -5,5 +5,4 @@ package com.heliorm.def;
  */
 public interface Join<LO> {
 
-
 }

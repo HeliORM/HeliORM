@@ -39,11 +39,11 @@ public interface FloatField< O> extends Field<O, Float>, WithRange< O, Float>, W
     }
 
     default Continuation<O> in(Integer... values) throws OrmException {
-        return in(Arrays.stream(values).map(value -> value.floatValue()).collect(Collectors.toList()));
+        return in(Arrays.stream(values).map(Integer::floatValue).collect(Collectors.toList()));
     }
 
     default Continuation<O> notIn(Integer... values) throws OrmException {
-        return notIn(Arrays.stream(values).map(value -> value.floatValue()).collect(Collectors.toList()));
+        return notIn(Arrays.stream(values).map(Integer::floatValue).collect(Collectors.toList()));
     }
 
     default Continuation<O> lt(Long value) throws OrmException {
@@ -71,10 +71,10 @@ public interface FloatField< O> extends Field<O, Float>, WithRange< O, Float>, W
     }
 
     default Continuation<O> in(Long... values) throws OrmException {
-        return in(Arrays.stream(values).map(value -> value.floatValue()).collect(Collectors.toList()));
+        return in(Arrays.stream(values).map(Long::floatValue).collect(Collectors.toList()));
     }
 
     default Continuation<O> notIn(Long... values) throws OrmException {
-        return notIn(Arrays.stream(values).map(value -> value.floatValue()).collect(Collectors.toList()));
+        return notIn(Arrays.stream(values).map(Long::floatValue).collect(Collectors.toList()));
     }
 }

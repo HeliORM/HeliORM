@@ -40,11 +40,11 @@ public interface LongField< O> extends Field<O, Long>, WithRange<O, Long>, WithE
     }
 
     default Continuation<O> in(Integer... values) throws OrmException {
-        return in(Arrays.stream(values).map(value -> value.longValue()).collect(Collectors.toList()));
+        return in(Arrays.stream(values).map(Integer::longValue).collect(Collectors.toList()));
     }
 
     default Continuation<O> notIn(Integer... values) throws OrmException {
-        return notIn(Arrays.stream(values).map(value -> value.longValue()).collect(Collectors.toList()));
+        return notIn(Arrays.stream(values).map(Integer::longValue).collect(Collectors.toList()));
     }
 
 }

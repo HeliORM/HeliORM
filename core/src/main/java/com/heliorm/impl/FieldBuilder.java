@@ -2,11 +2,8 @@ package com.heliorm.impl;
 
 import com.heliorm.Field;
 import com.heliorm.Table;
-import com.heliorm.UncaughtOrmException;
 
 import java.util.Optional;
-
-import static java.lang.String.format;
 
 public final class FieldBuilder<P extends FieldPart<?,?>> {
 
@@ -65,47 +62,20 @@ public final class FieldBuilder<P extends FieldPart<?,?>> {
     }
 
     public P build() {
-        P part;
-        switch (fieldType) {
-            case STRING:
-                part = (P) new StringFieldPart(table, javaName);
-                break;
-            case BOOLEAN:
-                part = (P) new BooleanFieldPart(table, javaName);
-                break;
-            case BYTE:
-                part = (P) new ByteFieldPart(table, javaName);
-                break;
-            case SHORT:
-                part = (P) new ShortFieldPart(table, javaName);
-                break;
-            case INTEGER:
-                part = (P) new IntegerFieldPart(table, javaName);
-                break;
-            case LONG:
-                part = (P) new LongFieldPart(table, javaName);
-                break;
-            case FLOAT:
-                part = (P) new FloatFieldPart(table, javaName);
-                break;
-            case DOUBLE:
-                part = (P) new DoubleFieldPart(table, javaName);
-                break;
-            case ENUM:
-                part = (P) new EnumFieldPart(table, javaType, javaName);
-                break;
-            case DATE:
-                part = (P) new DateFieldPart(table, javaName);
-                break;
-            case INSTANT:
-                part = (P) new InstantFieldPart(table, javaName);
-                break;
-            case LOCAL_DATE_TIME:
-                part = (P) new LocalDateTimeFieldPart<>(table, javaName);
-                break;
-            default:
-                throw new UncaughtOrmException(format("Unexpected field type %s. BUG!", fieldType));
-        }
+        P part = switch (fieldType) {
+            case STRING -> (P) new StringFieldPart(table, javaName);
+            case BOOLEAN -> (P) new BooleanFieldPart(table, javaName);
+            case BYTE -> (P) new ByteFieldPart(table, javaName);
+            case SHORT -> (P) new ShortFieldPart(table, javaName);
+            case INTEGER -> (P) new IntegerFieldPart(table, javaName);
+            case LONG -> (P) new LongFieldPart(table, javaName);
+            case FLOAT -> (P) new FloatFieldPart(table, javaName);
+            case DOUBLE -> (P) new DoubleFieldPart(table, javaName);
+            case ENUM -> (P) new EnumFieldPart(table, javaType, javaName);
+            case DATE -> (P) new DateFieldPart(table, javaName);
+            case INSTANT -> (P) new InstantFieldPart(table, javaName);
+            case LOCAL_DATE_TIME -> (P) new LocalDateTimeFieldPart<>(table, javaName);
+        };
         part.setAutoNumber(autoNumber);
         part.setForeignKey(foreignKey);
         part.setForeignTable(foreignTable);
@@ -115,6 +85,5 @@ public final class FieldBuilder<P extends FieldPart<?,?>> {
         part.setLength(length);
         return part;
     }
-
 
 }

@@ -1,7 +1,6 @@
 package com.heliorm.impl;
 
 import com.heliorm.OrmException;
-import com.heliorm.Table;
 import com.heliorm.def.Executable;
 
 import java.util.List;
