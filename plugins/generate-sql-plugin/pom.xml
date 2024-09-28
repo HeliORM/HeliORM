@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.heliorm</groupId>
         <artifactId>plugins</artifactId>
-        <version>0.99.100</version>
+        <version>0.99.101</version>
     </parent>
     <artifactId>generate-sql-plugin</artifactId>
     <packaging>maven-plugin</packaging>
