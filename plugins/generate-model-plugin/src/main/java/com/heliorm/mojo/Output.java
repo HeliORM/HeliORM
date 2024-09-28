@@ -4,18 +4,7 @@ import com.heliorm.Database;
 import com.heliorm.Field;
 import com.heliorm.Index;
 import com.heliorm.Table;
-import com.heliorm.def.BooleanField;
-import com.heliorm.def.ByteField;
-import com.heliorm.def.DateField;
-import com.heliorm.def.DoubleField;
-import com.heliorm.def.EnumField;
-import com.heliorm.def.FloatField;
-import com.heliorm.def.InstantField;
-import com.heliorm.def.IntegerField;
-import com.heliorm.def.LocalDateTimeField;
-import com.heliorm.def.LongField;
-import com.heliorm.def.ShortField;
-import com.heliorm.def.StringField;
+import com.heliorm.def.*;
 import com.heliorm.impl.FieldBuilder;
 import com.heliorm.impl.IndexPart;
 import com.heliorm.impl.TableBuilder;
@@ -155,7 +144,7 @@ class Output {
         }
     }
 
-    private <O> void emit(Table<O> cm) throws OrmMetaDataException {
+    private <O> void emit(Table<O> cm) {
         impt(cm.getObjectClass());
         emit("public static class %s implements Table<%s> {",
                 tableName(cm), getJavaName(cm));
@@ -303,7 +292,7 @@ class Output {
         return res;
     }
 
-    private void addFieldModel(Table<?> cm, Field<?, ?> fm) throws OrmMetaDataException {
+    private void addFieldModel(Table<?> cm, Field<?, ?> fm) {
         switch (fm.getFieldType()) {
             case BYTE -> addByteField(cm, fm);
             case SHORT -> addShortField(cm, fm);
@@ -317,10 +306,8 @@ class Output {
             case LOCAL_DATE_TIME -> addLocalDateTimeField(cm, fm);
             case STRING -> addStringField(cm, fm);
             case ENUM -> addEnumField(cm, fm);
-            default ->
-                    throw new OrmMetaDataException(format("Unsupported Pojo field type %s for field '%s' on class %s", fm.getFieldType(), fm.getJavaName(), getJavaName(cm)));
+            case BYTE_ARRAY -> addByteArrayField(cm,fm);
         }
-
     }
 
     private void addLongField(Table<?> cm, Field<?, ?> fm) {
@@ -368,6 +355,16 @@ class Output {
                 fm.getJavaName(),
                 fm.getJavaName(),
                 enumTypeName);
+        completeField(fm);
+    }
+
+    private void addByteArrayField(Table<?> cm, Field<?,?> fm) {
+        impt(ByteArrayField.class);
+        emit("public final %s<%s> %s = builder.byteArrayField(\"%s\")",
+                ByteArrayField.class.getSimpleName(),
+                cm.getObjectClass().getSimpleName(),
+                fm.getJavaName(),
+                fm.getJavaName());
         completeField(fm);
     }
 

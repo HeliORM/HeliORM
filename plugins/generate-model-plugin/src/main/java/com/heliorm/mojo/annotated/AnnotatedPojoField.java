@@ -104,6 +104,9 @@ public class AnnotatedPojoField<O, C> implements Field<O,C> {
         } else if (Enum.class.isAssignableFrom(type)) {
             return FieldType.ENUM;
         }
+        else if (byte[].class.isAssignableFrom(type)) {
+            return FieldType.BYTE_ARRAY;
+        }
         throw new AnnotatedPojoException(format("Unsupported field type %s for field '%s' on %s",
                 type.getSimpleName(), pojoField.getName(), pojoField.getDeclaringClass().getCanonicalName()));
     }

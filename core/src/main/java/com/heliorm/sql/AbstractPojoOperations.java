@@ -89,7 +89,7 @@ abstract class AbstractPojoOperations implements PojoOperations {
             case FLOAT -> getFloat(pojo, refField);
             case BOOLEAN -> getBoolean(pojo, refField);
             case ENUM -> getEnum(pojo, refField);
-            case DATE, INSTANT, LOCAL_DATE_TIME, STRING -> getObject(pojo, refField);
+            case DATE, INSTANT, LOCAL_DATE_TIME, STRING, BYTE_ARRAY -> getObject(pojo, refField);
         };
     }
 

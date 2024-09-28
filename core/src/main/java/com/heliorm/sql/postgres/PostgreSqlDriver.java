@@ -116,7 +116,7 @@ public final class PostgreSqlDriver extends SqlDriver {
                 case LONG -> rs.getLong(field.getSqlName());
                 case INTEGER -> rs.getInt(field.getSqlName());
                 case STRING -> rs.getString(field.getSqlName());
-                case SHORT, BYTE, DOUBLE, FLOAT, BOOLEAN, ENUM, DATE, INSTANT, LOCAL_DATE_TIME ->
+                case SHORT, BYTE, DOUBLE, FLOAT, BOOLEAN, ENUM, DATE, INSTANT, LOCAL_DATE_TIME, BYTE_ARRAY ->
                         throw new OrmException(format("Field type '%s' is not a supported primary key type", field.getFieldType()));
             };
         } catch (SQLException ex) {

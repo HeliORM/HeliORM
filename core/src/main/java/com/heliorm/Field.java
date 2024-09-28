@@ -101,7 +101,8 @@ public interface Field<O, C> extends FieldOrder<O, C> {
         STRING,
         DATE,
         INSTANT,
-        LOCAL_DATE_TIME
+        LOCAL_DATE_TIME,
+        BYTE_ARRAY
     }
 
 }

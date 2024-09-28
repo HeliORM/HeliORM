@@ -67,4 +67,8 @@ public final class TableBuilder<T extends Table<O>, O> {
     public <E extends Enum<E>> FieldBuilder<EnumFieldPart<O, E>> enumField(String javaName, Class<E> enumType) {
         return new FieldBuilder<>(table, Field.FieldType.ENUM, enumType, javaName);
     }
+
+    public FieldBuilder<ByteArrayFieldPart<O>> byteArrayField(String javaName) {
+        return new FieldBuilder<>(table, FieldType.BYTE_ARRAY, byte[].class, javaName);
+    }
 }

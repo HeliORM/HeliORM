@@ -82,7 +82,7 @@ public final class MySqlDriver extends SqlDriver {
                 case LONG -> rs.getLong(idx);
                 case INTEGER -> rs.getInt(idx);
                 case STRING -> rs.getString(idx);
-                case SHORT, BYTE, DOUBLE, FLOAT, BOOLEAN, ENUM, DATE, INSTANT, LOCAL_DATE_TIME ->
+                case SHORT, BYTE, DOUBLE, FLOAT, BOOLEAN, ENUM, DATE, INSTANT, LOCAL_DATE_TIME, BYTE_ARRAY ->
                         throw new OrmException(format("Field type '%s' is not a supported primary key type", field.getFieldType()));
             };
         } catch (SQLException ex) {

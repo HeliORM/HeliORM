@@ -25,6 +25,8 @@ public class Person {
     private String emailAddress;
     @Column(nullable = true)
     private Double income;
+    @Column(nullable = true)
+    private byte[] photo;
 
     public Long getId() {
         return id;
