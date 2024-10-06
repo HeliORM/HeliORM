@@ -1,6 +1,7 @@
 package com.heliorm.sql;
 
 import com.heliorm.Field;
+import com.heliorm.Field.FieldType;
 import com.heliorm.OrmException;
 import com.heliorm.Table;
 import com.heliorm.UncaughtOrmException;

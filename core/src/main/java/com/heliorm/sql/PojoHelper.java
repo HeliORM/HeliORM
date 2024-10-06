@@ -47,6 +47,9 @@ final class PojoHelper {
         if (value == null) {
             return null;
         }
+        if (value instanceof Enum<?> e) {
+            return e.name();
+        }
         if (!(value instanceof String)) {
             throw new OrmException(format("Could not read String value for field type '%s'.", field.getFieldType()));
         }

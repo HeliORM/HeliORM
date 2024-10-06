@@ -8,6 +8,7 @@ import com.heliorm.test.pets.CatType;
 import com.heliorm.test.pets.Dog;
 import com.heliorm.test.pets.Pet;
 import com.heliorm.test.place.Province;
+import com.heliorm.test.place.Province.Type;
 import com.heliorm.test.place.Town;
 
 import java.util.ArrayList;
@@ -143,7 +144,7 @@ class TestData {
 
     static List<Province> makeProvinces() {
         return Arrays.stream(PROVINCE_NAMES)
-                .map(name -> new Province(null, name)).collect(Collectors.toList());
+                .map(name -> new Province(null, name, Type.COOL_PLACE)).collect(Collectors.toList());
     }
 
     static List<Town> makeTowns(List<Province> provinces) {
