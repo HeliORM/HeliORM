@@ -5,6 +5,8 @@ import com.heliorm.annotation.ForeignKey;
 import com.heliorm.annotation.Pojo;
 import com.heliorm.annotation.PrimaryKey;
 
+import java.time.LocalDateTime;
+
 @Pojo
 public class Town {
 
@@ -14,6 +16,7 @@ public class Town {
     private String name;
     @ForeignKey(pojo = Province.class)
     private Long provinceId;
+    private LocalDateTime founded;
 
     public Long getId() {
         return id;
@@ -37,5 +40,9 @@ public class Town {
 
     public void setProvinceId(Long provinceId) {
         this.provinceId = provinceId;
+    }
+
+    public void setFounded(LocalDateTime founded) {
+        this.founded = founded;
     }
 }

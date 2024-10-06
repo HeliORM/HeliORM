@@ -5,6 +5,7 @@ import com.heliorm.Table;
 import com.heliorm.def.Continuation;
 import com.heliorm.def.ByteArrayField;
 
+import static com.heliorm.Field.FieldType.BYTE_ARRAY;
 import static com.heliorm.Field.FieldType.LOCAL_DATE_TIME;
 
 /**
@@ -14,7 +15,7 @@ public final class ByteArrayFieldPart<O> extends FieldPart<O, byte[]> implements
         ByteArrayField<O> {
 
     public ByteArrayFieldPart(Table<O> table, String javaName) {
-        super(table, LOCAL_DATE_TIME, byte[].class, javaName);
+        super(table, BYTE_ARRAY, byte[].class, javaName);
     }
 
     @Override

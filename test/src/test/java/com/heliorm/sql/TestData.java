@@ -11,6 +11,7 @@ import com.heliorm.test.place.Province;
 import com.heliorm.test.place.Province.Type;
 import com.heliorm.test.place.Town;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -156,6 +157,7 @@ class TestData {
                 Town town = new Town();
                 town.setProvinceId(province.provinceId());
                 town.setName(name);
+                town.setFounded(LocalDateTime.of(1822, 10, 11, 16, 30));
                 towns.add(town);
             }
         }
