@@ -59,6 +59,7 @@ final class PreparedStatementHelper {
                     break;
                 case BYTE_ARRAY:
                     stmt.setObject(par, pojoHelper.getValueFromPojo(pojo, field));
+                    break;
                 default:
                     throw new OrmException(format("Field type '%s' is unsupported. BUG!", field.getFieldType()));
             }
