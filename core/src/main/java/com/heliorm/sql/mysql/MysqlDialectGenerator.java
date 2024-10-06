@@ -59,24 +59,16 @@ public class MysqlDialectGenerator implements TableGenerator {
     }
 
     private String generateFieldSql(Field<?,?> field) throws OrmSqlException {
-        switch (field.getFieldType()) {
-            case BOOLEAN:
-                return "TINYINT(1)";
-            case BYTE:
-                return "TINYINT";
-            case SHORT:
-                return "SMALLINT";
-            case INTEGER:
-                return "INTEGER";
-            case LONG:
-                return "BIGINT";
-            case DOUBLE:
-                return "DOUBLE";
-            case FLOAT:
-                return "REAL";
-            case ENUM:
-                return format("ENUM(%s)", getEnumValues(field));
-            case STRING: {
+       return switch (field.getFieldType()) {
+            case BOOLEAN -> "TINYINT(1)";
+            case BYTE -> "TINYINT";
+            case SHORT ->  "SMALLINT";
+            case INTEGER ->  "INTEGER";
+            case LONG ->  "BIGINT";
+            case DOUBLE -> "DOUBLE";
+            case FLOAT -> "REAL";
+            case ENUM -> format("ENUM(%s)", getEnumValues(field));
+            case STRING -> {
                 int length = 255;
                 if (field.isPrimaryKey()) {
                     length = 36;
@@ -84,16 +76,13 @@ public class MysqlDialectGenerator implements TableGenerator {
                 if (field.getLength().isPresent()) {
                     length = field.getLength().get();
                 }
-                return format("VARCHAR(%d)", length);
+                yield format("VARCHAR(%d)", length);
             }
-            case DATE:
-                return "DATE";
-            case INSTANT:
-            case LOCAL_DATE_TIME:
-                return "DATETIME";
-            default:
-                throw new OrmSqlException(format("Unkown field type '%s'. BUG!", field.getFieldType()));
-        }
+            case DATE -> "DATE";
+            case INSTANT -> "DATETIME";
+            case LOCAL_DATE_TIME -> "DATETIME";
+           case BYTE_ARRAY -> "LONGBLOB";
+        };
     }
 
     private String getEnumValues(Field<?, ?> field) {
