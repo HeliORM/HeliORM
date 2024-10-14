@@ -76,7 +76,15 @@ public class MysqlDialectGenerator implements TableGenerator {
                 if (field.getLength().isPresent()) {
                     length = field.getLength().get();
                 }
-                yield format("VARCHAR(%d)", length);
+                if (length >= 16777215) {
+                    yield  "LONGTEXT";
+                } else if (length > 65535) {
+                    yield  "MEDIUMTEXT";
+                } else if (length > 255) {
+                    yield  "TEXT";
+                } else {
+                    yield  format("VARCHAR(%d)", length);
+                }
             }
             case DATE -> "DATE";
             case INSTANT -> "DATETIME";
