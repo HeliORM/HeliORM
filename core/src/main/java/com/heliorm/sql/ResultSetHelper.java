@@ -101,6 +101,8 @@ class ResultSetHelper {
             case LOCAL_DATE_TIME:
                 pops.setValue(pojo, field, getLocalDateTime(rs, column));
                 break;
+            case BYTE_ARRAY:
+                pops.setValue(pojo, field, getValue(rs, field));
             default:
                 throw new OrmException(format("Field type '%s' is unsupported. BUG!", field.getFieldType()));
         }
@@ -144,12 +146,15 @@ class ResultSetHelper {
                 case DATE:
                     return rs.getDate(column);
                 case INSTANT:
+                    return getInstant(rs, column);
                 case LOCAL_DATE_TIME:
-                    return rs.getTimestamp(column);
+                    return getLocalDateTime(rs, column);
+                case BYTE_ARRAY:
+                    return rs.getBytes(column);
                 default:
                     throw new UncaughtOrmException(format("Field type '%s' is unsupported. BUG!", field.getFieldType()));
             }
-        } catch (SQLException ex) {
+        } catch (SQLException | OrmException ex) {
             throw new UncaughtOrmException(format("Error reading field value from SQL for '%s' (%s)", field.getJavaName(), ex.getMessage()), ex);
         }
     }
