@@ -22,7 +22,7 @@ public abstract class ExecutablePart< DO> implements Executable<DO> {
 
     public abstract List<OrderPart<DO>> getOrder();
 
-    public abstract LimitPart<DO> getLimit();
+    public abstract LimitPart getLimit();
 
     @Override
     public List<DO> list() throws OrmException {

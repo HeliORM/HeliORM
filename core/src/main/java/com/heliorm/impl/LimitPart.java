@@ -1,6 +1,6 @@
 package com.heliorm.impl;
 
-public class LimitPart<O> {
+public class LimitPart {
 
     private final int from;
     private final int number;

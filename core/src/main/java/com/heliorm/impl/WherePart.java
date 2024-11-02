@@ -6,7 +6,7 @@ import com.heliorm.def.Where;
 import java.util.LinkedList;
 import java.util.List;
 
-public class WherePart<O> implements Where<O> {
+public final class WherePart<O> implements Where<O> {
 
     private final ExpressionPart<O, ?> expression;
     private final List<ExpressionContinuationPart<O>> continuations = new LinkedList<>();

@@ -14,7 +14,7 @@ public final class OrderedPart< DO> extends ExecutablePart<DO> implements Comple
     private final SelectPart< DO> select;
     private final List<OrderPart< DO>> order;
 
-    public OrderedPart(Selector selector, SelectPart< DO> select, List<OrderPart< DO>> order, LimitPart<DO> limit) {
+    public OrderedPart(Selector selector, SelectPart< DO> select, List<OrderPart< DO>> order, LimitPart limit) {
         super(selector);
         this.select = select;
         this.order = order;
@@ -32,13 +32,13 @@ public final class OrderedPart< DO> extends ExecutablePart<DO> implements Comple
     }
 
     @Override
-    public LimitPart<DO> getLimit() {
+    public LimitPart getLimit() {
         return select.getLimit();
     }
 
     @Override
     public Executable<DO> limit(int from, int number) {
-        this.select.setLimit(new LimitPart<>(from, number));
+        this.select.setLimit(new LimitPart(from, number));
         return this;
     }
 

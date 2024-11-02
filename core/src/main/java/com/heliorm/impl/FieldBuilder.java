@@ -3,8 +3,6 @@ package com.heliorm.impl;
 import com.heliorm.Field;
 import com.heliorm.Table;
 
-import java.util.Optional;
-
 public final class FieldBuilder<P extends FieldPart<?,?>> {
 
     private final Table<?> table;
@@ -16,8 +14,8 @@ public final class FieldBuilder<P extends FieldPart<?,?>> {
     private boolean autoNumber = false;
     private boolean foreignKey = false;
     private boolean nullable = false;
-    private Optional<Table<?>> foreignTable = Optional.empty();
-    private Optional<Integer> length = Optional.empty();
+    private Table<?> foreignTable = null;
+    private Integer length = null;
 
     public FieldBuilder(Table<?> table, Field.FieldType fieldType, Class<?> javaType, String javaName) {
         this.table = table;
@@ -52,12 +50,12 @@ public final class FieldBuilder<P extends FieldPart<?,?>> {
     }
 
     public FieldBuilder<P> withForeignTable(Table<?> value) {
-        this.foreignTable = Optional.ofNullable(value);
+        this.foreignTable = value;
         return this;
     }
 
     public FieldBuilder<P> withLength(int value) {
-        this.length = Optional.of(value);
+        this.length = value;
         return this;
     }
 

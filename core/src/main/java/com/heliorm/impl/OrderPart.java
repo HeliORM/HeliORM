@@ -1,6 +1,6 @@
 package com.heliorm.impl;
 
-public class OrderPart<O> {
+public final class OrderPart<O> {
     private final Direction direction;
     private final FieldPart< O, ?> field;
     public OrderPart(Direction direction, FieldPart< O, ?> field) {

@@ -13,7 +13,7 @@ import static com.heliorm.Field.FieldType.SHORT;
 /**
  * @author gideon
  */
-public class ShortFieldPart<O> extends NumberFieldPart<O, Short> implements ShortField<O> {
+public final class ShortFieldPart<O> extends NumberFieldPart<O, Short> implements ShortField<O> {
 
     public ShortFieldPart(Table<O> table, String javaName) {
         super(table, SHORT, Short.class, javaName);

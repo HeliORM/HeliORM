@@ -26,13 +26,13 @@ public final class SelectPart<DO> extends ExecutablePart<DO> implements Select<D
     private final Where<DO> where;
     private final List<JoinPart<?,?>> joins;
     private List<OrderPart<DO>> order;
-    private LimitPart<DO> limit;
+    private LimitPart limit;
 
     public SelectPart(Selector orm, Table<DO> table) {
         this(orm, table, null,  Collections.emptyList());
     }
 
-    public SelectPart(Selector orm, Table<DO> table, Where<DO> where, List<JoinPart<?, ?>> joins, List<OrderPart<DO>> order, LimitPart<DO> limit) {
+    public SelectPart(Selector orm, Table<DO> table, Where<DO> where, List<JoinPart<?, ?>> joins, List<OrderPart<DO>> order, LimitPart limit) {
         super(orm);
         this.table = table;
         this.where = where;
@@ -43,7 +43,7 @@ public final class SelectPart<DO> extends ExecutablePart<DO> implements Select<D
     }
 
     public SelectPart(Selector orm, Table<DO> table, Where<DO> where, List<JoinPart<?, ?>> joins) {
-        this(orm, table, where, joins, Collections.emptyList(), new LimitPart<>(-1, -1));
+        this(orm, table, where, joins, Collections.emptyList(), new LimitPart(-1, -1));
     }
 
 
@@ -78,11 +78,11 @@ public final class SelectPart<DO> extends ExecutablePart<DO> implements Select<D
     }
 
     @Override
-    public LimitPart<DO> getLimit() {
+    public LimitPart getLimit() {
         return limit;
     }
 
-    void setLimit(LimitPart<DO> limit) {
+    void setLimit(LimitPart limit) {
         this.limit = limit;
     }
 
@@ -126,13 +126,13 @@ public final class SelectPart<DO> extends ExecutablePart<DO> implements Select<D
 
     @Override
     public Executable<DO> limit(int from, int number) {
-        limit = new LimitPart<>(from, number);
+        limit = new LimitPart(from, number);
         return this;
     }
 
     @Override
     public Executable<DO> limit(int number) {
-        limit = new LimitPart<>(number);
+        limit = new LimitPart(number);
         return this;
     }
 }

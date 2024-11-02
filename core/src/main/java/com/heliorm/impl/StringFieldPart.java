@@ -13,7 +13,7 @@ import static com.heliorm.Field.FieldType.STRING;
 /**
  * @author gideon
  */
-public class StringFieldPart<O> extends FieldPart<O, String> implements
+public final class StringFieldPart<O> extends FieldPart<O, String> implements
         StringField<O>,
         WithEqualsPart<O, String>,
         WithRangePart<O, String>,

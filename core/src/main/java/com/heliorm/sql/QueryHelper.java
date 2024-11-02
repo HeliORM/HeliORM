@@ -310,7 +310,7 @@ final class QueryHelper {
         return query.toString();
     }
 
-    private String expandLimit(LimitPart<?> limit) {
+    private String expandLimit(LimitPart limit) {
         var query = new StringBuilder();
         if (limit.getNumber() > -1) {
             query.append(" LIMIT ");

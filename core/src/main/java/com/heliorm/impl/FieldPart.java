@@ -25,8 +25,8 @@ public abstract class FieldPart<O, C> implements Field<O, C>, Cloneable {
     private boolean autoNumber = false;
     private boolean foreignKey = false;
     private boolean nullable = false;
-    private Optional<Table<?>> foreignTable = Optional.empty();
-    private Optional<Integer> length = Optional.empty();
+    private Table<?> foreignTable = null;
+    private Integer length = null;
 
 
     public FieldPart(Table<O> table, FieldType fieldType, Class<C> javaType, String javaName) {
@@ -81,6 +81,7 @@ public abstract class FieldPart<O, C> implements Field<O, C>, Cloneable {
 
     public final FieldPart<O, C> getThis() throws OrmException {
         try {
+            //noinspection unchecked
             return (FieldPart<O, C>) clone();
         } catch (CloneNotSupportedException ex) {
             throw new OrmException(format("Could not make a copy of class %s.BUG!", getClass().getSimpleName()));
@@ -103,19 +104,19 @@ public abstract class FieldPart<O, C> implements Field<O, C>, Cloneable {
 
     @Override
     public final Optional<Table<?>> getForeignTable() {
-        return foreignTable;
+        return Optional.ofNullable(foreignTable);
     }
 
-    void setForeignTable(Optional<Table<?>> foreignTable) {
+    void setForeignTable(Table<?> foreignTable) {
         this.foreignTable = foreignTable;
     }
 
     @Override
     public final Optional<Integer> getLength() {
-        return length;
+        return Optional.ofNullable(length);
     }
 
-    public void setLength(Optional<Integer> length) {
+    public void setLength(Integer length) {
         this.length = length;
     }
 
@@ -128,12 +129,14 @@ public abstract class FieldPart<O, C> implements Field<O, C>, Cloneable {
         this.nullable = nullable;
     }
 
+    @Override
     public FieldOrder<O, C> asc() {
         return () -> FieldPart.this;
     }
 
+    @Override
     public FieldOrder<O, C> desc() {
-        return new FieldOrder<O, C>() {
+        return new FieldOrder<>() {
 
             @Override
             public Direction getDirection() {

@@ -369,9 +369,9 @@ public class SelectTest extends AbstractOrmTest {
                 .filter(cat -> cat.getAge() < 5 && cat.getType().equals(CatType.INDOOR))
                 .collect(Collectors.toList());
         List<Cat> other = cats.stream()
-                .filter(cat ->cat .getAge() > 8 &&  cat.getType().equals(CatType.OUTDOOR))
+                .filter(cat -> cat.getAge() > 8 && cat.getType().equals(CatType.OUTDOOR))
                 .collect(Collectors.toList());
-        List<Cat>wanted = new ArrayList<>();
+        List<Cat> wanted = new ArrayList<>();
         wanted.addAll(some);
         wanted.addAll(other);
         List<Cat> all = orm().select(CAT,
@@ -382,6 +382,7 @@ public class SelectTest extends AbstractOrmTest {
         assertEquals(all.size(), wanted.size(), format("The amount of loaded data should match the number of the items expected (%d vs %s)", all.size(), wanted.size()));
         assertTrue(listCompareOrdered(all, wanted), "The items loaded are exactly the same as the ones we expected");
     }
+
     //    @Test
     @Order(167)
     public void testSelectWhereDateField() throws Exception {

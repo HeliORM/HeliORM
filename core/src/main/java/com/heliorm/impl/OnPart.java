@@ -3,7 +3,7 @@ package com.heliorm.impl;
 import com.heliorm.Field;
 import com.heliorm.def.On;
 
-public class OnPart<LO, RO> implements On< LO, RO> {
+public final class OnPart<LO, RO> implements On< LO, RO> {
 
     private final Field<LO, ?> leftField;
     private final Field<RO, ?> rightField;

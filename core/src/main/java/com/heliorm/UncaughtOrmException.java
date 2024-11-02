@@ -8,7 +8,7 @@ package com.heliorm;
  *
  * @author gideon
  */
-public class UncaughtOrmException extends RuntimeException {
+public final class UncaughtOrmException extends RuntimeException {
 
     /**
      * Create a new exception with the given message.
