@@ -29,3 +29,6 @@ nb-configuration.xml
 
 # FB infer 
 infer-out/
+
+# MacOS
+.DS_Store

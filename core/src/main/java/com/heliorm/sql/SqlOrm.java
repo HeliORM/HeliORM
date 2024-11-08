@@ -27,11 +27,13 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.ServiceLoader;
+import java.util.Set;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.concurrent.ConcurrentHashMap;
@@ -66,7 +68,7 @@ public final class SqlOrm implements Orm {
     private final PreparedStatementHelper preparedStatementHelper;
     private final ResultSetHelper resultSetHelper;
     private SqlTransaction currentTransaction;
-
+    private final ThreadLocal<Set<Connection>> deferred = new ThreadLocal<>();
 
     /**
      * Create an ORM mapper using the supplied driver instance. This is meant to
@@ -264,6 +266,15 @@ public final class SqlOrm implements Orm {
 
     @Override
     public void close() {
+        if (deferred.get() != null) {
+            for (var con : deferred.get()) {
+                try {
+                    closeConnection(con);
+                }
+                catch (OrmException ignored) {
+                }
+            }
+        }
     }
 
     @Override
@@ -309,16 +320,18 @@ public final class SqlOrm implements Orm {
         if (queries.isEmpty()) {
             throw new OrmException("Could not build query from parts. BUG!");
         }
+        var con  = getConnection();
+        deferClose(con);
         if (queries.size() == 1) {
             var query = queries.getFirst().getSelect();
-            Stream<PojoCompare<O>> res = streamSingle(query.getTable(), queryHelper.buildSelectQuery(tail));
+            Stream<PojoCompare<O>> res = streamSingle(con, query.getTable(), queryHelper.buildSelectQuery(tail));
             return res.map(PojoCompare::getPojo);
         } else {
             if (driver.useUnionAll()) {
                 Map<String, Table<O>> tableMap = queries.stream()
                         .map(query -> query.getSelect().getTable())
                         .collect(Collectors.toMap(table -> table.getObjectClass().getName(), table -> table));
-                Stream<PojoCompare<O>> sorted = streamUnion(queryHelper.buildSelectUnionQuery(queries.stream().map(ExecutablePart::getSelect).collect(Collectors.toList())), tableMap)
+                Stream<PojoCompare<O>> sorted = streamUnion(con, queryHelper.buildSelectUnionQuery(queries.stream().map(ExecutablePart::getSelect).collect(Collectors.toList())), tableMap)
                         .map(pojo -> new PojoCompare<>(pops, tail.getSelect().getTable(), pojo))
                         .sorted(makeComparatorForTail(tail.getOrder()));
                 return sorted.map(PojoCompare::getPojo);
@@ -326,7 +339,7 @@ public final class SqlOrm implements Orm {
                 Stream<PojoCompare<O>> res = queries.stream()
                         .flatMap(select -> {
                             try {
-                                return streamSingle(select.getSelect().getTable(), queryHelper.buildSelectQuery(select));
+                                return streamSingle(con, select.getSelect().getTable(), queryHelper.buildSelectQuery(select));
                             } catch (OrmException ex) {
                                 throw new UncaughtOrmException(ex.getMessage(), ex);
                             }
@@ -355,8 +368,7 @@ public final class SqlOrm implements Orm {
      * @return The stream of results.
      * @throws OrmException Thrown if there are SQL or ORM errors
      */
-    private <O> Stream<PojoCompare<O>> streamSingle(Table<O> table, String query) throws OrmException {
-        Connection con = getConnection();
+    private <O> Stream<PojoCompare<O>> streamSingle(Connection con, Table<O> table, String query) throws OrmException {
         try {
             Statement stmt = con.createStatement();
             ResultSet rs = stmt.executeQuery(query);
@@ -381,15 +393,13 @@ public final class SqlOrm implements Orm {
                                                             }
                                                         },
                             Spliterator.ORDERED), false);
-            return stream.onClose(() -> cleanup(con, stmt, rs));
+            return stream;
         } catch (SQLException | UncaughtOrmException ex) {
-            cleanup(con, null, null);
             throw new OrmSqlException(ex.getMessage(), ex);
         }
     }
 
-    private <O> Stream<O> streamUnion(String query, Map<String, Table<O>> tables) throws OrmException {
-        Connection con = getConnection();
+    private <O> Stream<O> streamUnion(Connection con, String query, Map<String, Table<O>> tables) throws OrmException {
         try {
             Statement stmt = con.createStatement();
             ResultSet rs = stmt.executeQuery(query);
@@ -413,9 +423,8 @@ public final class SqlOrm implements Orm {
                             }
                         }
                     }, Spliterator.ORDERED), false);
-            return stream.onClose(() -> cleanup(con, stmt, rs));
+            return stream;
         } catch (SQLException | UncaughtOrmException ex) {
-            cleanup(con, null, null);
             throw new OrmSqlException(ex.getMessage(), ex);
         }
     }
@@ -471,7 +480,6 @@ public final class SqlOrm implements Orm {
      * Close a SQL Connection in a way that properly deals with transactions.
      *
      * @param con The SQL connection
-     * @throws OrmException Thrown if there are SQL errors
      */
     private void closeConnection(Connection con) throws OrmException {
         if ((currentTransaction == null) || (currentTransaction.getConnection() != con)) {
@@ -480,40 +488,6 @@ public final class SqlOrm implements Orm {
             } catch (SQLException ex) {
                 throw new OrmException(ex.getMessage(), ex);
             }
-        }
-    }
-
-    /**
-     * Cleanup SQL Connection, Statement and ResultSet insuring that
-     * errors will not result in aborted cleanup.
-     *
-     * @param con  The SQL connection
-     * @param stmt The SQL statement
-     * @param rs   The SQL result set
-     */
-    private void cleanup(Connection con, Statement stmt, ResultSet rs) {
-        Exception error = null;
-        if (rs != null) {
-            try {
-                rs.close();
-            } catch (Exception ex) {
-                error = ex;
-            }
-        }
-        if (stmt != null) {
-            try {
-                stmt.close();
-            } catch (Exception ex) {
-                error = error != null ? error : ex;
-            }
-        }
-        try {
-            closeConnection(con);
-        } catch (Exception ex) {
-            error = error != null ? error : ex;
-        }
-        if (error != null) {
-            throw new UncaughtOrmException(error.getMessage(), error);
         }
     }
 
@@ -652,6 +626,13 @@ public final class SqlOrm implements Orm {
         } catch (IllegalAccessException | InvocationTargetException e) {
             throw new UncaughtOrmException(e.getMessage(), e);
         }
+    }
+
+    private void deferClose(Connection con) {
+        if (deferred.get() == null) {
+            deferred.set(new HashSet<>());
+        }
+        deferred.get().add(con);
     }
 
 }
