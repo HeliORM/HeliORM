@@ -268,11 +268,7 @@ public final class SqlOrm implements Orm {
     public void close() {
         if (deferred.get() != null) {
             for (var con : deferred.get()) {
-                try {
-                    closeConnection(con);
-                }
-                catch (OrmException ignored) {
-                }
+                closeConnection(con);
             }
         }
     }
@@ -320,12 +316,13 @@ public final class SqlOrm implements Orm {
         if (queries.isEmpty()) {
             throw new OrmException("Could not build query from parts. BUG!");
         }
-        var con  = getConnection();
+        var con = getConnection();
         deferClose(con);
         if (queries.size() == 1) {
             var query = queries.getFirst().getSelect();
             Stream<PojoCompare<O>> res = streamSingle(con, query.getTable(), queryHelper.buildSelectQuery(tail));
-            return res.map(PojoCompare::getPojo);
+            return res.map(PojoCompare::getPojo)
+                    .onClose(() -> closeConnection(con));
         } else {
             if (driver.useUnionAll()) {
                 Map<String, Table<O>> tableMap = queries.stream()
@@ -334,7 +331,8 @@ public final class SqlOrm implements Orm {
                 Stream<PojoCompare<O>> sorted = streamUnion(con, queryHelper.buildSelectUnionQuery(queries.stream().map(ExecutablePart::getSelect).collect(Collectors.toList())), tableMap)
                         .map(pojo -> new PojoCompare<>(pops, tail.getSelect().getTable(), pojo))
                         .sorted(makeComparatorForTail(tail.getOrder()));
-                return sorted.map(PojoCompare::getPojo);
+                return sorted.map(PojoCompare::getPojo)
+                        .onClose(() -> closeConnection(con));
             } else {
                 Stream<PojoCompare<O>> res = queries.stream()
                         .flatMap(select -> {
@@ -352,7 +350,8 @@ public final class SqlOrm implements Orm {
                         res = res.sorted();
                     }
                 }
-                return res.map(PojoCompare::getPojo);
+                return res.map(PojoCompare::getPojo)
+                        .onClose(() -> closeConnection(con));
             }
         }
     }
@@ -481,12 +480,13 @@ public final class SqlOrm implements Orm {
      *
      * @param con The SQL connection
      */
-    private void closeConnection(Connection con) throws OrmException {
+    private void closeConnection(Connection con) throws UncaughtOrmException {
         if ((currentTransaction == null) || (currentTransaction.getConnection() != con)) {
             try {
+                deferred.get().remove(con);
                 con.close();
             } catch (SQLException ex) {
-                throw new OrmException(ex.getMessage(), ex);
+                throw new UncaughtOrmException(ex.getMessage(), ex);
             }
         }
     }
