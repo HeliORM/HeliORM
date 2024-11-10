@@ -483,7 +483,9 @@ public final class SqlOrm implements Orm {
     private void closeConnection(Connection con) throws UncaughtOrmException {
         if ((currentTransaction == null) || (currentTransaction.getConnection() != con)) {
             try {
-                deferred.get().remove(con);
+                if (deferred.get() != null) {
+                    deferred.get().remove(con);
+                }
                 con.close();
             } catch (SQLException ex) {
                 throw new UncaughtOrmException(ex.getMessage(), ex);
