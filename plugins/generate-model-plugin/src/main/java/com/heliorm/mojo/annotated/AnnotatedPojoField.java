@@ -9,6 +9,7 @@ import com.heliorm.def.FieldOrder;
 
 import java.lang.annotation.Annotation;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Optional;
@@ -101,6 +102,9 @@ public class AnnotatedPojoField<O, C> implements Field<O,C> {
             return FieldType.INSTANT;
         } else if (LocalDateTime.class.isAssignableFrom(type)) {
             return FieldType.LOCAL_DATE_TIME;
+        }
+        else if (LocalDate.class.isAssignableFrom(type)) {
+            return FieldType.DATE;
         } else if (Enum.class.isAssignableFrom(type)) {
             return FieldType.ENUM;
         }

@@ -68,6 +68,7 @@ abstract class AbstractPojoOperations implements PojoOperations {
             case BOOLEAN -> setBoolean(pojo, refField, value);
             case ENUM -> setEnum(pojo, refField, value);
             case DATE, INSTANT, LOCAL_DATE_TIME, STRING -> setObject(pojo, refField, value);
+            case BYTE_ARRAY -> setObject(pojo, refField, value);
             default -> throw new OrmException(format("Unsupported field type '%s'. BUG!", field.getFieldType()));
         }
     }

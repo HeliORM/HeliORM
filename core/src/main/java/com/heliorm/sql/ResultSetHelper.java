@@ -103,6 +103,7 @@ class ResultSetHelper {
                 break;
             case BYTE_ARRAY:
                 pops.setValue(pojo, field, getValue(rs, field));
+                break;
             default:
                 throw new OrmException(format("Field type '%s' is unsupported. BUG!", field.getFieldType()));
         }
