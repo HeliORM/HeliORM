@@ -301,7 +301,7 @@ final class QueryHelper {
             if (!body.isEmpty()) {
                 body.append(", ");
             }
-            body.append(format("%s", driver.fieldName(table, order.getField())));
+            body.append(format("%s", driver.fullFieldName(table, order.getField())));
             if (order.getDirection() == OrderPart.Direction.DESCENDING) {
                 body.append(" DESC");
             }
