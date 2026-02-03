@@ -17,6 +17,7 @@ public class Town {
     @ForeignKey(pojo = Province.class)
     private Long provinceId;
     private LocalDateTime founded;
+    private boolean hasPetshop;
 
     public Long getId() {
         return id;
