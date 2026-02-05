@@ -123,13 +123,13 @@ class ResultSetHelper {
         String column = getFieldId(field);
         try {
             switch (field.getFieldType()) {
+                case BOOLEAN: return rs.getBoolean(column);
                 case LONG:
                 case INTEGER:
                 case SHORT:
                 case BYTE:
                 case DOUBLE:
                 case FLOAT:
-                case BOOLEAN:
                     return rs.getObject(column);
                 case ENUM: {
                     Class javaType = field.getJavaType();

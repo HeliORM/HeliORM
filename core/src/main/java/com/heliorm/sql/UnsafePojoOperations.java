@@ -191,6 +191,13 @@ final class UnsafePojoOperations extends AbstractPojoOperations {
      * @param value The value to set
      */
     protected void setBoolean(Object pojo, java.lang.reflect.Field field, Object value) {
+//        value = switch (value) {
+//            case null -> null;
+//            case Boolean b -> b;
+//            case Integer i -> i != 0;
+//            case Long l -> l != 0;
+//            default -> value;
+//        };
         if (field.getType().isPrimitive()) {
             unsafe.putBoolean(pojo, unsafe.objectFieldOffset(field), (boolean) value);
         } else {
