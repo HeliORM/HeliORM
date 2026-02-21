@@ -92,7 +92,7 @@ class ResultSetHelper {
             case BOOLEAN:
             case ENUM:
             case STRING:
-            case DATE:
+            case DATE, BYTE_ARRAY:
                 pops.setValue(pojo, field, getValue(rs, field));
                 break;
             case INSTANT:
@@ -100,9 +100,6 @@ class ResultSetHelper {
                 break;
             case LOCAL_DATE_TIME:
                 pops.setValue(pojo, field, getLocalDateTime(rs, column));
-                break;
-            case BYTE_ARRAY:
-                pops.setValue(pojo, field, getValue(rs, field));
                 break;
             default:
                 throw new OrmException(format("Field type '%s' is unsupported. BUG!", field.getFieldType()));
@@ -132,12 +129,13 @@ class ResultSetHelper {
                 case FLOAT:
                     return rs.getObject(column);
                 case ENUM: {
-                    Class javaType = field.getJavaType();
+                    @SuppressWarnings("rawtypes") Class javaType = field.getJavaType();
                     if (!javaType.isEnum()) {
                         throw new UncaughtOrmException(format("Field %s is not an enum. BUG!", field.getJavaName()));
                     }
-                    String val = rs.getString(column);
+                    var val = rs.getString(column);
                     if (val != null) {
+                        //noinspection unchecked
                         return Enum.valueOf(javaType, val);
                     }
                     return null;

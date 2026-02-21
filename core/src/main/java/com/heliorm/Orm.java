@@ -66,6 +66,7 @@ public interface Orm extends AutoCloseable {
      * @return The Select object that can be used to expand the query or to
      * query data.
      */
+    @SuppressWarnings("unchecked")
     <O> Select<O> select(Table<O> table, Join<O>... joins);
 
     /**
@@ -78,6 +79,7 @@ public interface Orm extends AutoCloseable {
      * @return The Select object that can be used to expand the query or to
      * query data.
      */
+    @SuppressWarnings("unchecked")
     <O> Select<O> select(Table<O> table, Where<O> where, Join<O>... joins);
 
     /**

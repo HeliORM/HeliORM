@@ -130,10 +130,10 @@ public final class MySqlDriver extends SqlDriver {
     }
 
     private String getEnumValues(Field<?, ?> field) {
-        StringJoiner sql = new StringJoiner(",");
+        var sql = new StringJoiner(",");
         Class<?> javaType = field.getJavaType();
         for (Object v : javaType.getEnumConstants()) {
-            sql.add(format("'%s'", ((Enum) v).name()));
+            sql.add(format("'%s'", ((Enum<?>) v).name()));
         }
         return sql.toString();
     }

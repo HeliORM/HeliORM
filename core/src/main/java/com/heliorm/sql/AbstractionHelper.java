@@ -57,17 +57,18 @@ final class AbstractionHelper {
         return new CompoundComparator<>(comps);
     }
 
+    @SuppressWarnings({"rawtypes", "unchecked"})
     private static <O> List<OrderedPart<O>> explode(OrderedPart<O> ordered) {
-        List<OrderedPart<O>> res = new ArrayList<>();
-        SelectPart<O> select = ordered.getSelect();
-        Table<O> table = select.getTable();
+        var res = new ArrayList<OrderedPart<O>>();
+        var select = ordered.getSelect();
+        var  table = select.getTable();
         Set<Table<?>> subTables = table.getSubTables();
         if (subTables.isEmpty()) {
             var selectPart = new SelectPart<>(select.getSelector(), select.getTable(), select.getWhere().orElse(null), explode(select.getJoins()));
             res.add(new OrderedPart(select.getSelector(), selectPart,
                     ordered.getOrder(), ordered.getLimit()));
         } else {
-            for (Table<?> subTable : subTables) {
+            for (var subTable : subTables) {
                 res.add(new OrderedPart(select.getSelector(),
                         new SelectPart(select.getSelector(), subTable, select.getWhere().orElse(null), explode(select.getJoins())),
                         ordered.getOrder(), ordered.getLimit()));
@@ -76,6 +77,7 @@ final class AbstractionHelper {
         return res;
     }
 
+    @SuppressWarnings({"rawtypes", "unchecked"})
     private static <O> List<SelectPart<O>> explode(SelectPart<O> select) {
         List<SelectPart<O>> res = new ArrayList<>();
         Table<?> table = select.getTable();
@@ -90,6 +92,7 @@ final class AbstractionHelper {
         return res;
     }
 
+    @SuppressWarnings({"rawtypes", "unchecked"})
     private static List<JoinPart<?, ?>> explode(List<JoinPart<?, ?>> joins) {
         List<JoinPart<?, ?>> res = new ArrayList<>();
         for (JoinPart<?, ?> join : joins) {

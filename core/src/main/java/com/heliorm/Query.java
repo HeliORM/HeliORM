@@ -33,10 +33,13 @@ public final class Query {
         return new JoinPart<>(table, (OnPart<LO, RO>) on, (WherePart<RO>) where, List.of());
     }
 
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    @SafeVarargs
     public static <LO, RO> Join<LO> join(Table<RO> table, On<LO, RO> on, Join<RO>...joins) {
         return new JoinPart(table, (OnPart<LO, RO>) on, null, Arrays.asList(joins));
     }
 
+    @SuppressWarnings({"unchecked", "rawtypes"})
     @SafeVarargs
     public static <LO, RO> Join<LO> join(Table<RO> table, On<LO, RO> on, Where<RO> where, Join<RO>... joins) {
         return new JoinPart(table, (OnPart<LO, RO>) on, (WherePart<RO>) where, Arrays.asList(joins));

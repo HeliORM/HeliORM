@@ -3,7 +3,6 @@ package com.heliorm.sql.mysql;
 import com.heliorm.Field;
 import com.heliorm.Index;
 import com.heliorm.Table;
-import com.heliorm.sql.OrmSqlException;
 import com.heliorm.sql.TableGenerator;
 
 import java.util.Optional;
@@ -14,7 +13,7 @@ import static java.lang.String.format;
 public class MysqlDialectGenerator implements TableGenerator {
 
     @Override
-    public <O> String generateSchema(Table<O> table) throws OrmSqlException {
+    public <O> String generateSchema(Table<O> table) {
         StringBuilder sql = new StringBuilder();
         sql.append(format("CREATE TABLE %s (\n", fullTableName(table)));
         boolean first = true;
@@ -58,7 +57,7 @@ public class MysqlDialectGenerator implements TableGenerator {
         return sql.toString();
     }
 
-    private String generateFieldSql(Field<?,?> field) throws OrmSqlException {
+    private String generateFieldSql(Field<?,?> field) {
        return switch (field.getFieldType()) {
             case BOOLEAN -> "TINYINT(1)";
             case BYTE -> "TINYINT";
@@ -87,14 +86,13 @@ public class MysqlDialectGenerator implements TableGenerator {
                 }
             }
             case DATE -> "DATE";
-            case INSTANT -> "DATETIME";
-            case LOCAL_DATE_TIME -> "DATETIME";
+            case INSTANT, LOCAL_DATE_TIME -> "DATETIME";
            case BYTE_ARRAY -> "LONGBLOB";
         };
     }
 
     private String getEnumValues(Field<?, ?> field) {
-        StringJoiner sql = new StringJoiner(",");
+        var sql = new StringJoiner(",");
         Class<?> javaType = field.getJavaType();
         for (Object v : javaType.getEnumConstants()) {
             sql.add(format("'%s'", ((Enum<?>) v).name()));

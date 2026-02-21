@@ -1,7 +1,6 @@
 package com.heliorm.sql;
 
 import com.heliorm.Field;
-import com.heliorm.Field.FieldType;
 import com.heliorm.OrmException;
 import com.heliorm.Table;
 import com.heliorm.UncaughtOrmException;
@@ -67,8 +66,7 @@ abstract class AbstractPojoOperations implements PojoOperations {
             case FLOAT -> setFloat(pojo, refField, value);
             case BOOLEAN -> setBoolean(pojo, refField, value);
             case ENUM -> setEnum(pojo, refField, value);
-            case DATE, INSTANT, LOCAL_DATE_TIME, STRING -> setObject(pojo, refField, value);
-            case BYTE_ARRAY -> setObject(pojo, refField, value);
+            case DATE, INSTANT, LOCAL_DATE_TIME, STRING, BYTE_ARRAY -> setObject(pojo, refField, value);
             default -> throw new OrmException(format("Unsupported field type '%s'. BUG!", field.getFieldType()));
         }
     }
@@ -142,6 +140,7 @@ abstract class AbstractPojoOperations implements PojoOperations {
                 if (val1 == null) return -1;
                 if (val2 == null) return 1;
                 if (val1 instanceof Comparable) {
+                    //noinspection unchecked,rawtypes
                     return ((Comparable) val1).compareTo(val2);
                 } else {
                     throw new OrmException(format("Non-comparable type %s for field %s", field.getJavaType(), field.getJavaName()));

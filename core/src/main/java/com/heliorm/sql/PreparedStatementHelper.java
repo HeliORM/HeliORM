@@ -41,7 +41,7 @@ final class PreparedStatementHelper {
                 case BYTE:
                 case DOUBLE:
                 case FLOAT:
-                case BOOLEAN:
+                case BOOLEAN, BYTE_ARRAY:
                     stmt.setObject(par, pojoHelper.getValueFromPojo(pojo, field));
                     break;
                 case ENUM:
@@ -56,9 +56,6 @@ final class PreparedStatementHelper {
                 case INSTANT:
                 case LOCAL_DATE_TIME:
                     stmt.setTimestamp(par, pojoHelper.getTimestampFromPojo(pojo, field));
-                    break;
-                case BYTE_ARRAY:
-                    stmt.setObject(par, pojoHelper.getValueFromPojo(pojo, field));
                     break;
                 default:
                     throw new OrmException(format("Field type '%s' is unsupported. BUG!", field.getFieldType()));

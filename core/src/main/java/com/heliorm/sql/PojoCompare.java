@@ -41,6 +41,7 @@ final class PojoCompare<O> implements Comparable<PojoCompare<O>> {
                 }
             }
             if (pojo instanceof Comparable) {
+                //noinspection rawtypes,unchecked
                 return ((Comparable)pojo).compareTo(w.getPojo());
             }
         }
@@ -69,6 +70,7 @@ final class PojoCompare<O> implements Comparable<PojoCompare<O>> {
         if (PojoCompare.class != obj.getClass()) {
             return false;
         }
+        //noinspection unchecked
         return compareTo((PojoCompare<O>) obj) == 0;
     }
 
