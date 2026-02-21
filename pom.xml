@@ -45,28 +45,44 @@
     <profiles>
         <profile>
             <id>release</id>
+
             <build>
                 <plugins>
+                    <!-- Central Publishing Maven Plugin -->
+                    <plugin>
+                        <groupId>org.sonatype.central</groupId>
+                        <artifactId>central-publishing-maven-plugin</artifactId>
+                        <version>0.5.0</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <publishingServerId>central</publishingServerId>
+                            <bundle>
+                                <!-- Optional: Path to bundle file, if not using default -->
+                                <file>${project.build.directory}/${project.artifactId}-${project.version}-bundle.jar</file>
+                            </bundle>
+                        </configuration>
+                    </plugin>
+
+                    <!-- Source Plugin for attaching sources -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-source-plugin</artifactId>
-                        <version>3.2.1</version>
+                        <version>3.3.1</version>
                         <executions>
                             <execution>
                                 <id>attach-sources</id>
                                 <goals>
-                                    <goal>jar</goal>
+                                    <goal>jar-no-fork</goal>
                                 </goals>
                             </execution>
                         </executions>
                     </plugin>
+
+                    <!-- Javadoc Plugin for attaching Javadocs -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>3.3.2</version>
-                        <configuration>
-                            <excludePackageNames>example;*.impl</excludePackageNames>
-                        </configuration>
+                        <version>3.8.0</version>
                         <executions>
                             <execution>
                                 <id>attach-javadocs</id>
@@ -76,10 +92,12 @@
                             </execution>
                         </executions>
                     </plugin>
+
+                    <!-- GPG Plugin for signing artifacts -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.6</version>
+                        <version>3.2.5</version>
                         <executions>
                             <execution>
                                 <id>sign-artifacts</id>
@@ -90,24 +108,14 @@
                             </execution>
                         </executions>
                     </plugin>
-                    <plugin>
-                        <groupId>org.sonatype.plugins</groupId>
-                        <artifactId>nexus-staging-maven-plugin</artifactId>
-                        <version>${nexus.version}</version>
-                        <extensions>true</extensions>
-                        <configuration>
-                            <serverId>ossrh</serverId>
-                            <nexusUrl>https://oss.sonatype.org</nexusUrl>
-                            <autoReleaseAfterClose>true</autoReleaseAfterClose>
-                        </configuration>
-                    </plugin>
                 </plugins>
             </build>
+
             <distributionManagement>
-                <snapshotRepository>
-                    <id>ossrh</id>
-                    <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-                </snapshotRepository>
+                <repository>
+                    <id>central</id>
+                    <url>https://central.sonatype.com/api/v1/publisher/</url>
+                </repository>
             </distributionManagement>
         </profile>
     </profiles>
