@@ -82,8 +82,9 @@ public final class MySqlDriver extends SqlDriver {
                 case LONG -> rs.getLong(idx);
                 case INTEGER -> rs.getInt(idx);
                 case STRING -> rs.getString(idx);
-                case SHORT, BYTE, DOUBLE, FLOAT, BOOLEAN, ENUM, DATE, INSTANT, LOCAL_DATE_TIME, BYTE_ARRAY ->
-                        throw new OrmException(format("Field type '%s' is not a supported primary key type", field.getFieldType()));
+                case SHORT, BYTE, DOUBLE, FLOAT, BOOLEAN, ENUM,
+                     DATE, INSTANT, LOCAL_DATE_TIME, LOCAL_DATE,
+                     BYTE_ARRAY -> throw new OrmException(format("Field type '%s' is not a supported primary key type", field.getFieldType()));
             };
         } catch (SQLException ex) {
             throw new OrmSqlException(ex.getMessage(), ex);
@@ -92,24 +93,16 @@ public final class MySqlDriver extends SqlDriver {
 
     @Override
     protected String fieldType(Table<?> table, Field<?,?> field) throws OrmException {
-        switch (field.getFieldType()) {
-            case BOOLEAN:
-                return "TINYINT(1)";
-            case BYTE:
-                return "TINYINT";
-            case SHORT:
-                return "SMALLINT";
-            case INTEGER:
-                return "INTEGER";
-            case LONG:
-                return "BIGINT";
-            case DOUBLE:
-                return "DOUBLE";
-            case FLOAT:
-                return "REAL";
-            case ENUM:
-                return format("ENUM(%s)", getEnumValues(field));
-            case STRING: {
+        return switch (field.getFieldType()) {
+            case BOOLEAN -> "TINYINT(1)";
+            case BYTE -> "TINYINT";
+            case SHORT -> "SMALLINT";
+            case INTEGER -> "INTEGER";
+            case LONG -> "BIGINT";
+            case DOUBLE -> "DOUBLE";
+            case FLOAT -> "REAL";
+            case ENUM -> format("ENUM(%s)", getEnumValues(field));
+            case STRING -> {
                 int length = 255;
                 if (field.isPrimaryKey()) {
                     length = 36;
@@ -117,16 +110,13 @@ public final class MySqlDriver extends SqlDriver {
                 if (field.getLength().isPresent()) {
                     length = field.getLength().get();
                 }
-                return format("VARCHAR(%d)", length);
+                yield format("VARCHAR(%d)", length);
             }
-            case DATE:
-                return "DATE";
-            case INSTANT:
-            case LOCAL_DATE_TIME:
-                return "DATETIME";
-            default:
-                throw new OrmSqlException(format("Unknown field type '%s'. BUG!", field.getFieldType()));
-        }
+            case DATE -> "DATE";
+            case INSTANT, LOCAL_DATE_TIME -> "DATETIME";
+            case LOCAL_DATE ->   "DATETIME";
+            case BYTE_ARRAY -> throw new OrmSqlException(format("Unknown field type '%s'. BUG!", field.getFieldType()));
+        };
     }
 
     private String getEnumValues(Field<?, ?> field) {

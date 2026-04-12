@@ -12,6 +12,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.function.Function;
@@ -119,40 +120,25 @@ class ResultSetHelper {
     private Object getValue(ResultSet rs, Field<?, ?> field) throws UncaughtOrmException {
         String column = getFieldId(field);
         try {
-            switch (field.getFieldType()) {
-                case BOOLEAN: return rs.getBoolean(column);
-                case LONG:
-                case INTEGER:
-                case SHORT:
-                case BYTE:
-                case DOUBLE:
-                case FLOAT:
-                    return rs.getObject(column);
-                case ENUM: {
+            return switch (field.getFieldType()) {
+                case BOOLEAN -> rs.getBoolean(column);
+                case LONG, INTEGER, SHORT, BYTE, DOUBLE, FLOAT -> rs.getObject(column);
+                case ENUM -> {
                     @SuppressWarnings("rawtypes") Class javaType = field.getJavaType();
                     if (!javaType.isEnum()) {
                         throw new UncaughtOrmException(format("Field %s is not an enum. BUG!", field.getJavaName()));
                     }
                     var val = rs.getString(column);
-                    if (val != null) {
-                        //noinspection unchecked
-                        return Enum.valueOf(javaType, val);
-                    }
-                    return null;
+                    @SuppressWarnings("unchecked") Object result = val != null ? Enum.valueOf(javaType, val) : null;
+                    yield result;
                 }
-                case STRING:
-                    return rs.getString(column);
-                case DATE:
-                    return rs.getDate(column);
-                case INSTANT:
-                    return getInstant(rs, column);
-                case LOCAL_DATE_TIME:
-                    return getLocalDateTime(rs, column);
-                case BYTE_ARRAY:
-                    return rs.getBytes(column);
-                default:
-                    throw new UncaughtOrmException(format("Field type '%s' is unsupported. BUG!", field.getFieldType()));
-            }
+                case STRING -> rs.getString(column);
+                case DATE -> rs.getDate(column);
+                case INSTANT -> getInstant(rs, column);
+                case LOCAL_DATE_TIME -> getLocalDateTime(rs, column);
+                case BYTE_ARRAY -> rs.getBytes(column);
+                case LOCAL_DATE ->  getLocalDate(rs, column);
+            };
         } catch (SQLException | OrmException ex) {
             throw new UncaughtOrmException(format("Error reading field value from SQL for '%s' (%s)", field.getJavaName(), ex.getMessage()), ex);
         }
@@ -165,6 +151,18 @@ class ResultSetHelper {
                 return null;
             }
             return value.toLocalDateTime();
+        } catch (SQLException ex) {
+            throw new OrmException(format("Could not read timestamp value from SQL (%s)", ex.getMessage()), ex);
+        }
+    }
+
+    private LocalDate getLocalDate(ResultSet rs, String column) throws OrmException {
+        try {
+            Timestamp value = rs.getTimestamp(column);
+            if (value == null) {
+                return null;
+            }
+            return value.toLocalDateTime().toLocalDate();
         } catch (SQLException ex) {
             throw new OrmException(format("Could not read timestamp value from SQL (%s)", ex.getMessage()), ex);
         }

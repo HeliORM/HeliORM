@@ -17,7 +17,7 @@ public class MysqlDialectGenerator implements TableGenerator {
         StringBuilder sql = new StringBuilder();
         sql.append(format("CREATE TABLE %s (\n", fullTableName(table)));
         boolean first = true;
-        for (Field<?,?> field : table.getFields()) {
+        for (Field<?, ?> field : table.getFields()) {
             if (first) {
                 first = false;
             } else {
@@ -32,7 +32,7 @@ public class MysqlDialectGenerator implements TableGenerator {
                 sql.append(" AUTO_INCREMENT");
             }
         }
-        Optional<Field<O,?>> key = table.getPrimaryKey();
+        Optional<Field<O, ?>> key = table.getPrimaryKey();
         if (key.isPresent()) {
             sql.append(",\n");
             sql.append(format("PRIMARY KEY (`%s`)", key.get().getSqlName()));
@@ -57,13 +57,13 @@ public class MysqlDialectGenerator implements TableGenerator {
         return sql.toString();
     }
 
-    private String generateFieldSql(Field<?,?> field) {
-       return switch (field.getFieldType()) {
+    private String generateFieldSql(Field<?, ?> field) {
+        return switch (field.getFieldType()) {
             case BOOLEAN -> "TINYINT(1)";
             case BYTE -> "TINYINT";
-            case SHORT ->  "SMALLINT";
-            case INTEGER ->  "INTEGER";
-            case LONG ->  "BIGINT";
+            case SHORT -> "SMALLINT";
+            case INTEGER -> "INTEGER";
+            case LONG -> "BIGINT";
             case DOUBLE -> "DOUBLE";
             case FLOAT -> "REAL";
             case ENUM -> format("ENUM(%s)", getEnumValues(field));
@@ -76,18 +76,18 @@ public class MysqlDialectGenerator implements TableGenerator {
                     length = field.getLength().get();
                 }
                 if (length >= 16777215) {
-                    yield  "LONGTEXT";
+                    yield "LONGTEXT";
                 } else if (length > 65535) {
-                    yield  "MEDIUMTEXT";
+                    yield "MEDIUMTEXT";
                 } else if (length > 255) {
-                    yield  "TEXT";
+                    yield "TEXT";
                 } else {
-                    yield  format("VARCHAR(%d)", length);
+                    yield format("VARCHAR(%d)", length);
                 }
             }
             case DATE -> "DATE";
-            case INSTANT, LOCAL_DATE_TIME -> "DATETIME";
-           case BYTE_ARRAY -> "LONGBLOB";
+            case INSTANT, LOCAL_DATE_TIME, LOCAL_DATE -> "DATETIME";
+            case BYTE_ARRAY -> "LONGBLOB";
         };
     }
 

@@ -73,6 +73,7 @@ public final class FieldBuilder<P extends FieldPart<?,?>> {
             case DATE -> (P) new DateFieldPart(table, javaName);
             case INSTANT -> (P) new InstantFieldPart(table, javaName);
             case LOCAL_DATE_TIME -> (P) new LocalDateTimeFieldPart<>(table, javaName);
+            case LOCAL_DATE -> (P) new LocalDateFieldPart<>(table, javaName);
             case BYTE_ARRAY -> (P) new ByteArrayFieldPart<>(table, javaName);
         };
         part.setAutoNumber(autoNumber);

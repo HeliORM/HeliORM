@@ -55,6 +55,10 @@ public final class TableBuilder<T extends Table<O>, O> {
         return new FieldBuilder<>(table, FieldType.LOCAL_DATE_TIME, Instant.class, javaName);
     }
 
+    public FieldBuilder<LocalDateFieldPart<O>> localDateField(String javaName) {
+        return new FieldBuilder<>(table, FieldType.LOCAL_DATE, Instant.class, javaName);
+    }
+
 
     public FieldBuilder<StringFieldPart<O>> stringField(String javaName) {
         return new FieldBuilder<>(table, Field.FieldType.STRING, String.class, javaName);

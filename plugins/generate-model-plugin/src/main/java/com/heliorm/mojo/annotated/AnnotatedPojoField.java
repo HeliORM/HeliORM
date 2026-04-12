@@ -104,7 +104,7 @@ public class AnnotatedPojoField<O, C> implements Field<O,C> {
             return FieldType.LOCAL_DATE_TIME;
         }
         else if (LocalDate.class.isAssignableFrom(type)) {
-            return FieldType.DATE;
+            return FieldType.LOCAL_DATE;
         } else if (Enum.class.isAssignableFrom(type)) {
             return FieldType.ENUM;
         }
