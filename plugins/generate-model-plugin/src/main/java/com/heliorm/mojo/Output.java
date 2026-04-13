@@ -121,7 +121,7 @@ class Output {
     }
 
     private void emit(String fmt, Object... args) {
-        buf.append(String.join("",Collections.nCopies(depth*4," ")));
+        buf.append(String.join("", Collections.nCopies(depth * 4, " ")));
         buf.append(format(fmt, args));
         if (!fmt.endsWith("\n")) {
             buf.append("\n");
@@ -304,9 +304,10 @@ class Output {
             case DATE -> addDateField(cm, fm);
             case INSTANT -> addInstantField(cm, fm);
             case LOCAL_DATE_TIME -> addLocalDateTimeField(cm, fm);
+            case LOCAL_DATE -> addLocalDateField(cm, fm);
             case STRING -> addStringField(cm, fm);
             case ENUM -> addEnumField(cm, fm);
-            case BYTE_ARRAY -> addByteArrayField(cm,fm);
+            case BYTE_ARRAY -> addByteArrayField(cm, fm);
         }
     }
 
@@ -358,7 +359,7 @@ class Output {
         completeField(fm);
     }
 
-    private void addByteArrayField(Table<?> cm, Field<?,?> fm) {
+    private void addByteArrayField(Table<?> cm, Field<?, ?> fm) {
         impt(ByteArrayField.class);
         emit("public final %s<%s> %s = builder.byteArrayField(\"%s\")",
                 ByteArrayField.class.getSimpleName(),
@@ -378,6 +379,10 @@ class Output {
 
     private void addLocalDateTimeField(Table<?> cm, Field<?, ?> fm) {
         addField(cm, fm, LocalDateTimeField.class, "localDateTimeField");
+    }
+
+    private void addLocalDateField(Table<?> cm, Field<?, ?> fm) {
+        addField(cm, fm, LocalDateField.class, "localDateField");
     }
 
     private void addStringField(Table<?> cm, Field<?, ?> fm) {

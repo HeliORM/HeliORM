@@ -506,8 +506,7 @@ public final class SqlOrm implements Orm {
                     Connection con = getConnection();
                     try (Statement stmt = con.createStatement()) {
                         stmt.executeUpdate(driver.getTableGenerator().generateSchema(table));
-                    } catch (SQLException ex) {
-                        throw new OrmSqlException(format("Error creating table (%s)", ex.getMessage()), ex);
+                    } catch (SQLException ignored) {
                     } finally {
                         closeConnection(con);
                     }

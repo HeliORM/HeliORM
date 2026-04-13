@@ -35,31 +35,19 @@ final class PreparedStatementHelper {
     void setValueInStatement(PreparedStatement stmt, Object pojo, Field<?, ?> field, int par) throws OrmException {
         try {
             switch (field.getFieldType()) {
-                case LONG:
-                case INTEGER:
-                case SHORT:
-                case BYTE:
-                case DOUBLE:
-                case FLOAT:
-                case BOOLEAN, BYTE_ARRAY:
+                case LONG, INTEGER, SHORT, BYTE, DOUBLE, FLOAT, BOOLEAN, BYTE_ARRAY ->
                     stmt.setObject(par, pojoHelper.getValueFromPojo(pojo, field));
-                    break;
-                case ENUM:
+                case ENUM ->
                     setEnum.apply(stmt, par, pojoHelper.getStringFromPojo(pojo, field));
-                    break;
-                case STRING:
+                case STRING ->
                     stmt.setString(par, pojoHelper.getStringFromPojo(pojo, field));
-                    break;
-                case DATE:
+                case DATE, LOCAL_DATE ->
                     stmt.setDate(par, pojoHelper.getDateFromPojo(pojo, field));
-                    break;
-                case INSTANT:
-                case LOCAL_DATE_TIME:
+                case INSTANT, LOCAL_DATE_TIME ->
                     stmt.setTimestamp(par, pojoHelper.getTimestampFromPojo(pojo, field));
-                    break;
-                default:
+                default ->
                     throw new OrmException(format("Field type '%s' is unsupported. BUG!", field.getFieldType()));
-            }
+            };
         } catch (SQLException ex) {
             throw new OrmSqlException(ex.getMessage(), ex);
         }

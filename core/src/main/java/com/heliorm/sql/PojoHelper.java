@@ -67,11 +67,14 @@ final class PojoHelper {
         if (value == null) {
             return null;
         }
-        if (!(value instanceof java.util.Date)) {
-            throw new OrmException(format("Could not read Date value for field '%s' with type '%s'.", field.getJavaName(), field.getFieldType()));
-        }
-        return new java.sql.Date(((java.util.Date) value).getTime());
+        return switch (value) {
+            case null -> null;
+            case java.util.Date date -> new java.sql.Date(date.getTime());
+            case LocalDate date ->  java.sql.Date.valueOf(date);
+            default -> throw new OrmException(format("Could not read Date value for field '%s' with type '%s'.", field.getJavaName(), field.getFieldType()));
+        };
     }
+
 
     /**
      * Get a timestamp value from the given POJO for the given field.
