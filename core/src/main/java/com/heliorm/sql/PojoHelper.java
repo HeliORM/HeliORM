@@ -3,7 +3,6 @@ package com.heliorm.sql;
 import com.heliorm.Field;
 import com.heliorm.OrmException;
 
-import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -93,24 +92,6 @@ final class PojoHelper {
             default ->
                     throw new OrmException(format("Could not read Instant value for field '%s' with type '%s'.", field.getJavaName(), field.getFieldType()));
         };
-    }
-
-    /**
-     * Get a duration value from the given POJO for the given field.
-     *
-     * @param pojo  The POJO from which to read the timestamp.
-     * @param field The field to read.
-     * @return The duration string value.
-     */
-    String getDurationFromPojo(Object pojo, Field field) throws OrmException {
-        Object value = getValueFromPojo(pojo, field);
-        if (value == null) {
-            return null;
-        }
-        if (value instanceof Duration) {
-            return ((Duration) value).toString();
-        }
-        throw new OrmException(format("Could not read Duration value for field '%s' with type '%s'.", field.getJavaName(), field.getFieldType()));
     }
 
 }

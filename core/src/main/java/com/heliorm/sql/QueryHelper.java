@@ -19,6 +19,11 @@ import com.heliorm.impl.WherePart;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -38,7 +43,7 @@ import static java.lang.String.format;
 final class QueryHelper {
 
     static final String POJO_NAME_FIELD = "pojo_field_name";
-    private static final DateFormat dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+    private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
     private final SqlDriver driver;
     private final Function<Field<?, ?>, String> getFieldId;
     private final FullTableName fullTableName;
@@ -324,10 +329,12 @@ final class QueryHelper {
     }
 
     private String sqlValue(Field<?, ?> field, Object object) {
-        if (Objects.requireNonNull(field.getFieldType()) == FieldType.DATE) {
-            return dateTimeFormat.format(object);
-        }
-        return object.toString();
+        return switch (field.getFieldType()) {
+            case INSTANT -> dateTimeFormatter.format(LocalDateTime.ofInstant((Instant)object, ZoneOffset.UTC));
+            case LOCAL_DATE_TIME -> dateTimeFormatter.format((LocalDateTime)object);
+            case LOCAL_DATE -> dateTimeFormatter.format((LocalDate)object);
+            default -> object.toString();
+        };
     }
 
     /**

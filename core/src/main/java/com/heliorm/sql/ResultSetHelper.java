@@ -15,6 +15,8 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.TimeZone;
 import java.util.function.Function;
 
 import static java.lang.String.format;
@@ -25,6 +27,8 @@ import static java.lang.String.format;
  * @author gideon
  */
 class ResultSetHelper {
+
+    private static final TimeZone UTC = TimeZone.getTimeZone("UTC");
 
     private final PojoOperations pops;
     private final Function<Field<?, ?>, String> getFieldId;
@@ -170,7 +174,7 @@ class ResultSetHelper {
 
     private Instant getInstant(ResultSet rs, String column) throws OrmException {
         try {
-            Timestamp value = rs.getTimestamp(column);
+            Timestamp value = rs.getTimestamp(column, Calendar.getInstance(UTC));
             if (value == null) {
                 return null;
             }

@@ -5,6 +5,8 @@ import com.heliorm.OrmException;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Calendar;
+import java.util.TimeZone;
 
 import static java.lang.String.format;
 
@@ -14,6 +16,8 @@ import static java.lang.String.format;
  * @author gideon
  */
 final class PreparedStatementHelper {
+
+    private static final TimeZone UTC = TimeZone.getTimeZone("UTC");
 
     private final PojoHelper pojoHelper;
     private final SetEnum setEnum;
@@ -43,7 +47,9 @@ final class PreparedStatementHelper {
                     stmt.setString(par, pojoHelper.getStringFromPojo(pojo, field));
                 case DATE, LOCAL_DATE ->
                     stmt.setDate(par, pojoHelper.getDateFromPojo(pojo, field));
-                case INSTANT, LOCAL_DATE_TIME ->
+                case INSTANT ->
+                    stmt.setTimestamp(par, pojoHelper.getTimestampFromPojo(pojo, field), Calendar.getInstance(UTC));
+                case LOCAL_DATE_TIME ->
                     stmt.setTimestamp(par, pojoHelper.getTimestampFromPojo(pojo, field));
                 default ->
                     throw new OrmException(format("Field type '%s' is unsupported. BUG!", field.getFieldType()));
