@@ -46,4 +46,12 @@ public class Town {
     public void setFounded(LocalDateTime founded) {
         this.founded = founded;
     }
+
+    public boolean isHasPetshop() {
+        return hasPetshop;
+    }
+
+    public void setHasPetshop(boolean hasPetshop) {
+        this.hasPetshop = hasPetshop;
+    }
 }

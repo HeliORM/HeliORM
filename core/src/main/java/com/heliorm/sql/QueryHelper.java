@@ -333,6 +333,9 @@ final class QueryHelper {
             case INSTANT -> dateTimeFormatter.format(LocalDateTime.ofInstant((Instant)object, ZoneOffset.UTC));
             case LOCAL_DATE_TIME -> dateTimeFormatter.format((LocalDateTime)object);
             case LOCAL_DATE -> dateTimeFormatter.format((LocalDate)object);
+            // Not 'true' and 'false': MySQL and MariaDB turn those strings into 0 when comparing with a TINYINT column.
+            // 1 and 0 are understood by MySQL, MariaDB, PostgreSQL and H2 alike.
+            case BOOLEAN -> (Boolean) object ? "1" : "0";
             default -> object.toString();
         };
     }
